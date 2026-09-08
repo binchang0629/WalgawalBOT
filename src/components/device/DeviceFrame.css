@@ -1,0 +1,137 @@
+/* PC 기기 목업. 모바일에서는 ShowcaseLayout이 아예 렌더링하지 않는다. */
+
+/*
+ * 축소된 크기만큼만 레이아웃 자리를 차지하는 바깥 래퍼.
+ * 크기는 DeviceFrame.tsx가 인라인 스타일로 넣는다.
+ */
+.device-frame-fit {
+    flex: none;
+}
+
+/* 실제 축소를 담당한다. 좌상단 기준으로 줄여야 래퍼 크기와 정확히 맞는다. */
+.device-frame-scaler {
+    transform-origin: top left;
+}
+
+/*
+ * 화면 402 × 874 + 검은 베젤 3px × 2 + 금속 프레임 12px × 2 = 30px.
+ * 베젤 여백을 빼먹으면 화면이 베젤을 밀고 나가 오른쪽 테두리만 얇아진다.
+ */
+.device-frame {
+    width: calc(var(--device-width) + 30px);
+    height: calc(var(--device-height) + 30px);
+    padding: 12px;
+    border-radius: 62px;
+    background: linear-gradient(160deg, #3a3a3c 0%, #1c1c1e 40%, #48484a 100%);
+    box-shadow:
+        0 24px 60px rgba(37, 37, 37, .28),
+        0 2px 0 rgba(255, 255, 255, .18) inset;
+}
+
+.device-frame__bezel {
+    width: 100%;
+    height: 100%;
+    padding: 3px;
+    border-radius: 50px;
+    background: #000;
+}
+
+/* 실제 화면. Figma 기준 402 × 874를 유지한다. */
+.device-frame__screen {
+    position: relative;
+    width: var(--device-width);
+    height: var(--device-height);
+    border-radius: 47px;
+    overflow: hidden;
+    background: #fff;
+}
+
+/* ---------- 시스템 상태바 (Figma top_nav 상단 62px) ---------- */
+
+.device-status-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    height: var(--device-status-bar);
+    padding: 14px 26px 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    pointer-events: none;
+    color: var(--neutral-900);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -.4px;
+}
+
+.device-status-bar__time {
+    width: 74px;
+    padding-top: 3px;
+}
+
+/* 다이내믹 아일랜드 */
+.device-status-bar__island {
+    width: 94px;
+    height: 29px;
+    margin-top: -4px;
+    background: #000;
+    border-radius: 24px;
+}
+
+.device-status-bar__indicators {
+    width: 74px;
+    padding-top: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+}
+
+.device-status-bar__signal,
+.device-status-bar__wifi {
+    width: 17px;
+    height: 11px;
+    background: var(--neutral-900);
+    border-radius: 2px;
+}
+
+.device-status-bar__wifi {
+    width: 15px;
+    border-radius: 50% 50% 2px 2px;
+}
+
+.device-status-bar__battery {
+    width: 25px;
+    height: 12px;
+    border: 1.5px solid var(--neutral-900);
+    border-radius: 4px;
+    position: relative;
+}
+
+.device-status-bar__battery::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    background: var(--neutral-900);
+    border-radius: 1px;
+}
+
+/* ---------- 홈 인디케이터 (down_nav 하단 여백에 겹친다) ---------- */
+
+.device-home-indicator {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 30;
+    width: 139px;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--neutral-900);
+    opacity: .85;
+    pointer-events: none;
+}
+
+/* 앱 화면 영역(.app-viewport) 스타일은 AppViewport.css에 있다. */

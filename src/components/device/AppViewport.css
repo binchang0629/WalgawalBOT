@@ -1,0 +1,32 @@
+/*
+ * 앱 화면 경계.
+ * PC에서는 목업 안쪽, 모바일에서는 실제 화면 전체다.
+ * DeviceFrame은 PC에서만 렌더링되므로 이 스타일은 별도 파일로 둔다.
+ */
+
+.app-viewport {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #fff;
+    /* PC: 상태바는 목업이 그리므로 앱 콘텐츠는 그 아래에서 시작한다. */
+    padding-top: var(--device-status-bar);
+}
+
+/* 모바일: 목업 상태바가 없으므로 실제 안전 영역만 반영한다. */
+.showcase--mobile .app-viewport {
+    padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* 모달·바텀시트 portal 대상. 기기 내부이면서 스크롤 콘텐츠 바깥이다. */
+#app-overlay-root {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    pointer-events: none;
+}
+
+#app-overlay-root:empty {
+    display: none;
+}

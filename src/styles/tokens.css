@@ -1,0 +1,78 @@
+/*
+ * 왈가왈BOT 공통 디자인 토큰
+ * 근거: PROJECT_SPEC.md §1-2 타이포그래피, §1-3 컬러 (Figma 확정 스타일가이드)
+ * 이 파일 밖에서 새 색·새 폰트 크기를 임의로 만들지 않는다.
+ */
+
+:root {
+    /* ---------- Neutral ---------- */
+    --neutral-900: #252525;
+    --neutral-800: #424042;
+    --neutral-700: #59565b;
+    --neutral-600: #78757a;
+    --neutral-500: #a29fa3;
+    --neutral-400: #bfbcc1;
+    --neutral-300: #d5d2d6;
+    --neutral-250: #e0dde2;
+    --neutral-200: #e8e6ea;
+    --neutral-100: #f0eef1;
+    --neutral-050: #fafafa;
+
+    /* ---------- Primary blue ---------- */
+    --blue-900: #1035c7;
+    --blue-800: #3043ea;
+    --blue-700: #374bff;
+    --blue-600: #2863fa;
+    --blue-500: #377dff;
+    --blue-400: #4d8efd;
+    --blue-300: #659eff;
+    --blue-200: #81b7ff;
+    --blue-150: #b4d7ff;
+    --blue-100: #d8eaff;
+    --blue-050: #eaf6ff;
+    --blue-025: #f9fafd;
+
+    /* ---------- Secondary orange ---------- */
+    --orange-900: #f57200;
+    --orange-800: #fd8013;
+    --orange-700: #ff9524;
+    --orange-600: #ffa748;
+    --orange-500: #ffb361;
+    --orange-400: #ffc27d;
+    --orange-300: #ffd396;
+    --orange-250: #ffdda7;
+    --orange-200: #ffeabd;
+    --orange-100: #fff6dc;
+    --orange-050: #fefbef;
+    --orange-025: #fffdf8;
+
+    /* ---------- Semantic / accent ---------- */
+    --positive: #374bff;
+    --negative: #ff6358;
+    --bright-green: #deff73;
+    --green: #83d400;
+    --pink: #ffbbbb;
+    --dark-brown: #614d28;
+    --brown: #8d786d;
+
+    /* ---------- 역할 별칭 (기존 Home.css 호환) ---------- */
+    --ink: var(--neutral-900);
+    --sub: var(--neutral-600);
+    --line: var(--neutral-200);
+    --blue: var(--blue-700);
+    --soft-blue: var(--blue-050);
+    --orange: var(--orange-700);
+    --coral: var(--negative);
+
+    /* ---------- 폰트 ---------- */
+    --font-title: Paperlogy, Pretendard, "Noto Sans KR", Arial, sans-serif;
+    --font-body: Pretendard, "Noto Sans KR", Arial, sans-serif;
+
+    /* ---------- 기기 기준 크기 (PROJECT_SPEC.md §1-4) ---------- */
+    --device-width: 402px;
+    --device-height: 874px;
+    --device-status-bar: 62px;   /* Figma top_nav 상단 62px = 시스템 상태바 */
+    --device-app-header: 66px;   /* Figma top_nav 하단 66px = 서비스 헤더 */
+    --device-bottom-nav: 100px;  /* Figma down_nav (홈 인디케이터 포함) */
+    --content-gutter: 24px;
+}

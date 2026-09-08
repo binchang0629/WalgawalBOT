@@ -1,0 +1,63 @@
+/* 시연 도구. 실제 서비스 UI와 구분되도록 기기 바깥에서만 쓴다. */
+
+/* 오른쪽 패널의 첫 요소이므로 위쪽 구분선을 두지 않는다. */
+.persona-switcher {
+    margin-top: 0;
+}
+
+.persona-switcher__caption {
+    margin: 0 0 10px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .4px;
+    color: var(--neutral-600);
+}
+
+.persona-switcher__list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.persona-switcher__item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 12px 14px;
+    border: 1px solid var(--neutral-250);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .9);
+    text-align: left;
+}
+
+.persona-switcher__item:hover {
+    border-color: var(--blue-200);
+}
+
+.persona-switcher__item--current {
+    border-color: var(--blue-700);
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(55, 75, 255, .12);
+}
+
+.persona-switcher__name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--neutral-900);
+}
+
+.persona-switcher__item--current .persona-switcher__name {
+    color: var(--blue-700);
+}
+
+.persona-switcher__kind {
+    font-size: 12px;
+    color: var(--neutral-600);
+}
+
+.persona-switcher__status {
+    margin: 12px 0 0;
+    font-size: 12px;
+    color: var(--neutral-600);
+}

@@ -1,0 +1,117 @@
+/*
+ * 회원가입 (데모).
+ * Figma 컨펌 시안이 없는 화면이라 확정 스타일가이드 토큰만 사용한다.
+ * 새 색·새 폰트 크기를 여기서 만들지 않는다. (PROJECT_SPEC.md §1-3)
+ */
+
+.signup {
+    padding: 12px var(--content-gutter) 0;
+}
+
+.signup__title {
+    margin: 0;
+    font-family: var(--font-title);
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--neutral-900);
+}
+
+.signup__lead {
+    margin: 14px 0 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--neutral-600);
+}
+
+.signup__form {
+    margin-top: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.signup__field {
+    display: block;
+}
+
+.signup__label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--neutral-700);
+}
+
+.signup__input {
+    width: 100%;
+    height: 52px;
+    padding: 0 16px;
+    border: 1px solid var(--neutral-250);
+    border-radius: 14px;
+    background: var(--neutral-050);
+    color: var(--neutral-900);
+    font-family: var(--font-body);
+    font-size: 16px;
+    cursor: default;
+    transition: color .2s ease, border-color .2s ease, background .2s ease;
+}
+
+.signup__input:focus {
+    outline: none;
+}
+
+/* 더미텍스트 입력 전 — 값은 보이지만 아직 확정되지 않은 상태 */
+.signup__input--dim {
+    color: var(--neutral-400);
+    background: #fff;
+}
+
+.signup__notice {
+    margin: 20px 0 0;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--blue-050);
+    color: var(--blue-900);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.signup__actions {
+    margin-top: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.signup__dummy {
+    height: 50px;
+    border: 1px solid var(--blue-150);
+    border-radius: 14px;
+    background: #fff;
+    color: var(--blue-700);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.signup__dummy:disabled {
+    border-color: var(--neutral-200);
+    color: var(--neutral-500);
+    cursor: default;
+}
+
+.signup__submit {
+    height: 54px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--blue);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.signup__submit:disabled {
+    background: var(--neutral-200);
+    color: var(--neutral-500);
+    cursor: not-allowed;
+}

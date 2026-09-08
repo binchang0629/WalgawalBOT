@@ -1,0 +1,47 @@
+.auth-layout {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    overflow: hidden;
+}
+
+.auth-layout__bar {
+    flex: none;
+    height: var(--device-app-header);
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+}
+
+.auth-layout__back {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    background: none;
+    color: var(--neutral-900);
+    font-size: 30px;
+    line-height: 1;
+}
+
+.auth-layout__scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+
+    /* 목업 안에 데스크톱 스크롤바가 보이지 않게 한다. 스크롤 자체는 유지된다. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.auth-layout__scroll::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+}

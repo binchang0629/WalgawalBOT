@@ -1,32 +1,16 @@
 ---
 name: design-to-react
-description: 왈가왈BOT의 컨펌 Figma 시안을 자료종합·확정 스타일가이드 기준으로 기존 React와 CSS 구조에 구현하거나 수정할 때 사용합니다.
+description: 왈가왈BOT 구현 기준은 PROJECT_SPEC.md로 통합되었습니다. 이 파일은 삭제 대상입니다.
 ---
 
-# Design to React
+# Design to React (통합됨)
 
-## 목표
+이 스킬의 내용은 `PROJECT_SPEC.md`로 통합되었다. **삭제 대상 파일이다.**
 
-컨펌된 왈가왈BOT 모바일 시안을 기존 Vite + React + CSS 프로젝트에서 정확하고 유지보수 가능한 화면으로 구현한다.
-
-## 작업 순서
-
-1. `PRD.md`, `AGENTS.md`, `design-analysis.md`, `PROJECT_CONTEXT.md`를 읽는다.
-2. Figma `자료종합`의 IA·유저플로우와 `확정 스타일가이드`를 확인한다.
-3. 대상 화면의 Figma 컨펌 시안, 실제 에셋, 기존 페이지·공통 코드를 확인한다.
-4. 화면의 목적, 반복 컴포넌트, 기본·선택·빈 상태, 안전한 도움 진입점을 구분한다.
-5. 요청 범위의 `src/pages/[PageName]/`에서 섹션을 조립한다. 재사용 조각은 `src/components/layout`, `src/components/ui`, `src/components/case` 또는 페이지 전용 `components`로 분리한다.
-6. 공통 요소는 기존 `src/components` 또는 `src/common`을 먼저 확인하고 팀 합의 범위에서만 수정한다.
-7. iPhone 17의 402 × 874px 기준으로 구현한 뒤 텍스트 잘림·의도하지 않은 가로 스크롤·하단바 겹침을 확인한다.
-8. `npm run lint`, `npm run build`로 확인하고 `PROJECT_CONTEXT.md`를 갱신한다.
-
-## 지킬 점
-
-- Figma에서 확인하지 못한 색·간격·동작은 임의로 확정하지 않는다.
-- 제목/본문/보조/메타는 확정 스타일가이드의 텍스트 스케일을 사용한다.
-- 텍스트를 키우면 컨테이너·여백·줄바꿈도 함께 조정한다.
-- 실제 에셋을 우선 사용하며, 없는 에셋을 새로 만들기 전 팀에 확인한다.
-- 디자인을 이미지 한 장으로 붙이거나 모든 요소를 절대 위치로 배치하지 않는다.
-- 공통 컴포넌트에는 화면별 문구·수치를 고정하지 않고 prop으로 전달한다.
-- 한 화면에서만 확인된 조각은 우선 페이지 전용 컴포넌트로 만들고, 재사용이 확인된 뒤 공통 컴포넌트로 승격한다.
-- 요청 없이 라이브러리·라우터·서버 API를 추가하지 않는다.
+| 기존 내용 | 옮겨간 위치 |
+| --- | --- |
+| 작업 순서 | `PROJECT_SPEC.md` §7-10 |
+| 시각 기준·에셋 사용 | `PROJECT_SPEC.md` §1 |
+| 이미지 붙이기·절대 위치 금지 | `PROJECT_SPEC.md` §1 |
+| 컴포넌트 분리·prop 전달 | `PROJECT_SPEC.md` §7-2, §7-9 |
+| 라이브러리·라우터 임의 추가 금지 | `PROJECT_SPEC.md` §7-1 |

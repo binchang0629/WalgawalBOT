@@ -28,3 +28,8 @@ dist/
 *.njsproj
 *.sln
 *.sw?
+# Claude 데스크톱 앱이 만드는 산출물 폴더
+Claude outputs/
+
+# TypeScript 빌드 정보 (tsconfig에서 node_modules/.tmp로 보내지만 안전장치)
+*.tsbuildinfo
