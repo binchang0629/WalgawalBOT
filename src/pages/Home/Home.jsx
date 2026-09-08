@@ -1,17 +1,10 @@
 import { useState } from 'react'
 import './Home.css'
-import weddingEnvelope from '../../assets/home/wedding-envelope.png'
 import perillaTable from '../../assets/home/perilla-table.png'
-import mintChoco from '../../assets/home/mint-choco.png'
 
 const recentCases = [
   { tag: '친구 · 금전', title: '친구 모임에서 항상\n계산은 제가 해요', meta: '💬 24', tone: 'blue' },
   { tag: '연인 · 약속', title: '이웃의 늦은 밤 세탁기\n소음, 참아야 할까요?', meta: '💬 12', tone: 'yellow' },
-]
-
-const opinions = [
-  { label: '공개 지적은 과했음', percent: '52%', tone: 'blue' },
-  { label: '마감 지연은 문제', percent: '48%', tone: 'coral' },
 ]
 
 function SectionHeading({ title, description, action = '더보기' }) {
