@@ -1,0 +1,80 @@
+/*
+ * 웹폰트 등록. `PROJECT_SPEC.md` §1-2의 다섯 가지 역할 폰트를 모두 담았다.
+ *
+ * | 역할        | 패밀리              | 파일                                  |
+ * | ----------- | ------------------- | ------------------------------------- |
+ * | 제목        | Paperlogy 7 Bold    | `Paperlogy-7Bold.woff2`               |
+ * | 본문·UI     | Pretendard Variable | `PretendardVariable.woff2` (100~900)  |
+ * | 보조 문구   | RIDIBatang          | `RIDIBatang.woff2`                    |
+ * | 인용부호    | Noto Sans KR Bold   | `NotoSansKR-Bold-latin/korean.woff2`  |
+ * | 장식(한정)  | Cafe24 Ssukssuk     | `Cafe24Ssukssuk.woff2`                |
+ *
+ * 원래 있던 두 파일은 ttf였다(합계 8.0MB). 같은 폰트를 woff2로 변환해 2.5MB로 줄였다.
+ * woff2는 2016년 이후 모든 주요 브라우저가 읽으므로 ttf는 참조하지 않는다.
+ * 원본 ttf는 폴더에 그대로 두되 빌드에는 들어가지 않는다.
+ *
+ * 라이선스 — RIDIBatang: 리디 제공, 상업적 이용 무료(폰트 파일 자체의 판매·재배포 금지).
+ * Cafe24 Ssukssuk: 카페24 제공, 상업적 이용 무료. Noto Sans KR: SIL OFL 1.1.
+ * 세 폰트 모두 서비스에 임베드해 쓰는 것은 허용된 범위다. 배포 전 팀 확인 권장. → §9-7
+ */
+
+/* ---------- 제목: Paperlogy 7 Bold ---------- */
+@font-face {
+    font-family: Paperlogy;
+    src: url("../assets/fonts/Paperlogy-7Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ---------- 본문·UI: Pretendard Variable ---------- */
+@font-face {
+    font-family: Pretendard;
+    src: url("../assets/fonts/PretendardVariable.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ---------- 보조 문구: RIDIBatang ---------- */
+@font-face {
+    font-family: RIDIBatang;
+    src: url("../assets/fonts/RIDIBatang.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ---------- 인용부호: Noto Sans KR Bold ---------- */
+/* 라틴·기호 구간. 시안에서 쓰는 따옴표 “ ”(U+201C·U+201D)가 여기 들어 있다. */
+@font-face {
+    font-family: "Noto Sans KR";
+    src: url("../assets/fonts/NotoSansKR-Bold-latin.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+    unicode-range:
+        U+0000-00ff, U+0131, U+0152-0153, U+02bb-02bc, U+02c6, U+02da, U+02dc,
+        U+0304, U+0308, U+0329, U+2000-206f, U+20ac, U+2122, U+2191, U+2193,
+        U+2212, U+2215, U+feff, U+fffd;
+}
+
+/* 한글 구간. 따옴표만 쓰는 지금은 거의 내려받지 않지만, 본문에 쓰게 될 때를 위해 둔다. */
+@font-face {
+    font-family: "Noto Sans KR";
+    src: url("../assets/fonts/NotoSansKR-Bold-korean.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+1100-11ff, U+3130-318f, U+a960-a97f, U+ac00-d7a3, U+d7b0-d7ff;
+}
+
+/* ---------- 장식(도라에몽쉘 타이틀 한정): Cafe24 Ssukssuk ---------- */
+/* 공통 UI에 쓰지 않는다. (PROJECT_SPEC.md §1-2) */
+@font-face {
+    font-family: "Cafe24 Ssukssuk";
+    src: url("../assets/fonts/Cafe24Ssukssuk.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}

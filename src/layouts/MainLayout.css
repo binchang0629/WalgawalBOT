@@ -78,10 +78,25 @@
     white-space: nowrap;
 }
 
-.bottom-nav__item>span {
+/*
+ * 아이콘은 Figma에서 내보낸 SVG를 mask로 얹는다.
+ * <img>로 넣으면 파일에 박힌 색이 그대로 나와 활성·비활성 색을 바꿀 수 없다.
+ * mask는 벡터 모양은 그대로 두고 색만 currentColor가 정하게 해준다.
+ */
+.bottom-nav__icon {
+    display: block;
+    width: 24px;
     height: 25px;
-    font-size: 22px;
-    line-height: 25px;
+    background: currentColor;
+    /* --nav-icon은 BottomNavigation이 메뉴별 SVG 경로로 넘긴다. */
+    mask-image: var(--nav-icon);
+    -webkit-mask-image: var(--nav-icon);
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: contain;
 }
 
 .bottom-nav__item.active {
@@ -99,19 +114,38 @@
     color: var(--blue);
 }
 
-.bottom-nav .case-nav>span {
-    display: grid;
-    place-items: center;
+/* 중앙 CTA는 파란 원 안에 흰 아이콘을 둔다. mask 색만 흰색으로 바꾼다. */
+.bottom-nav .case-nav .bottom-nav__icon--cta {
     width: 57px;
     height: 57px;
     border-radius: 50%;
-    color: #fff;
     background: var(--blue);
     box-shadow: 0 5px 10px rgba(61, 92, 217, .25);
-    font-size: 32px;
+    mask: none;
+    -webkit-mask: none;
+    position: relative;
 }
 
-.bottom-nav .case-nav:disabled>span {
+.bottom-nav .case-nav .bottom-nav__icon--cta::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 33px;
+    height: 32px;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    mask-image: var(--nav-icon);
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+    -webkit-mask-image: var(--nav-icon);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: contain;
+}
+
+.bottom-nav .case-nav:disabled .bottom-nav__icon--cta {
     background: var(--blue-200);
     box-shadow: none;
 }

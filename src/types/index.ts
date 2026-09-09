@@ -3,8 +3,11 @@
  * 화면 전용 타입은 해당 페이지 폴더에 둔다. (PROJECT_SPEC.md §7-9)
  */
 
-/** 사건 카드에 붙는 분류. IA에 있는 값만 사용한다. */
-export type CaseCategory = '친구' | '연인' | '가족' | '직장' | '금전' | '이웃'
+/**
+ * 사건 카드에 붙는 분류.
+ * 광장 시안의 카테고리 칩(연인·친구·가족·직장·학업)과 IA 사례의 분류를 합친 값이다.
+ */
+export type CaseCategory = '친구' | '연인' | '가족' | '직장' | '학업' | '금전' | '이웃'
 
 /** 사건 상세의 관점 선택. 승패가 아니라 이해의 방향이다. (PROJECT_SPEC.md §0-6) */
 export type OpinionSide = 'writer' | 'other' | 'both'
@@ -67,5 +70,15 @@ export interface Persona {
   /** 시연할 핵심 행동 */
   keyActions: string[]
 }
+
+/** 배심원 광장의 명판관 랭킹 한 줄. */
+export interface JurorRank {
+  rank: 1 | 2 | 3
+  nickname: string
+  point: number
+}
+
+/** 광장 사건 목록 정렬 기준. URL 쿼리로 관리한다. (PROJECT_SPEC.md §7-7) */
+export type PlazaSortKey = 'latest' | 'popular'
 
 export type SessionStatus = 'restoring' | 'anonymous' | 'authenticated'

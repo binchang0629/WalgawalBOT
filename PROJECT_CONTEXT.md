@@ -32,12 +32,13 @@ npm run dev
 | 2026-09-08 | **회원가입 화면(`/signup`)을 시안 없이 추가** | 팀 결정. 발표 시연에 필요. 확정 스타일가이드 토큰만 사용 |
 | 2026-09-08 | 온보딩·별도 로그인 화면은 만들지 않음 | 시안도 없고 시연 흐름에도 없음 |
 | 2026-09-08 | 곽지훈(B)은 가입 없이 계정 전환으로 진입 | 발표에서 윤서아 다음 순서라 로그인 시점이 필요 없음 |
-| 2026-09-09 | `DetailLayout` 신설, 하단바 없음 | PROJECT_SPEC.md §7-2 폴더 계획에 있던 레이아웃을 처음 구현. 지훈01~05 화면이 자체 헤더·진행률·하단 CTA를 모두 가지고 있어 레이아웃은 Outlet만 감싸는 얇은 틀로 두었다 |
-| 2026-09-09 | `/cases/new*` 접근 가드 없음 | 로그인 필요 범위가 아직 미정이라(§9-9) 임의로 `RequireAuth`를 걸지 않았다 |
-| 2026-09-09 | Figma `color/Blue/500`(#649EFF)를 `--blue-300`(#659EFF)에 매핑 | 프로젝트 컬러 스케일에 정확히 같은 값이 없다. 육안 차이가 없는 동일 계열 값이라 스케일 밖 새 색을 만드는 대신 가장 가까운 기존 토큰을 재사용했다 (PROJECT_SPEC.md §1-3) |
-| 2026-09-09 | 사건 접수 지훈01~05 전 단계를 별도 라우트로 구현 | `/cases/new`(작성) → `/cases/new/questions`(추가 질문) → `/cases/new/summary`(요약 확인) → `/cases/new/opinion`(AI 참고 의견·접수) → `/cases/new/complete`(접수 완료). 각 단계가 새로고침·직접 URL 접근에도 견디도록 라우트로 나누고, 공유 입력 상태는 `CaseSubmitFlow`의 Context에 뒀다 |
-| 2026-09-09 | `배심원 광장에 공개`는 선택 불가로 구현 | Figma 주석(node 1446:10059)에 "처음 진입 시 둘 다 회색, 배심원 광장은 비활성화, 나만보기만 클릭 시 주황"이라고 명시돼 있다. 공개 범위를 어디까지 열지 미정이라(§9-9) 시안 주석을 그대로 따랐다 — 사건 접수는 항상 `나만 보기`로만 완료된다 |
-| 2026-09-09 | 지훈02~04의 질문·요약·AI 의견은 고정 예시(디자이너 잔금 미지급) 그대로 사용 | 실제 AI 없이 mock으로 구현하는 프로젝트라(§6), 1단계에 사용자가 무엇을 적든 그 내용을 실제로 분석해 질문·요약을 생성하지 않는다. Figma 시안의 예시 카피를 그대로 쓰고, 요약 화면의 제목·확인된 내용만 실제로 고쳐 쓸 수 있게 했다 |
+| 2026-09-09 | **Figma `개발` 페이지에 올라온 화면만 구현 대상** | 팀 결정. 확정된 화면을 하나씩 옮겨 담기로 함 |
+| 2026-09-09 | 아이콘은 `수정금지`의 **기타 아이콘 · nav · 화살표 · 꼬리화살표**만 사용 | 나머지는 참고용 모음이라 확정이 아님 (`PROJECT_SPEC.md` §9-17) |
+| 2026-09-09 | 벡터 에셋은 Figma Plugin API `exportAsync`로 내보내 저장 | 프록시가 `figma.com` 직접 다운로드를 막아 에셋 URL을 받을 수 없음 |
+| 2026-09-09 | 비트맵 에셋은 Figma에서 직접 내보내 폴더에 넣기 | 이그레스 정책이 `figma.com` 자산 URL을 막는다 |
+| 2026-09-09 | 광장 에셋은 컴포넌트에서 직접 import | 자동 감지(`optionalImages.ts`) 없이 파일을 바로 넣는 편이 단순하다. 에셋 6종 반영 완료 |
+| 2026-09-09 | **자료종합 페이지 전체를 기준 자료로 학습** | IA·유저플로우·설문·퍼소나·Font/Color가 모두 이 페이지에 있다. 아래 "자료종합 학습 기록" 참고 |
+| 2026-09-09 | 미확정 항목을 본문에서 확정처럼 쓰지 않기 | §6의 관점 선택 3택 서술이 §9-12(미정)와 충돌했다. 본문은 §9를 가리키게만 두고 값은 §9에서 확정한다 |
 
 ## 구현 상태
 
@@ -45,8 +46,8 @@ npm run dev
 | --- | --- | --- | --- |
 | 홈 | **확정** (`김하은/홈수정`) | **구현됨** | 에셋·폰트 교체 남음 |
 | 404 | — | **구현됨** | `pages/Error/NotFoundPage.tsx` |
-| 배심원 광장 | 작업 중 | 미착수 | `src/pages/Plaza/` 빈 폴더 |
-| 사건 접수 (지훈01~05) | **확정** (node 1446:9899~10071) | **구현됨** | `/cases/new`~`/cases/new/complete` 5단계 모두 구현 |
+| 배심원 광장 | **확정** (`개발 > 광장`) | **구현됨** | 에셋 반영 완료. 정렬·검색·페이지네이션 등 **기능 구현만 남음** |
+| 사건 접수 | 작업 중 | 미착수 | `src/pages/Submit/` 빈 폴더 |
 | 사건 상세 · AI 1심 | 작업 중 | 미착수 | `src/pages/Case/` 빈 폴더 |
 | 왈가왈후~ (후일담) | 작업 중 | 미착수 | 폴더 없음 |
 | MY | 작업 중 | 미착수 | `src/pages/My/` 빈 폴더 |
@@ -123,116 +124,50 @@ src/components/demo/PersonaSwitcher.tsx · PersonaSwitcher.css
   저장은 effect로 분리 (린트 `react-hooks/set-state-in-effect`)
 - `src/layouts/ShowcaseLayout.tsx` — 축소 비율을 state에서 빼고 렌더 중 계산 (같은 린트 규칙)
 
-### 2026-09-09 추가 — 사건 접수 지훈01~05 전체
+**배심원 광장 (2026-09-09)**
 
-Figma MCP(Dev Mode)로 지훈01~05 노드(파일 키 `5msPuamjPpGJOUFl0OXBOX`)의 실제 레이아웃·
-색상·문구를 각각 읽어 그대로 옮겼다. 처음에는 지훈01만 구현했다가(위 결정 사항 참고),
-이어서 나머지 4단계도 같은 방식으로 구현했다.
-
-| 단계 | Figma 프레임 | node | 라우트 | 페이지 컴포넌트 |
-| --- | --- | --- | --- | --- |
-| 1 | 지훈01 / 사건 작성 · 기본 | 1446:9899 | `/cases/new` | `CaseSubmitPage` |
-| 2 | 지훈02 / 추가 질문 | 1446:9956 | `/cases/new/questions` | `CaseSubmitQuestionsPage` |
-| 3 | 지훈03 / 요약 확인 | 1446:10011 | `/cases/new/summary` | `CaseSubmitSummaryPage` |
-| 4 | 지훈04 / AI 참고 의견·접수 | 1446:10041 | `/cases/new/opinion` | `CaseSubmitOpinionPage` |
-| 5 | 지훈05 / 접수 완료 | 1446:10071 | `/cases/new/complete` | `CaseSubmitCompletePage` |
-
-새로 만든 파일:
+새로 만든 파일
 
 ```
-src/layouts/DetailLayout.tsx · DetailLayout.css
-src/pages/Submit/CaseSubmitFlow.tsx              # 5단계 공유 상태 Provider + Outlet
-src/pages/Submit/caseSubmitDraftContext.ts · useCaseSubmitDraft.ts
-src/pages/Submit/useWizardBack.ts                # 단계 공통 뒤로가기(AuthLayout과 같은 패턴)
-src/pages/Submit/types.ts                        # Relationship·QuestionAnswers·Visibility 등
-src/pages/Submit/caseSubmitContent.ts            # 고정 예시 사연(요약·AI 의견) 텍스트
-src/pages/Submit/CaseSubmit.css                  # 헤더·진행률·본문·CTA 등 5단계 공통 스타일
-src/pages/Submit/components/CaseSubmitHeader.tsx
-src/pages/Submit/components/CaseSubmitProgress.tsx
-src/pages/Submit/components/CaseSubmitFooter.tsx
-src/pages/Submit/CaseSubmitPage.tsx · CaseSubmitPage.css                 # 1단계
-src/pages/Submit/CaseSubmitQuestionsPage.tsx · CaseSubmitQuestionsPage.css  # 2단계
-src/pages/Submit/CaseSubmitSummaryPage.tsx · CaseSubmitSummaryPage.css     # 3단계
-src/pages/Submit/CaseSubmitOpinionPage.tsx · CaseSubmitOpinionPage.css     # 4단계
-src/pages/Submit/CaseSubmitCompletePage.tsx · CaseSubmitCompletePage.css  # 5단계
-src/assets/submit/figma/imgChevronLeft.svg        # 헤더 뒤로가기 (#78757A)
-src/assets/submit/figma/imgCheck.svg              # 선택된 항목의 체크 표시
-src/assets/submit/figma/imgCharacterWalangJoy.svg # 판멍이 인라인 도움말 캐릭터
-src/assets/submit/figma/imgRadioSelected.svg · imgRadioDefault.svg  # 4단계 공개 범위 라디오
-src/assets/submit/figma/imgPanMungyeeJudge.png    # 5단계 판사 옷 판멍이 일러스트
+src/pages/Plaza/PlazaPage.tsx
+src/pages/Plaza/Plaza.css
+src/pages/Plaza/components/RankingHeroSection.tsx
+src/pages/Plaza/components/CaseFeedSection.tsx
+src/data/common/plazaContent.ts        # 랭킹·카테고리·사건 목록 더미데이터
+src/components/common/TopBar.tsx · TopBar.css
+src/assets/icons/                      # 17개 (nav 5, 기타 아이콘, 화살표, 꼬리화살표)
+src/assets/plaza/rank-1.svg            # 왈가닥이
+src/assets/plaza/rank-2.svg            # 왈랑이
 ```
 
-고친 파일:
+고친 파일
 
-- `src/routes/paths.ts` — `caseSubmitQuestions`·`caseSubmitSummary`·`caseSubmitOpinion`·`caseSubmitComplete` 추가
-- `src/routes/AppRoutes.tsx` — `DetailLayout` 아래 `CaseSubmitFlow`로 5개 라우트를 중첩 연결
-- `src/components/common/BottomNavigation.tsx` — `사건 접수` 항목 `enabled: true`로 전환
-
-단계 간 공유 상태:
-
-5단계 모두 새로고침·직접 URL 접근에 견뎌야 해서(§7-7) 화면마다 독립된 라우트로 나눴다.
-관계·첨부·사건 내용·질문 답변·요약·공개 범위처럼 여러 단계가 함께 쓰는 값은
-화면 로컬 state가 아니라 `CaseSubmitFlow`가 들고 있는 Context(`useCaseSubmitDraft`)에 둔다.
-세션·퍼소나처럼 앱 전역 상태가 아니라 이 흐름 안에서만 쓰는 상태라
-`src/state/`가 아니라 `src/pages/Submit/`에 뒀다.
-
-각 단계는 이전 단계 데이터가 없으면(예: 1단계를 거치지 않고 `/cases/new/summary`를 직접 열면)
-`<Navigate>`로 앞 단계로 돌려보낸다 — 빈 상태를 완료된 것처럼 보여주지 않는다.
-
-화면 동작 — 단계별로 정직하게 구현/미구현을 구분했다:
-
-- **1단계** `상대와의 관계`는 6개 칩 중 단일 선택, 기본 미선택 → 선택 시 주황 + 체크.
-  `사진 추가`/`파일 첨부`는 실제 `<input type=file>`로 선택한 파일명을 목록에 보여준다
-  (실제 업로드는 없음 — 백엔드가 없는 데모 범위). `사건 내용`은 1,000자 제한 + 실시간 글자 수,
-  비어 있으면 `다음`이 비활성 상태를 유지한다.
-- **2단계** 3개 질문(최종 파일 전달 기록 / 계약서 잔금 지급일 / 수정 범위)이 모두
-  실제 3지선다 단일 선택이며, 전부 답해야 `AI 요약 확인하기`가 활성화된다.
-  첫 질문에서 `있어요`를 고르면 실제로 입력 가능한 추가 설명 textarea가 열린다.
-- **3단계** `사건 요약`의 제목·확인된 내용만 `수정하기`로 실제 편집 가능(진짜 상태 변경).
-  `확인이 필요한 쟁점`·`원하는 도움`은 AI가 정리한 결과로 취급해 이 화면에서 고치지 않는다.
-  제목·확인된 내용이 비어 있으면 다음 버튼이 비활성화된다.
-- **4단계** `배심원 광장에 공개`는 Figma 주석(node 1446:10059: "처음 진입 시 둘 다 회색,
-  배심원 광장은 비활성화, 나만보기만 클릭 시 주황")을 그대로 따라 **선택할 수 없게** 뒀다.
-  `나만 보기`를 실제로 선택해야만 `사건 접수하기`가 활성화된다.
-- **5단계** 접수를 실제로 마치지 않고(Context의 `isSubmitted`가 false인 채) URL로 바로 열면
-  1단계로 돌려보낸다. 뒤로가기·`홈으로 돌아가기` 모두 `/home`으로 이동한다.
-- 모든 단계의 `임시저장`은 아직 구현 범위 밖이라 `BottomNavigation`의 미구현 항목과
-  같은 방식으로 **비활성 버튼**으로 뒀다. 성공한 것처럼 보이는 가짜 동작을 만들지 않았다.
-- 1단계 뒤로가기는 `AuthLayout`과 같은 패턴 — 앱 내부 이력이 있으면 `navigate(-1)`,
-  외부에서 바로 들어온 경우 `BACK_FALLBACK.cases`(`/plaza`)로 이동한다.
-  2~4단계는 같은 패턴으로 바로 이전 단계 라우트가 fallback이다.
-
-지훈02~04의 질문·요약·AI 의견 문구는 Figma의 고정 예시 사연(디자이너 잔금 미지급 분쟁)
-그대로다 — 실제 생성형 AI가 1단계 내용을 읽고 만든 결과가 아니다 (PROJECT_SPEC.md §6).
-
-검증 (2026-09-09 재실행):
-
-| 검사 | 결과 |
-| --- | --- |
-| `npm install` | **통과** (162 packages, 0 vulnerabilities) |
-| `npm run typecheck` | **통과** |
-| `npm run lint` | **통과** |
-| `npm run build` | **통과** (84 modules) |
-| 브라우저 확인 | **실행함** — Playwright(Chromium headless)로 402×900에서 지훈01→02→03→04→05
-  전체 흐름을 실제로 조작(칩·질문 선택, textarea 입력, 요약 편집, 공개 범위 선택, 제출)했고
-  각 단계의 URL 전환·버튼 활성화 조건이 의도대로 동작함을 확인했다. `/cases/new/summary`를
-  중간 상태 없이 직접 열면 1단계로 리다이렉트되는 가드도 확인했다. 콘솔 에러 0건.
-  스크린샷이 Figma 시안과 일치함을 육안으로 확인했다 |
+- `src/pages/Home/HomePage.tsx` — 화면 안에 있던 앱 헤더를 공통 `TopBar`로 올림
+  (§7-2 "두 번째 사용이 확인되면 공통 폴더로" 규칙 적용)
+- `src/components/common/BottomNavigation.tsx` — 문자 아이콘을 실제 SVG로 교체.
+  아이콘 경로를 `--nav-icon` CSS 변수로 넘긴다. 인라인 `mask-image`를 쓰면
+  중앙 CTA의 원형 배경까지 함께 잘려 나간다. `배심원 광장`을 `enabled: true`로 전환
+- `src/layouts/MainLayout.css` — `.bottom-nav__icon`과 CTA `::after`가
+  `var(--nav-icon)`을 마스크로 쓰도록 정정 (`mask-image: inherit`은 동작하지 않았다)
+- `src/routes/AppRoutes.tsx` — `/plaza` 라우트 추가
+- `src/routes/paths.ts` — `plaza` 경로 상수
+- `src/types/index.ts` — `JurorRank`, `PlazaSortKey` 추가
 
 ### 삭제 정리
 
-2026-09-08 삭제 완료.
+**TypeScript 전환으로 대체된 파일 — 2026-09-08 삭제 완료 (폴더에서 확인함)**
 
-TypeScript 전환으로 대체된 파일:
 `vite.config.js` · `src/main.jsx` · `src/App.jsx` · `src/App.css` · `src/pages/Home/Home.jsx`
 
-`PROJECT_SPEC.md`로 통합되어 삭제한 문서:
+**통합 문서 4개 — 2026-09-09 삭제 완료**
+
 `PRD.md` · `design-analysis.md` · `project_rules.md` · `SKILL.md`
 
-아직 문서 기준을 잡는 단계이고 코드 작업자가 한 명뿐이라,
-안내문을 남겨 둘 필요 없이 바로 정리했다.
-남은 문서는 `PROJECT_SPEC.md`(기준) · `PROJECT_CONTEXT.md`(상태) ·
-`CLAUDE.md` / `AGENTS.md`(진입점) 네 개다.
+2026-09-08 기록에는 이미 삭제했다고 적혀 있었지만, 09-09에 확인해 보니
+안내표만 남은 껍데기 파일 네 개가 그대로 있었다. 같은 날 실제로 지웠다.
+
+이제 문서는 네 개다 — `PROJECT_SPEC.md`(기준) · `PROJECT_CONTEXT.md`(상태) ·
+`CLAUDE.md` / `AGENTS.md`(진입점).
 
 ## 홈 화면 잔여 항목
 
@@ -241,11 +176,60 @@ TypeScript 전환으로 대체된 파일:
   `src/assets/home/figma/`의 실제 SVG·PNG로 교체해야 한다.
 - Paperlogy·Pretendard 폰트 파일이 `src/assets/fonts/`에 있으나
   `@font-face` 등록이 아직 없다.
-- 하단바의 배심원 광장·왈가왈후~·MY는 라우트가 없어 비활성 상태다.
-  `사건 접수`는 2026-09-09에 라우트가 생겨 활성화했다.
-  나머지도 화면이 생기면 `BottomNavigation.tsx`의 `enabled`만 켜면 된다.
-- 앱 헤더가 아직 `HomePage.tsx` 안에 있다.
-  두 번째 화면 컨펌 시 `TopBar` 공통 컴포넌트로 올린다.
+- 하단바 아이콘은 2026-09-09에 실제 SVG로 교체 완료.
+  배심원 광장도 활성화했다. 사건 접수·왈가왈후~·MY는 아직 라우트가 없어 비활성이다.
+  각 화면이 생기면 `BottomNavigation.tsx`의 `enabled`만 켜면 된다.
+- 앱 헤더는 2026-09-09에 공통 `TopBar`로 올렸다.
+
+## 배심원 광장 잔여 항목
+
+**에셋은 끝났다 (2026-09-09).** `src/assets/plaza/`에 6종이 들어와 있고
+`RankingHeroSection.tsx`가 직접 import 한다.
+
+```
+hero-bg.webp · hero-mascot.png · hero-trophy.png
+rank-1.png · rank-2.png · rank-3.png
+```
+
+이전 기록에 있던 `hero.png` / `hero-bg.png` 3종 규격과
+`src/assets/plaza/optionalImages.ts`(폴더를 훑어 자동 반영) 방식은 **더 이상 쓰지 않는다.**
+그 파일은 만들지 않았고, 1·2위 마스코트도 SVG가 아니라 PNG로 교체됐다.
+
+남은 것은 **기능 구현뿐이다.**
+
+- 정렬·검색·페이지네이션은 동작 후 화면이 시안에 없어 비활성으로 두었다.
+  카테고리 칩만 실제로 목록을 거른다. (§9-14)
+- 랭킹 탭은 선택 상태만 로컬로 표현한다. 탭별 목록은 시안에 없다. (§9-13)
+- `랭킹 보러가기`는 이동할 화면이 없어 링크를 걸지 않았다. (§9-15)
+
+## 자료종합 학습 기록 (2026-09-09)
+
+Figma `자료종합` 페이지(노드 `1264:12056`)의 최상위 16개 항목을 모두 읽었다.
+상세 정리는 별도 노트에 있고, 여기에는 **기준 문서에 영향을 준 것만** 남긴다.
+
+읽은 것
+
+| 자료 | 노드 | 얻은 것 |
+| --- | --- | --- |
+| 유저플로우 1, 2 | `1264:12058` | 서아·지훈의 화면 단위 플로우, 1·2순위 퍼소나 보드 |
+| 전제구조ia | `1264:12421` | 홈·광장·사건 상세·접수·후일담·MY·챗봇·FAQ 전체 IA |
+| 결과요약 · 설문결과 | `1264:16599` · `1264:16611` | 설문 Q1~Q21 전체와 해석 주의사항 |
+| 서아 · 지훈 | `1264:14326` · `1264:14357` | 퍼소나 나이·직업·유형·사건 예시·필요한 도움 |
+| Font · Color · Corner_Radius | `1264:16617` · `16688` · `16878` | Headline 1~23 램프, 컬러 스케일, 임시 반경 |
+| 왈 패밀리 · 컴포넌트_신상 | `1264:16913` · `1264:16932` | 캐릭터 3종 역할, `radio`/`RadioList`/`PanMungyee` 컴포넌트 |
+
+새로 확인된 것
+
+- **사건 상세의 화면 순서**가 IA에 정의되어 있다.
+  `사건 본문 → AI가 정리한 핵심 쟁점 → 당신의 판단은?(투표) → AI와 배심원의 판단은? → 댓글`
+- **투표 전에는 AI·배심원 판단을 보여주지 않는다**는 설계 이유가 명시돼 있다.
+  "의견을 따라가는 편향이 생길 수 있으므로 투표 후에 보여준다."
+- 결과 화면에는 배심원 최다 선택 비율, AI 최종 판결, **판단 확신도**(예: 68% · 73%),
+  AI와 배심원의 일치/불일치 문구가 함께 들어간다.
+- 챗봇은 추천 질문 칩 5종과 각 응답·이동 버튼까지 정의돼 있다.
+- 사건 진행 상태는 5단계다.
+  `사건 접수 완료 → AI 1심 완료 → 커뮤니티 공개 완료 → 배심원 투표 완료 → 결과 확인 가능`
+- 계정 전환 경로는 `내정보 → 프로필 → 계정 전환`이다.
 
 ## 발표 시연 흐름
 
@@ -267,6 +251,8 @@ TypeScript 전환으로 대체된 파일:
 ## 서버 없이 표현한 데이터·상태
 
 - 홈의 사건 카드·투표 수치·참여 인원은 모두 예시 데이터다 (`src/data/common/homeContent.ts`).
+- 광장의 랭킹·포인트·사건 목록·페이지 수도 예시 데이터다 (`src/data/common/plazaContent.ts`).
+  실제 집계가 아니며 카테고리 필터만 화면 로컬 상태로 동작한다.
 - 밸런스 게임 선택은 화면 로컬 상태이며 저장되지 않는다.
 - AI 판단은 실제 모델 결과가 아닌 UI 프로토타입이다.
 - 로그인·알림·저장 API는 연결되어 있지 않다.
@@ -274,16 +260,15 @@ TypeScript 전환으로 대체된 파일:
 
 ## 다음 작업
 
-1. `npm run lint`를 다시 실행해 2건이 해결됐는지 확인하고 결과를 이 문서에 기록
-2. 모바일 폭(360·390·402·430)과 키보드가 열린 상태를 실기기 또는 기기 모드에서 확인
-3. 홈 화면 실제 에셋·`@font-face` 적용
-4. 사건 상세 시안이 나오면 가입 진입점(`로그인하고 나도 투표하기`)을 제자리로 옮긴다.
+1. `npm run typecheck && npm run lint && npm run dev`로 광장 화면 확인 (아직 안 함)
+2. 광장 기능 구현 — 정렬·검색·페이지네이션·랭킹 탭. 동작 후 화면 시안이 없으므로
+   §9-13~15를 먼저 확인한 뒤 붙인다
+3. 모바일 폭(360·390·402·430)과 키보드가 열린 상태를 실기기 또는 기기 모드에서 확인
+4. 홈 화면 실제 에셋·`@font-face` 적용
+5. 사건 상세 시안이 나오면 가입 진입점(`로그인하고 나도 투표하기`)을 제자리로 옮긴다.
    지금은 홈의 `로그인 하고 사건 투표하기` 버튼에 임시로 걸려 있다
-5. 확정된 화면부터 담당자별 구현, 완성되면 `BottomNavigation`과 `AppRoutes`에 연결
-6. 접수한 사건이 실제 목록·MY에 반영되도록 연결 (지훈05는 아직 접수 후 어디로도 저장하지 않는다.
-   `CaseSubmitFlow`의 Context는 페이지를 벗어나면 사라지는 화면 상태일 뿐이다)
-7. 사건 접수 로그인 필요 여부가 정해지면 `/cases/new*`에 `RequireAuth` 적용 여부 반영 (§9-9)
-8. 공개 범위(§9-9)가 정해지면 `배심원 광장에 공개`를 실제로 선택 가능하게 전환
+6. `개발` 페이지에 화면이 올라오는 순서대로 구현하고,
+   완성되면 `BottomNavigation`의 `enabled`와 `AppRoutes`에 연결
 
 ## 마지막 검증 결과
 
@@ -296,6 +281,8 @@ TypeScript 전환으로 대체된 파일:
 | `npm run build` | **통과** | 28 modules, 143ms |
 | `npm run lint` | **오류 2건 발견 → 수정함, 재실행 필요** | `react-hooks/set-state-in-effect` (`ShowcaseLayout.tsx`, `SessionProvider.tsx`). 규칙을 끄지 않고 구조를 바꿔 해결했다 |
 | 브라우저 확인 | **미실행** | PC 목업·모바일 전환을 아직 눈으로 확인하지 못했다 |
+
+배심원 광장(2026-09-09)은 아직 `typecheck` · `lint` · 브라우저 확인을 하지 않았다.
 
 빌드 산출물
 
@@ -311,7 +298,15 @@ TypeScript 전환으로 대체된 파일:
 
 ## 알려진 문제 / 확인 필요
 
-`PROJECT_SPEC.md` §9에 11개 항목으로 정리되어 있다.
-해결된 것은 §9-5(홈 인디케이터), §9-4(하단바 표기), §9-2(가입 화면 — 팀 결정으로 추가)다.
+`PROJECT_SPEC.md` §9에 정리되어 있다.
+해결된 것은 §9-2(가입 화면), §9-4(하단바 표기), §9-5(홈 인디케이터),
+§9-16(광장 비트맵 에셋), §9-17(아이콘 확정 범위)이다.
+
+자료종합 학습에서 새로 올라온 것은 §9-18(기준 페이지 이관 범위),
+§9-19(컬러 값 불일치 4건), §9-20(반경 토큰화 여부)이고,
+§9-1(퍼소나 세부)과 §9-12(관점 선택)는 자료종합에서 근거를 찾아 내용을 보강했다.
+
 가장 급한 것은 **§9-3 사건 상세 시안**이다.
 시연 흐름의 가입 진입점이 사건 상세에 있어서, 그 화면이 나와야 흐름이 제자리를 찾는다.
+그다음이 **§9-12 관점 선택**이다. 자료종합은 4택으로 일관되지만 문구가 세 가지로 갈려 있어
+사건 상세를 만들기 전에 정해야 한다.

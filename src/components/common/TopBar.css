@@ -1,0 +1,62 @@
+/*
+ * 공통 앱 헤더. Figma top_nav 하단 66px.
+ * 스크롤해도 상단에 붙어 있어야 하므로 sticky를 쓴다.
+ * 부모에 overflow: hidden이 있으면 sticky가 죽으므로 주의한다.
+ */
+
+.top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    height: var(--device-app-header);
+    padding: 0 var(--content-gutter);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+}
+
+.top-bar__logo {
+    font-size: 19px;
+    letter-spacing: -1px;
+    color: var(--ink);
+}
+
+.top-bar__logo span {
+    margin-left: 2px;
+    color: var(--blue);
+}
+
+.top-bar__actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.top-bar__action {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    background: none;
+}
+
+.top-bar__action img {
+    display: block;
+    width: 24px;
+    height: 24px;
+}
+
+.top-bar__dot {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--blue);
+}
