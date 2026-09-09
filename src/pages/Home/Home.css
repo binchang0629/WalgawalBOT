@@ -13,69 +13,13 @@
     font-family: var(--font-body);
     /*
      * overflow: hidden을 쓰면 이 요소가 스크롤 컨테이너가 되어
-     * .home-header의 position: sticky가 무력화된다(헤더가 같이 밀려 올라간다).
+     * TopBar의 position: sticky가 무력화된다(헤더가 같이 밀려 올라간다).
      * clip은 스크롤 컨테이너를 만들지 않으므로 가로 넘침만 잘라내고 sticky는 살아 있다.
      */
     overflow-x: clip;
 }
 
-.home-header {
-    /* Figma top_nav 하단 66px. 상단 62px 시스템 상태바는 목업이 그린다. */
-    height: var(--device-app-header);
-    background: #fff;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    border-bottom: 1px solid var(--line);
-}
-
-.app-bar {
-    height: 66px;
-    padding: 0 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.app-bar strong {
-    font-size: 19px;
-    letter-spacing: -1px;
-}
-
-.app-bar strong span {
-    color: var(--blue);
-    margin-left: 2px;
-}
-
-.header-actions {
-    display: flex;
-    gap: 16px;
-}
-
-.header-actions button {
-    border: 0;
-    background: none;
-    color: var(--ink);
-    padding: 0;
-    position: relative;
-    font-size: 27px;
-    line-height: 1;
-}
-
-.header-actions button:last-child {
-    font-size: 23px;
-    transform: rotate(180deg);
-}
-
-.header-actions i {
-    position: absolute;
-    width: 5px;
-    height: 5px;
-    background: var(--blue);
-    border-radius: 50%;
-    right: -1px;
-    top: -1px;
-}
+/* 앱 헤더 스타일은 공통 컴포넌트인 components/common/TopBar.css로 옮겼다. */
 
 .section-pad {
     padding: 60px 24px;

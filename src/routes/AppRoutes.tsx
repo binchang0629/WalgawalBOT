@@ -3,6 +3,7 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout'
 import MainLayout from '../layouts/MainLayout'
 import AuthLayout from '../layouts/AuthLayout'
 import HomePage from '../pages/Home/HomePage'
+import PlazaPage from '../pages/Plaza/PlazaPage'
 import SignupPage from '../pages/Auth/SignupPage'
 import NotFoundPage from '../pages/Error/NotFoundPage'
 import { PATHS } from './paths'
@@ -12,7 +13,7 @@ import { PATHS } from './paths'
  * 디자인이 확정되지 않은 화면은 아직 라우트를 만들지 않는다.
  *
  * 아직 연결하지 않은 경로 (디자인 확정 후 추가):
- *   /demo · /plaza · /cases/:caseId · /cases/new · /afterstory · /my
+ *   /demo · /cases/:caseId · /cases/new · /afterstory · /my
  *
  * /signup은 컨펌 시안이 없지만 발표 시연을 위해 팀 결정으로 추가했다. (PROJECT_SPEC.md §9-2)
  */
@@ -33,6 +34,7 @@ function AppRoutes() {
         {/* 앱 헤더와 하단 내비게이션을 쓰는 주요 메뉴 화면 */}
         <Route element={<MainLayout />}>
           <Route path={PATHS.home} element={<HomePage />} />
+          <Route path={PATHS.plaza} element={<PlazaPage />} />
         </Route>
 
         {/* 가입·로그인 계열. 하단 내비게이션을 표시하지 않는다. */}

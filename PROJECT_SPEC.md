@@ -3,12 +3,18 @@
 이 문서는 강사가 제공한 「Figma 디자인 기반 AI 챗봇 지원 커뮤니티 웹앱 구현 요청」 초안을
 왈가왈BOT 프로젝트의 실제 정보로 채운 **단일 기준 문서**다.
 
-기존 `PRD.md`, `design-analysis.md`, `AGENTS.md`, `project_rules.md`, `SKILL.md`의 내용은
-이 문서로 흡수했다. 진행 상태와 검증 기록은 `PROJECT_CONTEXT.md`에서 따로 관리한다.
+기존에 나뉘어 있던 `PRD.md`, `design-analysis.md`, `project_rules.md`, `SKILL.md`와
+`AGENTS.md`의 작업 규칙을 모두 이 문서로 흡수하고, 원본 네 개는 삭제했다.
 
-- 기준(잘 바뀌지 않는 것): 이 문서
-- 상태(계속 바뀌는 것): `PROJECT_CONTEXT.md`
-- 확정되지 않은 것: 이 문서 §9 확인 필요 항목
+프로젝트 문서는 네 개뿐이다.
+
+| 파일 | 역할 |
+| --- | --- |
+| `PROJECT_SPEC.md` | **기준** — 잘 바뀌지 않는 것. 서비스·퍼소나·토큰·구현 규칙·검증 기준 |
+| `PROJECT_CONTEXT.md` | **상태** — 계속 바뀌는 것. 완료·진행·문제·검증 기록 |
+| `CLAUDE.md` · `AGENTS.md` | 위 두 문서를 불러오는 진입점과 짧은 작업 규칙 |
+
+확정되지 않은 것은 이 문서 §9에 모아 둔다. 거기 있는 항목은 임의로 결정하지 않는다.
 
 너는 기존 Figma 디자인과 서비스 기획을 실제 동작하는 웹앱으로 구현하는 프론트엔드 개발자다.
 이 프로젝트는 디자인을 새로 만드는 작업이 아니라, 확정된 시안을 코드로 옮기는 작업이다.
@@ -970,6 +976,30 @@ Vite 개발 서버에서 화면이 보인다는 이유만으로
 - 컨펌 시안과 IA가 충돌하거나 시안에 없는 결정을 해야 하면
   구현 전 이유·영향·확인 필요 사항을 §9와 `PROJECT_CONTEXT.md`에 남긴다.
 - 작업이 끝나면 `PROJECT_CONTEXT.md`에 완료 내용과 검증 결과를 갱신한다.
+
+### 7-12. 설정을 바꾸는 위치
+
+강사 기준이 요구하는 "배경·기기·퍼소나 데이터를 수정하는 위치"다.
+값을 여기저기 흩어 두지 않고 아래 파일에만 둔다. 화면 코드에 숫자를 직접 적지 않는다.
+
+| 바꾸고 싶은 것 | 파일 | 이름 |
+| --- | --- | --- |
+| 서비스명·한 줄 소개 | `src/config/app.ts` | `SERVICE` |
+| 기준 기기·화면 크기(402 × 874) | `src/config/app.ts` | `DEVICE` |
+| 기기 테두리·베젤 두께 | `src/config/app.ts` + `DeviceFrame.css` | `FRAME_PADDING`, `BEZEL_PADDING` |
+| PC 배경 이미지·그라데이션 | `src/config/app.ts` | `SHOWCASE_BACKGROUND` |
+| PC ↔ 모바일 전환 너비 | `src/config/app.ts` | `DESKTOP_BREAKPOINT` |
+| 데모 모드 on/off, 저장소 키 | `src/config/app.ts` | `DEMO` |
+| 컬러·폰트·텍스트 스케일 | `src/styles/tokens.css` | CSS 변수 |
+| 퍼소나 정의 | `src/data/personas/index.ts` | `PERSONAS` |
+| 시연 계정(이메일·닉네임) | `src/data/personas/index.ts` | `DEMO_ACCOUNTS` |
+| 홈 화면 더미데이터 | `src/data/common/homeContent.ts` | — |
+| URL 경로 | `src/routes/paths.ts` | `PATHS` |
+| 하단바 메뉴·활성 여부 | `src/components/common/BottomNavigation.tsx` | `NAV_ITEMS` |
+| 가입 폼 입력 항목 | `src/pages/Auth/SignupPage.tsx` | `FIELDS` |
+
+화면이 새로 생기면 `NAV_ITEMS`의 `enabled`를 `true`로 바꾸고
+`AppRoutes.tsx`에 `Route`를 한 줄 추가하면 하단바까지 함께 연결된다.
 
 ---
 

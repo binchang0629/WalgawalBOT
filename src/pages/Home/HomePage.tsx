@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import TopBar from '../../components/common/TopBar'
 import useSession from '../../hooks/useSession'
 import { PATHS } from '../../routes/paths'
 import {
@@ -21,7 +22,7 @@ import './Home.css'
  * 홈 화면. Figma `1차 디자인 시안 > 컨펌 > 김하은/홈수정` 기준.
  *
  * 시스템 상태바는 이 화면이 그리지 않는다. 기기 목업의 StatusBar가 담당한다. (PROJECT_SPEC.md §0-4)
- * 하단 내비게이션도 이 화면이 아니라 MainLayout이 담당한다. (PROJECT_SPEC.md §7-4)
+ * 앱 헤더는 공통 TopBar, 하단 내비게이션은 MainLayout이 담당한다. (PROJECT_SPEC.md §7-2, §7-4)
  *
  * TODO: 아이콘·일러스트를 src/assets/home/figma/의 실제 에셋으로 교체한다.
  *       현재 문자 표시는 임시다. (PROJECT_CONTEXT.md 홈 잔여 항목)
@@ -60,26 +61,7 @@ function HomePage() {
 
   return (
     <main className="home-screen">
-      {/*
-        서비스 앱 헤더 (Figma top_nav 하단 66px).
-        TODO: 두 번째 화면 컨펌 시 TopBar 공통 컴포넌트로 올린다. (PROJECT_SPEC.md §7-2)
-      */}
-      <header className="home-header">
-        <div className="app-bar">
-          <strong>
-            왈가왈<span>BOT</span>
-          </strong>
-          <div className="header-actions" aria-label="상단 메뉴">
-            <button type="button" aria-label="검색">
-              ⌕
-            </button>
-            <button type="button" aria-label="알림">
-              ♧
-              <i />
-            </button>
-          </div>
-        </div>
-      </header>
+      <TopBar hasUnreadNotification />
 
       <section className="hero-section">
         <SectionHeading title="오늘 사건" action={null} />
