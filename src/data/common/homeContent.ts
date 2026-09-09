@@ -77,17 +77,23 @@ export const adBanner = {
   label: 'AD',
 } as const
 
-/** 밸런스 게임 */
-export const balanceQuestion = {
-  id: 'balance-perilla',
-  order: 'A.',
-  title: '깻잎 논쟁, 당신의 선택은?',
-  leftLabel: '상관 없음',
-  rightLabel: '절대 안됨',
-  guide: '깻잎을 좌우로 밀어 선택!',
-} as const
-
-export const balancePager = { current: 1, total: 4 } as const
+/** 밸런스 게임. 추가 3문항은 사용자 요청으로 작성한 데모 카피다.
+ * 주제 참고: https://www.nocutnews.co.kr/news/5788798
+ */
+export const balanceQuestions = [
+  { id: 'balance-perilla', order: 'A.', title: '깻잎 논쟁, 당신의 선택은?',
+    scenario: '내 애인이 이성 친구의 붙은 깻잎을 떼어 준다면?',
+    leftLabel: '상관 없음', rightLabel: '절대 안됨', guide: '깻잎을 좌우로 밀어 선택!' },
+  { id: 'balance-shrimp', order: 'B.', title: '새우 논쟁, 당신의 선택은?',
+    scenario: '내 애인이 이성 친구의 새우 껍질을 까 준다면?',
+    leftLabel: '상관 없음', rightLabel: '절대 안됨', guide: '질문을 밀거나 버튼으로 선택!' },
+  { id: 'balance-zipper', order: 'C.', title: '패딩 지퍼, 어디까지 괜찮아?',
+    scenario: '내 애인이 이성 친구의 끼인 패딩 지퍼를 풀어 준다면?',
+    leftLabel: '상관 없음', rightLabel: '절대 안됨', guide: '질문을 밀거나 버튼으로 선택!' },
+  { id: 'balance-bluetooth', order: 'D.', title: '차 안의 음악, 당신의 선택은?',
+    scenario: '내 애인 차에 이성 친구의 휴대폰이 자동 연결된다면?',
+    leftLabel: '상관 없음', rightLabel: '신경 쓰임', guide: '질문을 밀거나 버튼으로 선택!' },
+] as const
 
 /** 막상막하 — 표가 팽팽한 대표 사건 */
 export const closeCallCase = {

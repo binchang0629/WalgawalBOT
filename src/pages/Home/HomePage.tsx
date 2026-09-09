@@ -22,7 +22,7 @@ import './Home.css'
  * 로그인 후 홈(`개발 > 홈/로그인 후`, 노드 `1473:8830`)은 아직 옮기지 않았다.
  */
 function HomePage() {
-  const { sessionStatus } = useSession()
+  const { sessionStatus, personaId } = useSession()
   const isAuthenticated = sessionStatus === 'authenticated'
 
   /*
@@ -51,7 +51,7 @@ function HomePage() {
       <PopularCaseSection />
       <RecentCasesSection />
       <AdBanner />
-      <BalanceGameSection />
+      <BalanceGameSection key={personaId} />
       <CloseCallSection cta={cta} />
       <AfterStorySection />
       <AiRecommendSection />

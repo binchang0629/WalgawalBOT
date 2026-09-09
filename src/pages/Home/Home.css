@@ -476,10 +476,10 @@
     margin-top: 2px;
 }
 
-.balance-board__subject {
+.balance-board__draggable {
     position: absolute;
     top: -13px;
-    left: 138px;
+    left: calc(50% - 44.45px);
     width: 127px;
     height: 133px;
     object-fit: contain;
@@ -1145,4 +1145,178 @@ img.ai-card__mascot {
 .ai-card__text p b {
     color: var(--blue-600);
     font-weight: 700;
+}
+
+/* 밸런스 게임: 터치 시 세로 스크롤 유지, PC 목업 안에서도 동일한 조작. */
+.balance-board__draggable {
+    z-index: 1;
+    touch-action: pan-y;
+    cursor: grab;
+    user-select: none;
+    filter: none;
+}
+.balance-board__draggable:active { cursor: grabbing; }
+.balance-board__subject {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+.balance-board__draggable:has(.balance-board__scenario) {
+    left: calc(50% - 95px);
+    width: 190px;
+}
+.balance-board__scenario {
+    display: flex;
+    align-items: center;
+    min-height: 110px;
+    margin: 0;
+    padding: 16px;
+    border: 1px solid var(--blue-150);
+    border-radius: var(--radius-lg);
+    background: var(--blue-050);
+    color: var(--neutral-900);
+    font-size: 16px;
+    line-height: 1.5;
+    text-align: center;
+    word-break: keep-all;
+}
+.balance-board, .balance-question { max-width: 100%; }
+.balance-board__plate { max-width: 42.37%; }
+.balance-choice { max-width: 39.55%; }
+.balance-board__side--left .balance-board__plate { left: 3.67%; }
+.balance-board__side--right .balance-board__plate { left: auto; right: 3.67%; }
+.balance-choice--left { left: 5.08%; }
+.balance-choice--right { left: auto; right: 5.08%; }
+.balance-choice:focus-visible, .balance-section__refresh:focus-visible {
+    outline: 2px solid var(--blue-700);
+    outline-offset: 4px;
+}
+
+/* 선택 → 접시 위 고정 → 확대 → 깻잎 더미로 전환. */
+.balance-board__draggable {
+    transition: left 400ms ease, top 400ms ease, transform 1200ms ease, opacity 350ms ease;
+    /* 젓가락까지 포함한 박스 대신 잎의 중심을 확대 기준으로 사용한다. */
+    transform-origin: 35% 90%;
+}
+.balance-section--idle .balance-board__draggable { transition: none; }
+.balance-section--left:not(.balance-section--idle) .balance-board__draggable { left: calc(24.85% - 44.45px); top: 2px; }
+.balance-section--right:not(.balance-section--idle) .balance-board__draggable { left: calc(75.15% - 44.45px); top: 6px; }
+.balance-section--growing .balance-board__draggable { transform: scale(1.08); }
+.balance-board__plate, .balance-choice { transition: transform 1200ms ease, opacity 400ms ease, left 650ms ease, right 650ms ease, top 650ms ease; }
+.balance-section--left:not(.balance-section--idle) .balance-board__side--right,
+.balance-section--right:not(.balance-section--idle) .balance-board__side--left { opacity: .65; }
+.balance-section--left:not(.balance-section--idle) .balance-board__side--right .balance-board__plate,
+.balance-section--left:not(.balance-section--idle) .balance-board__side--right .balance-choice,
+.balance-section--right:not(.balance-section--idle) .balance-board__side--left .balance-board__plate,
+.balance-section--right:not(.balance-section--idle) .balance-board__side--left .balance-choice { transform: scale(.65); }
+.balance-section--growing.balance-section--left .balance-board__side--left .balance-board__plate,
+.balance-section--growing.balance-section--right .balance-board__side--right .balance-board__plate { transform: scale(1.2); }
+.balance-section--growing .balance-choice.is-selected { transform: scale(1.15); border-color: var(--blue-050); }
+.balance-board__pile {
+    position: absolute; width: 270px; max-width: 88%; height: 205px;
+    object-fit: contain; left: 50%; top: 28px;
+    transform: translateX(-50%) scale(.65); opacity: 0; pointer-events: none;
+    transition: transform 650ms ease, opacity 450ms ease;
+}
+.balance-section--result .balance-board__pile { opacity: 1; transform: translateX(-50%) scale(1); }
+.balance-section--result .balance-board__draggable { opacity: 0; pointer-events: none; }
+.balance-section--result .balance-board__plate { opacity: 0; }
+.balance-section--result.balance-section--left .balance-board__side--right,
+.balance-section--result.balance-section--right .balance-board__side--left { visibility: hidden; }
+.balance-section--result .balance-choice.is-selected {
+    top: 220px; left: 50%; right: auto; transform: translateX(-50%);
+    border-color: var(--blue-050);
+}
+.balance-section--result .balance-choice.is-selected img { left: 59px; }
+.balance-section:not(.balance-section--idle) .balance-board__guide { opacity: 0; }
+.balance-answer { color: var(--blue-600); }
+.balance-section--right .balance-answer { color: var(--negative); }
+.balance-question { min-height: 37px; padding-inline: 8px; }
+@media (prefers-reduced-motion: reduce) {
+    .balance-board__draggable, .balance-board__plate, .balance-choice, .balance-board__pile { transition: none; }
+}
+
+/* 결과에서도 젓가락이 집은 깻잎을 더미 위에 남겨 참조 시안과 연결한다. */
+.balance-section--result.balance-section--left .balance-board__draggable,
+.balance-section--result.balance-section--right .balance-board__draggable {
+    opacity: 1; left: min(calc(74% - 44.45px), calc(100% - 127px)); top: -3px; transform: scale(1);
+}
+.balance-board__pile { width: 300px; height: 225px; top: 15px; }
+.balance-section--result .balance-choice.is-selected { top: 228px; }
+
+/* 접시 확대 전에 잎을 중앙에 고정한다. 좌표 보간으로 옆에서 자라는 현상을 막는다. */
+.balance-section--placing .balance-board__draggable {
+    transition: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .balance-section--result .balance-board__draggable {
+        transition: left 750ms cubic-bezier(.22, 1, .36, 1),
+                    top 750ms cubic-bezier(.22, 1, .36, 1),
+                    transform 750ms cubic-bezier(.22, 1, .36, 1);
+    }
+}
+
+/* 드래그 중 접시 진입은 미리보기일 뿐, pointerup에서만 결과를 확정한다. */
+.balance-section--hover-left .balance-board__side--left .balance-board__plate,
+.balance-section--hover-right .balance-board__side--right .balance-board__plate {
+    transform: scale(1.2);
+    transition: transform 900ms ease-out;
+}
+.balance-section--hover-left .balance-choice--left,
+.balance-section--hover-right .balance-choice--right { transform: scale(1.1); }
+.balance-section--placing.balance-section--left .balance-board__side--left .balance-board__plate,
+.balance-section--placing.balance-section--right .balance-board__side--right .balance-board__plate { transform: scale(1.2); }
+.balance-section--left .balance-board__pile { left: 24.85%; }
+.balance-section--right .balance-board__pile { left: 75.15%; }
+.balance-board__pile {
+    transform: translateX(-50%) scale(.6);
+    transform-origin: center 65%;
+    transition: left 900ms cubic-bezier(.22, 1, .36, 1), transform 900ms cubic-bezier(.22, 1, .36, 1), opacity 700ms ease;
+}
+.balance-section--result .balance-board__pile { left: 50%; transform: translateX(-50%) scale(1); }
+.balance-section--result.balance-section--left .balance-board__side--left .balance-board__plate,
+.balance-section--result.balance-section--right .balance-board__side--right .balance-board__plate {
+    left: calc(50% - 75px); right: auto; top: 130px;
+    transform: scale(1.7); opacity: 0;
+    transition: left 900ms cubic-bezier(.22, 1, .36, 1), top 900ms ease, transform 900ms ease, opacity 700ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+    .balance-section .balance-board__plate, .balance-section .balance-board__pile,
+    .balance-section .balance-choice, .balance-section .balance-board__draggable { transition: none; }
+}
+
+/* 빈 접시 확대를 끝낸 뒤 같은 자리에 결과 이미지만 교체한다. */
+.balance-section--expanding.balance-section--left .balance-board__side--left .balance-board__plate,
+.balance-section--expanding.balance-section--right .balance-board__side--right .balance-board__plate,
+.balance-section--result.balance-section--left .balance-board__side--left .balance-board__plate,
+.balance-section--result.balance-section--right .balance-board__side--right .balance-board__plate {
+    left: calc(50% - 75px); right: auto; top: 130px;
+    transform: scale(1.74, 1.1);
+    transition: left 900ms cubic-bezier(.22, 1, .36, 1), top 900ms cubic-bezier(.22, 1, .36, 1),
+                transform 900ms cubic-bezier(.22, 1, .36, 1), opacity 550ms ease;
+}
+.balance-section--expanding .balance-board__plate { opacity: 1; }
+.balance-section--expanding.balance-section--left .balance-board__side--right,
+.balance-section--expanding.balance-section--right .balance-board__side--left { opacity: 0; transition: opacity 350ms ease; }
+.balance-section--expanding .balance-choice.is-selected {
+    top: 228px; left: 50%; right: auto; transform: translateX(-50%);
+}
+.balance-section--expanding.balance-section--left .balance-board__draggable,
+.balance-section--expanding.balance-section--right .balance-board__draggable {
+    left: calc(50% - 44.45px); top: 50px; transform: scale(1.08);
+    transition: left 900ms cubic-bezier(.22, 1, .36, 1), top 900ms cubic-bezier(.22, 1, .36, 1), transform 900ms ease;
+}
+.balance-section--expanding .balance-board__pile,
+.balance-section--result .balance-board__pile {
+    left: 50%; transform: translateX(-50%) scale(1);
+    transition: opacity 550ms ease;
+}
+.balance-section--expanding .balance-board__pile { opacity: 0; }
+.balance-section--result .balance-board__pile { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+    .balance-section .balance-board__plate, .balance-section .balance-board__pile,
+    .balance-section .balance-board__draggable { transition: none; }
 }
