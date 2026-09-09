@@ -88,6 +88,9 @@
     width: 24px;
     height: 25px;
     background: currentColor;
+    /* --nav-icon은 BottomNavigation이 메뉴별 SVG 경로로 넘긴다. */
+    mask-image: var(--nav-icon);
+    -webkit-mask-image: var(--nav-icon);
     mask-repeat: no-repeat;
     mask-position: center;
     mask-size: contain;
@@ -132,11 +135,11 @@
     height: 32px;
     transform: translate(-50%, -50%);
     background: #fff;
-    mask-image: inherit;
+    mask-image: var(--nav-icon);
     mask-repeat: no-repeat;
     mask-position: center;
     mask-size: contain;
-    -webkit-mask-image: inherit;
+    -webkit-mask-image: var(--nav-icon);
     -webkit-mask-repeat: no-repeat;
     -webkit-mask-position: center;
     -webkit-mask-size: contain;

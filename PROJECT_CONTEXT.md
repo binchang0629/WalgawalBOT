@@ -1,6 +1,6 @@
 # 왈가왈BOT 현재 상태
 
-마지막 업데이트: 2026-09-08
+마지막 업데이트: 2026-09-09
 
 기준 문서는 `PROJECT_SPEC.md`다. 이 문서는 **현재 상태만** 기록한다.
 규칙·토큰·구현 기준을 이 문서에 다시 적지 않는다.
@@ -32,6 +32,10 @@ npm run dev
 | 2026-09-08 | **회원가입 화면(`/signup`)을 시안 없이 추가** | 팀 결정. 발표 시연에 필요. 확정 스타일가이드 토큰만 사용 |
 | 2026-09-08 | 온보딩·별도 로그인 화면은 만들지 않음 | 시안도 없고 시연 흐름에도 없음 |
 | 2026-09-08 | 곽지훈(B)은 가입 없이 계정 전환으로 진입 | 발표에서 윤서아 다음 순서라 로그인 시점이 필요 없음 |
+| 2026-09-09 | **Figma `개발` 페이지에 올라온 화면만 구현 대상** | 팀 결정. 확정된 화면을 하나씩 옮겨 담기로 함 |
+| 2026-09-09 | 아이콘은 `수정금지`의 **기타 아이콘 · nav · 화살표 · 꼬리화살표**만 사용 | 나머지는 참고용 모음이라 확정이 아님 (`PROJECT_SPEC.md` §9-17) |
+| 2026-09-09 | 벡터 에셋은 Figma Plugin API `exportAsync`로 내보내 저장 | 프록시가 `figma.com` 직접 다운로드를 막아 에셋 URL을 받을 수 없음 |
+| 2026-09-09 | 비트맵 에셋은 Figma에서 직접 내보내 폴더에 넣기 | 이그레스 정책이 `figma.com` 자산 URL을 막는다. 정해진 파일명으로 넣으면 코드 수정 없이 붙도록 처리 |
 
 ## 구현 상태
 
@@ -39,7 +43,7 @@ npm run dev
 | --- | --- | --- | --- |
 | 홈 | **확정** (`김하은/홈수정`) | **구현됨** | 에셋·폰트 교체 남음 |
 | 404 | — | **구현됨** | `pages/Error/NotFoundPage.tsx` |
-| 배심원 광장 | 작업 중 | 미착수 | `src/pages/Plaza/` 빈 폴더 |
+| 배심원 광장 | **확정** (`개발 > 광장`) | **구현됨** | 비트맵 에셋 3종 · 정렬/검색/페이지네이션 동작 남음 |
 | 사건 접수 | 작업 중 | 미착수 | `src/pages/Submit/` 빈 폴더 |
 | 사건 상세 · AI 1심 | 작업 중 | 미착수 | `src/pages/Case/` 빈 폴더 |
 | 왈가왈후~ (후일담) | 작업 중 | 미착수 | 폴더 없음 |
@@ -117,6 +121,35 @@ src/components/demo/PersonaSwitcher.tsx · PersonaSwitcher.css
   저장은 effect로 분리 (린트 `react-hooks/set-state-in-effect`)
 - `src/layouts/ShowcaseLayout.tsx` — 축소 비율을 state에서 빼고 렌더 중 계산 (같은 린트 규칙)
 
+**배심원 광장 (2026-09-09)**
+
+새로 만든 파일
+
+```
+src/pages/Plaza/PlazaPage.tsx
+src/pages/Plaza/Plaza.css
+src/pages/Plaza/components/RankingHeroSection.tsx
+src/pages/Plaza/components/CaseFeedSection.tsx
+src/data/common/plazaContent.ts        # 랭킹·카테고리·사건 목록 더미데이터
+src/components/common/TopBar.tsx · TopBar.css
+src/assets/icons/                      # 17개 (nav 5, 기타 아이콘, 화살표, 꼬리화살표)
+src/assets/plaza/rank-1.svg            # 왈가닥이
+src/assets/plaza/rank-2.svg            # 왈랑이
+```
+
+고친 파일
+
+- `src/pages/Home/HomePage.tsx` — 화면 안에 있던 앱 헤더를 공통 `TopBar`로 올림
+  (§7-2 "두 번째 사용이 확인되면 공통 폴더로" 규칙 적용)
+- `src/components/common/BottomNavigation.tsx` — 문자 아이콘을 실제 SVG로 교체.
+  아이콘 경로를 `--nav-icon` CSS 변수로 넘긴다. 인라인 `mask-image`를 쓰면
+  중앙 CTA의 원형 배경까지 함께 잘려 나간다. `배심원 광장`을 `enabled: true`로 전환
+- `src/layouts/MainLayout.css` — `.bottom-nav__icon`과 CTA `::after`가
+  `var(--nav-icon)`을 마스크로 쓰도록 정정 (`mask-image: inherit`은 동작하지 않았다)
+- `src/routes/AppRoutes.tsx` — `/plaza` 라우트 추가
+- `src/routes/paths.ts` — `plaza` 경로 상수
+- `src/types/index.ts` — `JurorRank`, `PlazaSortKey` 추가
+
 ### 삭제 정리
 
 2026-09-08 삭제 완료.
@@ -139,10 +172,29 @@ TypeScript 전환으로 대체된 파일:
   `src/assets/home/figma/`의 실제 SVG·PNG로 교체해야 한다.
 - Paperlogy·Pretendard 폰트 파일이 `src/assets/fonts/`에 있으나
   `@font-face` 등록이 아직 없다.
-- 하단바의 배심원 광장·사건 접수·왈가왈후~·MY는 라우트가 없어 비활성 상태다.
+- 하단바 아이콘은 2026-09-09에 실제 SVG로 교체 완료.
+  배심원 광장도 활성화했다. 사건 접수·왈가왈후~·MY는 아직 라우트가 없어 비활성이다.
   각 화면이 생기면 `BottomNavigation.tsx`의 `enabled`만 켜면 된다.
-- 앱 헤더가 아직 `HomePage.tsx` 안에 있다.
-  두 번째 화면 컨펌 시 `TopBar` 공통 컴포넌트로 올린다.
+- 앱 헤더는 2026-09-09에 공통 `TopBar`로 올렸다.
+
+## 배심원 광장 잔여 항목
+
+- 비트맵 에셋 3종이 아직 없다. Figma에서 PNG로 내보내
+  `src/assets/plaza/`에 아래 이름 그대로 넣으면 **코드를 고치지 않아도 바로 붙는다**.
+  (`src/assets/plaza/optionalImages.ts`가 폴더를 훑어 있으면 쓰고 없으면 자리 표시로 둔다)
+
+  | 파일명 | Figma 위치 |
+  | --- | --- |
+  | `hero.png` | `1차 디자인 시안 > 캐릭터 > hero` (판멍이 + 트로피) |
+  | `hero-bg.png` | `Section / Hall of Fame / Home Tone` |
+  | `rank-3.png` | `1차 디자인 시안 > 캐릭터 > ThirdPlaceMascotImage` |
+
+  Figma 자산 URL은 조직 이그레스 정책(`figma.com` 403)이 막아 코드에서 내려받을 수 없다.
+- 1·2위 마스코트는 벡터라 플러그인 API로 SVG를 뽑아 이미 붙어 있다.
+- 정렬·검색·페이지네이션은 동작 후 화면이 시안에 없어 비활성으로 두었다.
+  카테고리 칩만 실제로 목록을 거른다.
+- 랭킹 탭은 선택 상태만 로컬로 표현한다. 탭별 목록은 시안에 없다.
+- `랭킹 보러가기`는 이동할 화면이 없어 링크를 걸지 않았다.
 
 ## 발표 시연 흐름
 
@@ -164,6 +216,8 @@ TypeScript 전환으로 대체된 파일:
 ## 서버 없이 표현한 데이터·상태
 
 - 홈의 사건 카드·투표 수치·참여 인원은 모두 예시 데이터다 (`src/data/common/homeContent.ts`).
+- 광장의 랭킹·포인트·사건 목록·페이지 수도 예시 데이터다 (`src/data/common/plazaContent.ts`).
+  실제 집계가 아니며 카테고리 필터만 화면 로컬 상태로 동작한다.
 - 밸런스 게임 선택은 화면 로컬 상태이며 저장되지 않는다.
 - AI 판단은 실제 모델 결과가 아닌 UI 프로토타입이다.
 - 로그인·알림·저장 API는 연결되어 있지 않다.
@@ -171,12 +225,14 @@ TypeScript 전환으로 대체된 파일:
 
 ## 다음 작업
 
-1. `npm run lint`를 다시 실행해 2건이 해결됐는지 확인하고 결과를 이 문서에 기록
-2. 모바일 폭(360·390·402·430)과 키보드가 열린 상태를 실기기 또는 기기 모드에서 확인
-3. 홈 화면 실제 에셋·`@font-face` 적용
-4. 사건 상세 시안이 나오면 가입 진입점(`로그인하고 나도 투표하기`)을 제자리로 옮긴다.
+1. `npm run typecheck && npm run lint && npm run dev`로 광장 화면 확인
+2. 광장 비트맵 에셋 3종을 `src/assets/plaza/`에 넣기 (넣으면 자동 반영)
+3. 모바일 폭(360·390·402·430)과 키보드가 열린 상태를 실기기 또는 기기 모드에서 확인
+4. 홈 화면 실제 에셋·`@font-face` 적용
+5. 사건 상세 시안이 나오면 가입 진입점(`로그인하고 나도 투표하기`)을 제자리로 옮긴다.
    지금은 홈의 `로그인 하고 사건 투표하기` 버튼에 임시로 걸려 있다
-5. 확정된 화면부터 담당자별 구현, 완성되면 `BottomNavigation`과 `AppRoutes`에 연결
+6. `개발` 페이지에 화면이 올라오는 순서대로 구현하고,
+   완성되면 `BottomNavigation`의 `enabled`와 `AppRoutes`에 연결
 
 ## 마지막 검증 결과
 
@@ -189,6 +245,8 @@ TypeScript 전환으로 대체된 파일:
 | `npm run build` | **통과** | 28 modules, 143ms |
 | `npm run lint` | **오류 2건 발견 → 수정함, 재실행 필요** | `react-hooks/set-state-in-effect` (`ShowcaseLayout.tsx`, `SessionProvider.tsx`). 규칙을 끄지 않고 구조를 바꿔 해결했다 |
 | 브라우저 확인 | **미실행** | PC 목업·모바일 전환을 아직 눈으로 확인하지 못했다 |
+
+배심원 광장(2026-09-09)은 아직 `typecheck` · `lint` · 브라우저 확인을 하지 않았다.
 
 빌드 산출물
 
@@ -204,7 +262,10 @@ TypeScript 전환으로 대체된 파일:
 
 ## 알려진 문제 / 확인 필요
 
-`PROJECT_SPEC.md` §9에 11개 항목으로 정리되어 있다.
-해결된 것은 §9-5(홈 인디케이터), §9-4(하단바 표기), §9-2(가입 화면 — 팀 결정으로 추가)다.
+`PROJECT_SPEC.md` §9에 정리되어 있다.
+해결된 것은 §9-5(홈 인디케이터), §9-4(하단바 표기), §9-2(가입 화면 — 팀 결정으로 추가),
+§9-17(아이콘 확정 범위)이다.
+광장 구현에서 §9-12~16(관점 선택 항목 수, 랭킹 탭, 정렬·검색·페이지네이션,
+`랭킹 보러가기` 목적지, 비트맵 에셋 3종)이 새로 올라왔다.
 가장 급한 것은 **§9-3 사건 상세 시안**이다.
 시연 흐름의 가입 진입점이 사건 상세에 있어서, 그 화면이 나와야 흐름이 제자리를 찾는다.

@@ -14,16 +14,28 @@
 
 /* ---------- 랭킹 히어로 ---------- */
 
+/*
+ * 배경은 Figma `Section / Hall of Fame / Home Tone`.
+ * 원본 PNG가 764KB라 화질 차이 없이 WebP로 바꿨다(12KB).
+ * 이미지를 못 읽는 경우를 대비해 비슷한 톤의 그라데이션을 아래에 깔아 둔다.
+ */
 .ranking-hero {
     position: relative;
     padding: 22px var(--content-gutter) 38px;
-    /* TODO(에셋): hero-bg.png가 들어오면 background-image로 교체한다. */
-    background: linear-gradient(180deg, #f4f9ff 0%, #eaf4ff 55%, #e4f0ff 100%);
+    background-color: #f4f9ff;
+    background-image: url(../../assets/plaza/hero-bg.webp);
+    background-repeat: no-repeat;
+    background-position: center top;
+    background-size: cover;
 }
 
 .ranking-hero__heading {
+    /* 일러스트가 뒤로 가도록 텍스트 쪽을 위로 올린다. */
+    position: relative;
+    z-index: 1;
     padding-left: 12px;
-    padding-bottom: 20px;
+    /* 시안에서 헤드라인은 섹션 위에서 81px 지점에서 시작한다. */
+    padding-bottom: 35px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -49,6 +61,8 @@
 }
 
 .ranking-hero__headline {
+    position: relative;
+    z-index: 1;
     padding-left: 17px;
     font-size: 26px;
     font-weight: 700;
@@ -65,17 +79,49 @@
     color: var(--orange-700);
 }
 
-/* 판멍이·트로피 일러스트 자리. 에셋이 들어오면 <img>로 바꾼다. */
+/*
+ * 판멍이·트로피 일러스트.
+ * 시안(1301:9117)은 섹션 오른쪽 위(오른쪽 14 · 위 70)에 판멍이(160×110)를 깔고
+ * 트로피(66×66)를 그 안 왼쪽 5 · 위 40 지점에 얹는다.
+ * z-index 0으로 두어 제목·헤드라인·랭킹 패널보다 뒤에 깔린다.
+ */
 .ranking-hero__art {
     position: absolute;
+    z-index: 0;
     right: 14px;
     top: 70px;
     width: 160px;
     height: 110px;
 }
 
+.ranking-hero__mascot,
+.ranking-hero__trophy {
+    position: absolute;
+    display: block;
+    /* 원본 비율이 달라도 잘리거나 찌그러지지 않게 한다. */
+    object-fit: contain;
+}
+
+.ranking-hero__mascot {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.ranking-hero__trophy {
+    left: 5px;
+    top: 40px;
+    width: 66px;
+    height: 66px;
+    /* 트로피가 판멍이 앞에 온다. */
+    z-index: 1;
+    filter: drop-shadow(0 3px 5px rgba(31, 36, 128, .18));
+}
+
 .ranking-hero__content {
-    margin-top: 24px;
+    position: relative;
+    z-index: 1;
+    margin-top: 22px;
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -164,7 +210,8 @@
 }
 
 .ranking-item--1 {
-    gap: 8px;
+    /* 시안은 배지-마스코트만 8, 나머지 간격은 4다. 차이는 상자 위 여백으로 만든다. */
+    gap: 4px;
     width: 110px;
     height: 166px;
     padding: 8px 14px;
@@ -200,17 +247,47 @@
     background: #46d42a;
 }
 
-/* 마스코트 자리. 에셋이 들어오면 <img>로 바꾼다. */
-.ranking-item__mascot {
-    display: block;
+/*
+ * 마스코트 상자와 캐릭터.
+ * 시안(1301:9131)은 82×66 상자 안에 캐릭터를 작게 앉힌다. 1위만 상자가 82×78이다.
+ * 상자 안 원형 배경은 카드와 같은 색이라 보이지 않는 여백일 뿐이라 만들지 않는다.
+ * 캐릭터 크기·바닥 여백은 시안 수치를 그대로 옮겼다.
+ */
+.ranking-item__mascot-wrap {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
     width: 82px;
     height: 66px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, .45);
+}
+
+.ranking-item--1 .ranking-item__mascot-wrap {
+    height: 78px;
+    margin-top: 4px;
+}
+
+.ranking-item__mascot {
+    display: block;
+    /* 원본 비율이 제각각이라(3위는 2:1) 비율을 지키며 맞춘다. */
+    object-fit: contain;
 }
 
 .ranking-item--1 .ranking-item__mascot {
-    height: 78px;
+    width: 46px;
+    height: 47px;
+    margin-bottom: 11px;
+}
+
+.ranking-item--2 .ranking-item__mascot {
+    width: 39px;
+    height: 39px;
+    margin-bottom: 9px;
+}
+
+.ranking-item--3 .ranking-item__mascot {
+    width: 55px;
+    height: 28px;
+    margin-bottom: 16px;
 }
 
 .ranking-item__nickname {
@@ -236,7 +313,9 @@
 /* ---------- 랭킹 보러가기 ---------- */
 
 .ranking-hero__link {
-    margin: 24px auto 0;
+    position: relative;
+    z-index: 1;
+    margin: 25px auto 0;
     height: 40px;
     padding: 0 28px;
     display: flex;
@@ -268,7 +347,12 @@
 /* ---------- 전체 사건 ---------- */
 
 .case-feed {
-    padding: 44px var(--content-gutter) 38px;
+    /*
+     * 아래 여백은 하단바 높이(--device-bottom-nav)와 별개다.
+     * 그 값은 하단바에 가리지 않게 비워 두는 몫이라, 마지막 콘텐츠와
+     * 하단바 사이 숨 쉴 공간은 여기서 준다.
+     */
+    padding: 44px var(--content-gutter) 72px;
     display: flex;
     flex-direction: column;
     gap: 22px;
