@@ -37,6 +37,11 @@
     background: none;
 }
 
+/* 공용 화살표 아이콘은 오른쪽을 가리키므로 좌우 반전해 뒤로가기로 쓴다. */
+.case-submit__back-icon {
+    transform: scaleX(-1);
+}
+
 .case-submit__title {
     flex: 1;
     margin: 0;
