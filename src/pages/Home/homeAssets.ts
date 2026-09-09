@@ -32,6 +32,15 @@ import adShell from '../../assets/home/figma/imgImage22.png'
 import letterEnvelope from '../../assets/home/figma/img.png'
 import letterPaper from '../../assets/home/figma/img2.png'
 
+/*
+ * 왈가왈후~ 편지봉투 세 겹. 사용자가 내보낸 이미지를 그대로 쓴다.
+ * 라벤더였던 두 장은 `envelope-front`의 파랑에 맞춰 색을 통일했고,
+ * 원본 PNG 합계 910KB가 WebP로 71KB가 됐다(육안 차이 없음).
+ */
+import envelopeBack from '../../assets/home/figma/envelope-back.webp'
+import envelopeFront from '../../assets/home/figma/envelope-front.webp'
+import envelopeClosed from '../../assets/home/figma/envelope-closed.webp'
+
 export const homeIcons = {
   btnArrow,
   tipIcon,
@@ -50,6 +59,9 @@ export const homeIcons = {
 } as const
 
 export const homeImages = {
+  envelopeBack,
+  envelopeFront,
+  envelopeClosed,
   judgeMascot,
   botFace,
   adShell,
@@ -64,15 +76,13 @@ export const homeImages = {
  *
  * | 파일명                | Figma 노드     | 크기      | 쓰이는 곳            |
  * | --------------------- | -------------- | --------- | -------------------- |
- * | `envelope-back.png`   | `1402:7362`    | 342 × 336 | 왈가왈후~ 편지봉투 뒤 |
- * | `envelope-front.png`  | `1402:7372`    | 340 × 185 | 왈가왈후~ 편지봉투 앞 |
  * | `plate-left.png`      | `1402:7217`    | 150 × 85  | 밸런스 게임 왼쪽 접시 |
  * | `plate-right.png`     | `1402:7216`    | 150 × 85  | 밸런스 게임 오른쪽 접시 |
  * | `perilla.png`         | `1402:7230`    | 127 × 133 | 밸런스 게임 깻잎      |
  * | `chat-mascot.png`     | `1473:8568`    | 79 × 67   | AI 맞춤 추천 판멍이   |
  */
 const bitmapModules = import.meta.glob(
-  '../../assets/home/figma/{envelope-back,envelope-front,plate-left,plate-right,perilla,chat-mascot}.png',
+  '../../assets/home/figma/{plate-left,plate-right,perilla,chat-mascot}.png',
   { eager: true, query: '?url', import: 'default' },
 ) as Record<string, string>
 
@@ -82,8 +92,6 @@ function optional(fileName: string): string | null {
 }
 
 export const optionalImages = {
-  envelopeBack: optional('envelope-back.png'),
-  envelopeFront: optional('envelope-front.png'),
   plateLeft: optional('plate-left.png'),
   plateRight: optional('plate-right.png'),
   perilla: optional('perilla.png'),

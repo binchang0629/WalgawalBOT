@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import SectionTitle from '../../../components/common/SectionTitle'
-import { homeIcons, homeImages, optionalImages } from '../homeAssets'
+import { homeIcons, homeImages } from '../homeAssets'
 import {
   afterStoryQuotes,
   featuredAfterStory,
@@ -9,14 +10,14 @@ import {
 /**
  * 05 After Story — 왈가왈후~. Figma `1402:7357`
  *
- * 편지는 네 겹이다: 편지(뒤) → 편지봉투_뒤 → 편지지 → 편지봉투_앞.
+ * 편지는 다섯 겹이다: 편지 → 봉투_뒤(열린) → 편지지 → 봉투_앞 → 봉투_닫힘.
  *
- * `envelope-back.png`·`envelope-front.png`이 아직 없다. 두 겹을 대충 흉내 내면
- * 글자와 겹쳐 오히려 읽기 어려워지므로, 없을 때는 봉투 없이 편지지만 보여준다(`letter--flat`).
- * 파일이 들어오면 `homeAssets.ts`가 자동으로 바꿔 끼우고 봉투가 다시 덮인다.
+ * 닫혔을 때는 맨 위의 닫힌 봉투만 보이고 편지지는 그 뒤로 내려가 있다.
+ * 누르면 닫힌 봉투가 사라지며 열린 봉투로 바뀌고, 편지지가 올라오며 글이 보인다.
+ * 봉투 세 장의 겹치는 위치는 이미지의 밑변 폭을 맞춰 계산했다(Home.css 참고).
  */
 function AfterStorySection() {
-  const hasEnvelope = Boolean(optionalImages.envelopeBack && optionalImages.envelopeFront)
+  const [isOpened, setIsOpened] = useState(false)
 
   return (
     <section className="story-section">
@@ -26,17 +27,13 @@ function AfterStorySection() {
         action={homeSectionTitles.afterStory.action}
       />
 
-      <article className={`letter${hasEnvelope ? '' : ' letter--flat'}`}>
-        {hasEnvelope && (
-          <>
-            <img className="letter__mail" src={homeImages.letterEnvelope} alt="" aria-hidden="true" />
-            <img className="letter__back" src={optionalImages.envelopeBack ?? ''} alt="" aria-hidden="true" />
-          </>
-        )}
+      <article className={isOpened ? 'letter is-open' : 'letter'}>
+        <img className="letter__mail" src={homeImages.letterEnvelope} alt="" aria-hidden="true" />
+        <img className="letter__back" src={homeImages.envelopeBack} alt="" aria-hidden="true" />
 
         <img className="letter__paper" src={homeImages.letterPaper} alt="" aria-hidden="true" />
 
-        <div className="letter__content">
+        <div className="letter__content" id="featured-after-story">
           {featuredAfterStory.isNew && <span className="letter__new">NEW</span>}
           <blockquote className="letter__quote">
             <span className="letter__mark">“</span>
@@ -55,11 +52,26 @@ function AfterStorySection() {
           </p>
         </div>
 
-        {hasEnvelope && (
-          <img className="letter__front" src={optionalImages.envelopeFront ?? ''} alt="" aria-hidden="true" />
-        )}
+        <img className="letter__front" src={homeImages.envelopeFront} alt="" aria-hidden="true" />
+        <img className="letter__closed" src={homeImages.envelopeClosed} alt="" aria-hidden="true" />
 
-        <b className="letter__cta">{featuredAfterStory.envelopeCta}</b>
+        <b className="letter__cta">
+          {isOpened ? featuredAfterStory.envelopeCta : '편지 열어보기'}
+        </b>
+
+        {/*
+          봉투 전체가 누르는 영역이다. 보이는 글자는 `letter__cta`가 이미 맡고 있어서
+          버튼 자체의 이름은 화면에서 숨기고 스크린리더에만 읽힌다.
+        */}
+        <button
+          type="button"
+          className="letter__toggle"
+          aria-expanded={isOpened}
+          aria-controls="featured-after-story"
+          onClick={() => setIsOpened((open) => !open)}
+        >
+          <span>{isOpened ? '후일담 편지 접기' : '후일담 편지 열어보기'}</span>
+        </button>
       </article>
 
       <div className="story-scroll">
