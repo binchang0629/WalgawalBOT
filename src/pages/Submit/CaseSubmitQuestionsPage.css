@@ -1,0 +1,47 @@
+/*
+ * 사건 접수 2단계(지훈02) 전용 스타일.
+ * 삼지선다 답변 스타일은 CaseSubmit.css의 .case-submit__choice*를 공유한다.
+ */
+
+.case-submit__optional-detail {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 8px;
+    height: 88px;
+    padding: 16px;
+    border: 1px solid var(--neutral-250);
+    border-radius: 12px;
+    background: var(--neutral-100);
+}
+
+.case-submit__optional-detail-input {
+    flex: 1;
+    min-height: 0;
+    resize: none;
+    border: 0;
+    padding: 0;
+    background: none;
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--neutral-900);
+}
+
+.case-submit__optional-detail-input::placeholder {
+    color: var(--neutral-600);
+}
+
+.case-submit__optional-detail-input:focus {
+    outline: none;
+}
+
+.case-submit__optional-detail-label {
+    flex: none;
+    align-self: flex-end;
+    font-family: var(--font-body);
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--neutral-600);
+}

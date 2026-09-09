@@ -28,7 +28,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: '홈', icon: '⌂', to: PATHS.home, enabled: true },
   { label: '배심원 광장', icon: '♟', to: PATHS.plaza, enabled: false },
-  { label: '사건 접수', icon: '＋', to: PATHS.caseSubmit, enabled: false, isCta: true },
+  { label: '사건 접수', icon: '＋', to: PATHS.caseSubmit, enabled: true, isCta: true },
   { label: '왈가왈후~', icon: '▢', to: PATHS.afterStory, enabled: false },
   { label: 'MY', icon: '♙', to: PATHS.my, enabled: false },
 ]

@@ -1,6 +1,6 @@
 # 왈가왈BOT 현재 상태
 
-마지막 업데이트: 2026-09-08
+마지막 업데이트: 2026-09-09
 
 기준 문서는 `PROJECT_SPEC.md`다. 이 문서는 **현재 상태만** 기록한다.
 규칙·토큰·구현 기준을 이 문서에 다시 적지 않는다.
@@ -32,6 +32,12 @@ npm run dev
 | 2026-09-08 | **회원가입 화면(`/signup`)을 시안 없이 추가** | 팀 결정. 발표 시연에 필요. 확정 스타일가이드 토큰만 사용 |
 | 2026-09-08 | 온보딩·별도 로그인 화면은 만들지 않음 | 시안도 없고 시연 흐름에도 없음 |
 | 2026-09-08 | 곽지훈(B)은 가입 없이 계정 전환으로 진입 | 발표에서 윤서아 다음 순서라 로그인 시점이 필요 없음 |
+| 2026-09-09 | `DetailLayout` 신설, 하단바 없음 | PROJECT_SPEC.md §7-2 폴더 계획에 있던 레이아웃을 처음 구현. 지훈01~05 화면이 자체 헤더·진행률·하단 CTA를 모두 가지고 있어 레이아웃은 Outlet만 감싸는 얇은 틀로 두었다 |
+| 2026-09-09 | `/cases/new*` 접근 가드 없음 | 로그인 필요 범위가 아직 미정이라(§9-9) 임의로 `RequireAuth`를 걸지 않았다 |
+| 2026-09-09 | Figma `color/Blue/500`(#649EFF)를 `--blue-300`(#659EFF)에 매핑 | 프로젝트 컬러 스케일에 정확히 같은 값이 없다. 육안 차이가 없는 동일 계열 값이라 스케일 밖 새 색을 만드는 대신 가장 가까운 기존 토큰을 재사용했다 (PROJECT_SPEC.md §1-3) |
+| 2026-09-09 | 사건 접수 지훈01~05 전 단계를 별도 라우트로 구현 | `/cases/new`(작성) → `/cases/new/questions`(추가 질문) → `/cases/new/summary`(요약 확인) → `/cases/new/opinion`(AI 참고 의견·접수) → `/cases/new/complete`(접수 완료). 각 단계가 새로고침·직접 URL 접근에도 견디도록 라우트로 나누고, 공유 입력 상태는 `CaseSubmitFlow`의 Context에 뒀다 |
+| 2026-09-09 | `배심원 광장에 공개`는 선택 불가로 구현 | Figma 주석(node 1446:10059)에 "처음 진입 시 둘 다 회색, 배심원 광장은 비활성화, 나만보기만 클릭 시 주황"이라고 명시돼 있다. 공개 범위를 어디까지 열지 미정이라(§9-9) 시안 주석을 그대로 따랐다 — 사건 접수는 항상 `나만 보기`로만 완료된다 |
+| 2026-09-09 | 지훈02~04의 질문·요약·AI 의견은 고정 예시(디자이너 잔금 미지급) 그대로 사용 | 실제 AI 없이 mock으로 구현하는 프로젝트라(§6), 1단계에 사용자가 무엇을 적든 그 내용을 실제로 분석해 질문·요약을 생성하지 않는다. Figma 시안의 예시 카피를 그대로 쓰고, 요약 화면의 제목·확인된 내용만 실제로 고쳐 쓸 수 있게 했다 |
 
 ## 구현 상태
 
@@ -40,7 +46,7 @@ npm run dev
 | 홈 | **확정** (`김하은/홈수정`) | **구현됨** | 에셋·폰트 교체 남음 |
 | 404 | — | **구현됨** | `pages/Error/NotFoundPage.tsx` |
 | 배심원 광장 | 작업 중 | 미착수 | `src/pages/Plaza/` 빈 폴더 |
-| 사건 접수 | 작업 중 | 미착수 | `src/pages/Submit/` 빈 폴더 |
+| 사건 접수 (지훈01~05) | **확정** (node 1446:9899~10071) | **구현됨** | `/cases/new`~`/cases/new/complete` 5단계 모두 구현 |
 | 사건 상세 · AI 1심 | 작업 중 | 미착수 | `src/pages/Case/` 빈 폴더 |
 | 왈가왈후~ (후일담) | 작업 중 | 미착수 | 폴더 없음 |
 | MY | 작업 중 | 미착수 | `src/pages/My/` 빈 폴더 |
@@ -117,6 +123,102 @@ src/components/demo/PersonaSwitcher.tsx · PersonaSwitcher.css
   저장은 effect로 분리 (린트 `react-hooks/set-state-in-effect`)
 - `src/layouts/ShowcaseLayout.tsx` — 축소 비율을 state에서 빼고 렌더 중 계산 (같은 린트 규칙)
 
+### 2026-09-09 추가 — 사건 접수 지훈01~05 전체
+
+Figma MCP(Dev Mode)로 지훈01~05 노드(파일 키 `5msPuamjPpGJOUFl0OXBOX`)의 실제 레이아웃·
+색상·문구를 각각 읽어 그대로 옮겼다. 처음에는 지훈01만 구현했다가(위 결정 사항 참고),
+이어서 나머지 4단계도 같은 방식으로 구현했다.
+
+| 단계 | Figma 프레임 | node | 라우트 | 페이지 컴포넌트 |
+| --- | --- | --- | --- | --- |
+| 1 | 지훈01 / 사건 작성 · 기본 | 1446:9899 | `/cases/new` | `CaseSubmitPage` |
+| 2 | 지훈02 / 추가 질문 | 1446:9956 | `/cases/new/questions` | `CaseSubmitQuestionsPage` |
+| 3 | 지훈03 / 요약 확인 | 1446:10011 | `/cases/new/summary` | `CaseSubmitSummaryPage` |
+| 4 | 지훈04 / AI 참고 의견·접수 | 1446:10041 | `/cases/new/opinion` | `CaseSubmitOpinionPage` |
+| 5 | 지훈05 / 접수 완료 | 1446:10071 | `/cases/new/complete` | `CaseSubmitCompletePage` |
+
+새로 만든 파일:
+
+```
+src/layouts/DetailLayout.tsx · DetailLayout.css
+src/pages/Submit/CaseSubmitFlow.tsx              # 5단계 공유 상태 Provider + Outlet
+src/pages/Submit/caseSubmitDraftContext.ts · useCaseSubmitDraft.ts
+src/pages/Submit/useWizardBack.ts                # 단계 공통 뒤로가기(AuthLayout과 같은 패턴)
+src/pages/Submit/types.ts                        # Relationship·QuestionAnswers·Visibility 등
+src/pages/Submit/caseSubmitContent.ts            # 고정 예시 사연(요약·AI 의견) 텍스트
+src/pages/Submit/CaseSubmit.css                  # 헤더·진행률·본문·CTA 등 5단계 공통 스타일
+src/pages/Submit/components/CaseSubmitHeader.tsx
+src/pages/Submit/components/CaseSubmitProgress.tsx
+src/pages/Submit/components/CaseSubmitFooter.tsx
+src/pages/Submit/CaseSubmitPage.tsx · CaseSubmitPage.css                 # 1단계
+src/pages/Submit/CaseSubmitQuestionsPage.tsx · CaseSubmitQuestionsPage.css  # 2단계
+src/pages/Submit/CaseSubmitSummaryPage.tsx · CaseSubmitSummaryPage.css     # 3단계
+src/pages/Submit/CaseSubmitOpinionPage.tsx · CaseSubmitOpinionPage.css     # 4단계
+src/pages/Submit/CaseSubmitCompletePage.tsx · CaseSubmitCompletePage.css  # 5단계
+src/assets/submit/figma/imgChevronLeft.svg        # 헤더 뒤로가기 (#78757A)
+src/assets/submit/figma/imgCheck.svg              # 선택된 항목의 체크 표시
+src/assets/submit/figma/imgCharacterWalangJoy.svg # 판멍이 인라인 도움말 캐릭터
+src/assets/submit/figma/imgRadioSelected.svg · imgRadioDefault.svg  # 4단계 공개 범위 라디오
+src/assets/submit/figma/imgPanMungyeeJudge.png    # 5단계 판사 옷 판멍이 일러스트
+```
+
+고친 파일:
+
+- `src/routes/paths.ts` — `caseSubmitQuestions`·`caseSubmitSummary`·`caseSubmitOpinion`·`caseSubmitComplete` 추가
+- `src/routes/AppRoutes.tsx` — `DetailLayout` 아래 `CaseSubmitFlow`로 5개 라우트를 중첩 연결
+- `src/components/common/BottomNavigation.tsx` — `사건 접수` 항목 `enabled: true`로 전환
+
+단계 간 공유 상태:
+
+5단계 모두 새로고침·직접 URL 접근에 견뎌야 해서(§7-7) 화면마다 독립된 라우트로 나눴다.
+관계·첨부·사건 내용·질문 답변·요약·공개 범위처럼 여러 단계가 함께 쓰는 값은
+화면 로컬 state가 아니라 `CaseSubmitFlow`가 들고 있는 Context(`useCaseSubmitDraft`)에 둔다.
+세션·퍼소나처럼 앱 전역 상태가 아니라 이 흐름 안에서만 쓰는 상태라
+`src/state/`가 아니라 `src/pages/Submit/`에 뒀다.
+
+각 단계는 이전 단계 데이터가 없으면(예: 1단계를 거치지 않고 `/cases/new/summary`를 직접 열면)
+`<Navigate>`로 앞 단계로 돌려보낸다 — 빈 상태를 완료된 것처럼 보여주지 않는다.
+
+화면 동작 — 단계별로 정직하게 구현/미구현을 구분했다:
+
+- **1단계** `상대와의 관계`는 6개 칩 중 단일 선택, 기본 미선택 → 선택 시 주황 + 체크.
+  `사진 추가`/`파일 첨부`는 실제 `<input type=file>`로 선택한 파일명을 목록에 보여준다
+  (실제 업로드는 없음 — 백엔드가 없는 데모 범위). `사건 내용`은 1,000자 제한 + 실시간 글자 수,
+  비어 있으면 `다음`이 비활성 상태를 유지한다.
+- **2단계** 3개 질문(최종 파일 전달 기록 / 계약서 잔금 지급일 / 수정 범위)이 모두
+  실제 3지선다 단일 선택이며, 전부 답해야 `AI 요약 확인하기`가 활성화된다.
+  첫 질문에서 `있어요`를 고르면 실제로 입력 가능한 추가 설명 textarea가 열린다.
+- **3단계** `사건 요약`의 제목·확인된 내용만 `수정하기`로 실제 편집 가능(진짜 상태 변경).
+  `확인이 필요한 쟁점`·`원하는 도움`은 AI가 정리한 결과로 취급해 이 화면에서 고치지 않는다.
+  제목·확인된 내용이 비어 있으면 다음 버튼이 비활성화된다.
+- **4단계** `배심원 광장에 공개`는 Figma 주석(node 1446:10059: "처음 진입 시 둘 다 회색,
+  배심원 광장은 비활성화, 나만보기만 클릭 시 주황")을 그대로 따라 **선택할 수 없게** 뒀다.
+  `나만 보기`를 실제로 선택해야만 `사건 접수하기`가 활성화된다.
+- **5단계** 접수를 실제로 마치지 않고(Context의 `isSubmitted`가 false인 채) URL로 바로 열면
+  1단계로 돌려보낸다. 뒤로가기·`홈으로 돌아가기` 모두 `/home`으로 이동한다.
+- 모든 단계의 `임시저장`은 아직 구현 범위 밖이라 `BottomNavigation`의 미구현 항목과
+  같은 방식으로 **비활성 버튼**으로 뒀다. 성공한 것처럼 보이는 가짜 동작을 만들지 않았다.
+- 1단계 뒤로가기는 `AuthLayout`과 같은 패턴 — 앱 내부 이력이 있으면 `navigate(-1)`,
+  외부에서 바로 들어온 경우 `BACK_FALLBACK.cases`(`/plaza`)로 이동한다.
+  2~4단계는 같은 패턴으로 바로 이전 단계 라우트가 fallback이다.
+
+지훈02~04의 질문·요약·AI 의견 문구는 Figma의 고정 예시 사연(디자이너 잔금 미지급 분쟁)
+그대로다 — 실제 생성형 AI가 1단계 내용을 읽고 만든 결과가 아니다 (PROJECT_SPEC.md §6).
+
+검증 (2026-09-09 재실행):
+
+| 검사 | 결과 |
+| --- | --- |
+| `npm install` | **통과** (162 packages, 0 vulnerabilities) |
+| `npm run typecheck` | **통과** |
+| `npm run lint` | **통과** |
+| `npm run build` | **통과** (84 modules) |
+| 브라우저 확인 | **실행함** — Playwright(Chromium headless)로 402×900에서 지훈01→02→03→04→05
+  전체 흐름을 실제로 조작(칩·질문 선택, textarea 입력, 요약 편집, 공개 범위 선택, 제출)했고
+  각 단계의 URL 전환·버튼 활성화 조건이 의도대로 동작함을 확인했다. `/cases/new/summary`를
+  중간 상태 없이 직접 열면 1단계로 리다이렉트되는 가드도 확인했다. 콘솔 에러 0건.
+  스크린샷이 Figma 시안과 일치함을 육안으로 확인했다 |
+
 ### 삭제 정리
 
 2026-09-08 삭제 완료.
@@ -139,8 +241,9 @@ TypeScript 전환으로 대체된 파일:
   `src/assets/home/figma/`의 실제 SVG·PNG로 교체해야 한다.
 - Paperlogy·Pretendard 폰트 파일이 `src/assets/fonts/`에 있으나
   `@font-face` 등록이 아직 없다.
-- 하단바의 배심원 광장·사건 접수·왈가왈후~·MY는 라우트가 없어 비활성 상태다.
-  각 화면이 생기면 `BottomNavigation.tsx`의 `enabled`만 켜면 된다.
+- 하단바의 배심원 광장·왈가왈후~·MY는 라우트가 없어 비활성 상태다.
+  `사건 접수`는 2026-09-09에 라우트가 생겨 활성화했다.
+  나머지도 화면이 생기면 `BottomNavigation.tsx`의 `enabled`만 켜면 된다.
 - 앱 헤더가 아직 `HomePage.tsx` 안에 있다.
   두 번째 화면 컨펌 시 `TopBar` 공통 컴포넌트로 올린다.
 
@@ -177,6 +280,10 @@ TypeScript 전환으로 대체된 파일:
 4. 사건 상세 시안이 나오면 가입 진입점(`로그인하고 나도 투표하기`)을 제자리로 옮긴다.
    지금은 홈의 `로그인 하고 사건 투표하기` 버튼에 임시로 걸려 있다
 5. 확정된 화면부터 담당자별 구현, 완성되면 `BottomNavigation`과 `AppRoutes`에 연결
+6. 접수한 사건이 실제 목록·MY에 반영되도록 연결 (지훈05는 아직 접수 후 어디로도 저장하지 않는다.
+   `CaseSubmitFlow`의 Context는 페이지를 벗어나면 사라지는 화면 상태일 뿐이다)
+7. 사건 접수 로그인 필요 여부가 정해지면 `/cases/new*`에 `RequireAuth` 적용 여부 반영 (§9-9)
+8. 공개 범위(§9-9)가 정해지면 `배심원 광장에 공개`를 실제로 선택 가능하게 전환
 
 ## 마지막 검증 결과
 
