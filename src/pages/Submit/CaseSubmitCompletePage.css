@@ -1,0 +1,78 @@
+/* 사건 접수 5단계(지훈05) 전용 스타일. */
+
+.case-submit__complete-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 64px var(--content-gutter) 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.case-submit__complete-body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+.case-submit__complete-art {
+    flex: none;
+    object-fit: cover;
+}
+
+.case-submit__complete-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+    width: 100%;
+}
+
+.case-submit__complete-message .case-submit__heading,
+.case-submit__complete-message .case-submit__description {
+    text-align: center;
+}
+
+.case-submit__receipt {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    border-radius: 8px;
+    background: var(--blue-050);
+}
+
+.case-submit__receipt-title {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--neutral-900);
+    white-space: pre-line;
+}
+
+.case-submit__receipt-visibility {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--neutral-600);
+}
+
+.case-submit__complete-reminder {
+    margin: 0;
+    text-align: center;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--neutral-600);
+}
