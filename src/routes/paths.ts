@@ -6,11 +6,14 @@
 export const PATHS = {
   root: '/',
   demo: '/demo',
+  /** 로그인 시안 확정 전 임시 연결 화면. */
+  login: '/login',
   /** 회원가입 (데모). 컨펌 시안 없이 팀 결정으로 추가한 화면이다. (PROJECT_SPEC.md §9-2) */
   signup: '/signup',
   home: '/home',
   plaza: '/plaza',
   caseDetail: '/cases/:caseId',
+  caseResult: '/cases/:caseId/result',
   caseSubmit: '/cases/new',
   afterStory: '/afterstory',
   afterStoryDetail: '/afterstory/:storyId',
@@ -20,6 +23,7 @@ export const PATHS = {
 
 /** 동적 경로 생성 함수. useParams로 읽는 값과 짝을 이룬다. */
 export const toCaseDetail = (caseId: string) => `/cases/${caseId}`
+export const toCaseResult = (caseId: string) => `/cases/${caseId}/result`
 export const toAfterStoryDetail = (storyId: string) => `/afterstory/${storyId}`
 
 /**

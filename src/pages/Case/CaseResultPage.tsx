@@ -1,0 +1,287 @@
+import { useRef, useState } from 'react'
+import type { FormEvent } from 'react'
+import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
+import chevronIcon from '../../assets/case/result/chevron.svg'
+import dislikeIcon from '../../assets/case/result/dislike.svg'
+import emojiIcon from '../../assets/case/result/emoji.svg'
+import likeIcon from '../../assets/case/result/like.svg'
+import menuIcon from '../../assets/case/result/menu.svg'
+import pageNextIcon from '../../assets/case/result/page-next.svg'
+import pagePrevIcon from '../../assets/case/result/page-prev.svg'
+import quoteDivider from '../../assets/case/result/quote-divider.svg'
+import storyLinkIcon from '../../assets/case/result/story-link.svg'
+import submitIcon from '../../assets/case/result/submit.svg'
+import { weddingGiftCase } from '../../data/common/caseDetailContent'
+import type { WeddingGiftVoteId } from '../../data/common/caseDetailContent'
+import {
+  voteDisplayById,
+  weddingGiftResult,
+} from '../../data/common/caseResultContent'
+import type { CaseResultComment } from '../../data/common/caseResultContent'
+import useSession from '../../hooks/useSession'
+import { PATHS } from '../../routes/paths'
+import CaseHeader from './components/CaseHeader'
+import './CaseResultPage.css'
+
+interface ResultRouteState {
+  selectedVote?: WeddingGiftVoteId
+}
+
+function isVoteId(value: unknown): value is WeddingGiftVoteId {
+  return weddingGiftCase.choices.some((choice) => choice.id === value)
+}
+
+function MissingCase() {
+  return (
+    <main className="case-missing">
+      <h1>사건을 찾을 수 없어요</h1>
+      <p>삭제되었거나 잘못된 사건 주소예요.</p>
+      <Link to={PATHS.plaza}>배심원 광장으로 가기</Link>
+    </main>
+  )
+}
+
+function ResultBreakdown() {
+  const [isExpanded, setIsExpanded] = useState(true)
+
+  return (
+    <div className="result-breakdown">
+      <button
+        type="button"
+        className="result-breakdown__toggle"
+        onClick={() => setIsExpanded((value) => !value)}
+        aria-expanded={isExpanded}
+      >
+        <span>전체 결과 보기</span>
+        <img className={isExpanded ? 'is-open' : ''} src={chevronIcon} alt="" />
+      </button>
+
+      {isExpanded && (
+        <ul className="result-breakdown__list">
+          {weddingGiftResult.breakdown.map((item) => (
+            <li key={item.id}>
+              <div>
+                <span>{item.label}</span>
+                <strong>{item.percent}%</strong>
+              </div>
+              <span className={`result-breakdown__track result-breakdown__track--${item.id}`}>
+                <i style={{ width: `${item.percent}%` }} />
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
+function CommentItem({ comment }: { comment: CaseResultComment }) {
+  const [reaction, setReaction] = useState<'like' | 'dislike' | null>(null)
+  const badge = voteDisplayById[comment.voteId]
+
+  return (
+    <article className="result-comment">
+      <div className="result-comment__avatar">
+        <img src={comment.avatarUrl} alt="" />
+      </div>
+      <div className="result-comment__content">
+        <div className="result-comment__head">
+          <div>
+            <span>{comment.nickname} · {comment.createdAt}</span>
+            <strong className={`result-comment__badge is-${badge.tone}`}>{comment.voteLabel}</strong>
+          </div>
+          <img className="result-comment__menu" src={menuIcon} alt="" aria-hidden="true" />
+        </div>
+        <p>{comment.body}</p>
+        <div className="result-comment__actions">
+          <button
+            type="button"
+            className={reaction === 'like' ? 'is-active' : ''}
+            onClick={() => setReaction((value) => value === 'like' ? null : 'like')}
+            aria-pressed={reaction === 'like'}
+          >
+            <img src={likeIcon} alt="" /> 공감 {comment.likes + (reaction === 'like' ? 1 : 0)}
+          </button>
+          <button
+            type="button"
+            className={reaction === 'dislike' ? 'is-active' : ''}
+            onClick={() => setReaction((value) => value === 'dislike' ? null : 'dislike')}
+            aria-pressed={reaction === 'dislike'}
+          >
+            <img src={dislikeIcon} alt="" /> 반대 {comment.dislikes + (reaction === 'dislike' ? 1 : 0)}
+          </button>
+          <span>대댓글 달기</span>
+        </div>
+      </div>
+    </article>
+  )
+}
+
+function CaseResultPage() {
+  const { caseId } = useParams()
+  const location = useLocation()
+  const { sessionStatus, currentUser } = useSession()
+  const [draft, setDraft] = useState('')
+  const [addedComments, setAddedComments] = useState<CaseResultComment[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const nextCommentId = useRef(1)
+
+  if (caseId !== weddingGiftCase.id) return <MissingCase />
+
+  const loginPath = `${PATHS.login}?from=${encodeURIComponent(location.pathname)}`
+  if (sessionStatus !== 'authenticated') return <Navigate to={loginPath} replace />
+
+  const routeState = location.state as ResultRouteState | null
+  const selectedVote = isVoteId(routeState?.selectedVote) ? routeState.selectedVote : 'writer'
+  const allComments = [...addedComments, ...weddingGiftResult.comments]
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const body = draft.trim()
+    if (!body) return
+
+    const voteDisplay = voteDisplayById[selectedVote]
+    setAddedComments((comments) => [
+      {
+        id: `new-comment-${nextCommentId.current++}`,
+        avatarUrl: weddingGiftResult.comments[0].avatarUrl,
+        nickname: currentUser?.nickname ?? '익명의 배심원',
+        createdAt: '방금 전',
+        voteId: selectedVote,
+        voteLabel: voteDisplay.label,
+        body,
+        likes: 0,
+        dislikes: 0,
+      },
+      ...comments,
+    ])
+    setDraft('')
+  }
+
+  const handleEmoji = () => {
+    setDraft((value) => `${value}🙂`)
+    textareaRef.current?.focus()
+  }
+
+  return (
+    <main className="case-result">
+      <CaseHeader />
+
+      <div className="case-result__body">
+        <section className="result-overview" aria-labelledby="result-case-title">
+          <p className="result-overview__number">사건 번호 {weddingGiftCase.caseNumber.replace('#', '')}</p>
+          <h2 id="result-case-title">{weddingGiftCase.title}</h2>
+          <div className="result-overview__author">
+            <span><img src={weddingGiftCase.author.avatarUrl} alt="" /></span>
+            <p><strong>{weddingGiftCase.author.nickname}</strong> · {weddingGiftCase.age}</p>
+          </div>
+        </section>
+
+        <div className="case-result__divider" />
+
+        <section className="vote-result" aria-labelledby="vote-result-title">
+          <h2 id="vote-result-title">투표 결과</h2>
+          <p className="vote-result__deadline">투표 마감까지&nbsp;&nbsp;{weddingGiftResult.deadline}</p>
+          <div className="vote-result__artwork">
+            <img src={weddingGiftResult.artworkUrl} alt="판멍이가 판결 결과를 발표하는 모습" />
+            {weddingGiftResult.verdictCards.map((card) => (
+              <div key={card.id} className={`verdict-card verdict-card--${card.id}`}>
+                <span>{card.label}</span>
+                <strong>{card.percent}%</strong>
+              </div>
+            ))}
+          </div>
+          <ResultBreakdown />
+        </section>
+
+        <div className="case-result__section-divider" />
+
+        <section className="ai-verdict" aria-labelledby="ai-verdict-title">
+          <h2 id="ai-verdict-title">판멍이의 판결 이유</h2>
+          <div className="ai-verdict__card">
+            <span>판멍이의 최종 판결</span>
+            <h3>AI 판멍이는 상대방의 손을 들어줬어요.</h3>
+            <div>
+              {weddingGiftResult.aiReasons.map((reason) => <p key={reason}>{reason}</p>)}
+            </div>
+            <footer>
+              <span>판단 확신도</span>
+              <strong>{weddingGiftResult.confidence}%</strong>
+            </footer>
+          </div>
+          <div className="ai-verdict__comparison">
+            <strong>판단 비교</strong>
+            <p>{weddingGiftResult.comparison}</p>
+          </div>
+        </section>
+
+        <div className="case-result__section-divider" />
+
+        <section className="comment-section" aria-labelledby="comments-title">
+          <div className="comment-section__heading">
+            <h2 id="comments-title">댓글 ({weddingGiftResult.baseCommentCount + addedComments.length})</h2>
+            <span>등록순 <i /> 최신순</span>
+          </div>
+
+          <form className="comment-composer" onSubmit={handleSubmit}>
+            <textarea
+              ref={textareaRef}
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+              placeholder="댓글을 입력해주세요."
+              aria-label="댓글 내용"
+              maxLength={300}
+            />
+            <div>
+              <button type="button" className="comment-composer__emoji" onClick={handleEmoji} aria-label="이모지 추가">
+                <img src={emojiIcon} alt="" />
+              </button>
+              <button type="submit" className="comment-composer__submit" disabled={!draft.trim()}>
+                <img src={submitIcon} alt="" /> 등록
+              </button>
+            </div>
+          </form>
+
+          <div className="comment-list" aria-live="polite">
+            {allComments.map((comment) => <CommentItem key={comment.id} comment={comment} />)}
+          </div>
+
+          <nav className="comment-pagination" aria-label="댓글 페이지">
+            <button type="button" onClick={() => setCurrentPage((page) => Math.max(1, page - 1))} disabled={currentPage === 1} aria-label="이전 페이지">
+              <img src={pagePrevIcon} alt="" />
+            </button>
+            {[1, 2, 3, 4, 5].map((page) => (
+              <button
+                key={page}
+                type="button"
+                className={currentPage === page ? 'is-current' : ''}
+                onClick={() => setCurrentPage(page)}
+                aria-current={currentPage === page ? 'page' : undefined}
+              >
+                {page}
+              </button>
+            ))}
+            <button type="button" onClick={() => setCurrentPage((page) => Math.min(5, page + 1))} disabled={currentPage === 5} aria-label="다음 페이지">
+              <img src={pageNextIcon} alt="" />
+            </button>
+          </nav>
+        </section>
+
+        <section className="after-story" aria-labelledby="after-story-title">
+          <h2 id="after-story-title">후일담</h2>
+          <article>
+            <blockquote>{weddingGiftResult.afterStory.quote}</blockquote>
+            <img className="after-story__divider" src={quoteDivider} alt="" />
+            <div>
+              <p>{weddingGiftResult.afterStory.title}</p>
+              <span><img src={storyLinkIcon} alt="" /></span>
+            </div>
+          </article>
+        </section>
+      </div>
+    </main>
+  )
+}
+
+export default CaseResultPage

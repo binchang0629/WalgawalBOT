@@ -8,6 +8,22 @@
  * 변수 쪽(`#939094` / `#649EFF` / `#FEFAEF`)으로 맞췄다. → PROJECT_SPEC.md §9-19
  */
 
+@font-face {
+    font-family: 'Pretendard';
+    src: url('../assets/fonts/PretendardVariable.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Paperlogy';
+    src: url('../assets/fonts/Paperlogy-7Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
     /* ---------- Neutral (Figma gray_1000 → gray_50) ---------- */
     --neutral-900: #252525;  /* gray_1000 */
