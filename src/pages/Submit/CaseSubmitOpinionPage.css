@@ -1,0 +1,118 @@
+/* 사건 접수 4단계(지훈04) 전용 스타일. */
+
+.case-submit__ai-opinion {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 8px;
+    background: var(--blue-050);
+}
+
+.case-submit__ai-opinion-eyebrow {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--blue);
+}
+
+.case-submit__ai-opinion-headline {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--neutral-900);
+    white-space: pre-line;
+}
+
+.case-submit__ai-opinion-reasons {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--neutral-900);
+}
+
+.case-submit__ai-opinion-reasons li::before {
+    content: '• ';
+}
+
+.case-submit__ai-opinion-disclaimer {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--neutral-600);
+    white-space: pre-line;
+}
+
+/* ---------- 공개 범위 ---------- */
+
+.case-submit__privacy {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.case-submit__privacy-heading {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--neutral-900);
+}
+
+.case-submit__privacy-option {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    border: 0;
+    background: none;
+    padding: 0;
+    width: 100%;
+    text-align: left;
+}
+
+button.case-submit__privacy-option[aria-disabled='true'],
+div.case-submit__privacy-option {
+    cursor: not-allowed;
+}
+
+.case-submit__privacy-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.case-submit__privacy-option-title {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--neutral-600);
+}
+
+.case-submit__privacy-option-title--selected {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--orange);
+}
+
+.case-submit__privacy-description {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--neutral-600);
+}

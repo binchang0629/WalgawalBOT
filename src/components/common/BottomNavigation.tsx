@@ -35,7 +35,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: '홈', icon: homeIcon, to: PATHS.home, enabled: true },
   { label: '배심원 광장', icon: plazaIcon, to: PATHS.plaza, enabled: true },
-  { label: '사건 접수', icon: submitIcon, to: PATHS.caseSubmit, enabled: false, isCta: true },
+  { label: '사건 접수', icon: submitIcon, to: PATHS.caseSubmit, enabled: true, isCta: true },
   { label: '왈가왈후~', icon: afterStoryIcon, to: PATHS.afterStory, enabled: false },
   { label: 'MY', icon: myIcon, to: PATHS.my, enabled: true },
 ]
