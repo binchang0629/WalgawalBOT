@@ -889,7 +889,7 @@
     top: -10px;
     bottom: auto;
     left: 50%;
-    width: 540px;   /* 투명 여백을 보정해 봉투 폭에 맞춘다. */
+    width: 630px;   /* 실제 흰 종이 면적이 봉투 폭의 약 88%가 되도록 보정한다. */
     height: 411px;
     transform: translateX(-50%);
     /* box-shadow는 투명 여백까지 네모로 그려진다. drop-shadow는 알파를 따라간다. */
