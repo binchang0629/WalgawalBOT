@@ -95,29 +95,25 @@ export const balanceQuestions = [
     leftLabel: '상관 없음', rightLabel: '신경 쓰임', guide: '질문을 밀거나 버튼으로 선택!' },
 ] as const
 
-/** 막상막하 — 표가 팽팽한 대표 사건 */
-export const closeCallCase = {
-  id: 'case-dog-bite',
-  titleLines: ['반려견 개물림 사고,', '견주 구속 합당한가?'],
-  leftLabel: '구속 합당',
-  leftPercent: 52,
-  rightLabel: '구속 과도',
-  rightPercent: 48,
-  /** 시안에 그대로 적힌 문구. 두 비율의 차이를 사람이 읽을 수 있게 옮긴 것 */
-  gapText: '단 4% 차이',
-} as const
-
-/** 막상막하 아래의 바꿔보기 카드 */
-export const closeCallMiniCase = {
-  id: 'case-secondhand-fraud',
-  tag: '치열한 공방 중',
-  changeLabel: '바꿔보기',
-  title: '중고거래 사기, 플랫폼의 책임은 어디까지인가?',
-  leftLabel: '플랫폼 책임 O',
-  leftPercent: 58,
-  rightLabel: '플랫폼 책임 X',
-  rightPercent: 42,
-} as const
+/** 막상막하에서 위 게이지와 아래 사건 카드를 교환하는 두 사건. */
+export const closeCallCases = [
+  {
+    id: 'case-dog-bite',
+    titleLines: ['반려견 개물림 사고,', '견주 구속 합당한가?'],
+    leftLabel: '구속 합당',
+    leftPercent: 48,
+    rightLabel: '구속 과도',
+    rightPercent: 52,
+  },
+  {
+    id: 'case-secondhand-fraud',
+    titleLines: ['중고거래 사기,', '플랫폼의 책임은 어디까지인가?'],
+    leftLabel: '플랫폼 책임 O',
+    leftPercent: 58,
+    rightLabel: '플랫폼 책임 X',
+    rightPercent: 42,
+  },
+] as const
 
 /** 왈가왈후~ (이어진 이야기) — 편지 카드 */
 export const featuredAfterStory = {

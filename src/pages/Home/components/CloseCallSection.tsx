@@ -1,25 +1,30 @@
-import type { ReactNode } from 'react'
+import { useState } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import SectionTitle from '../../../components/common/SectionTitle'
 import { homeIcons } from '../homeAssets'
-import {
-  closeCallCase,
-  closeCallMiniCase,
-  homeSectionTitles,
-} from '../../../data/common/homeContent'
+import mascot from '../../../assets/home/figma/close-call-mascot.svg'
+import { closeCallCases, homeSectionTitles } from '../../../data/common/homeContent'
 
-/**
- * 막상막하 · Close call. Figma `1402:7235`
- *
- * 아래 CTA는 시연 흐름의 가입 진입점이다. 문구는 시안 그대로
- * `로그인 하고 나도 투표하기`이고, 로그인 상태에 따라 다른 요소를 그린다.
- * (PROJECT_SPEC.md §4-A)
- */
 interface CloseCallSectionProps {
   /** 비로그인일 때 가입으로 보내는 링크, 로그인일 때 투표 버튼 */
   cta: ReactNode
 }
 
+/** 최신 Figma 개발 시안의 게이지형 막상막하. 바꿔보기는 두 사건을 실제로 교환한다. */
 function CloseCallSection({ cta }: CloseCallSectionProps) {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const currentCase = closeCallCases[currentIndex]
+  const nextCase = closeCallCases[(currentIndex + 1) % closeCallCases.length]
+  const gap = Math.abs(currentCase.leftPercent - currentCase.rightPercent)
+  const gaugeStyle = {
+    '--close-left-angle': String((currentCase.leftPercent / 100) * 180) + 'deg',
+    '--close-needle-angle': String((currentCase.leftPercent - 50) * 1.4) + 'deg',
+  } as CSSProperties
+
+  function handleSwap() {
+    setCurrentIndex((index) => (index + 1) % closeCallCases.length)
+  }
+
   return (
     <section className="close-section">
       <SectionTitle
@@ -28,73 +33,41 @@ function CloseCallSection({ cta }: CloseCallSectionProps) {
         action={homeSectionTitles.closeCall.action}
       />
 
-      <article className="close-card">
-        <div className="close-card__head">
-          <img src={homeIcons.characterHead} alt="" aria-hidden="true" />
-          <h3>
-            {closeCallCase.titleLines.map((line) => (
-              <span key={line}>
-                {line}
-                <br />
-              </span>
-            ))}
-          </h3>
-        </div>
-
-        <div className="close-card__poll">
-          <div className="close-card__choice">
-            <p>{closeCallCase.leftLabel}</p>
-            <strong className="close-card__percent close-card__percent--blue">
-              {closeCallCase.leftPercent}
-              <i>%</i>
-            </strong>
+      <article className="close-card" aria-live="polite">
+        <h3 className="close-card__title">
+          {currentCase.titleLines.map((line) => <span key={line}>{line}<br /></span>)}
+        </h3>
+        <div className="close-card__gauge" style={gaugeStyle}>
+          <div className="close-card__arc" aria-hidden="true">
+            <span className="close-card__needle" />
+            <img className="close-card__mascot" src={mascot} alt="" />
           </div>
-          <span className="close-card__vs">VS</span>
-          <div className="close-card__choice">
-            <p>{closeCallCase.rightLabel}</p>
-            <strong className="close-card__percent close-card__percent--red">
-              {closeCallCase.rightPercent}
-              <i>%</i>
-            </strong>
+          <div className="close-card__choice close-card__choice--left">
+            <p>{currentCase.leftLabel}</p>
+            <strong>{currentCase.leftPercent}<i>%</i></strong>
           </div>
+          <div className="close-card__choice close-card__choice--right">
+            <p>{currentCase.rightLabel}</p>
+            <strong>{currentCase.rightPercent}<i>%</i></strong>
+          </div>
+          <p className="close-card__gap">단 <b>{gap}%</b> 차이</p>
         </div>
-
-        <div className="close-card__bar">
-          <i style={{ width: `${closeCallCase.leftPercent}%` }} />
-        </div>
-        <p className="close-card__gap">{closeCallCase.gapText}</p>
       </article>
 
-      <article className="swap-card">
+      <article className="swap-card" aria-live="polite">
         <div className="swap-card__head">
-          <span className="swap-card__tag">
-            <img src={homeIcons.fireIcon} alt="" aria-hidden="true" />
-            {closeCallMiniCase.tag}
-          </span>
-          <button type="button" className="swap-card__change">
-            {closeCallMiniCase.changeLabel}
-            <img src={homeIcons.chevronsUp} alt="" aria-hidden="true" />
+          <span className="swap-card__tag"><img src={homeIcons.fireIcon} alt="" aria-hidden="true" />치열한 공방 중</span>
+          <button type="button" className="swap-card__change" onClick={handleSwap} aria-label="위아래 사건 바꿔보기">
+            바꿔보기 <img src={homeIcons.chevronsUp} alt="" aria-hidden="true" />
           </button>
         </div>
-
-        <p className="swap-card__title">{closeCallMiniCase.title}</p>
-
-        <div className="swap-card__bar">
-          <i style={{ width: `${closeCallMiniCase.leftPercent}%` }} />
-        </div>
-
+        <p className="swap-card__title">{nextCase.titleLines.join(' ')}</p>
+        <div className="swap-card__bar"><i style={{ width: String(nextCase.leftPercent) + '%' }} /></div>
         <div className="swap-card__result">
-          <span className="swap-card__side swap-card__side--blue">
-            <b>{closeCallMiniCase.leftPercent}%</b>
-            {closeCallMiniCase.leftLabel}
-          </span>
-          <span className="swap-card__side swap-card__side--red">
-            <b>{closeCallMiniCase.rightPercent}%</b>
-            {closeCallMiniCase.rightLabel}
-          </span>
+          <span className="swap-card__side swap-card__side--blue"><b>{nextCase.leftPercent}%</b>{nextCase.leftLabel}</span>
+          <span className="swap-card__side swap-card__side--red"><b>{nextCase.rightPercent}%</b>{nextCase.rightLabel}</span>
         </div>
       </article>
-
       {cta}
     </section>
   )
