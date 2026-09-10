@@ -49,9 +49,29 @@
     align-items: flex-start;
     justify-content: space-around;
     padding: 19px 10px 16px;
+    isolation: isolate;
+    background: transparent;
+}
+
+/*
+ * 중앙 CTA 주변을 원형으로 비워, 하단 바가 버튼을 감싸는 시안의 노치를 만든다.
+ * 마스크에 drop-shadow를 적용해 외곽과 노치의 그림자가 같은 윤곽을 따른다.
+ */
+.bottom-nav::before {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    inset: 0;
     border-radius: 24px 24px 0 0;
     background: #fff;
-    box-shadow: 0 -4px 16px rgba(37, 37, 37, .08);
+    filter: drop-shadow(0 -4px 16px rgba(37, 37, 37, .10));
+    mask-image: radial-gradient(circle 50px at 50% 12px, transparent 98%, #000 100%);
+    -webkit-mask-image: radial-gradient(circle 50px at 50% 12px, transparent 98%, #000 100%);
+}
+
+.bottom-nav__item {
+    position: relative;
+    z-index: 1;
 }
 
 /* 모바일에서는 홈 인디케이터 영역만큼 아래를 더 확보한다. */
