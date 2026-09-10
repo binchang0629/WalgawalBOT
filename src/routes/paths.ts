@@ -20,6 +20,8 @@ export const PATHS = {
   afterStory: '/afterstory',
   afterStoryDetail: '/afterstory/:storyId',
   my: '/my',
+  /** 챗봇(판멍이). Figma `Chatbot / Initial`·`Conversation`·`Conversation02`(node 1951:4051~4539) 기준. */
+  chatbot: '/chatbot',
   notFound: '*',
 } as const
 
@@ -34,4 +36,5 @@ export const toAfterStoryDetail = (storyId: string) => `/afterstory/${storyId}`
 export const BACK_FALLBACK: Record<string, string> = {
   cases: PATHS.plaza,
   afterstory: PATHS.afterStory,
+  chatbot: PATHS.home,
 }

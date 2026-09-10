@@ -764,7 +764,7 @@ Figma 프레임 하나를 무조건 페이지 하나로 만들지 않는다.
 | 후일담 | 왈가왈후~ | `/afterstory` | AfterStoryPage | MainLayout | 불필요 | 디자인 미확정 |
 | 후일담 상세 | 이어진 이야기 상세 | `/afterstory/:storyId` | AfterStoryDetailPage | DetailLayout | 확인 필요 | 디자인 미확정 |
 | 마이페이지 | MY | `/my` | MyPage | MainLayout | 필요 | 디자인 미확정 |
-| 미확정 | 챗봇 | 확인 필요 | ChatbotPage 또는 바텀시트 | 확인 필요 | 확인 필요 | 디자인 미확정 |
+| `개발 > Chatbot / Initial·Conversation·Conversation02` | 챗봇 | `/chatbot` | ChatbotPage | DetailLayout | 불필요 | **디자인 확정, 구현됨** |
 | **시안 없음** | 회원가입 (데모) | `/signup` | SignupPage | AuthLayout | 비로그인 전용 | **구현됨** — 팀 결정으로 추가 (§9-2) |
 | — | 존재하지 않는 경로 | `*` | NotFoundPage | ShowcaseLayout | 불필요 | **구현됨** |
 
@@ -1102,7 +1102,7 @@ Vite 개발 서버에서 화면이 보인다는 이유만으로
 | 13 | 광장 랭킹 탭 전환 화면 | 탭(주간·월간 등)을 눌렀을 때의 화면이 시안에 없다. 선택 상태만 로컬로 표현하고 목록은 바꾸지 않았다 | 디자인 담당 |
 | 14 | 광장 정렬·검색·페이지네이션 | 컨트롤은 시안에 있으나 동작 후 화면이 없다. 현재 비활성(`disabled`)으로 두고 카테고리 칩만 실제로 거른다 | 디자인 담당 |
 | 15 | 광장 `랭킹 보러가기` 목적지 | 버튼은 있으나 이동할 랭킹 전체 화면 시안이 없다. 라우트를 만들지 않았다 | 디자인 담당 |
-| 6 | 챗봇 화면 형태 | 컨펌 섹션에 챗봇 대화 전용 화면이 없다. 판멍이는 홈 AI 추천 카드와 사건 상세의 `판멍이 1심 판결`로만 등장한다. 별도 화면인지 바텀시트인지 미정이라 라우트를 만들지 않았다 | 디자인 담당 |
+| 6 | 챗봇 화면 형태 | 해결됨 (2026-09-10). Figma `개발` 페이지에 `Chatbot / Initial`·`Conversation`·`Conversation02`(node 1951:4051~4539)가 올라와 사용자가 직접 지정해 구현을 요청했다. 별도 화면(`/chatbot`)으로 구현하고, 세 프레임은 대화 진행에 따른 상태로 한 라우트에 합쳤다 | 완료 |
 | 7 | 폰트 에셋 | RIDIBatang, Noto Sans KR이 프로젝트 에셋에 없다. Paperlogy·Pretendard도 `@font-face` 등록이 아직 없다 | 디자인 담당 |
 | 8 | PC 배경 이미지 | 미제공. `SHOWCASE_BACKGROUND.gradient`로 임시 처리 중 (`src/config/app.ts`) | 디자인 담당 |
 | 9 | 로그인 필요 범위 | 사건 상세·접수·MY 중 어디까지 비로그인 열람이 가능한지 미정. 홈 시안의 `로그인 하고 사건 투표하기`만 확인됨 | 팀·기획 |

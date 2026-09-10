@@ -5,7 +5,7 @@ import CaseSubmitHeader from './components/CaseSubmitHeader'
 import CaseSubmitProgress from './components/CaseSubmitProgress'
 import CaseSubmitFooter from './components/CaseSubmitFooter'
 import useCaseSubmitDraft from './useCaseSubmitDraft'
-import useWizardBack from './useWizardBack'
+import useWizardBack from '../../hooks/useWizardBack'
 import './CaseSubmit.css'
 import './CaseSubmitSummaryPage.css'
 

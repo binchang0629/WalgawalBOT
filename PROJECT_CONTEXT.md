@@ -1,6 +1,6 @@
 # 왈가왈BOT 현재 상태
 
-마지막 업데이트: 2026-09-09
+마지막 업데이트: 2026-09-10
 
 기준 문서는 `PROJECT_SPEC.md`다. 이 문서는 **현재 상태만** 기록한다.
 규칙·토큰·구현 기준을 이 문서에 다시 적지 않는다.
@@ -39,6 +39,9 @@ npm run dev
 | 2026-09-09 | 광장 에셋은 컴포넌트에서 직접 import | 자동 감지(`optionalImages.ts`) 없이 파일을 바로 넣는 편이 단순하다. 에셋 6종 반영 완료 |
 | 2026-09-09 | **자료종합 페이지 전체를 기준 자료로 학습** | IA·유저플로우·설문·퍼소나·Font/Color가 모두 이 페이지에 있다. 아래 "자료종합 학습 기록" 참고 |
 | 2026-09-09 | 미확정 항목을 본문에서 확정처럼 쓰지 않기 | §6의 관점 선택 3택 서술이 §9-12(미정)와 충돌했다. 본문은 §9를 가리키게만 두고 값은 §9에서 확정한다 |
+| 2026-09-10 | 사건 접수(지훈01~05) 라우트를 `AppRoutes.tsx`에 다시 연결, `BottomNavigation`의 `사건 접수`를 `enabled: true`로 전환 | 사용자 요청. `src/pages/Submit/`은 이미 5단계가 모두 구현돼 있었으나, 배심원 광장 작업 중 `AppRoutes.tsx`·`BottomNavigation.tsx`가 다시 쓰이면서 연결이 빠져 있었다. §7-3 기준으로는 아직 `개발` 페이지에 없어 디자인 미확정이지만, 사용자가 지훈01~05 프레임을 직접 지정해 구현을 요청한 화면이라 라우트를 유지한다 (`CaseSubmitFlow.tsx` 상단 주석 참고) |
+| 2026-09-10 | **챗봇(`/chatbot`) 구현. §9-6 해결** | 사용자가 Figma `Chatbot / Initial`·`Conversation`·`Conversation02`(node 1951:4051~4539, `개발` 페이지) 세 프레임을 직접 지정해 구현을 요청했다. 세 프레임은 한 화면의 상태 3개(대화 시작 전 / 진행 중 두 단계)라 라우트 하나로 합쳤다 |
+| 2026-09-10 | `useWizardBack`을 `pages/Submit/`에서 `src/hooks/`로 승격 | 챗봇 헤더의 뒤로가기가 두 번째 사용처가 됐다. §7-2 "두 번째 사용이 확인되면 공통 폴더로" 규칙 적용 |
 
 ## 구현 상태
 
@@ -47,11 +50,11 @@ npm run dev
 | 홈 | **확정** (`김하은/홈수정`) | **구현됨** | 에셋·폰트 교체 남음 |
 | 404 | — | **구현됨** | `pages/Error/NotFoundPage.tsx` |
 | 배심원 광장 | **확정** (`개발 > 광장`) | **구현됨** | 에셋 반영 완료. 정렬·검색·페이지네이션 등 **기능 구현만 남음** |
-| 사건 접수 | 작업 중 | 미착수 | `src/pages/Submit/` 빈 폴더 |
+| 사건 접수 (지훈01~05) | 작업 중 — `개발` 페이지에는 아직 없음 | **구현됨** | `/cases/new`~`/cases/new/complete` 5단계. 컨펌 섹션 지훈01~05(node 1446:9899~10071) 프레임을 사용자 요청으로 그대로 옮겼다 |
 | 사건 상세 · AI 1심 | 작업 중 | 미착수 | `src/pages/Case/` 빈 폴더 |
 | 왈가왈후~ (후일담) | 작업 중 | 미착수 | 폴더 없음 |
 | MY | 작업 중 | 미착수 | `src/pages/My/` 빈 폴더 |
-| 챗봇 | 미확정 | 미착수 | 화면 형태 미정 (`PROJECT_SPEC.md` §9-6) |
+| 챗봇 | **확정** (`Chatbot / Initial`·`Conversation`·`Conversation02`, node 1951:4051~4539) | **구현됨** | `/chatbot`. mock 대화 스크립트, 응답 대기·오류·재시도 상태 포함 |
 | 회원가입 `/signup` | **시안 없음** | **구현됨** | 팀 결정으로 추가. 더미값 readOnly + `더미텍스트 입력` 버튼 |
 | 계정 전환 (시연 도구) | — | **구현됨** | `PersonaSwitcher` — PC 기기 바깥 패널 |
 | 온보딩·별도 로그인 | — | 만들지 않음 | 시연 흐름에 없음 |
@@ -202,6 +205,65 @@ rank-1.png · rank-2.png · rank-3.png
 - 랭킹 탭은 선택 상태만 로컬로 표현한다. 탭별 목록은 시안에 없다. (§9-13)
 - `랭킹 보러가기`는 이동할 화면이 없어 링크를 걸지 않았다. (§9-15)
 
+## 챗봇 (2026-09-10)
+
+Figma `Chatbot / Initial`(1951:4252) · `Chatbot / Conversation`(1951:4539) ·
+`Chatbot / Conversation02`(1951:4051) 세 프레임 — 대화 시작 전 화면과, 대화가 진행된
+두 시점의 스냅샷이라 `/chatbot` 라우트 하나에서 상태로 표현했다.
+
+새로 만든 파일
+
+```
+src/pages/Chatbot/ChatbotPage.tsx
+src/pages/Chatbot/Chatbot.css
+src/pages/Chatbot/chatbotScript.ts        # mock 대화 스크립트(스텝·선택지·자유 입력 분기)
+src/pages/Chatbot/types.ts
+src/pages/Chatbot/components/ChatbotHeader.tsx
+src/pages/Chatbot/components/ChatbotComposer.tsx
+src/pages/Chatbot/components/ChatEmptyState.tsx
+src/pages/Chatbot/components/ChatOptionButtons.tsx
+src/pages/Chatbot/components/BotMessageContent.tsx
+src/services/chatbotService.ts            # mock 응답 경계. 실제 API로 바꿀 때 이 파일만 교체
+src/assets/chatbot/figma/imgBotLogo.png · imgAddButton.svg · imgSendArrow.svg
+```
+
+고친 파일
+
+- `src/routes/paths.ts` · `AppRoutes.tsx` — `/chatbot` 경로 추가(`DetailLayout`, 하단바 없음)
+- `src/pages/Home/components/AiRecommendSection.tsx` · `Home.css` — AI 추천 카드를
+  `/chatbot`으로 연결(§9-6 해결). 챗봇 화면 미확정이라 링크를 걸지 않았던 이전 상태를 대체
+- `src/pages/Submit/useWizardBack.ts` → `src/hooks/useWizardBack.ts`로 이동.
+  `CaseSubmit*.tsx` 4개 파일의 import 경로만 갱신(동작 변경 없음)
+
+구현 메모
+
+- **"내 사건에 대해 물어볼게요"**는 세션 퍼소나로 분기한다. 곽지훈(B)만 최근 사건이 있는
+  데모 상태라 Figma 시안 그대로(최근 사건 카드 + 2버튼)를 보여주고, 윤서아(A)나 비로그인은
+  "아직 접수한 사건이 없어요" 빈 상태로 안내한다. (§9-1의 곽지훈 메모 — 프리랜서 잔금 사건 — 기준)
+- Figma가 다루지 않은 분기(초기 5칩 중 4개, "메시지만 있어요" 등 세부 답변)는 §0-6 안전
+  원칙에 맞춰 새로 썼고, 모든 종착 답변에 `다른 질문 할게요`를 달아 대화가 막히지 않게 했다.
+- 자유 텍스트 입력은 실제 NLP가 아니라 스텝별 `freeTextNext`를 따라간다.
+  정의되지 않은 지점에서 입력하면 "정해진 답변만 드릴 수 있어요" 안내 후 같은 선택지를
+  다시 보여준다 — mock임을 숨기지 않는다는 원칙(§6)에 따른 선택.
+- 응답 대기(타이핑 표시)·오류·재시도가 실제로 동작한다. `chatbotService`가 낮은 확률(12%)로
+  실패를 재현해 재시도 버튼을 검증할 수 있게 했다.
+- 아이콘 3종(첨부 `+`, 전송 화살표, 봇 얼굴)은 Figma MCP 에셋 URL에서 실제로 내려받아
+  그대로 저장했다(§1-4 "실제 제공 에셋 우선 사용"). 헤더 뒤로가기는 새 아이콘을 만들지 않고
+  기존 `chevron-right.svg`를 좌우 반전해 재사용했다(사건 접수 헤더와 같은 방식).
+- `imgBotLogo.png`가 1.2MB로 크다(Figma 원본 그대로). 홈의 `perilla-table.png`(2.1MB) 등과
+  같은 종류의 후속 정리 대상이라 별도로 처리하지 않았다.
+
+검증
+
+- `npm run typecheck` · `npm run lint` · `npm run build` 모두 통과.
+- Puppeteer(로컬 Chrome, 390×844, 데스크톱 기준 미만이라 PC 목업 없이 실기기 폭) 로
+  실제 클릭·타이핑을 재현: 첫 화면 → "내 사건에 대해 물어볼게요"(퍼소나 B로 전환해 확인) →
+  응답 대기 표시 → 최근 사건 카드 → "이 사건으로 질문할게요" → 추천 질문 칩 →
+  자유 텍스트 전송 → 뒤로가기(`/home`으로 이동) 전 과정 스크린샷 확인.
+  `document.documentElement.scrollWidth === clientWidth`(가로 넘침 없음), 콘솔 오류 0건.
+  퍼소나 A(기본값)로는 "아직 접수한 사건이 없어요" 빈 상태 분기도 확인됨.
+- 실제 모바일 터치·키보드, PC 목업 배율에서의 확인은 미실행.
+
 ## 자료종합 학습 기록 (2026-09-09)
 
 Figma `자료종합` 페이지(노드 `1264:12056`)의 최상위 16개 항목을 모두 읽었다.
@@ -300,7 +362,7 @@ Figma `자료종합` 페이지(노드 `1264:12056`)의 최상위 16개 항목을
 
 `PROJECT_SPEC.md` §9에 정리되어 있다.
 해결된 것은 §9-2(가입 화면), §9-4(하단바 표기), §9-5(홈 인디케이터),
-§9-16(광장 비트맵 에셋), §9-17(아이콘 확정 범위)이다.
+§9-16(광장 비트맵 에셋), §9-17(아이콘 확정 범위), §9-6(챗봇 화면 형태 — `/chatbot` 구현됨)이다.
 
 자료종합 학습에서 새로 올라온 것은 §9-18(기준 페이지 이관 범위),
 §9-19(컬러 값 불일치 4건), §9-20(반경 토큰화 여부)이고,

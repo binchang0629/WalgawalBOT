@@ -1206,6 +1206,8 @@
     border-radius: var(--radius-lg);
     background: #fff;
     filter: drop-shadow(0 4px 14px rgba(78, 62, 39, 0.09));
+    text-decoration: none;
+    color: inherit;
 }
 
 /* 시안은 판멍이를 좌우로 뒤집어 넣었다. */
