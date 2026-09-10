@@ -19,6 +19,7 @@ import CaseSubmitSummaryPage from '../pages/Submit/CaseSubmitSummaryPage'
 import CaseSubmitOpinionPage from '../pages/Submit/CaseSubmitOpinionPage'
 import CaseSubmitCompletePage from '../pages/Submit/CaseSubmitCompletePage'
 import NotFoundPage from '../pages/Error/NotFoundPage'
+import { AfterStoryHomePage, CompleteAfterStoryPage, PreviewAfterStoryPage, WriteAfterStoryPage } from '../pages/AfterStory/AfterStoryPage'
 import { PATHS } from './paths'
 
 /**
@@ -51,6 +52,8 @@ function AppRoutes() {
           <Route path={PATHS.caseDetail} element={<CaseDetailPage />} />
           <Route path={PATHS.caseResult} element={<CaseResultPage />} />
           <Route path={PATHS.my} element={<MyPage />} />
+          <Route path={PATHS.afterStory} element={<AfterStoryHomePage />} />
+
         </Route>
 
         {/* MY 하위 상세 화면은 Figma 시안대로 하단 내비게이션 없이 표시한다. */}
@@ -65,6 +68,11 @@ function AppRoutes() {
 
         {/* 사건 접수는 진행 상태를 공유하는 5단계 흐름이며 하단 내비게이션을 표시하지 않는다. */}
         <Route element={<DetailLayout />}>
+          <Route path={PATHS.afterStoryMine} element={<Navigate to='/afterstory/write/friend' replace />} />
+          <Route path={PATHS.afterStoryCommunity} element={<Navigate to={PATHS.afterStory} replace />} />
+          <Route path={PATHS.afterStoryWrite} element={<WriteAfterStoryPage />} />
+          <Route path={PATHS.afterStoryPreview} element={<PreviewAfterStoryPage />} />
+          <Route path={PATHS.afterStoryComplete} element={<CompleteAfterStoryPage />} />
           <Route path={PATHS.caseSubmit} element={<CaseSubmitFlow />}>
             <Route index element={<CaseSubmitPage />} />
             <Route path="questions" element={<CaseSubmitQuestionsPage />} />

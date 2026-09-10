@@ -29,7 +29,6 @@ import chevronRight from '../../assets/icons/chevron-right.svg'
 import judgeMascot from '../../assets/home/figma/img1Judge.png'
 import botFace from '../../assets/home/figma/imgImg.png'
 import adShell from '../../assets/home/figma/imgImage22.png'
-import letterEnvelope from '../../assets/home/figma/img.png'
 import letterPaper from '../../assets/home/figma/img2.png'
 
 /*
@@ -65,7 +64,6 @@ export const homeImages = {
   judgeMascot,
   botFace,
   adShell,
-  letterEnvelope,
   letterPaper,
 } as const
 

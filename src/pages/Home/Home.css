@@ -701,15 +701,6 @@
     background: var(--blue-700);
 }
 
-.close-card__gap {
-    margin: 0;
-    padding: 8px 0;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1;
-    color: var(--orange-900);
-}
-
 .swap-card {
     display: flex;
     flex-direction: column;
@@ -863,16 +854,6 @@
     overflow: hidden;
 }
 
-.letter__mail {
-    position: absolute;
-    top: auto;
-    bottom: 0;
-    left: 22px;
-    width: 309px;
-    height: 174px;
-    object-fit: contain;
-}
-
 .letter__back {
     position: absolute;
     top: auto;
@@ -974,14 +955,19 @@
  *   앞        678×368  밑변 642px → 337×183, top 178, left 8
  *   닫힘      618×348  밑변 580px → 340×192, top 171, left 6
  */
+/*
+ * 앞면은 뒤 봉투와 '같은 실루엣'이어야 한다.
+ * 2px 어긋나 있어서 뒤 봉투 테두리가 앞면 밖으로 삐져나와 얇은 띠로 보였다.
+ * 뒤 봉투 실루엣을 재보니 폭 340px · 왼쪽 6px이라 그 값에 맞춘다.
+ */
 .letter__front {
     position: absolute;
     top: auto;
-    bottom: 1px;
-    left: 8px;
+    bottom: 0;
+    left: 6px;
     z-index: 3;
-    width: 337px;
-    height: 183px;
+    width: 340px;
+    height: 184px;
     object-fit: contain;
 }
 
@@ -1104,6 +1090,14 @@
     overflow-x: auto;
     padding-bottom: 4px;
     scrollbar-width: none;
+    /* 마우스로 끌 수 있다는 걸 커서로 알린다. 터치는 원래대로 손가락 스와이프. */
+    cursor: grab;
+}
+
+.story-scroll.is-dragging {
+    cursor: grabbing;
+    /* 끄는 동안 글자가 선택되면 파랗게 잡혀서 지저분해진다. */
+    user-select: none;
 }
 
 .story-scroll::-webkit-scrollbar {
@@ -1431,12 +1425,13 @@ img.ai-card__mascot {
     background: #fff;
 }
 .close-card {
+    --gauge-ink: #30333a;
     box-sizing: border-box;
-    justify-content: center;
-    gap: 4px;
+    justify-content: flex-start;
+    gap: 5px;
     width: 100%;
-    height: 262px;
-    padding: 16px;
+    height: 304px;
+    padding: 30px 0 0;
     border: 0;
     border-radius: 16px;
     background: var(--blue-050);
@@ -1451,58 +1446,133 @@ img.ai-card__mascot {
     text-align: center;
 }
 .close-card__title span:last-child br { display: none; }
+/* Figma `수정?` 기준 게이지 상자. 안쪽 좌표는 모두 이 309×191 상자에 맞춰 잡았다. */
 .close-card__gauge {
     position: relative;
-    width: 322px;
+    width: 309px;
     max-width: 100%;
-    height: 168px;
+    height: 191px;
 }
+/*
+ * 눈금 두 줄. 끝을 둥글게 마감해야 시안과 같아서 conic-gradient를 버리고 stroke로 그린다.
+ * 파랑·빨강이 갈리는 각도는 컴포넌트가 실제 비율로 계산해 path에 넣는다.
+ */
 .close-card__arc {
     position: absolute;
     top: 0;
-    left: 50%;
-    width: 200px;
-    height: 124px;
-    overflow: hidden;
-    transform: translateX(-50%);
-}
-.close-card__arc::before {
-    position: absolute;
-    top: 24px;
     left: 0;
-    width: 200px;
-    height: 100px;
-    border-radius: 200px 200px 0 0;
-    background: conic-gradient(from -90deg at 50% 100%, var(--blue-700) 0deg var(--close-left-angle), var(--negative) var(--close-left-angle) 180deg, transparent 180deg);
-    content: '';
+    overflow: visible;
+    width: 100%;
+    height: 100%;
 }
-.close-card__arc::after {
-    position: absolute;
-    top: 40px;
-    left: 16px;
-    width: 168px;
-    height: 84px;
-    border-radius: 168px 168px 0 0;
-    background: var(--blue-050);
-    content: '';
+.close-card__arc path {
+    fill: none;
+    stroke-width: 18;
+    stroke-linecap: round;
 }
+.close-card__arc-left { stroke: var(--blue-700); }
+.close-card__arc-right { stroke: var(--negative); }
+/*
+ * 바늘은 두 겹이다.
+ * 겉(span)은 비율에 따른 실제 각도를 맡고, 속(i)은 계속 흔들리는 몫을 맡는다.
+ * 한 요소에 둘을 같이 걸면 흔들림 애니메이션이 각도 전환을 덮어써 버린다.
+ * 회전축(아래 끝)은 시안 그대로 (154,111).
+ * 길이는 시안이 63인데, 판멍이에 가려 보이는 구간이 짧아 68로 조금 늘렸다.
+ */
 .close-card__needle {
     position: absolute;
     z-index: 1;
-    top: 38px;
+    top: 43px;
     left: calc(50% - 2px);
-    width: 5px;
-    height: 62px;
-    border-radius: 6px;
-    background: #252525;
+    width: 4px;
+    height: 68px;
     transform: rotate(var(--close-needle-angle));
     transform-origin: 50% 100%;
     transition: transform 280ms ease;
 }
+
+.close-card__needle i {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 2px;
+    background: var(--gauge-ink);
+    /* 아래쪽을 축으로 돌아야 끝만 좌우로 움직인다. */
+    transform-origin: 50% 100%;
+    animation: close-needle-drift 11s ease-in-out infinite;
+}
+
+/* 바늘이 박혀 있는 축 덮개. 시안은 정원이 아니라 14 × 15.2 타원이다. */
+.close-card__knob {
+    position: absolute;
+    z-index: 1;
+    top: 101.25px;
+    left: calc(50% - 7px);
+    width: 14px;
+    height: 15.24px;
+    border-radius: 50%;
+    background: var(--gauge-ink);
+}
+
+/*
+ * NYT 선거 바늘 방식. 기준값(실제 비율)을 중심으로 정해진 폭 안에서만 천천히 배회한다.
+ * 규칙적으로 왕복하면 메트로놈처럼 보이고, 폭이 크면 계기판이 고장 난 것처럼 보인다.
+ * 그래서 최대 ±2.2도로 좁게 묶고, 멈추는 지점을 불규칙하게 흩어 놓았다.
+ */
+@keyframes close-needle-drift {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    9% {
+        transform: rotate(1.6deg);
+    }
+
+    17% {
+        transform: rotate(1.1deg);
+    }
+
+    28% {
+        transform: rotate(-1.9deg);
+    }
+
+    36% {
+        transform: rotate(-1.2deg);
+    }
+
+    47% {
+        transform: rotate(2.2deg);
+    }
+
+    55% {
+        transform: rotate(1.4deg);
+    }
+
+    64% {
+        transform: rotate(-0.7deg);
+    }
+
+    73% {
+        transform: rotate(-2.1deg);
+    }
+
+    82% {
+        transform: rotate(-0.4deg);
+    }
+
+    91% {
+        transform: rotate(1.8deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+/* 시안 그대로 58 × 58, 눈금 상자 기준 (125, 73.4). */
 .close-card__mascot {
     position: absolute;
     z-index: 2;
-    bottom: 4px;
+    top: 73.4px;
     left: 50%;
     width: 58px;
     height: 58px;
@@ -1510,12 +1580,12 @@ img.ai-card__mascot {
 }
 .close-card__choice {
     position: absolute;
-    top: 44px;
+    top: 69px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1px;
-    width: 70px;
+    width: 56px;
     height: auto;
 }
 .close-card__choice--left { left: 0; }
@@ -1541,17 +1611,23 @@ img.ai-card__mascot {
 .close-card__choice--right strong { color: var(--negative); }
 .close-card__gap {
     position: absolute;
-    bottom: 2px;
+    bottom: 0;
     left: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
     width: 116px;
     height: 34px;
+    /* padding이 남아 있으면 알약 안에서 글자가 아래로 밀린다. */
     margin: 0;
+    padding: 0;
     border-radius: 17px;
     background: var(--orange-200);
     color: var(--neutral-900);
     font-size: 12px;
     font-weight: 700;
-    line-height: 34px;
+    line-height: 1;
     text-align: center;
     transform: translateX(-50%);
 }
@@ -1601,6 +1677,7 @@ img.ai-card__mascot {
 }
 @media (prefers-reduced-motion: reduce) {
     .close-card__needle, .swap-card__bar i { transition: none; }
+    .close-card__needle i { animation: none; }
 }
 
 /* 말풍선 꼬리와 본체는 하나의 SVG 외곽선으로 그려, 경계가 끊기지 않게 한다. */
@@ -1776,6 +1853,8 @@ img.ai-card__mascot {
 .letter .letter__paper { max-width: none; }
 
 
-/* 열린 봉투 안쪽의 진한 파랑을 바깥 봉투와 같은 밝기로 낮춘다. */
-.letter.is-open .letter__back { opacity: .5; }
+/*
+ * 안쪽 파랑은 이미지 자체에서 바깥 벽과 같은 채도로 맞췄다(0.59 → 0.49).
+ * opacity로 낮추면 레이어 전체가 흐려져 바깥 벽이 앞면과 어긋난다.
+ */
 

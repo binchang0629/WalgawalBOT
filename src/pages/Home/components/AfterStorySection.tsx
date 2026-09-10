@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import useDragScroll from '../../../hooks/useDragScroll'
 import SectionTitle from '../../../components/common/SectionTitle'
 import { homeIcons, homeImages } from '../homeAssets'
 import {
@@ -19,6 +20,8 @@ import {
 function AfterStorySection() {
   const [letterState, setLetterState] = useState<'closed' | 'opening' | 'open' | 'closing'>('closed')
   const transitionTimer = useRef<number | null>(null)
+  // 후일담 카드 줄은 마우스로도 끌어서 넘길 수 있어야 한다.
+  const storyScroll = useDragScroll<HTMLDivElement>()
   const isLetterOpen = letterState === 'opening' || letterState === 'open'
   const isAnimating = letterState === 'opening' || letterState === 'closing'
 
@@ -47,7 +50,6 @@ function AfterStorySection() {
       />
 
       <article className={'letter letter--' + letterState + (isLetterOpen ? ' is-open' : '')}>
-        <img className="letter__mail" src={homeImages.letterEnvelope} alt="" aria-hidden="true" />
         <img className="letter__back" src={homeImages.envelopeBack} alt="" aria-hidden="true" />
 
         <img className="letter__paper" src={homeImages.letterPaper} alt="" aria-hidden="true" />
@@ -94,7 +96,7 @@ function AfterStorySection() {
         </button>
       </article>
 
-      <div className="story-scroll">
+      <div className="story-scroll" ref={storyScroll.ref} onDragStart={storyScroll.onDragStart}>
         {afterStoryQuotes.map((story) => (
           <article className="quote-card" key={story.id}>
             <div className="quote-card__body">

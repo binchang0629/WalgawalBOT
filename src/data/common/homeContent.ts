@@ -21,8 +21,12 @@ export const todayCase = {
     { text: '10만원', accent: true },
   ] as const,
   titleSecondLine: '적당한가?',
-  /** 카운트다운은 시안처럼 자리마다 한 칸씩 그린다. `:`은 구분자다. */
-  countdown: ['0', '1', ':', '0', '1'] as const,
+  /**
+   * 투표 마감까지 남은 시간(시간 단위).
+   * 서버가 없어 사건별 마감 일시를 받을 수 없으므로, 화면을 연 시점부터 이만큼을 센다.
+   * 실제 API가 붙으면 이 값 대신 사건의 마감 일시를 쓴다. (PROJECT_SPEC.md §1-5)
+   */
+  countdownHours: 2,
   countdownLabel: '투표 마감까지',
   participantCount: 1245,
   ctaLabel: '투표하러 가기',
@@ -109,9 +113,9 @@ export const closeCallCases = [
     id: 'case-secondhand-fraud',
     titleLines: ['중고거래 사기,', '플랫폼의 책임은 어디까지인가?'],
     leftLabel: '플랫폼 책임 O',
-    leftPercent: 58,
+    leftPercent: 53,
     rightLabel: '플랫폼 책임 X',
-    rightPercent: 42,
+    rightPercent: 47,
   },
 ] as const
 
