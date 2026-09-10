@@ -1697,3 +1697,6 @@ img.ai-card__mascot {
     left: 75.15%;
     right: auto;
 }
+
+.popular-case__cta { text-decoration: none; }
+

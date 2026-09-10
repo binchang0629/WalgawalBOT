@@ -1,6 +1,8 @@
+import { Link } from 'react-router-dom'
 import SectionTitle from '../../../components/common/SectionTitle'
 import { homeIcons, homeImages } from '../homeAssets'
 import { homeSectionTitles, todayCase } from '../../../data/common/homeContent'
+import { toCaseDetail } from '../../../routes/paths'
 
 /**
  * 01 Popular Case — 오늘의 사건. Figma `1402:7105`
@@ -50,10 +52,10 @@ function PopularCaseSection() {
               </p>
             </div>
 
-            <button type="button" className="popular-case__cta">
+            <Link className="popular-case__cta" to={toCaseDetail(todayCase.id)}>
               {todayCase.ctaLabel}
               <img src={homeIcons.btnArrow} alt="" aria-hidden="true" />
-            </button>
+            </Link>
           </div>
 
           <div className="context-tip">
