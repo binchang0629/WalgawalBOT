@@ -8,13 +8,14 @@ import CaseSubmitFooter from './components/CaseSubmitFooter'
 import useCaseSubmitDraft from './useCaseSubmitDraft'
 import useWizardBack from './useWizardBack'
 import { RELATIONSHIPS } from './types'
+import { SEOA_CONTENT, SUBMIT_SCENARIOS } from './caseSubmitContent'
 import checkMark from '../../assets/submit/figma/imgCheck.svg'
 import walangJoy from '../../assets/submit/figma/imgCharacterWalangJoy.svg'
 import './CaseSubmit.css'
 import './CaseSubmitPage.css'
 
 /**
- * 사건 접수 1단계 — 지훈01 / 사건 작성 · 기본.
+ * 사건 접수 1단계 — 서아01(1446:10093) / 지훈01의 공유 폼.
  * Figma `1차 디자인 시안 > 컨펌 > 사건접수(박건영) > 지훈01` 기준 (node 1446:9899).
  *
  * 로그인 필요 여부는 아직 미정이라 접근 가드를 걸지 않았다. (PROJECT_SPEC.md §9-9)
@@ -29,6 +30,7 @@ const CONTENT_PLACEHOLDER = `언제, 누구와 어떤 일이 있었나요?
 
 function CaseSubmitPage() {
   const {
+    personaId,
     relationship,
     setRelationship,
     photoNames,
@@ -38,6 +40,8 @@ function CaseSubmitPage() {
     content,
     setContent,
   } = useCaseSubmitDraft()
+  const isSeoa = personaId === 'A'
+  const hasFocusedContent = useRef(false)
 
   const photoInputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -68,13 +72,13 @@ function CaseSubmitPage() {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!canProceed) return
-    navigate(PATHS.caseSubmitQuestions)
+    navigate(isSeoa ? PATHS.caseSubmitSummary : PATHS.caseSubmitQuestions)
   }
 
   return (
-    <form className="case-submit" onSubmit={handleSubmit}>
+    <form className={`case-submit${isSeoa ? ' case-submit--seoa case-submit--writing' : ''}`} onSubmit={handleSubmit}>
       <CaseSubmitHeader onBack={handleBack} />
-      <CaseSubmitProgress step={1} label="사건 작성" />
+      <CaseSubmitProgress step={1} totalSteps={SUBMIT_SCENARIOS[personaId].totalSteps} label="사건 작성" />
 
       <div className="case-submit__body">
         <div className="case-submit__intro">
@@ -107,8 +111,8 @@ function CaseSubmitPage() {
 
         <div className="case-submit__field">
           <div className="case-submit__attachment-heading">
-            <span className="case-submit__label">사진·파일 첨부</span>
-            <span className="case-submit__optional">선택</span>
+            <span className="case-submit__label">사진·파일 첨부{isSeoa ? '(선택)' : ''}</span>
+            {!isSeoa && <span className="case-submit__optional">선택</span>}
           </div>
           <div className="case-submit__attachment-actions">
             <button
@@ -152,13 +156,17 @@ function CaseSubmitPage() {
           <label className="case-submit__label" htmlFor={contentFieldId}>
             사건 내용 <span className="case-submit__required">*</span>
           </label>
-          <div className="case-submit__textarea-box">
+          <div className={`case-submit__textarea-box${content ? ' has-content' : ''}`}>
             <textarea
               id={contentFieldId}
               className="case-submit__textarea"
-              placeholder={CONTENT_PLACEHOLDER}
+              placeholder={isSeoa ? '언제, 누구와 어떤 일이 있었나요?' : CONTENT_PLACEHOLDER}
               maxLength={CONTENT_MAX_LENGTH}
               value={content}
+              onFocus={() => {
+                if (isSeoa && !hasFocusedContent.current && !content) setContent(SEOA_CONTENT)
+                hasFocusedContent.current = true
+              }}
               onChange={(event) => setContent(event.target.value)}
               required
             />

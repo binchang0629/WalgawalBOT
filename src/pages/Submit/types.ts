@@ -30,11 +30,10 @@ export const INITIAL_ANSWERS: QuestionAnswers = {
 }
 
 /**
- * 공개 범위. Figma 주석에 따라 `배심원 광장에 공개`는 이번 구현에서 선택할 수 없다 —
- * "처음 진입 시 둘 다 회색, 배심원 광장은 비활성화, 나만보기만 클릭 시 주황"(node 1446:10059 주석).
- * 공개 범위를 어디까지 열지는 아직 미정이라(PROJECT_SPEC.md §9-9) 비활성 상태로 정직하게 표시한다.
+ * Figma 시연 범위: 처음에는 미선택. 서아는 community만(1446:10195),
+ * 지훈은 private만(1446:10059) 선택 가능. 실제 서버 공개 권한을 뜻하지 않는다.
  */
-export type Visibility = 'private' | null
+export type Visibility = 'private' | 'community' | null
 
 /** 지훈03 요약 확인에서 편집 가능한 AI 요약 문서. */
 export interface CaseSummary {

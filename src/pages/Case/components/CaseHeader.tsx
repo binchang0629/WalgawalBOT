@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import backIcon from '../../../assets/case/back.svg'
 import { PATHS } from '../../../routes/paths'
@@ -7,6 +8,11 @@ import './CaseHeader.css'
 function CaseHeader() {
   const navigate = useNavigate()
   const location = useLocation()
+  const headerRef = useRef<HTMLElement>(null)
+
+  useLayoutEffect(() => {
+    headerRef.current?.closest('.main-layout__scroll')?.scrollTo({ top: 0 })
+  }, [location.pathname])
 
   const handleBack = () => {
     if (location.key !== 'default') {
@@ -18,7 +24,7 @@ function CaseHeader() {
   }
 
   return (
-    <header className="case-detail-header">
+    <header ref={headerRef} className="case-detail-header">
       <div className="case-detail-header__slot">
         <button type="button" className="case-detail-header__back" onClick={handleBack} aria-label="뒤로 가기">
           <img src={backIcon} alt="" width={24} height={24} />

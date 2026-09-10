@@ -23,6 +23,8 @@ export const PATHS = {
   afterStory: '/afterstory',
   afterStoryDetail: '/afterstory/:storyId',
   my: '/my',
+  myCases: '/my/cases',
+  myCaseResult: '/my/cases/:caseId',
   notFound: '*',
 } as const
 
@@ -30,6 +32,7 @@ export const PATHS = {
 export const toCaseDetail = (caseId: string) => `/cases/${caseId}`
 export const toCaseResult = (caseId: string) => `/cases/${caseId}/result`
 export const toAfterStoryDetail = (storyId: string) => `/afterstory/${storyId}`
+export const toMyCaseResult = (caseId: string) => `/my/cases/${caseId}`
 
 /**
  * 상세 화면에 외부에서 바로 들어온 경우 돌아갈 기본 경로.

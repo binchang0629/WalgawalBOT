@@ -37,7 +37,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: '배심원 광장', icon: plazaIcon, to: PATHS.plaza, enabled: true },
   { label: '사건 접수', icon: submitIcon, to: PATHS.caseSubmit, enabled: true, isCta: true },
   { label: '왈가왈후~', icon: afterStoryIcon, to: PATHS.afterStory, enabled: false },
-  { label: 'MY', icon: myIcon, to: PATHS.my, enabled: false },
+  { label: 'MY', icon: myIcon, to: PATHS.my, enabled: true },
 ]
 
 function NavIcon({ src, isCta }: { src: string; isCta?: boolean }) {

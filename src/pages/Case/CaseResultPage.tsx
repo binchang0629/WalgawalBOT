@@ -1,16 +1,15 @@
-import { useRef, useState } from 'react'
+import { useId, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
-import chevronIcon from '../../assets/case/result/chevron.svg'
+import chevronIcon from '../../assets/case/result/breakdown-toggle.svg'
 import dislikeIcon from '../../assets/case/result/dislike.svg'
 import emojiIcon from '../../assets/case/result/emoji.svg'
 import likeIcon from '../../assets/case/result/like.svg'
 import menuIcon from '../../assets/case/result/menu.svg'
-import pageNextIcon from '../../assets/case/result/page-next.svg'
-import pagePrevIcon from '../../assets/case/result/page-prev.svg'
 import quoteDivider from '../../assets/case/result/quote-divider.svg'
 import storyLinkIcon from '../../assets/case/result/story-link.svg'
 import submitIcon from '../../assets/case/result/submit.svg'
+import Pagination from '../../components/common/Pagination'
 import { weddingGiftCase } from '../../data/common/caseDetailContent'
 import type { WeddingGiftVoteId } from '../../data/common/caseDetailContent'
 import {
@@ -21,11 +20,15 @@ import type { CaseResultComment } from '../../data/common/caseResultContent'
 import useSession from '../../hooks/useSession'
 import { PATHS } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
+import useDemoCountdown from './components/useDemoCountdown'
 import './CaseResultPage.css'
 
 interface ResultRouteState {
   selectedVote?: WeddingGiftVoteId
 }
+
+const COMMENTS_PER_PAGE = 5
+type CommentReaction = 'like' | 'dislike' | null
 
 function isVoteId(value: unknown): value is WeddingGiftVoteId {
   return weddingGiftCase.choices.some((choice) => choice.id === value)
@@ -43,6 +46,7 @@ function MissingCase() {
 
 function ResultBreakdown() {
   const [isExpanded, setIsExpanded] = useState(true)
+  const panelId = useId()
 
   return (
     <div className="result-breakdown">
@@ -51,67 +55,74 @@ function ResultBreakdown() {
         className="result-breakdown__toggle"
         onClick={() => setIsExpanded((value) => !value)}
         aria-expanded={isExpanded}
+        aria-controls={panelId}
       >
         <span>전체 결과 보기</span>
         <img className={isExpanded ? 'is-open' : ''} src={chevronIcon} alt="" />
       </button>
 
-      {isExpanded && (
-        <ul className="result-breakdown__list">
-          {weddingGiftResult.breakdown.map((item) => (
-            <li key={item.id}>
-              <div>
-                <span>{item.label}</span>
-                <strong>{item.percent}%</strong>
-              </div>
-              <span className={`result-breakdown__track result-breakdown__track--${item.id}`}>
-                <i style={{ width: `${item.percent}%` }} />
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
+      <div
+        id={panelId}
+        className={`result-breakdown__panel${isExpanded ? ' is-open' : ''}`}
+        aria-hidden={!isExpanded}
+        inert={!isExpanded}
+      >
+        <div className="result-breakdown__clip">
+          <ul className="result-breakdown__list">
+            {weddingGiftResult.breakdown.map((item) => (
+              <li key={item.id} className={item.id === 'writer' ? 'is-leading' : undefined}>
+                <div>
+                  <span>{item.label}</span>
+                  <strong>{item.percent}%</strong>
+                </div>
+                <span className={`result-breakdown__track result-breakdown__track--${item.id}`}>
+                  <i style={{ width: `${item.percent}%` }} />
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   )
 }
 
-function CommentItem({ comment }: { comment: CaseResultComment }) {
-  const [reaction, setReaction] = useState<'like' | 'dislike' | null>(null)
+function CommentItem({ comment, reaction, onReact }: {
+  comment: CaseResultComment
+  reaction: CommentReaction
+  onReact: (reaction: Exclude<CommentReaction, null>) => void
+}) {
   const badge = voteDisplayById[comment.voteId]
 
   return (
     <article className="result-comment">
-      <div className="result-comment__avatar">
-        <img src={comment.avatarUrl} alt="" />
+      <div className="result-comment__head">
+        <div className="result-comment__avatar">
+          <img src={comment.avatarUrl} alt="" />
+        </div>
+        <span>{comment.nickname} · {comment.createdAt}</span>
+        <strong className={`result-comment__badge is-${badge.tone}`}>{comment.voteLabel}</strong>
+        <img className="result-comment__menu" src={menuIcon} alt="" aria-hidden="true" />
       </div>
-      <div className="result-comment__content">
-        <div className="result-comment__head">
-          <div>
-            <span>{comment.nickname} · {comment.createdAt}</span>
-            <strong className={`result-comment__badge is-${badge.tone}`}>{comment.voteLabel}</strong>
-          </div>
-          <img className="result-comment__menu" src={menuIcon} alt="" aria-hidden="true" />
-        </div>
-        <p>{comment.body}</p>
-        <div className="result-comment__actions">
-          <button
-            type="button"
-            className={reaction === 'like' ? 'is-active' : ''}
-            onClick={() => setReaction((value) => value === 'like' ? null : 'like')}
-            aria-pressed={reaction === 'like'}
-          >
-            <img src={likeIcon} alt="" /> 공감 {comment.likes + (reaction === 'like' ? 1 : 0)}
-          </button>
-          <button
-            type="button"
-            className={reaction === 'dislike' ? 'is-active' : ''}
-            onClick={() => setReaction((value) => value === 'dislike' ? null : 'dislike')}
-            aria-pressed={reaction === 'dislike'}
-          >
-            <img src={dislikeIcon} alt="" /> 반대 {comment.dislikes + (reaction === 'dislike' ? 1 : 0)}
-          </button>
-          <span>대댓글 달기</span>
-        </div>
+      <p>{comment.body}</p>
+      <div className="result-comment__actions">
+        <button
+          type="button"
+          className={reaction === 'like' ? 'is-active' : ''}
+          onClick={() => onReact('like')}
+          aria-pressed={reaction === 'like'}
+        >
+          <img src={likeIcon} alt="" /> 공감 {comment.likes + (reaction === 'like' ? 1 : 0)}
+        </button>
+        <button
+          type="button"
+          className={reaction === 'dislike' ? 'is-active' : ''}
+          onClick={() => onReact('dislike')}
+          aria-pressed={reaction === 'dislike'}
+        >
+          <img src={dislikeIcon} alt="" /> 반대 {comment.dislikes + (reaction === 'dislike' ? 1 : 0)}
+        </button>
+        <span>대댓글 달기</span>
       </div>
     </article>
   )
@@ -124,8 +135,11 @@ function CaseResultPage() {
   const [draft, setDraft] = useState('')
   const [addedComments, setAddedComments] = useState<CaseResultComment[]>([])
   const [currentPage, setCurrentPage] = useState(1)
+  // 페이지가 바뀌어 댓글이 언마운트되어도 공감/반대 선택을 유지한다.
+  const [commentReactions, setCommentReactions] = useState<Record<string, CommentReaction>>({})
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const nextCommentId = useRef(1)
+  const countdown = useDemoCountdown(weddingGiftResult.deadline)
 
   if (caseId !== weddingGiftCase.id) return <MissingCase />
 
@@ -135,18 +149,20 @@ function CaseResultPage() {
   const routeState = location.state as ResultRouteState | null
   const selectedVote = isVoteId(routeState?.selectedVote) ? routeState.selectedVote : 'writer'
   const allComments = [...addedComments, ...weddingGiftResult.comments]
+  const totalPages = Math.max(1, Math.ceil(allComments.length / COMMENTS_PER_PAGE))
+  const visibleComments = allComments.slice((currentPage - 1) * COMMENTS_PER_PAGE, currentPage * COMMENTS_PER_PAGE)
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const body = draft.trim()
-    if (!body) return
+    if (!body || !currentUser) return
 
     const voteDisplay = voteDisplayById[selectedVote]
     setAddedComments((comments) => [
       {
         id: `new-comment-${nextCommentId.current++}`,
-        avatarUrl: weddingGiftResult.comments[0].avatarUrl,
-        nickname: currentUser?.nickname ?? '익명의 배심원',
+        avatarUrl: currentUser.anonymousAvatarUrl,
+        nickname: currentUser.nickname,
         createdAt: '방금 전',
         voteId: selectedVote,
         voteLabel: voteDisplay.label,
@@ -157,6 +173,7 @@ function CaseResultPage() {
       ...comments,
     ])
     setDraft('')
+    setCurrentPage(1)
   }
 
   const handleEmoji = () => {
@@ -170,27 +187,25 @@ function CaseResultPage() {
 
       <div className="case-result__body">
         <section className="result-overview" aria-labelledby="result-case-title">
-          <p className="result-overview__number">사건 번호 {weddingGiftCase.caseNumber.replace('#', '')}</p>
+          <p className="result-overview__number">사건 번호 · {weddingGiftCase.caseNumber.replace('#', '')}</p>
           <h2 id="result-case-title">{weddingGiftCase.title}</h2>
           <div className="result-overview__author">
-            <span><img src={weddingGiftCase.author.avatarUrl} alt="" /></span>
-            <p><strong>{weddingGiftCase.author.nickname}</strong> · {weddingGiftCase.age}</p>
+            <p>{weddingGiftCase.author.nickname} · {weddingGiftCase.age}</p>
           </div>
         </section>
 
-        <div className="case-result__divider" />
-
         <section className="vote-result" aria-labelledby="vote-result-title">
-          <h2 id="vote-result-title">투표 결과</h2>
-          <p className="vote-result__deadline">투표 마감까지&nbsp;&nbsp;{weddingGiftResult.deadline}</p>
+          <div className="vote-result__heading">
+            <h2 id="vote-result-title">투표 결과</h2>
+            <p className="vote-result__deadline">투표 마감까지&nbsp;&nbsp;{countdown}</p>
+          </div>
           <div className="vote-result__artwork">
             <img src={weddingGiftResult.artworkUrl} alt="판멍이가 판결 결과를 발표하는 모습" />
-            {weddingGiftResult.verdictCards.map((card) => (
-              <div key={card.id} className={`verdict-card verdict-card--${card.id}`}>
-                <span>{card.label}</span>
-                <strong>{card.percent}%</strong>
-              </div>
-            ))}
+            <div className="vote-result__summary">
+              <span>{weddingGiftResult.verdict.label}</span>
+              <h3>{weddingGiftResult.verdict.title}</h3>
+              <p>{weddingGiftResult.verdict.description}</p>
+            </div>
           </div>
           <ResultBreakdown />
         </section>
@@ -206,7 +221,7 @@ function CaseResultPage() {
               {weddingGiftResult.aiReasons.map((reason) => <p key={reason}>{reason}</p>)}
             </div>
             <footer>
-              <span>판단 확신도</span>
+              <span>판단 확신도 </span>
               <strong>{weddingGiftResult.confidence}%</strong>
             </footer>
           </div>
@@ -220,7 +235,7 @@ function CaseResultPage() {
 
         <section className="comment-section" aria-labelledby="comments-title">
           <div className="comment-section__heading">
-            <h2 id="comments-title">댓글 ({weddingGiftResult.baseCommentCount + addedComments.length})</h2>
+            <h2 id="comments-title">댓글 ({allComments.length})</h2>
             <span>등록순 <i /> 최신순</span>
           </div>
 
@@ -244,28 +259,22 @@ function CaseResultPage() {
           </form>
 
           <div className="comment-list" aria-live="polite">
-            {allComments.map((comment) => <CommentItem key={comment.id} comment={comment} />)}
+            {visibleComments.map((comment) => (
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                reaction={commentReactions[comment.id] ?? null}
+                onReact={(reaction) => setCommentReactions((previous) => ({
+                  ...previous,
+                  [comment.id]: previous[comment.id] === reaction ? null : reaction,
+                }))}
+              />
+            ))}
           </div>
 
-          <nav className="comment-pagination" aria-label="댓글 페이지">
-            <button type="button" onClick={() => setCurrentPage((page) => Math.max(1, page - 1))} disabled={currentPage === 1} aria-label="이전 페이지">
-              <img src={pagePrevIcon} alt="" />
-            </button>
-            {[1, 2, 3, 4, 5].map((page) => (
-              <button
-                key={page}
-                type="button"
-                className={currentPage === page ? 'is-current' : ''}
-                onClick={() => setCurrentPage(page)}
-                aria-current={currentPage === page ? 'page' : undefined}
-              >
-                {page}
-              </button>
-            ))}
-            <button type="button" onClick={() => setCurrentPage((page) => Math.min(5, page + 1))} disabled={currentPage === 5} aria-label="다음 페이지">
-              <img src={pageNextIcon} alt="" />
-            </button>
-          </nav>
+          <div className="comment-pagination">
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} ariaLabel="댓글 페이지" />
+          </div>
         </section>
 
         <section className="after-story" aria-labelledby="after-story-title">

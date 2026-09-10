@@ -1,0 +1,120 @@
+.my-cases-page,
+.my-case-result-page { --device-app-header: 64px; min-height: 100%; color: var(--ink); background: #fff; font-family: var(--font-body); }
+
+.my-sub-header {
+    position: sticky; top: 0; z-index: 10; height: var(--device-app-header);
+    display: grid; grid-template-columns: 64px 1fr 64px; align-items: center;
+    padding: 0 var(--content-gutter); border-bottom: 1px solid var(--neutral-100); background: #fff;
+}
+.my-sub-header button { display: grid; place-items: center; justify-self: start; width: 24px; height: 24px; padding: 0; border: 0; background: none; }
+.my-sub-header button img { width: 24px; height: 24px; }
+.my-sub-header h1 { margin: 0; font-family: var(--font-title); font-size: 20px; line-height: 1.2; text-align: center; }
+
+.my-cases-page { height: 100%; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.my-cases-page > .my-sub-header { flex: none; }
+.my-cases-page__content { flex: 1; min-height: 0; padding: 24px var(--content-gutter) 32px; overflow-y: auto; overflow-x: hidden; overscroll-behavior-y: contain; scrollbar-width: none; }
+.my-cases-page__content::-webkit-scrollbar { display: none; }
+.my-cases-page__content:focus-visible { outline: 2px solid var(--blue-700); outline-offset: -2px; }
+.showcase--mobile .my-cases-page__content { padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
+.my-cases-page__breadcrumb { display: flex; align-items: center; gap: 4px; margin: 0 0 10px; color: var(--neutral-500); font-size: 11px; line-height: 18px; }
+.my-cases-page__breadcrumb > span:last-child { color: var(--neutral-400); }
+.my-cases-page__content > h2 { margin: 0 0 22px; font-size: 26px; line-height: 1.2; }
+.my-case-filters { display: flex; gap: 8px; margin: 0 0 22px; overflow-x: auto; scrollbar-width: none; }
+.my-case-filters::-webkit-scrollbar { display: none; }
+.my-case-filters button { flex: none; padding: 8px 14px; border: 1px solid var(--neutral-250); border-radius: 50px; color: var(--neutral-700); background: #fff; font-size: 12px; font-weight: 500; line-height: 1.3; white-space: nowrap; }
+.my-case-filters button:disabled { background: var(--neutral-100); opacity: 1; cursor: default; }
+.my-case-filters button.is-active { border-color: var(--blue-700); color: #fff; background: var(--blue-700); font-weight: 700; }
+
+.my-case-card { display: flex; flex-direction: column; gap: 12px; padding: 19px; border: 1px solid var(--neutral-250); border-radius: 12px; background: #fff; box-shadow: 0 2px 4px rgba(0, 0, 0, .04); }
+.my-case-card__badges { display: flex; align-items: center; gap: 8px; }
+.my-case-card__category { display: flex; align-items: center; gap: 4px; padding-right: 8px; color: var(--blue-700); font-size: 12px; font-weight: 700; line-height: 1.3; }
+.my-case-card__category i { width: 5px; height: 5px; border-radius: 3px; background: currentColor; }
+.my-case-card__status { padding: 4px 12px; border-radius: 50px; color: var(--blue-700); background: var(--blue-050); font-size: 12px; font-weight: 500; line-height: 1.3; }
+.my-case-card--private .my-case-card__category { color: var(--orange-700); }
+.my-case-card--private .my-case-card__status { color: var(--neutral-700); background: var(--neutral-100); }
+.my-case-card h3 { margin: 0; font-size: 20px; line-height: 1.2; }
+.my-case-card dl { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 19px 0 8px; border-top: 1px solid #f7fdfe; }
+.my-case-card dl div { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 14px; line-height: 1.3; }
+.my-case-card dt { color: var(--neutral-600); }
+.my-case-card dd { margin: 0; font-weight: 500; text-align: right; overflow-wrap: anywhere; }
+.my-case-card dt { flex: none; }
+.my-case-card dd.is-private { font-weight: 600; }
+.my-case-card dd.is-blue { color: var(--blue-700); font-weight: 600; }
+.my-case-card__result { display: grid; place-items: center; width: 100%; height: 52px; border: 0; border-radius: 12px; color: #fff; background: var(--orange-700); font-size: 16px; font-weight: 700; }
+.my-case-card__result:disabled { opacity: 1; cursor: default; }
+.my-cases-page__empty { min-height: 340px; display: grid; place-items: center; color: var(--neutral-600); font-size: 14px; }
+.my-cases-page__notice { margin-top: 22px; padding: 14px; border-radius: 12px; color: #939094; background: var(--neutral-100); font-size: 12px; font-weight: 500; line-height: 1.3; text-align: center; }
+.my-cases-page__notice strong { color: var(--neutral-700); font-weight: 500; }
+
+/* 상세 헤더는 스크롤 밖에 두고 본문만 남은 화면 높이 안에서 스크롤한다. */
+.my-case-result-page { height: 100%; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.my-case-result-page > .my-sub-header { flex: none; }
+.my-case-result-page__content {
+    flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
+    display: flex; flex-direction: column; gap: 32px;
+    padding: 32px var(--content-gutter);
+    overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.my-case-result-page__content > * { flex: none; }
+.my-case-result-page__content::-webkit-scrollbar { display: none; }
+.my-case-result-page__content:focus-visible { outline: 2px solid var(--blue-700); outline-offset: -2px; }
+.showcase--mobile .my-case-result-page__content { padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
+.my-result-summary > span { display: inline-block; padding: 6px 12px; border-radius: 50px; color: var(--blue-700); background: var(--blue-050); font-size: 12px; font-weight: 500; line-height: 1; }
+.my-result-summary h2 { margin: 18px 0; font-size: 20px; line-height: 1.2; }
+.my-result-summary p { margin: 0; color: var(--neutral-500); font-size: 13px; line-height: 1.5; }
+
+.ai-verdict-card { position: relative; padding: 19px; border: 1px solid var(--blue-500); border-radius: 12px; background: var(--blue-050); box-shadow: 0 2px 4px rgba(0,0,0,.04); }
+.ai-verdict-card > img { position: absolute; top: 25px; right: 24px; width: 80px; height: 68px; object-fit: cover; }
+.ai-verdict-card h3 { margin: 0 0 12px; font-size: 14px; font-weight: 600; line-height: 1.3; }
+.ai-verdict-card > strong { display: block; padding-right: 90px; color: var(--blue-700); font-size: 20px; line-height: 1.2; }
+.ai-verdict-card > p { margin: 13px 0 14px; padding-right: 2px; color: var(--neutral-600); font-size: 14px; line-height: 1.3; }
+.ai-verdict-card > div { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid var(--blue-400); color: var(--blue-400); font-size: 13px; font-weight: 500; }
+.ai-verdict-card > div b { color: var(--blue-700); font-size: 18px; line-height: 1.2; }
+
+.jury-verdict-card { padding: 19px; border: 1px solid var(--neutral-250); border-radius: 12px; box-shadow: 0 1px 1px rgba(0,0,0,.05); }
+.jury-verdict-card h3 { margin: 0 0 12px; font-size: 14px; font-weight: 600; line-height: 1.3; }
+.jury-verdict-card > strong { display: block; color: var(--orange-700); font-size: 20px; line-height: 1.2; }
+.jury-verdict-card > strong > span { font-size: 26px; white-space: nowrap; }
+.jury-verdict-card ul { display: flex; flex-direction: column; gap: 14px; margin: 16px 0 20px; padding: 0; list-style: none; }
+.jury-verdict-card li > div { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 4px; color: var(--neutral-700); font-size: 14px; font-weight: 500; line-height: 1.3; }
+.jury-verdict-card li > div b { flex: none; font-weight: 600; }
+.jury-verdict-card li.is-highlight > div { color: var(--ink); }
+.jury-verdict-card li.is-highlight > div b { color: var(--orange-700); }
+.jury-verdict-card__track { display: block; height: 8px; overflow: hidden; border-radius: 50px; background: var(--blue-050); }
+.jury-verdict-card__track i { display: block; height: 100%; border-radius: inherit; background: var(--orange-300); }
+.jury-verdict-card li:nth-child(2) .jury-verdict-card__track i { background: var(--orange-500); }
+.jury-verdict-card li:nth-child(4) .jury-verdict-card__track i { background: var(--orange-200); }
+.jury-verdict-card li.is-highlight .jury-verdict-card__track i { background: var(--orange-700); }
+.jury-verdict-card > button { width: 100%; padding: 13px 1px; border: 1px solid var(--neutral-400); border-radius: 8px; color: var(--ink); background: #fff; font-size: 14px; font-weight: 500; line-height: 1.3; opacity: 1; cursor: default; }
+
+.verdict-difference { display: flex; align-items: center; gap: 4px; padding: 14px 18px; border: 1px solid var(--blue-500); border-radius: 12px; background: var(--blue-050); }
+.verdict-difference__character { display: grid; place-items: center; flex: none; width: 70px; height: 72px; overflow: hidden; }
+.verdict-difference img { display: block; width: 60px; height: 52px; object-fit: contain; }
+.verdict-difference > div { min-width: 0; }
+.verdict-difference strong { font-size: 13px; font-weight: 600; line-height: 1.4; }
+.verdict-difference p { margin: 4px 0 0; color: var(--blue-600); font-size: 13px; font-weight: 600; line-height: 1.4; }
+
+.action-guide { padding: 18px 14px; }
+.action-guide h3 { margin: 0 0 24px; color: var(--orange-700); font-size: 20px; line-height: 1.2; }
+.action-guide ol { display: flex; flex-direction: column; gap: 24px; margin: 0; padding: 0; list-style: none; }
+.action-guide li { display: flex; align-items: center; gap: 14px; color: var(--neutral-700); font-size: 14px; font-weight: 500; line-height: 1.3; }
+.action-guide li > span { display: grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 50%; color: var(--orange-700); background: var(--orange-200); font-size: 14px; font-weight: 700; }
+.action-guide li p { margin: 0; }
+
+.followup-card { padding: 19px; border: 1px dashed var(--neutral-400); border-radius: 12px; }
+.followup-card h3 { margin: 0 0 8px; font-size: 16px; line-height: 1.3; }
+.followup-card p { margin: 0 0 16px; color: var(--neutral-700); font-size: 14px; line-height: 1.3; }
+.followup-card button { width: 100%; height: 52px; border: 0; border-radius: 12px; color: #fff; background: var(--orange-700); font-size: 16px; font-weight: 700; opacity: 1; cursor: default; }
+.my-result-footer { margin: 0; padding-top: 4px; color: var(--neutral-500); font-size: 12px; font-weight: 500; line-height: 1.3; text-align: center; }
+.my-case-result-page--empty { display: grid; place-items: center; align-content: center; gap: 16px; color: var(--neutral-700); }
+.my-case-result-page--empty button { padding: 12px 18px; border: 0; border-radius: 12px; color: #fff; background: var(--blue-700); }
+
+@media (max-width: 370px) {
+    .my-cases-page__content,
+    .my-case-result-page__content { padding-inline: 18px; }
+    .my-case-card h3 br,
+    .my-result-summary h2 br { display: none; }
+    /* 좁은 화면에서도 판결 제목과 캐릭터가 겹치지 않게 자리 확보. */
+    .ai-verdict-card > strong { padding-right: 70px; }
+    .ai-verdict-card > img { right: 15px; width: 60px; height: 51px; }
+}

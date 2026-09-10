@@ -11,7 +11,7 @@ import type { SessionUser } from './sessionContext'
  *
  * 저장·복원 로직은 이 파일 안에만 둔다.
  * 컴포넌트가 localStorage를 직접 읽고 쓰지 않는다. (PROJECT_SPEC.md §7-8)
- * 저장소를 못 쓰거나 값이 깨져 있어도 흰 화면으로 멈추지 않고 비로그인 상태로 되돌아간다.
+ * 저장소를 못 쓰거나 값이 깨져 있어도 서아의 기본 데모 세션으로 시작한다.
  *
  * 복원은 첫 렌더의 초기값에서 동기로 끝낸다.
  * effect 안에서 setState를 부르면 렌더가 연쇄로 일어나므로 그렇게 하지 않는다.
@@ -70,7 +70,8 @@ function createInitialState(): SessionState {
     }
   }
 
-  return { personaId: 'A', sessionStatus: 'anonymous' }
+  // 발표 기본 진입은 서아 로그인. 저장된 전환/명시적 로그아웃은 위에서 그대로 복원한다.
+  return { personaId: 'A', sessionStatus: 'authenticated' }
 }
 
 function toUser(personaId: PersonaId): SessionUser {
@@ -80,6 +81,7 @@ function toUser(personaId: PersonaId): SessionUser {
     name: account.name,
     email: account.email,
     nickname: account.nickname,
+    anonymousAvatarUrl: account.anonymousAvatarUrl,
   }
 }
 
