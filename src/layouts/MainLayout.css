@@ -54,7 +54,7 @@
 }
 
 /*
- * 중앙 CTA 주변을 원형으로 비워, 하단 바가 버튼을 감싸는 시안의 노치를 만든다.
+ * 중앙 상단에서 아래로 깊게 내려오는 U자 노치를 만들어 첨부 시안의 배경 윤곽을 맞춘다.
  * 마스크에 drop-shadow를 적용해 외곽과 노치의 그림자가 같은 윤곽을 따른다.
  */
 .bottom-nav::before {
@@ -62,11 +62,11 @@
     position: absolute;
     z-index: 0;
     inset: 0;
-    border-radius: 24px 24px 0 0;
+    border-radius: 20px;
     background: #fff;
     filter: drop-shadow(0 -4px 16px rgba(37, 37, 37, .10));
-    mask-image: radial-gradient(circle 42px at 50% 12px, transparent 98%, #000 100%);
-    -webkit-mask-image: radial-gradient(circle 42px at 50% 12px, transparent 98%, #000 100%);
+    mask-image: radial-gradient(circle 54px at 50% 0, transparent 99%, #000 100%);
+    -webkit-mask-image: radial-gradient(circle 54px at 50% 0, transparent 99%, #000 100%);
 }
 
 .bottom-nav__item {
