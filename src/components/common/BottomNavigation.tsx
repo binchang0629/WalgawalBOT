@@ -74,7 +74,7 @@ function BottomNavigation() {
               title="시안 확정 후 연결됩니다"
             >
               <NavIcon src={item.icon} isCta={item.isCta} />
-              {item.label}
+              <span className="bottom-nav__label">{item.label}</span>
             </button>
           )
         }
@@ -84,9 +84,10 @@ function BottomNavigation() {
             key={item.label}
             to={item.to}
             className={({ isActive }) => (isActive ? `${className} active` : className)}
+            aria-label={item.isCta ? item.label : undefined}
           >
             <NavIcon src={item.icon} isCta={item.isCta} />
-            {item.label}
+            <span className="bottom-nav__label">{item.label}</span>
           </NavLink>
         )
       })}
