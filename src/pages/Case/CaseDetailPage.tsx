@@ -5,13 +5,15 @@ import { weddingGiftCase } from '../../data/common/caseDetailContent'
 import type { WeddingGiftVoteId } from '../../data/common/caseDetailContent'
 import { PATHS, toCaseResult } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
+import useDemoCountdown from './components/useDemoCountdown'
 import './CaseDetailPage.css'
 
 function VoteCountdown({ value }: { value: string }) {
-  const digits = value.replace(':', '').split('')
+  const countdown = useDemoCountdown(value)
+  const digits = countdown.replace(':', '').split('')
 
   return (
-    <span className="vote-countdown" aria-label={`남은 시간 ${value}`}>
+    <span className="vote-countdown" aria-label={`남은 시간 ${countdown}`}>
       {digits.map((digit, index) => (
         <span key={`${index}-${digit}`}>
           {index === 2 && <i aria-hidden="true">:</i>}
@@ -129,7 +131,9 @@ function CaseDetailPage() {
                 disabled={!isAuthenticated}
                 aria-pressed={selectedVote === choice.id}
               >
-                <img src={choice.imageUrl} alt="" width={62} height={62} />
+                <span className={`vote-choice__artwork vote-choice__artwork--${choice.id}`}>
+                  <img src={choice.imageUrl} alt="" width={62} height={62} />
+                </span>
                 <span>{choice.label[0]}<br />{choice.label[1]}</span>
               </button>
             ))}

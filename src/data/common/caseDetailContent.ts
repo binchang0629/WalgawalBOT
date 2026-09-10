@@ -1,12 +1,12 @@
-import authorWalang from '../../assets/case/author-walang.svg'
-import voteWriter from '../../assets/case/vote-writer.svg'
-import voteOther from '../../assets/case/vote-other.svg'
-import voteBoth from '../../assets/case/vote-both.svg'
-import voteNeither from '../../assets/case/vote-neither.svg'
+import authorWalang from '../../assets/case/author-hamster.png'
+import voteWriter from '../../assets/case/vote-writer-updated.svg'
+import voteOther from '../../assets/case/vote-other-updated.svg'
+import voteBoth from '../../assets/case/vote-both-updated.svg'
+import voteNeither from '../../assets/case/vote-neither-updated.svg'
 
 /**
  * 축의금 사건 상세의 화면 데이터.
- * Figma `축의금 사건 상세/로그인 전`(1507:12874)의 문구와 에셋을 그대로 옮겼다.
+ * Figma `축의금 사건 상세/로그인 후`(1802:5912)의 문구와 에셋을 반영한다.
  * 서버 연결 전 seed이므로 화면 컴포넌트에서 직접 수정하지 않는다.
  */
 export const weddingGiftCase = {
@@ -18,7 +18,7 @@ export const weddingGiftCase = {
     avatarUrl: authorWalang,
   },
   title: '10년 지기 친구 결혼식에 축의금 10만 원을 냈는데, 적은 건가요?',
-  caseNumber: '#MARRY-ME-01',
+  caseNumber: '#CASE-MARRY-01',
   age: '1시간 전',
   participantCount: 611,
   deadline: '01:01',

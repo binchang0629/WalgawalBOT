@@ -80,6 +80,7 @@ function toUser(personaId: PersonaId): SessionUser {
     name: account.name,
     email: account.email,
     nickname: account.nickname,
+    anonymousAvatarUrl: account.anonymousAvatarUrl,
   }
 }
 

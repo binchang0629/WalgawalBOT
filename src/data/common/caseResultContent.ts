@@ -1,9 +1,9 @@
-import avatar1 from '../../assets/case/result/avatar-1.svg'
-import avatar2 from '../../assets/case/result/avatar-2.svg'
-import avatar3 from '../../assets/case/result/avatar-3.svg'
-import avatar4 from '../../assets/case/result/avatar-4.svg'
-import avatar5 from '../../assets/case/result/avatar-5.svg'
-import resultArtwork from '../../assets/case/result/vote-result.png'
+import avatar1 from '../../assets/case/result/comment-avatar-1.png'
+import avatar2 from '../../assets/case/result/comment-avatar-2.png'
+import avatar3 from '../../assets/case/result/comment-avatar-3.png'
+import avatar4 from '../../assets/case/result/comment-avatar-4.png'
+import avatar5 from '../../assets/case/result/comment-avatar-5.png'
+import resultArtwork from '../../assets/case/result/verdict-artwork.png'
 import type { WeddingGiftVoteId } from './caseDetailContent'
 
 export interface CaseResultComment {
@@ -19,16 +19,17 @@ export interface CaseResultComment {
 }
 
 /**
- * Figma `축의금 사건 상세/로그인 후2`(1507:12731)의 결과·댓글 seed 데이터.
+ * Figma `축의금 사건 상세/로그인 후2`(1846:14556)의 결과·댓글 seed 데이터.
  * 서버 연결 전 시연용이며 새 댓글은 화면 상태에만 추가된다.
  */
 export const weddingGiftResult = {
   deadline: '01:32:47',
   artworkUrl: resultArtwork,
-  verdictCards: [
-    { id: 'other', label: '상대방', percent: 26 },
-    { id: 'writer', label: '글쓴이', percent: 48 },
-  ],
+  verdict: {
+    label: '배심원의 한 줄 판결',
+    title: '글쓴이의 입장이\n더 타당해요',
+    description: '최근 교류가 뜸했다면\n10만 원은 무리 없는 축의금이라는 의견이에요.',
+  },
   breakdown: [
     { id: 'writer', label: '글쓴이 입장이 더 타당해요', percent: 48 },
     { id: 'other', label: '상대방 입장이 더 타당해요', percent: 26 },

@@ -8,6 +8,9 @@ import CaseDetailPage from '../pages/Case/CaseDetailPage'
 import CaseResultPage from '../pages/Case/CaseResultPage'
 import SignupPage from '../pages/Auth/SignupPage'
 import LoginPage from '../pages/Auth/LoginPage'
+import MyPage from '../pages/My/MyPage'
+import MyCasesPage from '../pages/My/MyCasesPage'
+import MyCaseResultPage from '../pages/My/MyCaseResultPage'
 import NotFoundPage from '../pages/Error/NotFoundPage'
 import { PATHS } from './paths'
 
@@ -40,7 +43,12 @@ function AppRoutes() {
           <Route path={PATHS.plaza} element={<PlazaPage />} />
           <Route path={PATHS.caseDetail} element={<CaseDetailPage />} />
           <Route path={PATHS.caseResult} element={<CaseResultPage />} />
+          <Route path={PATHS.my} element={<MyPage />} />
         </Route>
+
+        {/* MY 하위 상세 화면은 Figma 시안대로 하단 내비게이션 없이 표시한다. */}
+        <Route path={PATHS.myCases} element={<MyCasesPage />} />
+        <Route path={PATHS.myCaseResult} element={<MyCaseResultPage />} />
 
         {/* 가입·로그인 계열. 하단 내비게이션을 표시하지 않는다. */}
         <Route element={<AuthLayout />}>

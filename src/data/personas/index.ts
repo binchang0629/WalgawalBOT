@@ -1,4 +1,6 @@
 import type { Persona, PersonaId } from '../../types'
+import seoaAnonymousAvatar from '../../assets/case/result/comment-avatar-2.png'
+import jihunAnonymousAvatar from '../../assets/case/result/comment-avatar-3.png'
 
 /**
  * 시연 퍼소나 정의.
@@ -47,6 +49,10 @@ export interface DemoAccount {
   name: string
   email: string
   nickname: string
+  /** MY 시안에 표시된 데모 포인트. 실제 적립/차감 기능은 미연결. */
+  points: number
+  /** 공개 댓글용 캐릭터. 계정 전환/MY의 실제 인물 사진과 구분한다. */
+  anonymousAvatarUrl: string
   /** 가입 폼에 흐리게 미리 채워 둘 비밀번호 표시용 문자열. 검증에만 쓰고 저장하지 않는다. */
   passwordPlaceholder: string
 }
@@ -56,14 +62,18 @@ export const DEMO_ACCOUNTS: Record<PersonaId, DemoAccount> = {
     personaId: 'A',
     name: '윤서아',
     email: 'seoa_daily@gmail.com',
-    nickname: '서아',
+    nickname: '익명의 왈가닥',
+    points: 10,
+    anonymousAvatarUrl: seoaAnonymousAvatar,
     passwordPlaceholder: 'seoa1234!',
   },
   B: {
     personaId: 'B',
     name: '곽지훈',
     email: 'kwak_freelancer@gmail.com',
-    nickname: '지훈',
+    nickname: '익명의 왈랑이',
+    points: 0,
+    anonymousAvatarUrl: jihunAnonymousAvatar,
     passwordPlaceholder: 'jihun1234!',
   },
 }

@@ -84,18 +84,23 @@
 }
 
 .case-author__avatar {
+    position: relative;
+    overflow: hidden;
     width: 38px;
     height: 38px;
     flex: none;
     display: grid;
     place-items: center;
     border-radius: 50%;
-    background: var(--orange-700);
 }
 
 .case-author__avatar img {
-    width: 26px;
-    height: 26px;
+    position: absolute;
+    width: 146.46%;
+    height: 146.46%;
+    max-width: none;
+    left: -22.91%;
+    top: -17.63%;
 }
 
 .case-author strong,
@@ -136,6 +141,7 @@
 }
 
 .case-story {
+    padding: 0 15px;
     display: flex;
     flex-direction: column;
     gap: 21px;
@@ -172,14 +178,29 @@
     list-style: none;
 }
 
-.ai-summary ol::before {
+.ai-summary li::before,
+.ai-summary li::after {
     content: '';
     position: absolute;
-    top: 12px;
-    bottom: 12px;
-    left: 11px;
+    left: 12px;
     width: 1px;
+    transform: translateX(-50%);
     background: var(--blue-100);
+}
+
+.ai-summary li::before {
+    top: -12px;
+    bottom: 50%;
+}
+
+.ai-summary li::after {
+    top: 50%;
+    bottom: 0;
+}
+
+.ai-summary li:first-child::before,
+.ai-summary li:last-child::after {
+    content: none;
 }
 
 .ai-summary li {
@@ -246,7 +267,7 @@
 .case-vote__grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    gap: 16px 12px;
 }
 
 .vote-choice {
@@ -267,9 +288,41 @@
     text-align: center;
 }
 
-.vote-choice img {
+.vote-choice__artwork {
+    position: relative;
     width: 62px;
     height: 62px;
+    flex: none;
+}
+
+.vote-choice__artwork img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.vote-choice__artwork--writer img {
+    inset: 4.27% 1.68% 4.17% 3.45%;
+    width: 94.87%;
+    height: 91.56%;
+}
+
+.vote-choice__artwork--other img {
+    inset: 4.71% 5.43% 3.41% 6.13%;
+    width: 88.44%;
+    height: 91.88%;
+}
+
+.vote-choice__artwork--both img {
+    inset: 4.27% 5.76% 4.17% 3.45%;
+    width: 90.79%;
+    height: 91.56%;
+}
+
+.vote-choice__artwork--neither img {
+    inset: 4.71% 8.81% 3.41% 6.13%;
+    width: 85.06%;
+    height: 91.88%;
 }
 
 .vote-choice.is-selected {
@@ -295,6 +348,7 @@
 
 .case-vote__login>div {
     width: 280px;
+    max-width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -323,6 +377,7 @@
 }
 
 .case-vote__submit {
+    margin-top: 9px;
     width: 100%;
     height: 52px;
     padding: 0 16px;
