@@ -1775,3 +1775,7 @@ img.ai-card__mascot {
 /* 전역 이미지 최대 폭 제한을 해제해야 원본 편지지 폭이 적용된다. */
 .letter .letter__paper { max-width: none; }
 
+
+/* 열린 봉투 안쪽의 진한 파랑을 바깥 봉투와 같은 밝기로 낮춘다. */
+.letter.is-open .letter__back { opacity: .5; }
+
