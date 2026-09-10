@@ -27,6 +27,9 @@ interface ResultRouteState {
   selectedVote?: WeddingGiftVoteId
 }
 
+const COMMENTS_PER_PAGE = 5
+type CommentReaction = 'like' | 'dislike' | null
+
 function isVoteId(value: unknown): value is WeddingGiftVoteId {
   return weddingGiftCase.choices.some((choice) => choice.id === value)
 }
@@ -84,8 +87,11 @@ function ResultBreakdown() {
   )
 }
 
-function CommentItem({ comment }: { comment: CaseResultComment }) {
-  const [reaction, setReaction] = useState<'like' | 'dislike' | null>(null)
+function CommentItem({ comment, reaction, onReact }: {
+  comment: CaseResultComment
+  reaction: CommentReaction
+  onReact: (reaction: Exclude<CommentReaction, null>) => void
+}) {
   const badge = voteDisplayById[comment.voteId]
 
   return (
@@ -103,7 +109,7 @@ function CommentItem({ comment }: { comment: CaseResultComment }) {
         <button
           type="button"
           className={reaction === 'like' ? 'is-active' : ''}
-          onClick={() => setReaction((value) => value === 'like' ? null : 'like')}
+          onClick={() => onReact('like')}
           aria-pressed={reaction === 'like'}
         >
           <img src={likeIcon} alt="" /> 공감 {comment.likes + (reaction === 'like' ? 1 : 0)}
@@ -111,7 +117,7 @@ function CommentItem({ comment }: { comment: CaseResultComment }) {
         <button
           type="button"
           className={reaction === 'dislike' ? 'is-active' : ''}
-          onClick={() => setReaction((value) => value === 'dislike' ? null : 'dislike')}
+          onClick={() => onReact('dislike')}
           aria-pressed={reaction === 'dislike'}
         >
           <img src={dislikeIcon} alt="" /> 반대 {comment.dislikes + (reaction === 'dislike' ? 1 : 0)}
@@ -129,6 +135,8 @@ function CaseResultPage() {
   const [draft, setDraft] = useState('')
   const [addedComments, setAddedComments] = useState<CaseResultComment[]>([])
   const [currentPage, setCurrentPage] = useState(1)
+  // 페이지가 바뀌어 댓글이 언마운트되어도 공감/반대 선택을 유지한다.
+  const [commentReactions, setCommentReactions] = useState<Record<string, CommentReaction>>({})
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const nextCommentId = useRef(1)
   const countdown = useDemoCountdown(weddingGiftResult.deadline)
@@ -141,6 +149,8 @@ function CaseResultPage() {
   const routeState = location.state as ResultRouteState | null
   const selectedVote = isVoteId(routeState?.selectedVote) ? routeState.selectedVote : 'writer'
   const allComments = [...addedComments, ...weddingGiftResult.comments]
+  const totalPages = Math.max(1, Math.ceil(allComments.length / COMMENTS_PER_PAGE))
+  const visibleComments = allComments.slice((currentPage - 1) * COMMENTS_PER_PAGE, currentPage * COMMENTS_PER_PAGE)
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -163,6 +173,7 @@ function CaseResultPage() {
       ...comments,
     ])
     setDraft('')
+    setCurrentPage(1)
   }
 
   const handleEmoji = () => {
@@ -224,7 +235,7 @@ function CaseResultPage() {
 
         <section className="comment-section" aria-labelledby="comments-title">
           <div className="comment-section__heading">
-            <h2 id="comments-title">댓글 ({weddingGiftResult.baseCommentCount + addedComments.length})</h2>
+            <h2 id="comments-title">댓글 ({allComments.length})</h2>
             <span>등록순 <i /> 최신순</span>
           </div>
 
@@ -248,11 +259,21 @@ function CaseResultPage() {
           </form>
 
           <div className="comment-list" aria-live="polite">
-            {allComments.map((comment) => <CommentItem key={comment.id} comment={comment} />)}
+            {visibleComments.map((comment) => (
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                reaction={commentReactions[comment.id] ?? null}
+                onReact={(reaction) => setCommentReactions((previous) => ({
+                  ...previous,
+                  [comment.id]: previous[comment.id] === reaction ? null : reaction,
+                }))}
+              />
+            ))}
           </div>
 
           <div className="comment-pagination">
-            <Pagination currentPage={currentPage} totalPages={5} onPageChange={setCurrentPage} ariaLabel="댓글 페이지" />
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} ariaLabel="댓글 페이지" />
           </div>
         </section>
 

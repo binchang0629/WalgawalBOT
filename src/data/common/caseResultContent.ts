@@ -100,7 +100,6 @@ export const weddingGiftResult = {
       dislikes: 4,
     },
   ] satisfies CaseResultComment[],
-  baseCommentCount: 124,
   afterStory: {
     quote: '솔직히 이야기해보니,\n축의금보다 서로의 기대가 달랐어요.\n서운함을 풀고 다시 잘 지내고 있어요.',
     title: '10년 지기 친구 결혼식\n축의금 10만 원 논쟁',
