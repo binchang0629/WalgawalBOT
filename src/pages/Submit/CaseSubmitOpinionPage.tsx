@@ -5,29 +5,30 @@ import CaseSubmitProgress from './components/CaseSubmitProgress'
 import CaseSubmitFooter from './components/CaseSubmitFooter'
 import useCaseSubmitDraft from './useCaseSubmitDraft'
 import useWizardBack from './useWizardBack'
-import { AI_OPINION } from './caseSubmitContent'
+import { SUBMIT_SCENARIOS } from './caseSubmitContent'
 import radioSelected from '../../assets/submit/figma/imgRadioSelected.svg'
 import radioDefault from '../../assets/submit/figma/imgRadioDefault.svg'
 import './CaseSubmit.css'
 import './CaseSubmitOpinionPage.css'
 
 /**
- * 사건 접수 4단계 — 지훈04 / AI 참고 의견·접수.
- * Figma node 1446:10041 기준.
+ * AI 참고 의견·접수 — 서아03(1446:10178) / 지훈04(1446:10041).
  *
- * `배심원 광장에 공개`는 디자이너 주석대로 이번 구현에서 고를 수 없게 뒀다 —
- * "처음 진입 시 둘 다 회색, 배심원 광장은 비활성화, 나만보기만 클릭 시 주황"(node 1446:10059 주석).
- * 공개 범위를 어디까지 열지는 아직 미정이라 임의로 활성화하지 않았다. (PROJECT_SPEC.md §9-9)
+ * 시안 주석대로 서아는 광장 공개만, 지훈은 나만 보기만 활성화한다.
+ * 처음 진입은 모두 미선택이며 허용된 범위를 선택한 뒤에만 시연 접수가 가능하다.
  */
 function CaseSubmitOpinionPage() {
-  const { content, answers, summary, visibility, setVisibility, setIsSubmitted } = useCaseSubmitDraft()
+  const { personaId, content, answers, summary, visibility, setVisibility, setIsSubmitted } = useCaseSubmitDraft()
+  const isSeoa = personaId === 'A'
+  const scenario = SUBMIT_SCENARIOS[personaId]
+  const opinion = scenario.opinion
   const navigate = useNavigate()
   const handleBack = useWizardBack(PATHS.caseSubmitSummary)
 
   if (!content.trim()) {
     return <Navigate to={PATHS.caseSubmit} replace />
   }
-  if (answers.deliveryRecord === null || answers.contractTerms === null || answers.revisionScope === null) {
+  if (!isSeoa && (answers.deliveryRecord === null || answers.contractTerms === null || answers.revisionScope === null)) {
     return <Navigate to={PATHS.caseSubmitQuestions} replace />
   }
   if (!summary.title.trim() || !summary.facts.trim()) {
@@ -35,17 +36,19 @@ function CaseSubmitOpinionPage() {
   }
 
   const isPrivateSelected = visibility === 'private'
+  const isCommunitySelected = visibility === 'community'
+  const canSubmit = visibility === scenario.allowedVisibility
 
   const handleSubmit = () => {
-    if (!isPrivateSelected) return
+    if (!canSubmit) return
     setIsSubmitted(true)
     navigate(PATHS.caseSubmitComplete)
   }
 
   return (
-    <div className="case-submit">
+    <div className={`case-submit${isSeoa ? ' case-submit--seoa' : ''}`}>
       <CaseSubmitHeader onBack={handleBack} />
-      <CaseSubmitProgress step={4} label="접수" />
+      <CaseSubmitProgress step={isSeoa ? 3 : 4} totalSteps={scenario.totalSteps} label="접수" />
 
       <div className="case-submit__body">
         <div className="case-submit__intro">
@@ -54,14 +57,14 @@ function CaseSubmitOpinionPage() {
         </div>
 
         <div className="case-submit__ai-opinion">
-          <p className="case-submit__ai-opinion-eyebrow">{AI_OPINION.eyebrow}</p>
-          <p className="case-submit__ai-opinion-headline">{AI_OPINION.headline}</p>
+          <p className="case-submit__ai-opinion-eyebrow">{opinion.eyebrow}</p>
+          <p className="case-submit__ai-opinion-headline">{opinion.headline}</p>
           <ul className="case-submit__ai-opinion-reasons">
-            {AI_OPINION.reasons.map((reason) => (
+            {opinion.reasons.map((reason) => (
               <li key={reason}>{reason}</li>
             ))}
           </ul>
-          <p className="case-submit__ai-opinion-disclaimer">{AI_OPINION.disclaimer}</p>
+          <p className="case-submit__ai-opinion-disclaimer">{opinion.disclaimer}</p>
         </div>
 
         <div className="case-submit__privacy">
@@ -71,6 +74,7 @@ function CaseSubmitOpinionPage() {
             type="button"
             className="case-submit__privacy-option"
             aria-pressed={isPrivateSelected}
+            disabled={isSeoa}
             onClick={() => setVisibility('private')}
           >
             <span className="case-submit__privacy-label">
@@ -84,13 +88,13 @@ function CaseSubmitOpinionPage() {
 
           <div className="case-submit__divider" />
 
-          <div className="case-submit__privacy-option" aria-disabled="true" title="아직 열려 있지 않은 공개 범위예요">
+          <button type="button" className="case-submit__privacy-option" disabled={!isSeoa} aria-pressed={isCommunitySelected} onClick={() => setVisibility('community')}>
             <span className="case-submit__privacy-label">
-              <img src={radioDefault} alt="" width={15} height={15} />
-              <span className="case-submit__privacy-option-title">배심원 광장에 공개</span>
+              <img src={isCommunitySelected ? radioSelected : radioDefault} alt="" width={15} height={15} />
+              <span className={isCommunitySelected ? 'case-submit__privacy-option-title--selected' : 'case-submit__privacy-option-title'}>배심원 광장에 공개</span>
             </span>
             <span className="case-submit__privacy-description">다른 배심원의 의견을 받아볼 수 있어요.</span>
-          </div>
+          </button>
         </div>
       </div>
 
@@ -98,7 +102,7 @@ function CaseSubmitOpinionPage() {
         type="button"
         primaryLabel="사건 접수하기"
         helperText="선택한 공개 범위로 접수돼요."
-        disabled={!isPrivateSelected}
+        disabled={!canSubmit}
         onPrimaryClick={handleSubmit}
       />
     </div>

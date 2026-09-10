@@ -6,27 +6,28 @@ import CaseSubmitProgress from './components/CaseSubmitProgress'
 import CaseSubmitFooter from './components/CaseSubmitFooter'
 import useCaseSubmitDraft from './useCaseSubmitDraft'
 import useWizardBack from './useWizardBack'
+import { SUBMIT_SCENARIOS } from './caseSubmitContent'
 import './CaseSubmit.css'
 import './CaseSubmitSummaryPage.css'
 
 /**
- * 사건 접수 3단계 — 지훈03 / 요약 확인.
- * Figma node 1446:10011 기준.
+ * 사건 접수 요약 확인 — 서아02(1446:10149) / 지훈03(1446:10011).
  *
- * `사건 요약`(제목·확인된 내용)만 실제로 고쳐 쓸 수 있게 했다.
+ * 지훈은 `사건 요약`(제목·확인된 내용)만 실제로 고쳐 쓸 수 있다. 서아 시안은 수정 버튼이 숨김 상태다.
  * `확인이 필요한 쟁점`·`원하는 도움`은 AI가 정리한 결과라 이 화면에서 직접 고치지 않는다.
  * 실제로는 mock 데이터라 1단계에서 무엇을 적었든 같은 예시 사연으로 보인다 — Figma 시안 그대로다. (PROJECT_SPEC.md §6)
  */
 function CaseSubmitSummaryPage() {
-  const { content, answers, summary, setSummary } = useCaseSubmitDraft()
+  const { personaId, content, answers, summary, setSummary } = useCaseSubmitDraft()
+  const isSeoa = personaId === 'A'
   const [isEditing, setIsEditing] = useState(false)
   const navigate = useNavigate()
-  const handleBack = useWizardBack(PATHS.caseSubmitQuestions)
+  const handleBack = useWizardBack(isSeoa ? PATHS.caseSubmit : PATHS.caseSubmitQuestions)
 
   if (!content.trim()) {
     return <Navigate to={PATHS.caseSubmit} replace />
   }
-  if (answers.deliveryRecord === null || answers.contractTerms === null || answers.revisionScope === null) {
+  if (!isSeoa && (answers.deliveryRecord === null || answers.contractTerms === null || answers.revisionScope === null)) {
     return <Navigate to={PATHS.caseSubmitQuestions} replace />
   }
 
@@ -38,9 +39,9 @@ function CaseSubmitSummaryPage() {
   }
 
   return (
-    <div className="case-submit">
+    <div className={`case-submit${isSeoa ? ' case-submit--seoa' : ''}`}>
       <CaseSubmitHeader onBack={handleBack} />
-      <CaseSubmitProgress step={3} label="요약 확인" />
+      <CaseSubmitProgress step={isSeoa ? 2 : 3} totalSteps={SUBMIT_SCENARIOS[personaId].totalSteps} label="요약 확인" />
 
       <div className="case-submit__body">
         <div className="case-submit__intro">
@@ -51,13 +52,13 @@ function CaseSubmitSummaryPage() {
         <div className="case-submit__summary">
           <div className="case-submit__summary-header">
             <span className="case-submit__label">사건 요약</span>
-            <button
+            {!isSeoa && <button
               type="button"
               className="case-submit__summary-edit"
               onClick={() => setIsEditing((prev) => !prev)}
             >
               {isEditing ? '완료' : '수정하기'}
-            </button>
+            </button>}
           </div>
           <div className="case-submit__divider" />
 
