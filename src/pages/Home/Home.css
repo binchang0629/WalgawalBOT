@@ -1700,3 +1700,74 @@ img.ai-card__mascot {
 
 .popular-case__cta { text-decoration: none; }
 
+
+/* 후일담 편지는 봉투 → 편지지 → 내용 순으로 열린다. */
+.letter {
+    transition: height 760ms cubic-bezier(.22, 1, .36, 1);
+}
+.letter.is-open {
+    transition-delay: 120ms;
+}
+.letter .letter__closed {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition: opacity 200ms ease 360ms, transform 200ms ease 360ms;
+}
+.letter.is-open .letter__closed {
+    opacity: 0;
+    transform: translateY(14px) scale(.97);
+    transition-delay: 0ms;
+}
+.letter .letter__back {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+    transition: opacity 160ms ease, transform 220ms cubic-bezier(.22, 1, .36, 1);
+}
+.letter .letter__front {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 160ms ease, transform 220ms cubic-bezier(.22, 1, .36, 1);
+}
+.letter.is-open .letter__back {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    transition-delay: 120ms;
+}
+.letter.is-open .letter__front {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 140ms;
+}
+.letter .letter__paper {
+    opacity: .96;
+    transform: translateX(-50%) translateY(175px) scale(.96);
+    transition: transform 560ms cubic-bezier(.22, 1, .36, 1), opacity 220ms ease;
+}
+.letter.is-open .letter__paper {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+    transition-delay: 160ms;
+}
+.letter .letter__content {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(190px) scale(.98);
+    transition: transform 180ms ease, opacity 180ms ease, visibility 0s linear 180ms;
+}
+.letter.is-open .letter__content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    transition: transform 420ms cubic-bezier(.22, 1, .36, 1) 470ms, opacity 300ms ease 470ms, visibility 0s linear 470ms;
+}
+.letter.is-open .letter__cta {
+    animation: letter-cta-appear 240ms ease 600ms both;
+}
+@keyframes letter-cta-appear {
+    from { opacity: 0; transform: translateX(-50%) translateY(6px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.letter__toggle:disabled { cursor: default; }
+@media (prefers-reduced-motion: reduce) {
+    .letter__cta { animation: none; }
+}

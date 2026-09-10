@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import SectionTitle from '../../../components/common/SectionTitle'
 import { homeIcons, homeImages } from '../homeAssets'
 import {
@@ -17,7 +17,26 @@ import {
  * 봉투 세 장의 겹치는 위치는 이미지의 밑변 폭을 맞춰 계산했다(Home.css 참고).
  */
 function AfterStorySection() {
-  const [isOpened, setIsOpened] = useState(false)
+  const [letterState, setLetterState] = useState<'closed' | 'opening' | 'open' | 'closing'>('closed')
+  const transitionTimer = useRef<number | null>(null)
+  const isLetterOpen = letterState === 'opening' || letterState === 'open'
+  const isAnimating = letterState === 'opening' || letterState === 'closing'
+
+  useEffect(() => () => {
+    if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current)
+  }, [])
+
+  function handleLetterToggle() {
+    if (isAnimating) return
+    if (letterState === 'closed') {
+      setLetterState('opening')
+      transitionTimer.current = window.setTimeout(() => setLetterState('open'), 960)
+      return
+    }
+
+    setLetterState('closing')
+    transitionTimer.current = window.setTimeout(() => setLetterState('closed'), 680)
+  }
 
   return (
     <section className="story-section">
@@ -27,7 +46,7 @@ function AfterStorySection() {
         action={homeSectionTitles.afterStory.action}
       />
 
-      <article className={isOpened ? 'letter is-open' : 'letter'}>
+      <article className={'letter letter--' + letterState + (isLetterOpen ? ' is-open' : '')}>
         <img className="letter__mail" src={homeImages.letterEnvelope} alt="" aria-hidden="true" />
         <img className="letter__back" src={homeImages.envelopeBack} alt="" aria-hidden="true" />
 
@@ -56,7 +75,7 @@ function AfterStorySection() {
         <img className="letter__closed" src={homeImages.envelopeClosed} alt="" aria-hidden="true" />
 
         <b className="letter__cta">
-          {isOpened ? featuredAfterStory.envelopeCta : '편지 열어보기'}
+          {letterState === 'open' || letterState === 'closing' ? featuredAfterStory.envelopeCta : '편지 열어보기'}
         </b>
 
         {/*
@@ -66,11 +85,12 @@ function AfterStorySection() {
         <button
           type="button"
           className="letter__toggle"
-          aria-expanded={isOpened}
+          aria-expanded={isLetterOpen}
           aria-controls="featured-after-story"
-          onClick={() => setIsOpened((open) => !open)}
+          disabled={isAnimating}
+          onClick={handleLetterToggle}
         >
-          <span>{isOpened ? '후일담 편지 접기' : '후일담 편지 열어보기'}</span>
+          <span>{letterState === 'open' || letterState === 'closing' ? '후일담 편지 접기' : '후일담 편지 열어보기'}</span>
         </button>
       </article>
 
