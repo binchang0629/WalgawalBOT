@@ -16,9 +16,11 @@ function CloseCallSection({ cta }: CloseCallSectionProps) {
   const currentCase = closeCallCases[currentIndex]
   const nextCase = closeCallCases[(currentIndex + 1) % closeCallCases.length]
   const gap = Math.abs(currentCase.leftPercent - currentCase.rightPercent)
+  // 6%p 이내의 막상막하는 게이지도 정중앙으로 표현한다. 수치는 양쪽에 그대로 둔다.
+  const gaugeLeftPercent = gap <= 6 ? 50 : currentCase.leftPercent
   const gaugeStyle = {
-    '--close-left-angle': String((currentCase.leftPercent / 100) * 180) + 'deg',
-    '--close-needle-angle': String((currentCase.leftPercent - 50) * 1.4) + 'deg',
+    '--close-left-angle': String((gaugeLeftPercent / 100) * 180) + 'deg',
+    '--close-needle-angle': String((gaugeLeftPercent - 50) * 1.8) + 'deg',
   } as CSSProperties
 
   function handleSwap() {
