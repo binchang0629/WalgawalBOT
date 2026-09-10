@@ -120,6 +120,10 @@
 }
 
 .primary-pill {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
     margin-top: 18px;
     padding: 10px 24px;
     border: 0;
@@ -144,6 +148,7 @@
     width: 142px;
     height: 151px;
     filter: drop-shadow(0 9px 8px rgba(45, 60, 136, .2));
+    pointer-events: none;
 }
 
 .bot-face {

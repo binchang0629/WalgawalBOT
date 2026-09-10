@@ -4,6 +4,22 @@
  * 이 파일 밖에서 새 색·새 폰트 크기를 임의로 만들지 않는다.
  */
 
+@font-face {
+    font-family: 'Pretendard';
+    src: url('../assets/fonts/PretendardVariable.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Paperlogy';
+    src: url('../assets/fonts/Paperlogy-7Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
     /* ---------- Neutral ---------- */
     --neutral-900: #252525;

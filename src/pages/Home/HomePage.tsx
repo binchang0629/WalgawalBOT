@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import TopBar from '../../components/common/TopBar'
 import useSession from '../../hooks/useSession'
 import { PATHS } from '../../routes/paths'
+import { toCaseDetail } from '../../routes/paths'
 import {
   adBanner,
   afterStoryQuotes,
@@ -78,9 +79,9 @@ function HomePage() {
             <p>
               배심원 <b>{todayCase.participantCount.toLocaleString()}</b>명 참여중
             </p>
-            <button type="button" className="primary-pill">
+            <Link className="primary-pill" to={toCaseDetail(todayCase.id)}>
               투표하러 가기 <span>›</span>
-            </button>
+            </Link>
           </div>
           <div className="hero-art" aria-hidden="true">
             <span className="bot-ear left" />
