@@ -65,8 +65,8 @@
     border-radius: 24px 24px 0 0;
     background: #fff;
     filter: drop-shadow(0 -4px 16px rgba(37, 37, 37, .10));
-    mask-image: radial-gradient(circle 50px at 50% 12px, transparent 98%, #000 100%);
-    -webkit-mask-image: radial-gradient(circle 50px at 50% 12px, transparent 98%, #000 100%);
+    mask-image: radial-gradient(circle 42px at 50% 12px, transparent 98%, #000 100%);
+    -webkit-mask-image: radial-gradient(circle 42px at 50% 12px, transparent 98%, #000 100%);
 }
 
 .bottom-nav__item {
