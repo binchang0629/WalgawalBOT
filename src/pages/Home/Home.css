@@ -889,7 +889,7 @@
     top: -10px;
     bottom: auto;
     left: 50%;
-    width: 630px;   /* 실제 흰 종이 면적이 봉투 폭의 약 88%가 되도록 보정한다. */
+    width: 405px;   /* 74% 투명 여백 비율을 반영해 실제 흰 종이가 봉투 내부 폭의 약 88%가 된다. */
     height: 411px;
     transform: translateX(-50%);
     /* box-shadow는 투명 여백까지 네모로 그려진다. drop-shadow는 알파를 따라간다. */
@@ -1771,3 +1771,7 @@ img.ai-card__mascot {
 @media (prefers-reduced-motion: reduce) {
     .letter__cta { animation: none; }
 }
+
+/* 전역 이미지 최대 폭 제한을 해제해야 원본 편지지 폭이 적용된다. */
+.letter .letter__paper { max-width: none; }
+
