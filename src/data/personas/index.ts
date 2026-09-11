@@ -49,7 +49,10 @@ export interface DemoAccount {
   name: string
   email: string
   nickname: string
-  /** MY 시안에 표시된 데모 포인트. 실제 적립/차감 기능은 미연결. */
+  /** MY의 초기 활동 수치. 이후 서아의 접수·투표는 공유 데모 상태에서 더한다. */
+  submittedCases: number
+  juryParticipations: number
+  /** 초기 데모 포인트. 실제 결제·리워드 시스템과 연결하지 않는다. */
   points: number
   /** 공개 댓글용 캐릭터. 계정 전환/MY의 실제 인물 사진과 구분한다. */
   anonymousAvatarUrl: string
@@ -63,7 +66,9 @@ export const DEMO_ACCOUNTS: Record<PersonaId, DemoAccount> = {
     name: '윤서아',
     email: 'seoa_daily@gmail.com',
     nickname: '익명의 왈가닥',
-    points: 10,
+    submittedCases: 0,
+    juryParticipations: 0,
+    points: 0,
     anonymousAvatarUrl: seoaAnonymousAvatar,
     passwordPlaceholder: 'seoa1234!',
   },
@@ -72,6 +77,8 @@ export const DEMO_ACCOUNTS: Record<PersonaId, DemoAccount> = {
     name: '곽지훈',
     email: 'kwak_freelancer@gmail.com',
     nickname: '익명의 왈랑이',
+    submittedCases: 4,
+    juryParticipations: 24,
     points: 0,
     anonymousAvatarUrl: jihunAnonymousAvatar,
     passwordPlaceholder: 'jihun1234!',

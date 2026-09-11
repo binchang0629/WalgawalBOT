@@ -39,7 +39,7 @@ function CaseDetailPage() {
   const { caseId } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
-  const { sessionStatus } = useSession()
+  const { sessionStatus, recordJuryVote } = useSession()
   const [selectedVote, setSelectedVote] = useState<WeddingGiftVoteId | null>(null)
   const [voteMessage, setVoteMessage] = useState('')
 
@@ -59,6 +59,7 @@ function CaseDetailPage() {
       return
     }
 
+    recordJuryVote(weddingGiftCase.id)
     navigate(toCaseResult(weddingGiftCase.id), { state: { selectedVote } })
   }
 

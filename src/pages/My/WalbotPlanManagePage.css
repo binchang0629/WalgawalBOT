@@ -1,0 +1,63 @@
+.walbot-plan-manage {
+    --device-app-header: 66px;
+    color: var(--ink);
+    font-family: var(--font-body);
+}
+
+.walbot-plan-manage .case-submit__header { padding-top: 2px; }
+.walbot-plan-manage .case-submit__temp-save { width: 32px; }
+.walbot-plan-manage__body { gap: 14px; padding-top: 20px; padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); overscroll-behavior-y: contain; }
+.walbot-plan-manage__body > * { flex: none; }
+.walbot-plan-manage__sections { display: flex; flex-direction: column; gap: 24px; }
+.walbot-plan-manage__section { display: flex; flex-direction: column; gap: 10px; }
+.walbot-plan-manage .section-title { padding-inline: 4px; }
+.walbot-plan-manage .section-title h2 { font-family: var(--font-body); font-size: 18px; line-height: 1.2; }
+
+.walbot-plan-manage__current { display: flex; flex-direction: column; gap: 12px; padding: 15px 16px; border: 1px solid var(--orange-700); border-radius: var(--radius-lg); background: var(--orange-050); }
+.walbot-plan-manage__summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.walbot-plan-manage__details { display: flex; flex: 1; flex-direction: column; gap: 11px; min-width: 0; }
+.walbot-plan-manage__plan-title { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; }
+.walbot-plan-manage__badge { padding: 6px 12px; border-radius: var(--radius-pill); color: #fff; background: var(--orange-700); font-size: 12px; font-weight: 500; line-height: 1; }
+.walbot-plan-manage__plan-title h3 { margin: 0; font-family: var(--font-title); font-size: 20px; font-weight: 700; line-height: 1.2; word-break: keep-all; }
+.walbot-plan-manage__benefits { margin: 0; color: var(--neutral-600); font-size: 11px; line-height: 1.4; word-break: keep-all; }
+.walbot-plan-manage__price { flex: none; margin: 0; color: var(--orange-700); font-size: 18px; font-weight: 600; line-height: 1.2; white-space: nowrap; }
+.walbot-plan-manage__billing { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding-top: 12px; border-top: 1px solid var(--neutral-250); }
+.walbot-plan-manage__billing dt { color: var(--neutral-600); font-size: 14px; font-weight: 500; line-height: 1.3; }
+.walbot-plan-manage__billing dd { margin: 0; font-size: 16px; font-weight: 700; line-height: 1.3; }
+
+.walbot-plan-manage__payment { display: flex; align-items: center; gap: 11px; width: 100%; padding: 12px 16px; border: 1px solid var(--neutral-200); border-radius: var(--radius-lg); color: var(--ink); background: #fff; font-family: var(--font-body); text-align: left; }
+.walbot-plan-manage__kakao { position: relative; display: block; flex: none; width: 47px; height: 20px; overflow: hidden; }
+.walbot-plan-manage__kakao img { position: absolute; display: block; }
+.walbot-plan-manage__kakao-symbol { inset: 0; width: 47.024px; height: 20px; }
+.walbot-plan-manage__kakao-mark { left: 5.65px; top: 4.8px; width: 10.696px; height: 10.1px; }
+.walbot-plan-manage__kakao-p { left: 18.9px; top: 4.97px; width: 6.457px; height: 10.498px; }
+.walbot-plan-manage__kakao-a { left: 26.56px; top: 5.02px; width: 5.921px; height: 7.811px; }
+.walbot-plan-manage__kakao-y { left: 33.52px; top: 4.92px; width: 7.115px; height: 10.871px; }
+.walbot-plan-manage__payment-info { display: flex; flex: 1; flex-direction: column; gap: 2px; min-width: 0; }
+.walbot-plan-manage__payment-info strong { font-size: 14px; font-weight: 600; line-height: 1.3; }
+.walbot-plan-manage__payment-info > span { color: var(--neutral-600); font-size: 12px; font-weight: 500; line-height: 1.3; }
+.walbot-plan-manage__payment-action { display: flex; flex: none; align-items: center; gap: 4px; color: var(--neutral-600); font-size: 13px; line-height: 1.3; }
+.walbot-plan-manage__payment-action img,
+.walbot-plan-manage__actions img { display: block; flex: none; width: 6px; height: 10px; }
+
+.walbot-plan-manage__history { margin: 0; padding: 0 16px; border: 1px solid var(--neutral-200); border-radius: var(--radius-lg); background: #fff; list-style: none; }
+.walbot-plan-manage__history li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 23px; font-size: 14px; font-weight: 500; line-height: 1.3; }
+.walbot-plan-manage__history li + li { border-top: 1px solid var(--neutral-200); }
+.walbot-plan-manage__history time { flex: none; }
+.walbot-plan-manage__history-details { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 177px; max-width: 56%; }
+.walbot-plan-manage__payment-status { color: var(--positive); font-size: 12px; line-height: 1.3; white-space: nowrap; }
+.walbot-plan-manage__history-details strong { font-size: 14px; font-weight: 600; line-height: 1.3; white-space: nowrap; }
+
+.walbot-plan-manage__actions { padding-inline: 16px; border: 1px solid var(--neutral-250); border-radius: var(--radius-lg); background: #fff; }
+.walbot-plan-manage__actions button { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 16px 0; border: 0; color: var(--ink); background: transparent; font: 600 14px/1.3 var(--font-body); text-align: left; }
+.walbot-plan-manage__actions button + button { border-top: 1px solid var(--neutral-250); }
+.walbot-plan-manage__actions .walbot-plan-manage__cancel { color: var(--negative); }
+.walbot-plan-manage__helper { margin: 0; color: var(--neutral-600); font-size: 11px; line-height: 1.4; word-break: keep-all; }
+.walbot-plan-manage__notice { margin: 0; padding: 12px 14px; border-radius: var(--radius-md); color: var(--neutral-700); background: var(--neutral-050); font-size: 13px; line-height: 1.4; word-break: keep-all; }
+.walbot-plan-manage button:focus-visible { outline: 2px solid var(--blue-700); outline-offset: 3px; }
+
+@media (max-width: 370px) {
+    .walbot-plan-manage__plan-title h3 { font-size: 18px; }
+    .walbot-plan-manage__summary { gap: 8px; }
+    .walbot-plan-manage__price { font-size: 16px; }
+}

@@ -19,6 +19,50 @@ import type { SessionUser } from './sessionContext'
  */
 
 const STORAGE_KEY = `${DEMO.storagePrefix}:session`
+// 서아 시안의 첫 배심 참여 1건/10pt를 재현하는 데모 보상이다.
+const DEMO_JURY_VOTE_POINTS = 10
+
+interface ActivityRecord {
+  submittedCaseIds: string[]
+  votedCaseIds: string[]
+}
+
+type ActivityRecords = Record<PersonaId, ActivityRecord>
+
+const activityStorageKey = (personaId: PersonaId) => `${DEMO.storagePrefix}:${personaId}:activity`
+
+function emptyActivity(): ActivityRecord {
+  return { submittedCaseIds: [], votedCaseIds: [] }
+}
+
+function isIdList(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((id: unknown) => typeof id === 'string' && id.trim().length > 0)
+}
+
+function readActivity(personaId: PersonaId): ActivityRecord {
+  try {
+    const raw = window.localStorage.getItem(activityStorageKey(personaId))
+    if (!raw) return emptyActivity()
+    const parsed: unknown = JSON.parse(raw)
+    if (typeof parsed !== 'object' || parsed === null) return emptyActivity()
+    const value = parsed as Partial<ActivityRecord>
+    if (!isIdList(value.submittedCaseIds) || !isIdList(value.votedCaseIds)) return emptyActivity()
+    return {
+      submittedCaseIds: [...new Set(value.submittedCaseIds)],
+      votedCaseIds: [...new Set(value.votedCaseIds)],
+    }
+  } catch {
+    return emptyActivity()
+  }
+}
+
+function writeActivity(personaId: PersonaId, activity: ActivityRecord) {
+  try {
+    window.localStorage.setItem(activityStorageKey(personaId), JSON.stringify(activity))
+  } catch {
+    // 저장소를 사용할 수 없어도 현재 화면의 활동 기록은 메모리에서 유지한다.
+  }
+}
 
 interface StoredSession {
   personaId: PersonaId
@@ -97,6 +141,10 @@ function toUser(personaId: PersonaId): SessionUser {
 
 function SessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<SessionState>(createInitialState)
+  const [activityRecords, setActivityRecords] = useState<ActivityRecords>(() => ({
+    A: readActivity('A'),
+    B: readActivity('B'),
+  }))
 
   // 상태를 외부 시스템(localStorage)에 반영한다. effect의 본래 용도다.
   useEffect(() => {
@@ -105,6 +153,11 @@ function SessionProvider({ children }: { children: ReactNode }) {
       isAuthenticated: session.sessionStatus === 'authenticated',
     })
   }, [session])
+
+  useEffect(() => {
+    writeActivity('A', activityRecords.A)
+    writeActivity('B', activityRecords.B)
+  }, [activityRecords])
 
   const signIn = useCallback((personaId: PersonaId) => {
     setSession({ personaId, sessionStatus: 'authenticated' })
@@ -123,17 +176,54 @@ function SessionProvider({ children }: { children: ReactNode }) {
     setSession({ personaId, sessionStatus: startStatusOf(personaId) })
   }, [])
 
+  const recordActivity = useCallback((field: keyof ActivityRecord, id: string) => {
+    // 이번 시안의 신규 활동은 서아에게만 적용한다. 지훈의 기존 시연 집계는 유지한다.
+    if (session.personaId !== 'A' || session.sessionStatus !== 'authenticated' || !id.trim()) return
+    const personaId = session.personaId
+    setActivityRecords((current) => {
+      const activity = current[personaId]
+      if (activity[field].includes(id)) return current
+      return {
+        ...current,
+        [personaId]: { ...activity, [field]: [...activity[field], id] },
+      }
+    })
+  }, [session.personaId, session.sessionStatus])
+
+  const recordCaseSubmission = useCallback((submissionId: string) => {
+    recordActivity('submittedCaseIds', submissionId)
+  }, [recordActivity])
+
+  const recordJuryVote = useCallback((caseId: string) => {
+    recordActivity('votedCaseIds', caseId)
+  }, [recordActivity])
+
+  const activityStats = useMemo(() => {
+    const account = DEMO_ACCOUNTS[session.personaId]
+    const activity = activityRecords[session.personaId]
+    const submittedCases = session.personaId === 'A' ? activity.submittedCaseIds.length : 0
+    const juryParticipations = session.personaId === 'A' ? activity.votedCaseIds.length : 0
+    return {
+      submittedCases: account.submittedCases + submittedCases,
+      juryParticipations: account.juryParticipations + juryParticipations,
+      points: account.points + juryParticipations * DEMO_JURY_VOTE_POINTS,
+    }
+  }, [session.personaId, activityRecords])
+
   const value = useMemo(
     () => ({
       personaId: session.personaId,
       sessionStatus: session.sessionStatus,
       currentUser:
         session.sessionStatus === 'authenticated' ? toUser(session.personaId) : null,
+      activityStats,
+      recordCaseSubmission,
+      recordJuryVote,
       signIn,
       signOut,
       switchPersona,
     }),
-    [session, signIn, signOut, switchPersona],
+    [session, activityStats, recordCaseSubmission, recordJuryVote, signIn, signOut, switchPersona],
   )
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>

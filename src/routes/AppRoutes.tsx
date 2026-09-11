@@ -12,6 +12,7 @@ import ClosedCaseResultPage from '../pages/Case/ClosedCaseResultPage'
 import SignupPage from '../pages/Auth/SignupPage'
 import LoginPage from '../pages/Auth/LoginPage'
 import MyPage from '../pages/My/MyPage'
+import WalbotPlanPage from '../pages/My/WalbotPlanPage'
 import MyCasesPage from '../pages/My/MyCasesPage'
 import MyCaseResultPage from '../pages/My/MyCaseResultPage'
 import CaseSubmitFlow from '../pages/Submit/CaseSubmitFlow'
@@ -75,6 +76,7 @@ function AppRoutes() {
 
         {/* 사건 접수는 진행 상태를 공유하는 5단계 흐름이며 하단 내비게이션을 표시하지 않는다. */}
         <Route element={<DetailLayout />}>
+          <Route path={PATHS.myPlan} element={<WalbotPlanPage />} />
           <Route path={PATHS.afterStoryCommunity} element={<Navigate to={PATHS.afterStory} replace />} />
           <Route path={PATHS.afterStoryWrite} element={<WriteAfterStoryPage />} />
           <Route path={PATHS.afterStoryPreview} element={<PreviewAfterStoryPage />} />

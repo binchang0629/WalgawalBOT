@@ -15,7 +15,7 @@ function FloatingChatButton() {
     || pathname === PATHS.afterStoryComplete
   const isCaseSubmitting = pathname === PATHS.caseSubmit || pathname.startsWith('/cases/new/')
 
-  if (pathname === PATHS.chatbot || isAfterStoryWriting || isCaseSubmitting) return null
+  if (pathname === PATHS.chatbot || pathname === PATHS.myPlan || isAfterStoryWriting || isCaseSubmitting) return null
 
   const sitsAboveNavigation = [PATHS.home, PATHS.plaza, PATHS.afterStory, PATHS.my].some((route) => route === pathname)
     || /^\/cases\/[^/]+(?:\/result)?$/.test(pathname)
