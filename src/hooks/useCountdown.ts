@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export interface Countdown {
   hours: number
@@ -13,23 +13,25 @@ export interface Countdown {
  *
  * 서버가 없어서 사건별 마감 일시를 받아올 수 없다. 그래서 화면을 처음 그린 시점부터
  * `hours`만큼을 마감으로 잡고 거꾸로 센다. 새로고침하면 다시 시작한다.
- * 실제 API가 붙으면 `deadlineRef`에 서버가 준 마감 일시를 넣기만 하면 된다.
  */
 function useCountdown(hours: number): Countdown {
-  // 마감 시각은 첫 렌더에 한 번만 정한다. 다시 그려도 흔들리지 않는다.
-  const deadlineRef = useRef(Date.now() + hours * 60 * 60 * 1000)
-  const [remaining, setRemaining] = useState(() => Math.max(0, deadlineRef.current - Date.now()))
+  const initialRemaining = Math.max(0, hours * 60 * 60 * 1000)
+  const [remaining, setRemaining] = useState(initialRemaining)
 
   useEffect(() => {
-    // 정확히 1초마다 재면 초가 가끔 건너뛴다. 더 자주 확인하고 값이 같으면 그냥 둔다.
-    const id = window.setInterval(() => {
-      setRemaining((prev) => {
-        const next = Math.max(0, deadlineRef.current - Date.now())
-        return Math.floor(next / 1000) === Math.floor(prev / 1000) ? prev : next
+    // 시간 읽기는 effect에서만 한다. 렌더는 props와 state만으로 계산한다.
+    const deadline = Date.now() + initialRemaining
+    const updateRemaining = () => {
+      setRemaining((previous) => {
+        const next = Math.max(0, deadline - Date.now())
+        return Math.floor(next / 1000) === Math.floor(previous / 1000) ? previous : next
       })
-    }, 200)
+    }
+
+    updateRemaining()
+    const id = window.setInterval(updateRemaining, 200)
     return () => window.clearInterval(id)
-  }, [])
+  }, [initialRemaining])
 
   const totalSeconds = Math.floor(remaining / 1000)
   return {
