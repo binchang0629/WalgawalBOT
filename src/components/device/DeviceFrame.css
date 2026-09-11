@@ -59,7 +59,7 @@
 
 .device-status-bar__time {
     position: absolute;
-    top: 20px;
+    top: 14px;
     left: 53px;
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
@@ -73,7 +73,7 @@
 /* 목업이 축소돼도 DeviceFrame의 scale과 함께 동일 비율로 줄어든다. */
 .device-status-bar__island {
     position: absolute;
-    top: 14px;
+    top: 8px;
     left: 50%;
     width: 125px;
     height: 37px;
@@ -84,11 +84,11 @@
 
 .device-status-bar__indicators {
     position: absolute;
-    top: 25px;
+    top: 19px;
     right: 38px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 6px;
     height: 18px;
 }
 

@@ -22,7 +22,7 @@ import CaseSubmitOpinionPage from '../pages/Submit/CaseSubmitOpinionPage'
 import CaseSubmitCompletePage from '../pages/Submit/CaseSubmitCompletePage'
 import ChatbotPage from '../pages/Chatbot/ChatbotPage'
 import NotFoundPage from '../pages/Error/NotFoundPage'
-import { AfterStoryHomePage, CompleteAfterStoryPage, PreviewAfterStoryPage, WriteAfterStoryPage } from '../pages/AfterStory/AfterStoryPage'
+import { AfterStoryHomePage, CompleteAfterStoryPage, MyAfterStoryPage, PreviewAfterStoryPage, WriteAfterStoryPage } from '../pages/AfterStory/AfterStoryPage'
 import { PATHS } from './paths'
 
 /**
@@ -58,6 +58,8 @@ function AppRoutes() {
           <Route path={PATHS.caseResult} element={<CaseResultPage />} />
           <Route path={PATHS.my} element={<MyPage />} />
           <Route path={PATHS.afterStory} element={<AfterStoryHomePage />} />
+          {/* 내 이야기 남기기. 시안에 하단 내비게이션이 있어 MainLayout 아래에 둔다. */}
+          <Route path={PATHS.afterStoryMine} element={<MyAfterStoryPage />} />
 
         </Route>
 
@@ -73,7 +75,6 @@ function AppRoutes() {
 
         {/* 사건 접수는 진행 상태를 공유하는 5단계 흐름이며 하단 내비게이션을 표시하지 않는다. */}
         <Route element={<DetailLayout />}>
-          <Route path={PATHS.afterStoryMine} element={<Navigate to='/afterstory/write/friend' replace />} />
           <Route path={PATHS.afterStoryCommunity} element={<Navigate to={PATHS.afterStory} replace />} />
           <Route path={PATHS.afterStoryWrite} element={<WriteAfterStoryPage />} />
           <Route path={PATHS.afterStoryPreview} element={<PreviewAfterStoryPage />} />
