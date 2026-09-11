@@ -18,27 +18,21 @@ import {
  * 봉투 세 장의 겹치는 위치는 이미지의 밑변 폭을 맞춰 계산했다(Home.css 참고).
  */
 function AfterStorySection() {
-  const [letterState, setLetterState] = useState<'closed' | 'opening' | 'open' | 'closing'>('closed')
+  const [letterState, setLetterState] = useState<'closed' | 'opening' | 'open'>('closed')
   const transitionTimer = useRef<number | null>(null)
   // 후일담 카드 줄은 마우스로도 끌어서 넘길 수 있어야 한다.
   const storyScroll = useDragScroll<HTMLDivElement>()
   const isLetterOpen = letterState === 'opening' || letterState === 'open'
-  const isAnimating = letterState === 'opening' || letterState === 'closing'
+  const isAnimating = letterState === 'opening'
 
   useEffect(() => () => {
     if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current)
   }, [])
 
   function handleLetterToggle() {
-    if (isAnimating) return
-    if (letterState === 'closed') {
-      setLetterState('opening')
-      transitionTimer.current = window.setTimeout(() => setLetterState('open'), 960)
-      return
-    }
-
-    setLetterState('closing')
-    transitionTimer.current = window.setTimeout(() => setLetterState('closed'), 680)
+    if (isAnimating || isLetterOpen) return
+    setLetterState('opening')
+    transitionTimer.current = window.setTimeout(() => setLetterState('open'), 960)
   }
 
   return (
@@ -77,7 +71,7 @@ function AfterStorySection() {
         <img className="letter__closed" src={homeImages.envelopeClosed} alt="" aria-hidden="true" />
 
         <b className="letter__cta">
-          {letterState === 'open' || letterState === 'closing' ? featuredAfterStory.envelopeCta : '편지 열어보기'}
+          {isLetterOpen ? featuredAfterStory.envelopeCta : '편지 열어보기'}
         </b>
 
         {/*
@@ -89,10 +83,10 @@ function AfterStorySection() {
           className="letter__toggle"
           aria-expanded={isLetterOpen}
           aria-controls="featured-after-story"
-          disabled={isAnimating}
+          disabled={isAnimating || isLetterOpen}
           onClick={handleLetterToggle}
         >
-          <span>{letterState === 'open' || letterState === 'closing' ? '후일담 편지 접기' : '후일담 편지 열어보기'}</span>
+          <span>{isLetterOpen ? '후일담 편지 열림' : '후일담 편지 열어보기'}</span>
         </button>
       </article>
 
