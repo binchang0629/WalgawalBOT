@@ -27,7 +27,7 @@ function FloatingChatButton() {
       className={`floating-chat-button${sitsAboveNavigation ? ' floating-chat-button--above-nav' : ''}`}
       aria-label="AI 판멍이에게 질문하기"
     >
-      <SpinningMascot size={56} />
+      <SpinningMascot size={80} />
       <span>AI에게 질문하기</span>
     </Link>
   )
