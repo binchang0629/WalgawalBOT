@@ -8,21 +8,17 @@ import PlazaPage from '../pages/Plaza/PlazaPage'
 import CaseDetailPage from '../pages/Case/CaseDetailPage'
 import CaseResultPage from '../pages/Case/CaseResultPage'
 import SignupPage from '../pages/Auth/SignupPage'
-
 import LoginPage from '../pages/Auth/LoginPage'
 import MyPage from '../pages/My/MyPage'
 import MyCasesPage from '../pages/My/MyCasesPage'
 import MyCaseResultPage from '../pages/My/MyCaseResultPage'
-
 import CaseSubmitFlow from '../pages/Submit/CaseSubmitFlow'
 import CaseSubmitPage from '../pages/Submit/CaseSubmitPage'
 import CaseSubmitQuestionsPage from '../pages/Submit/CaseSubmitQuestionsPage'
 import CaseSubmitSummaryPage from '../pages/Submit/CaseSubmitSummaryPage'
 import CaseSubmitOpinionPage from '../pages/Submit/CaseSubmitOpinionPage'
 import CaseSubmitCompletePage from '../pages/Submit/CaseSubmitCompletePage'
-
 import ChatbotPage from '../pages/Chatbot/ChatbotPage'
-
 import NotFoundPage from '../pages/Error/NotFoundPage'
 import { AfterStoryHomePage, CompleteAfterStoryPage, PreviewAfterStoryPage, WriteAfterStoryPage } from '../pages/AfterStory/AfterStoryPage'
 import { PATHS } from './paths'
@@ -32,15 +28,9 @@ import { PATHS } from './paths'
  * 디자인이 확정되지 않은 화면은 아직 라우트를 만들지 않는다.
  *
  * 아직 연결하지 않은 경로 (디자인 확정 후 추가):
-
  *   /demo · /afterstory
-
  *
  * /signup은 컨펌 시안이 없지만 발표 시연을 위해 팀 결정으로 추가했다. (PROJECT_SPEC.md §9-2)
- *
- * /cases/new(사건 접수)는 지훈01~05(사건 작성 → 추가 질문 → 요약 확인 → AI 참고 의견·접수 → 접수 완료)
- * 5단계를 모두 구현했다. §7-3 기준으로는 아직 `개발` 페이지에 없어 디자인 미확정이지만,
- * 사용자가 해당 프레임을 직접 지정해 구현을 요청해 라우트를 연결했다. (CaseSubmitFlow.tsx 상단 참고)
  */
 function AppRoutes() {
   return (
@@ -77,48 +67,26 @@ function AppRoutes() {
           <Route path={PATHS.signup} element={<SignupPage />} />
         </Route>
 
-{/* 사건 접수는 진행 상태를 공유하는 5단계 흐름이며 하단 내비게이션을 표시하지 않는다. */}
-<Route element={<DetailLayout />}>
-  <Route
-    path={PATHS.afterStoryMine}
-    element={<Navigate to="/afterstory/write/friend" replace />}
-  />
-
-  <Route
-    path={PATHS.afterStoryCommunity}
-    element={<Navigate to={PATHS.afterStory} replace />}
-  />
-
-  <Route
-    path={PATHS.afterStoryWrite}
-    element={<WriteAfterStoryPage />}
-  />
-
-  <Route
-    path={PATHS.afterStoryPreview}
-    element={<PreviewAfterStoryPage />}
-  />
-
-  <Route
-    path={PATHS.afterStoryComplete}
-    element={<CompleteAfterStoryPage />}
-  />
-
-  <Route path={PATHS.caseSubmit} element={<CaseSubmitFlow />}>
-    <Route index element={<CaseSubmitPage />} />
-    <Route path="questions" element={<CaseSubmitQuestionsPage />} />
-    <Route path="summary" element={<CaseSubmitSummaryPage />} />
-    <Route path="opinion" element={<CaseSubmitOpinionPage />} />
-    <Route path="complete" element={<CaseSubmitCompletePage />} />
-  </Route>
-
-  <Route path={PATHS.chatbot} element={<ChatbotPage />} />
-</Route>
+        {/* 사건 접수는 진행 상태를 공유하는 5단계 흐름이며 하단 내비게이션을 표시하지 않는다. */}
+        <Route element={<DetailLayout />}>
+          <Route path={PATHS.afterStoryMine} element={<Navigate to='/afterstory/write/friend' replace />} />
+          <Route path={PATHS.afterStoryCommunity} element={<Navigate to={PATHS.afterStory} replace />} />
+          <Route path={PATHS.afterStoryWrite} element={<WriteAfterStoryPage />} />
+          <Route path={PATHS.afterStoryPreview} element={<PreviewAfterStoryPage />} />
+          <Route path={PATHS.afterStoryComplete} element={<CompleteAfterStoryPage />} />
+          <Route path={PATHS.caseSubmit} element={<CaseSubmitFlow />}>
+            <Route index element={<CaseSubmitPage />} />
+            <Route path="questions" element={<CaseSubmitQuestionsPage />} />
+            <Route path="summary" element={<CaseSubmitSummaryPage />} />
+            <Route path="opinion" element={<CaseSubmitOpinionPage />} />
+            <Route path="complete" element={<CaseSubmitCompletePage />} />
+          </Route>
+          <Route path={PATHS.chatbot} element={<ChatbotPage />} />
         </Route>
 
         {/* 잘못된 URL. 없는 사건 ID와는 구분해서 처리한다. (PROJECT_SPEC.md §7-3) */}
         <Route path={PATHS.notFound} element={<NotFoundPage />} />
-
+      </Route>
     </Routes>
   )
 }

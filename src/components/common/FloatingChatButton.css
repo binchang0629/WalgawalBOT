@@ -1,0 +1,53 @@
+.floating-chat-button {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    z-index: 30;
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    padding: 0;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: var(--blue-700);
+    box-shadow: 0 8px 18px rgba(48, 67, 234, .32);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.floating-chat-button--above-nav {
+    bottom: calc(var(--device-bottom-nav) + 16px);
+}
+
+.floating-chat-button img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.floating-chat-button span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.floating-chat-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 11px 22px rgba(48, 67, 234, .38);
+}
+
+.floating-chat-button:focus-visible {
+    outline: 3px solid var(--orange-500);
+    outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .floating-chat-button { transition: none; }
+}

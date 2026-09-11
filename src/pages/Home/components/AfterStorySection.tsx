@@ -21,7 +21,7 @@ function AfterStorySection() {
   const [letterState, setLetterState] = useState<'closed' | 'opening' | 'open'>('closed')
   const transitionTimer = useRef<number | null>(null)
   // 후일담 카드 줄은 마우스로도 끌어서 넘길 수 있어야 한다.
-  const storyScroll = useDragScroll<HTMLDivElement>()
+  const [storyScrollRef, preventStoryDragStart] = useDragScroll<HTMLDivElement>()
   const isLetterOpen = letterState === 'opening' || letterState === 'open'
   const isAnimating = letterState === 'opening'
 
@@ -90,7 +90,7 @@ function AfterStorySection() {
         </button>
       </article>
 
-      <div className="story-scroll" ref={storyScroll.ref} onDragStart={storyScroll.onDragStart}>
+      <div className="story-scroll" ref={storyScrollRef} onDragStart={preventStoryDragStart}>
         {afterStoryQuotes.map((story) => (
           <article className="quote-card" key={story.id}>
             <div className="quote-card__body">
