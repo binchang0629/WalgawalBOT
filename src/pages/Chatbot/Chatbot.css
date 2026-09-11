@@ -196,7 +196,7 @@
 }
 
 .chatbot-chip:disabled {
-    opacity: .6;
+    color: var(--neutral-300); /* gray_400 */
 }
 
 /* ---------- 대화창 ---------- */
@@ -422,6 +422,12 @@
     opacity: 1;
 }
 
+/* 항상 비활성인 선택지(예: "다른 사건 선택할래요")는 처음 화면 비활성 칩과 같은 방식으로 표시한다. */
+.chatbot-action--disabled:disabled {
+    opacity: 1;
+    color: var(--neutral-300); /* gray_400 */
+}
+
 /* ---------- 선택지: 꽉 채운 목록 (Figma "chips") ---------- */
 
 .chatbot-option-list {
@@ -462,6 +468,12 @@
 
 .chatbot-option--active:disabled {
     opacity: 1;
+}
+
+/* 항상 비활성인 선택지(예: "다른 사건 선택할래요")는 처음 화면 비활성 칩과 같은 방식으로 표시한다. */
+.chatbot-option--disabled:disabled {
+    opacity: 1;
+    color: var(--neutral-300); /* gray_400 */
 }
 
 /* ---------- 응답 대기(타이핑) ---------- */

@@ -53,6 +53,22 @@ export const INITIAL_OPTIONS: ChatOption[] = [
 /** "내 사건에 대해 물어볼게요"·"내 사건으로 확인할게요"는 세션의 최근 사건 보유 여부로 분기한다. */
 export const CASE_ROUTED_OPTION_IDS = new Set(['ask-my-case', 'goCase'])
 
+/** 첫 화면에서 지금 눌러볼 수 있는 유일한 칩. 나머지 4개는 비활성 상태로만 보여준다. */
+export const ENABLED_INITIAL_OPTION_ID = 'ask-my-case'
+
+/**
+ * 대화 중 선택지 중에서 항상 비활성으로 보여주는 것들.
+ * 데모에서 실제로 지원하지 않는 동작(다른 사건 선택)이라, 눌러서 "준비 중" 답을
+ * 받게 하는 대신 처음 화면의 비활성 칩과 같은 방식(gray_400 텍스트)으로 막아 둔다.
+ */
+export const ALWAYS_DISABLED_OPTION_IDS = new Set([
+  'pick-other',
+  'respond-other',
+  'similar-cases',
+  'has-messages',
+  'not-sure',
+])
+
 export const RESTART_STEP_ID = 'restart'
 
 export const STEP_MAP: Record<string, BotStep> = {

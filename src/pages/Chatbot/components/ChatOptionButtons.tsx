@@ -1,3 +1,4 @@
+import { ALWAYS_DISABLED_OPTION_IDS } from '../chatbotScript'
 import type { ChatOption } from '../chatbotScript'
 import '../Chatbot.css'
 
@@ -31,17 +32,24 @@ function ChatOptionButtons({
 }: ChatOptionButtonsProps) {
   const baseClass = layout === 'actions' ? 'chatbot-action' : 'chatbot-option'
 
-  const buttons = options.map((option) => (
-    <button
-      key={option.id}
-      type="button"
-      className={option.id === selectedOptionId ? `${baseClass} ${baseClass}--active` : baseClass}
-      disabled={!interactive}
-      onClick={() => onSelect(option)}
-    >
-      {option.label}
-    </button>
-  ))
+  const buttons = options.map((option) => {
+    const isAlwaysDisabled = ALWAYS_DISABLED_OPTION_IDS.has(option.id)
+    const classNames = [baseClass]
+    if (option.id === selectedOptionId) classNames.push(`${baseClass}--active`)
+    if (isAlwaysDisabled) classNames.push(`${baseClass}--disabled`)
+
+    return (
+      <button
+        key={option.id}
+        type="button"
+        className={classNames.join(' ')}
+        disabled={!interactive || isAlwaysDisabled}
+        onClick={() => onSelect(option)}
+      >
+        {option.label}
+      </button>
+    )
+  })
 
   if (layout === 'actions') {
     return <div className="chatbot-action-row">{buttons}</div>

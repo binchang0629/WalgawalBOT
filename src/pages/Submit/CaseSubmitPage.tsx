@@ -8,8 +8,7 @@ import CaseSubmitFooter from './components/CaseSubmitFooter'
 import useCaseSubmitDraft from './useCaseSubmitDraft'
 import useWizardBack from '../../hooks/useWizardBack'
 import { RELATIONSHIPS } from './types'
-import { SEOA_CONTENT, SUBMIT_SCENARIOS } from './caseSubmitContent'
-import checkMark from '../../assets/submit/figma/imgCheck.svg'
+import { DUMMY_CASE_CONTENT, SUBMIT_SCENARIOS } from './caseSubmitContent'
 import walangJoy from '../../assets/submit/figma/imgCharacterWalangJoy.svg'
 import './CaseSubmit.css'
 import './CaseSubmitPage.css'
@@ -53,6 +52,11 @@ function CaseSubmitPage() {
   const canProceed = content.trim().length > 0
   const hasAttachments = photoNames.length > 0 || fileNames.length > 0
 
+  const handleFillDummyContent = () => {
+    if (!hasFocusedContent.current && !content) setContent(DUMMY_CASE_CONTENT[personaId])
+    hasFocusedContent.current = true
+  }
+
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? [])
     if (files.length > 0) {
@@ -87,7 +91,9 @@ function CaseSubmitPage() {
         </div>
 
         <fieldset className="case-submit__field">
-          <legend className="case-submit__label">상대와의 관계</legend>
+          <legend className="case-submit__label">
+            상대와의 관계 <span className="case-submit__required">*</span>
+          </legend>
           <div className="case-submit__chip-grid">
             {RELATIONSHIPS.map((option) => {
               const isSelected = relationship === option
@@ -100,9 +106,6 @@ function CaseSubmitPage() {
                   onClick={() => setRelationship(option)}
                 >
                   {option}
-                  {isSelected && (
-                    <img src={checkMark} alt="" className="case-submit__choice-check" width={9.5} height={7} />
-                  )}
                 </button>
               )
             })}
@@ -110,10 +113,7 @@ function CaseSubmitPage() {
         </fieldset>
 
         <div className="case-submit__field">
-          <div className="case-submit__attachment-heading">
-            <span className="case-submit__label">사진·파일 첨부{isSeoa ? '(선택)' : ''}</span>
-            {!isSeoa && <span className="case-submit__optional">선택</span>}
-          </div>
+          <p className="case-submit__attachment-label">사진·파일 첨부(선택)</p>
           <div className="case-submit__attachment-actions">
             <button
               type="button"
@@ -153,9 +153,14 @@ function CaseSubmitPage() {
         </div>
 
         <div className="case-submit__field">
-          <label className="case-submit__label" htmlFor={contentFieldId}>
-            사건 내용 <span className="case-submit__required">*</span>
-          </label>
+          <div className="case-submit__content-header">
+            <label className="case-submit__label" htmlFor={contentFieldId}>
+              사건 내용 <span className="case-submit__required">*</span>
+            </label>
+            <button type="button" className="case-submit__dummy-fill" onClick={handleFillDummyContent}>
+              더미 텍스트 입력
+            </button>
+          </div>
           <div className={`case-submit__textarea-box${content ? ' has-content' : ''}`}>
             <textarea
               id={contentFieldId}
@@ -163,10 +168,7 @@ function CaseSubmitPage() {
               placeholder={isSeoa ? '언제, 누구와 어떤 일이 있었나요?' : CONTENT_PLACEHOLDER}
               maxLength={CONTENT_MAX_LENGTH}
               value={content}
-              onFocus={() => {
-                if (isSeoa && !hasFocusedContent.current && !content) setContent(SEOA_CONTENT)
-                hasFocusedContent.current = true
-              }}
+              onFocus={handleFillDummyContent}
               onChange={(event) => setContent(event.target.value)}
               required
             />

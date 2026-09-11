@@ -22,9 +22,10 @@
 
 .case-submit__header {
     flex: none;
-    display: flex;
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) 64px;
     align-items: center;
-    height: var(--device-app-header);
+    height: 64px;
     padding: 0 var(--content-gutter);
     border-bottom: 1px solid var(--neutral-100);
 }
@@ -57,6 +58,7 @@
 
 .case-submit__temp-save {
     flex: none;
+    justify-self: end;
     border: 0;
     background: none;
     padding: 0;
@@ -66,7 +68,6 @@
 }
 
 .case-submit__temp-save:disabled {
-    color: var(--neutral-500);
     cursor: not-allowed;
 }
 
@@ -112,10 +113,10 @@
     min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 16px var(--content-gutter) 28px;
+    padding: 16px var(--content-gutter) 16px;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 28px;
 
     /* 기기 안에 데스크톱 스크롤바가 보이지 않게 한다. 스크롤 자체는 유지된다. */
     scrollbar-width: none;
@@ -170,6 +171,14 @@
     color: var(--blue);
 }
 
+/*
+ * legend는 fieldset이 display: flex여도 일반 flex item으로 gap이 적용되지 않는다.
+ * 아래 field들과 같은 8px 간격을 내려면 margin으로 직접 줘야 한다.
+ */
+.case-submit__field legend {
+    margin: 0 0 8px;
+}
+
 .case-submit__required {
     color: var(--blue);
 }
@@ -204,16 +213,12 @@
     color: #fff;
 }
 
-.case-submit__choice-check {
-    flex: none;
-}
-
 /* ---------- 판멍이 인라인 도움말 ---------- */
 
 .case-submit__panmung {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 4px;
 }
 
 .case-submit__panmung-art {
@@ -232,11 +237,17 @@
 
 .case-submit__footer {
     flex: none;
-    padding: 12px var(--content-gutter) calc(20px + env(safe-area-inset-bottom, 0px));
+    /*
+     * Figma `Footer / Sticky action`(node 1446:9953, 402×100)에 맞춘 값이다.
+     * 상단 여백은 0 — 본문(.case-submit__body)의 하단 padding(16px)이 그 역할을 한다.
+     * 하단 25px(12px 여백 + 13px 인디케이터 자리)는 기기 목업의 HomeIndicator가
+     * 겹쳐 그려지는 자리를 비워 둔다. 인디케이터 자체는 이 컴포넌트가 그리지 않는다. (PROJECT_SPEC.md §2)
+     */
+    padding: 0 var(--content-gutter) calc(25px + env(safe-area-inset-bottom, 0px));
     display: grid;
     /* 완료 화면도 안내 문구 자리를 비워 두어 모든 단계의 버튼 높이를 맞춘다. */
     grid-template-rows: 52px minmax(15.4px, auto);
-    gap: 12px;
+    gap: 8px;
     background: #fff;
     box-shadow: 0 -4px 16px rgba(37, 37, 37, .06);
 }

@@ -7,7 +7,6 @@ import CaseSubmitFooter from './components/CaseSubmitFooter'
 import useCaseSubmitDraft from './useCaseSubmitDraft'
 import useWizardBack from '../../hooks/useWizardBack'
 import type { TriAnswer } from './types'
-import checkMark from '../../assets/submit/figma/imgCheck.svg'
 import walangJoy from '../../assets/submit/figma/imgCharacterWalangJoy.svg'
 import './CaseSubmit.css'
 import './CaseSubmitQuestionsPage.css'
@@ -52,9 +51,6 @@ function TriAnswerRow({ value, options, onChange }: TriAnswerRowProps) {
             onClick={() => onChange(option.value)}
           >
             {option.label}
-            {isSelected && (
-              <img src={checkMark} alt="" className="case-submit__choice-check" width={9.5} height={7} />
-            )}
           </button>
         )
       })}

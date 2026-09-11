@@ -25,8 +25,14 @@ function CaseSubmitFlow() {
   return <CaseSubmitDraftProvider key={`${personaId}:${sessionStatus}`} personaId={personaId} />
 }
 
+/** Figma 시안 기준 초기 선택값 — 서아는 친구, 지훈은 직장이 처음부터 눌려 있다. */
+const DEFAULT_RELATIONSHIP: Record<PersonaId, Relationship> = {
+  A: '친구',
+  B: '직장',
+}
+
 function CaseSubmitDraftProvider({ personaId }: { personaId: PersonaId }) {
-  const [relationship, setRelationship] = useState<Relationship | null>(null)
+  const [relationship, setRelationship] = useState<Relationship | null>(DEFAULT_RELATIONSHIP[personaId])
   const [photoNames, setPhotoNames] = useState<string[]>([])
   const [fileNames, setFileNames] = useState<string[]>([])
   const [content, setContent] = useState('')

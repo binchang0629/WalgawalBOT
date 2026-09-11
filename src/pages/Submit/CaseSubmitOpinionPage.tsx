@@ -79,7 +79,13 @@ function CaseSubmitOpinionPage() {
           >
             <span className="case-submit__privacy-label">
               <img src={isPrivateSelected ? radioSelected : radioDefault} alt="" width={15} height={15} />
-              <span className={isPrivateSelected ? 'case-submit__privacy-option-title--selected' : 'case-submit__privacy-option-title'}>
+              <span
+                className={
+                  isPrivateSelected
+                    ? 'case-submit__privacy-option-title--selected'
+                    : `case-submit__privacy-option-title${!isSeoa ? ' case-submit__privacy-option-title--black' : ''}`
+                }
+              >
                 나만 보기
               </span>
             </span>
@@ -91,7 +97,15 @@ function CaseSubmitOpinionPage() {
           <button type="button" className="case-submit__privacy-option" disabled={!isSeoa} aria-pressed={isCommunitySelected} onClick={() => setVisibility('community')}>
             <span className="case-submit__privacy-label">
               <img src={isCommunitySelected ? radioSelected : radioDefault} alt="" width={15} height={15} />
-              <span className={isCommunitySelected ? 'case-submit__privacy-option-title--selected' : 'case-submit__privacy-option-title'}>배심원 광장에 공개</span>
+              <span
+                className={
+                  isCommunitySelected
+                    ? 'case-submit__privacy-option-title--selected'
+                    : `case-submit__privacy-option-title${isSeoa ? ' case-submit__privacy-option-title--black' : ''}`
+                }
+              >
+                배심원 광장에 공개
+              </span>
             </span>
             <span className="case-submit__privacy-description">다른 배심원의 의견을 받아볼 수 있어요.</span>
           </button>

@@ -1,5 +1,70 @@
 # 왈가왈BOT 현재 상태
 
+## 공개 범위 선택 기본 색 계정별 반전 (2026-09-11)
+
+`누구에게 공개할까요?` 두 옵션(`나만 보기` / `배심원 광장에 공개`)의 선택 전 기본 텍스트 색을 계정별로 다르게 했다. 각 계정에서 실제로 선택 가능한(활성) 옵션만 black(`--neutral-900`)을 쓰고, 비활성 옵션은 기존 `--neutral-600`을 유지한다 — 서아는 `배심원 광장에 공개`만 활성(black), 지훈은 `나만 보기`만 활성(black). `case-submit__privacy-option-title--black` modifier 클래스를 두 span에 `isSeoa` 조건으로 나눠 적용했다(`CaseSubmitOpinionPage.tsx`/`.css`).
+
+검증: `npm run lint`, `npm run typecheck`, `npm run build` 통과.
+
+## 사건 접수 1단계 더미 텍스트 입력 — 지훈 화면에도 추가 (2026-09-11)
+
+서아 화면에만 있던 `사건 내용` 필드의 `더미 텍스트 입력` 버튼을 지훈 화면에도 같은 위치·같은 동작으로 추가했다. `caseSubmitContent.ts`에 `DUMMY_CASE_CONTENT: Record<PersonaId, string>`를 새로 두고 `CaseSubmitPage.tsx`의 `handleFillDummyContent`가 `personaId`로 채울 문구를 찾도록 일반화했다(기존에는 `isSeoa`일 때만 동작).
+
+**지훈 쪽 채움 문구는 아직 확정이 아니다.** 사용자가 "클릭 시 나올 텍스트는 기능 구현 이후에 알려주겠다"고 해서, 우선 지훈 시나리오에 이미 있던 `DEMO_SUMMARY.facts`(잔금 미지급 사실관계 요약)를 `JIHOON_CONTENT`라는 이름으로 임시로 연결해 뒀다. 실제 문구를 받으면 `caseSubmitContent.ts`의 `JIHOON_CONTENT` 값만 바꾸면 된다.
+
+검증: `npm run lint`, `npm run typecheck`, `npm run build` 통과.
+
+## 사건 접수 상대와의 관계 * / 칩 그리드 간격 정정 (2026-09-11)
+
+`상대와의 관계 *`(legend)와 칩 그리드가 아래 다른 field들과 다르게 8px 간격 없이 붙어 있던 문제를 고쳤다. 원인은 `fieldset`에 `display: flex`를 줘도 `<legend>`는 일반 flex item으로 취급되지 않아 `gap`이 적용되지 않는 것. `CaseSubmit.css`에 `.case-submit__field legend { margin: 0 0 8px; }`를 공통 규칙으로 추가해 지훈·서아 화면 모두에서 8px가 나오도록 했고, 서아 화면에만 있던 동일 값의 중복 규칙(`SeoaSubmit.css`)은 제거했다.
+
+검증: `npm run lint`, `npm run typecheck`, `npm run build` 통과.
+
+## 사건 내용(서아01) 더미 텍스트 입력 버튼 추가 (2026-09-11)
+
+Figma `1446:10125`(`Field / 사건 내용`)를 `get_design_context`로 다시 확인해 `사건 내용 *` 라벨 오른쪽에 있던 `더미 텍스트 입력` 텍스트를 실제 버튼으로 구현했다. 지금까지는 텍스트 입력창을 클릭(포커스)할 때만 서아 예시 사연(`SEOA_CONTENT`)이 채워졌는데, 이 버튼을 눌러도 같은 방식으로 채워지도록 `handleFillDummyContent` 핸들러 하나를 만들어 `textarea`의 `onFocus`와 버튼의 `onClick`이 함께 쓰게 했다.
+- 라벨 줄을 `.case-submit__content-header`(flex, `justify-content: space-between`)로 감쌌다. `.case-submit__dummy-fill` 텍스트 스타일은 Figma 실측값 그대로: Pretendard Variable Regular 13px, 색 `#252525`(→ `--neutral-900`).
+- 이 버튼은 서아(A) 화면에서만 렌더링한다 — 지훈 화면은 같은 `사건 내용` field를 공유하지만 이 노드는 서아01(`1446:10093`) 하위 디자인이라 지훈 쪽엔 대응하는 시안이 없다.
+- 새 이미지·아이콘 에셋은 없다(텍스트 버튼).
+
+검증: `npm run lint`, `npm run typecheck`, `npm run build` 통과.
+
+## 사건 접수 상대와의 관계 기본 선택값 (2026-09-11)
+
+사용자 요청으로 사건 접수 1단계의 `상대와의 관계`가 계정별로 처음부터 선택돼 있도록 했다. 서아(A)는 `친구`, 지훈(B)은 `직장`(Figma 지훈01 예시 화면이 실제로 이 상태를 보여준다). `CaseSubmitFlow.tsx`의 `relationship` 초기 state를 `personaId`별 매핑(`DEFAULT_RELATIONSHIP`)으로 바꿨다. 계정 전환·로그아웃 시 기존처럼 폼이 초기화되므로 전환할 때마다 해당 계정의 기본값으로 다시 맞춰진다. 사용자가 직접 다른 항목을 누르면 그 선택으로 바뀐다.
+
+검증: `npm run typecheck`, `npm run lint`, `npm run build` 통과.
+
+## 사건 접수 하단 Footer 100px 재조정 (2026-09-11)
+
+Figma `node-id=1446-9953`(Footer / Sticky action)를 다시 읽으니 프레임 높이가 기존 110px에서 100px로 바뀌어 있었다(재사용 컴포넌트라 지훈·서아 전 단계 공통). 구조: 상단 padding 0, 버튼(52)+gap 8+안내 문구(~15) 그룹, 그 아래 gap 12 + 인디케이터 자리 13이 이어져 합계 100.
+- `.case-submit__footer`의 상단 padding 12px를 0으로, 버튼-안내문구 gap을 12→8px로, 하단 padding을 `20px+safe-area`에서 `25px+safe-area`(= 인디케이터 앞 gap 12 + 인디케이터 자리 13)로 고쳤다. 실제 인디케이터 막대는 여전히 기기 목업(`DeviceFrame`/`HomeIndicator`)이 겹쳐 그리며 이 컴포넌트는 그 자리만 비워 둔다 — `env(safe-area-inset-bottom)`은 그대로 유지해 실기기 안전 영역과 PC 목업 모두 대응한다.
+- 안내 문구가 없는 완료 화면도 버튼 높이가 흔들리지 않도록 `grid-template-rows: 52px minmax(15.4px, auto)` 트릭은 유지했다.
+
+검증: `npm run typecheck`, `npm run lint`, `npm run build` 통과. 브라우저 스크린샷 비교는 헤드리스 도구가 없어 이번에도 생략 — Figma `get_metadata`/`get_design_context`의 실측 좌표(75+12+13=100)와 코드 값을 대조해 확인했다.
+
+## 사건 접수 선택 버튼 체크 아이콘 제거 (2026-09-11)
+
+사용자 요청으로 접수 화면 전체에서 선택된 버튼(상대와의 관계, 지훈02 추가 질문 3지선다)에 붙던 체크 아이콘(`imgCheck.svg`)을 없앴다. 선택 상태는 기존대로 주황 배경·흰 글자·`aria-pressed`로만 표현한다. `CaseSubmitPage.tsx`·`CaseSubmitQuestionsPage.tsx`의 checkMark import와 렌더링, `CaseSubmit.css`의 `.case-submit__choice-check` 규칙을 지웠다. 에셋 파일 자체는 다른 곳에서 쓰지 않아도 삭제하지 않았다.
+
+검증: `npm run typecheck`, `npm run lint`, `npm run build` 통과.
+
+## 사건 접수 1단계(지훈01) Figma 재대조 (2026-09-11)
+
+Figma `node-id=1446-9899`(지훈01 / 사건 작성 · 기본)를 get_design_context로 다시 읽고 실제 좌표·색상·문구와 대조해 다음 어긋남을 고쳤다. 공통 파일(`CaseSubmit.css`, `types.ts`)에 영향이 있어 서아·지훈 01~05 전체에 반영된다.
+
+- **헤더 높이 67→64px, 3분할 grid로 전환**: `--device-app-header`(67px)를 재사용하던 게 Figma Header(64px)와 어긋났다. `MyPage.css`가 이미 같은 이유로 64px를 로컬 재정의해 둔 전례를 따라 `case-submit__header`에 `height:64px`를 직접 박았다. 좌우 슬롯을 `grid-template-columns: 64px 1fr 64px`로 나눠 제목이 실제로 가운데 오도록 했다(서아 전용 CSS에 이미 있던 처리를 지훈 기본값에도 적용). `임시저장`도 `justify-self:end`를 기본값으로 옮겼다.
+- **본문 스크롤 영역 간격 24→28px, 아래 패딩 28→16px**: Figma `Body / Scroll area`는 `gap-28`·`py-16`(위아래 대칭)이었는데 기존 코드는 24/16/28로 서아 쪽만 28·16으로 오버라이드돼 있었다. 기본값 자체를 Figma 수치로 고쳤다.
+- **판멍이 인라인 도움말 gap 12→4px**: Figma `Panmung / Inline helper`는 `gap-4`인데 12였다.
+- **`상대와의 관계` 라벨에 필수 표시 `*` 누락**: `사건 내용`과 달리 별표가 빠져 있었다.
+- **관계 선택지 `학교`→`학업`**: Figma 6개 칩 문구(연인·친구·가족·직장·학업·기타) 중 다섯 번째가 실제로는 "학업"인데 코드엔 "학교"로 들어가 있었다. `types.ts`의 `Relationship` 유니언·`RELATIONSHIPS` 배열을 함께 고쳤다.
+- **`사진·파일 첨부` 라벨이 파란 필수색 + 별도 "선택" 배지로 잘못 렌더링**: 지훈 화면은 `case-submit__label`(파란색, 필수 필드용)을 재사용하면서 텍스트도 "사진·파일 첨부" + 파란 계열 "선택" 배지로 나눠 그렸는데, Figma는 "사진·파일 첨부(선택)" 한 줄을 회색(neutral-600)으로만 보여준다. 서아 쪽은 이미 병합된 문구를 쓰고 있었으므로(단, 색만 스코프 오버라이드) 지훈 기본값도 동일하게 맞추고, 전용 `case-submit__attachment-label` 클래스를 새로 둬 색을 고정했다. 서아 전용 CSS의 죽은 셀렉터(`.case-submit__attachment-heading .case-submit__label`)도 정리했다.
+- **`사진·문서 속 개인정보는 가려주세요.` 문구에 스타일 정의 자체가 없었음**: `case-submit__helper` 클래스가 JSX에서만 쓰이고 CSS 정의가 서아 전용 오버라이드에만 있어, 지훈 화면에서는 브라우저 기본 문단 스타일(마진·검은 글자)로 깨져 있었다. `CaseSubmitPage.css`에 13px·neutral-600 기본 스타일을 추가했다.
+
+지훈02~05, 서아02~04는 이번에 다시 대조하지 않았다 — 각 단계 전용 Figma 노드를 아직 열어보지 않았다.
+
+검증: `npm run typecheck`(`tsc -b --force`), `npm run lint`, `npm run build` 모두 통과. 실제 브라우저 스크린샷 비교는 이번 세션에 헤드리스 브라우저 도구가 없어 진행하지 못했다 — 좌표·색상·문구는 Figma `get_design_context`/`get_metadata`가 반환한 실측값과 코드 값을 1:1 대조해 확인했다.
+
 ## 챗봇 화면 통합 (2026-09-11)
 
 - origin/geonyoung의 df78c38 ChatbotPage를 main에 통합했다. 홈 AI 맞춤 추천 카드에서 /chatbot으로 진입하며, 초기 안내·선택지 대화·직접 입력·재시도·사건 접수/광장 이동을 mock 대화 스크립트로 제공한다.

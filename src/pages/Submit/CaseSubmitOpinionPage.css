@@ -102,6 +102,14 @@ div.case-submit__privacy-option {
     color: var(--neutral-600);
 }
 
+/*
+ * 계정별로 활성화된(선택 가능한) 옵션의 선택 전 기본 색을 black으로 올린다.
+ * 서아는 `배심원 광장에 공개`, 지훈은 `나만 보기`가 활성 옵션이다.
+ */
+.case-submit__privacy-option-title--black {
+    color: var(--neutral-900);
+}
+
 .case-submit__privacy-option-title--selected {
     font-family: var(--font-body);
     font-size: 16px;

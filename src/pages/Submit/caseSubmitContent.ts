@@ -25,6 +25,18 @@ export const AI_OPINION = {
 /** 서아 시안의 고정 예시. 입력 내용을 분석한 실제 AI 결과가 아니다. */
 export const SEOA_CONTENT = '동아리 축제 준비 중, 한 팀원이 약속한 시간까지 홍보물을 올리지 않았고 연락도 없었어요.\n\n결국 제가 급하게 대신 만든 뒤 단체방에 “다음부터 중요한 일을 맡기기 어렵다”고 말했습니다.\n\n팀원은 노트북 고장으로 늦었다며, 사람들 앞에서 무책임한 사람처럼 만든 건 과했다고 했어요. 마감을 지적한 제가 너무 심했던 걸까요?'
 
+/**
+ * 지훈 사건 작성(1단계) `더미 텍스트 입력`에 채울 문구.
+ * 확정 문구를 아직 받지 못해 우선 지훈 시나리오의 기존 사실관계(DEMO_SUMMARY.facts)를 그대로 쓴다.
+ * 사용자가 확정 문구를 주면 이 값만 교체하면 된다.
+ */
+export const JIHOON_CONTENT = DEMO_SUMMARY.facts
+
+export const DUMMY_CASE_CONTENT: Record<PersonaId, string> = {
+  A: SEOA_CONTENT,
+  B: JIHOON_CONTENT,
+}
+
 export const SUBMIT_SCENARIOS = {
   A: {
     totalSteps: 3,
