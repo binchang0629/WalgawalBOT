@@ -118,7 +118,7 @@ function AppRoutes() {
 
         {/* 잘못된 URL. 없는 사건 ID와는 구분해서 처리한다. (PROJECT_SPEC.md §7-3) */}
         <Route path={PATHS.notFound} element={<NotFoundPage />} />
-      </Route>
+
     </Routes>
   )
 }
