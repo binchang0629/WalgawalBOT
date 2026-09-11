@@ -85,8 +85,6 @@ function CaseContextCard() {
 }
 
 export function AfterStoryHomePage() {
-  const navigate = useNavigate()
-
   return (
     <main className="afterstory-home">
       <AfterStoryHeader title="왈가왈후~" />

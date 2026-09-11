@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
-import botLogo from '../../assets/chatbot/figma/imgBotLogo.png'
 import { PATHS } from '../../routes/paths'
+import SpinningMascot from './SpinningMascot'
 import './FloatingChatButton.css'
 
 /**
@@ -27,7 +27,7 @@ function FloatingChatButton() {
       className={`floating-chat-button${sitsAboveNavigation ? ' floating-chat-button--above-nav' : ''}`}
       aria-label="AI 판멍이에게 질문하기"
     >
-      <img src={botLogo} alt="" />
+      <SpinningMascot size={56} />
       <span>AI에게 질문하기</span>
     </Link>
   )

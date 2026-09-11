@@ -5,25 +5,19 @@
     z-index: 30;
     display: grid;
     place-items: center;
-    width: 58px;
-    height: 58px;
+    width: 56px;
+    height: 56px;
     padding: 0;
-    border: 2px solid #fff;
+    /* Figma 2191:3560 — 머리만 놓인다. 파란 원 배경·흰 테두리·바깥 그림자는 없다.
+       border-radius는 배경이 없어도 focus 링을 둥글게 만들기 위해 남긴다. */
+    border: 0;
     border-radius: 50%;
-    background: var(--blue-700);
-    box-shadow: 0 8px 18px rgba(48, 67, 234, .32);
-    transition: transform .18s ease, box-shadow .18s ease;
+    background: none;
+    transition: transform .18s ease;
 }
 
 .floating-chat-button--above-nav {
     bottom: calc(var(--device-bottom-nav) + 16px);
-}
-
-.floating-chat-button img {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    object-fit: cover;
 }
 
 .floating-chat-button span {
@@ -38,9 +32,20 @@
     border: 0;
 }
 
-.floating-chat-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 11px 22px rgba(48, 67, 234, .38);
+/* 마우스를 올리거나 누르면 위치는 그대로 두고 얼굴만 살짝 커져서
+   여기가 챗봇 버튼이라는 걸 알린다. transform-origin이 기본값(가운데)이라
+   가운데에서 커지므로 아이콘이 놓인 자리는 움직이지 않는다. */
+@media (hover: hover) {
+    .floating-chat-button:hover {
+        transform: scale(1.08);
+    }
+}
+
+/* 터치 기기에는 hover가 없거나 탭한 뒤에도 남는다. 누르는 동안의 반응은 :active가 맡는다.
+   키보드 이동은 focus 링과 함께 같은 크기 변화를 준다. */
+.floating-chat-button:active,
+.floating-chat-button:focus-visible {
+    transform: scale(1.08);
 }
 
 .floating-chat-button:focus-visible {
