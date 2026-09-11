@@ -18,6 +18,7 @@ import CaseSubmitQuestionsPage from '../pages/Submit/CaseSubmitQuestionsPage'
 import CaseSubmitSummaryPage from '../pages/Submit/CaseSubmitSummaryPage'
 import CaseSubmitOpinionPage from '../pages/Submit/CaseSubmitOpinionPage'
 import CaseSubmitCompletePage from '../pages/Submit/CaseSubmitCompletePage'
+import ChatbotPage from '../pages/Chatbot/ChatbotPage'
 import NotFoundPage from '../pages/Error/NotFoundPage'
 import { AfterStoryHomePage, CompleteAfterStoryPage, PreviewAfterStoryPage, WriteAfterStoryPage } from '../pages/AfterStory/AfterStoryPage'
 import { PATHS } from './paths'
@@ -80,6 +81,7 @@ function AppRoutes() {
             <Route path="opinion" element={<CaseSubmitOpinionPage />} />
             <Route path="complete" element={<CaseSubmitCompletePage />} />
           </Route>
+          <Route path={PATHS.chatbot} element={<ChatbotPage />} />
         </Route>
 
         {/* 잘못된 URL. 없는 사건 ID와는 구분해서 처리한다. (PROJECT_SPEC.md §7-3) */}

@@ -30,6 +30,7 @@ export const PATHS = {
   my: '/my',
   myCases: '/my/cases',
   myCaseResult: '/my/cases/:caseId',
+  chatbot: '/chatbot',
   notFound: '*',
 } as const
 

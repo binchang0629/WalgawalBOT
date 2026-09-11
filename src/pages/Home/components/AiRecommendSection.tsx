@@ -1,12 +1,14 @@
+import { Link } from 'react-router-dom'
 import SectionTitle from '../../../components/common/SectionTitle'
 import { optionalImages } from '../homeAssets'
 import { aiRecommendation, homeSectionTitles } from '../../../data/common/homeContent'
+import { PATHS } from '../../../routes/paths'
 
 /**
  * AI 맞춤 추천. Figma `1402:7405`
  *
- * 판멍이 일러스트(`chat-mascot.png`)가 아직 없어 자리 표시로 둔다.
- * 챗봇 화면이 미확정이라 카드에 링크를 걸지 않는다. (PROJECT_SPEC.md §9-6)
+ * 챗봇 화면이 Figma `개발` 페이지에 올라와(node 1951:4051~4539) 구현됐으므로
+ * 카드를 눌러 챗봇으로 들어갈 수 있게 연결한다. (PROJECT_SPEC.md §9-6 해결)
  */
 function AiRecommendSection() {
   return (
@@ -16,7 +18,7 @@ function AiRecommendSection() {
         description={homeSectionTitles.aiRecommend.description}
       />
 
-      <article className="ai-card">
+      <Link to={PATHS.chatbot} className="ai-card">
         {optionalImages.chatMascot ? (
           <img className="ai-card__mascot" src={optionalImages.chatMascot} alt="판멍이" />
         ) : (
@@ -31,7 +33,7 @@ function AiRecommendSection() {
             {aiRecommendation.tail}
           </p>
         </div>
-      </article>
+      </Link>
     </section>
   )
 }
