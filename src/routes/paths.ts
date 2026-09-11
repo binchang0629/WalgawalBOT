@@ -14,6 +14,8 @@ export const PATHS = {
   plaza: '/plaza',
   caseDetail: '/cases/:caseId',
   caseResult: '/cases/:caseId/result',
+  jihoonCaseDetail: '/cases/case-company-874',
+  jihoonCaseResult: '/cases/case-company-874/result',
   /** 사건 접수 1~4단계. 흐름은 지훈01~05(사건 작성 → 추가 질문 → 요약 확인 → AI 참고 의견·접수 → 접수 완료) 기준. */
   caseSubmit: '/cases/new',
   caseSubmitQuestions: '/cases/new/questions',

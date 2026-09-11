@@ -7,6 +7,8 @@ import HomePage from '../pages/Home/HomePage'
 import PlazaPage from '../pages/Plaza/PlazaPage'
 import CaseDetailPage from '../pages/Case/CaseDetailPage'
 import CaseResultPage from '../pages/Case/CaseResultPage'
+import ClosedCaseDetailPage from '../pages/Case/ClosedCaseDetailPage'
+import ClosedCaseResultPage from '../pages/Case/ClosedCaseResultPage'
 import SignupPage from '../pages/Auth/SignupPage'
 import LoginPage from '../pages/Auth/LoginPage'
 import MyPage from '../pages/My/MyPage'
@@ -50,6 +52,8 @@ function AppRoutes() {
         <Route element={<MainLayout />}>
           <Route path={PATHS.home} element={<HomePage />} />
           <Route path={PATHS.plaza} element={<PlazaPage />} />
+          <Route path={PATHS.jihoonCaseDetail} element={<ClosedCaseDetailPage />} />
+          <Route path={PATHS.jihoonCaseResult} element={<ClosedCaseResultPage />} />
           <Route path={PATHS.caseDetail} element={<CaseDetailPage />} />
           <Route path={PATHS.caseResult} element={<CaseResultPage />} />
           <Route path={PATHS.my} element={<MyPage />} />

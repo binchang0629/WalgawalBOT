@@ -50,74 +50,70 @@
 
 .device-status-bar {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
+    inset: 0 0 auto;
     z-index: 30;
     height: var(--device-status-bar);
-    padding: 14px 26px 0;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
     pointer-events: none;
     color: var(--neutral-900);
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: -.4px;
 }
 
 .device-status-bar__time {
-    width: 74px;
-    padding-top: 3px;
+    position: absolute;
+    top: 20px;
+    left: 53px;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+    font-size: 17px;
+    font-weight: 590;
+    line-height: 22px;
+    letter-spacing: 0;
+    font-variation-settings: 'wdth' 100;
 }
 
-/* 다이내믹 아일랜드 */
+/* 목업이 축소돼도 DeviceFrame의 scale과 함께 동일 비율로 줄어든다. */
 .device-status-bar__island {
-    width: 94px;
-    height: 29px;
-    margin-top: -4px;
-    background: #000;
-    border-radius: 24px;
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    width: 125px;
+    height: 37px;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: var(--neutral-900);
 }
 
 .device-status-bar__indicators {
-    width: 74px;
-    padding-top: 6px;
+    position: absolute;
+    top: 25px;
+    right: 38px;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: 5px;
+    gap: 14px;
+    height: 18px;
 }
 
-.device-status-bar__signal,
-.device-status-bar__wifi {
-    width: 17px;
-    height: 11px;
-    background: var(--neutral-900);
-    border-radius: 2px;
+.device-status-bar__signal {
+    width: 18px;
+    height: 14px;
+    display: block;
+    flex: none;
+    fill: currentColor;
 }
 
 .device-status-bar__wifi {
-    width: 15px;
-    border-radius: 50% 50% 2px 2px;
+    width: 24px;
+    height: 18px;
+    display: block;
+    flex: none;
 }
 
 .device-status-bar__battery {
-    width: 25px;
-    height: 12px;
-    border: 1.5px solid var(--neutral-900);
-    border-radius: 4px;
-    position: relative;
+    width: 31px;
+    height: 15px;
+    display: block;
+    flex: none;
+    fill: currentColor;
 }
-
-.device-status-bar__battery::after {
-    content: '';
-    position: absolute;
-    inset: 2px;
-    background: var(--neutral-900);
-    border-radius: 1px;
-}
-
 /* ---------- 홈 인디케이터 (down_nav 하단 여백에 겹친다) ---------- */
 
 .device-home-indicator {

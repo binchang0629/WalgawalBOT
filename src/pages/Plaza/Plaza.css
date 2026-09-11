@@ -611,3 +611,15 @@
     background: var(--orange-700);
     color: #fff;
 }
+
+.case-card__link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.case-card__link:focus-visible {
+    outline: 3px solid rgba(55, 75, 255, .35);
+    outline-offset: 3px;
+    border-radius: 8px;
+}
