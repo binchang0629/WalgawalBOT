@@ -5,25 +5,19 @@
     z-index: 30;
     display: grid;
     place-items: center;
-    width: 58px;
-    height: 58px;
+    width: 56px;
+    height: 56px;
     padding: 0;
-    border: 2px solid #fff;
+    /* Figma 2191:3560 — 머리만 놓인다. 파란 원 배경·흰 테두리·바깥 그림자는 없다.
+       border-radius는 배경이 없어도 focus 링을 둥글게 만들기 위해 남긴다. */
+    border: 0;
     border-radius: 50%;
-    background: var(--blue-700);
-    box-shadow: 0 8px 18px rgba(48, 67, 234, .32);
-    transition: transform .18s ease, box-shadow .18s ease;
+    background: none;
+    transition: transform .18s ease;
 }
 
 .floating-chat-button--above-nav {
     bottom: calc(var(--device-bottom-nav) + 16px);
-}
-
-.floating-chat-button img {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    object-fit: cover;
 }
 
 .floating-chat-button span {
@@ -40,7 +34,6 @@
 
 .floating-chat-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 11px 22px rgba(48, 67, 234, .38);
 }
 
 .floating-chat-button:focus-visible {
