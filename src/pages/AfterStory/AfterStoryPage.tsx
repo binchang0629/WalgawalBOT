@@ -54,10 +54,21 @@ const MY_CLOSED_CASES = [
 
 interface AfterStoryLocationState { content?: string }
 
-function AfterStoryHeader({ title, onBack }: { title: string; onBack: () => void }) {
+/**
+ * 왈가왈후 공통 헤더.
+ *
+ * `onBack`을 주면 왼쪽에 뒤로가기가 붙고, 안 주면 빈 칸이 들어간다.
+ * 왈가왈후 홈은 하단 내비게이션으로 오가는 첫 화면이라 MY·광장처럼 뒤로가기를 두지 않는다.
+ * 양옆 칸 너비가 같아서 버튼이 있든 없든 제목은 정중앙에 선다.
+ */
+function AfterStoryHeader({ title, onBack }: { title: string; onBack?: () => void }) {
   return (
     <header className="afterstory-header">
-      <button type="button" onClick={onBack} aria-label="이전 화면으로 돌아가기"><img src={backIcon} alt="" /></button>
+      {onBack ? (
+        <button type="button" onClick={onBack} aria-label="이전 화면으로 돌아가기"><img src={backIcon} alt="" /></button>
+      ) : (
+        <span aria-hidden="true" />
+      )}
       <h1>{title}</h1>
       <span aria-hidden="true" />
     </header>
@@ -78,7 +89,7 @@ export function AfterStoryHomePage() {
 
   return (
     <main className="afterstory-home">
-      <AfterStoryHeader title="왈가왈후~" onBack={() => navigate(PATHS.home)} />
+      <AfterStoryHeader title="왈가왈후~" />
       <div className="afterstory-home__scroll" style={{ backgroundImage: `url(${scrollBackground})` }}>
         <section className="afterstory-hero">
           <p>왈가왈</p>

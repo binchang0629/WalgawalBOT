@@ -6,6 +6,7 @@ import plazaIcon from '../../assets/icons/nav-plaza.svg'
 import submitIcon from '../../assets/icons/nav-submit.svg'
 import afterStoryIcon from '../../assets/icons/nav-afterstory.svg'
 import myIcon from '../../assets/icons/nav-my.svg'
+import navBackground from '../../assets/home/figma/imgDownNav.svg'
 
 /**
  * 공통 하단 내비게이션.
@@ -60,6 +61,7 @@ function NavIcon({ src, isCta }: { src: string; isCta?: boolean }) {
 function BottomNavigation() {
   return (
     <nav className="bottom-nav" aria-label="주요 메뉴">
+      <img className="bottom-nav__background" src={navBackground} alt="" aria-hidden="true" />
       {NAV_ITEMS.map((item) => {
         const className = item.isCta ? 'bottom-nav__item case-nav' : 'bottom-nav__item'
 

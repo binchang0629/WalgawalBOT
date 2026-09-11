@@ -63,6 +63,30 @@
 
 /* ---------- 사건 내용 ---------- */
 
+/* 라벨과 시연용 채우기 버튼을 한 줄에 둔다. */
+.case-submit__content-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+/* 후일담 작성의 `내용 작성하기`와 같은 모양. 브랜드 오렌지, 밑줄 없음. */
+.case-submit__demo {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--orange);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.case-submit__demo:hover { color: var(--orange); }
+.case-submit__demo:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 4px; }
+
 .case-submit__textarea-box {
     display: flex;
     flex-direction: column;

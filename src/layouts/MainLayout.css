@@ -53,22 +53,19 @@
     background: transparent;
 }
 
-/*
- * 중앙 상단에서 아래로 깊게 내려오는 U자 노치를 만들어 첨부 시안의 배경 윤곽을 맞춘다.
- * 마스크에 drop-shadow를 적용해 외곽과 노치의 그림자가 같은 윤곽을 따른다.
- */
-.bottom-nav::before {
-    content: '';
+/* Figma 원본 navBG: 중앙 CTA를 감싸는 둥근 U자 홈과 외곽 그림자를 함께 가진다. */
+.bottom-nav__background {
     position: absolute;
     z-index: 0;
-    inset: 0;
-    border-radius: 20px;
-    background: #fff;
-    filter: drop-shadow(0 -4px 16px rgba(37, 37, 37, .10));
-    mask-image: radial-gradient(circle 54px at 50% 0, transparent 99%, #000 100%);
-    -webkit-mask-image: radial-gradient(circle 54px at 50% 0, transparent 99%, #000 100%);
+    top: -19px;
+    left: 50%;
+    width: calc(100% + 32px);
+    max-width: none;
+    height: auto;
+    transform: translateX(-50%);
+    pointer-events: none;
+    user-select: none;
 }
-
 .bottom-nav__item {
     position: relative;
     z-index: 1;

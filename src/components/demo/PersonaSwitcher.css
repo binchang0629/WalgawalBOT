@@ -56,6 +56,38 @@
     color: var(--neutral-600);
 }
 
+.persona-switcher__caption--auth {
+    margin-top: 18px;
+}
+
+/* 두 칸짜리 토글. 현재 상태 칸만 파랗게 채운다. */
+.persona-switcher__auth {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.persona-switcher__auth-item {
+    padding: 9px 0;
+    border: 1px solid var(--neutral-250);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .9);
+    color: var(--neutral-600);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.persona-switcher__auth-item:hover {
+    border-color: var(--blue-200);
+}
+
+.persona-switcher__auth-item--current {
+    border-color: var(--blue-700);
+    background: var(--blue-700);
+    color: #fff;
+}
+
 .persona-switcher__status {
     margin: 12px 0 0;
     font-size: 12px;

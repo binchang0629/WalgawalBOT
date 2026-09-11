@@ -8,7 +8,7 @@ import CaseSubmitFooter from './components/CaseSubmitFooter'
 import useCaseSubmitDraft from './useCaseSubmitDraft'
 import useWizardBack from '../../hooks/useWizardBack'
 import { RELATIONSHIPS } from './types'
-import { SEOA_CONTENT, SUBMIT_SCENARIOS } from './caseSubmitContent'
+import { JIHUN_CONTENT, SEOA_CONTENT, SUBMIT_SCENARIOS } from './caseSubmitContent'
 import checkMark from '../../assets/submit/figma/imgCheck.svg'
 import walangJoy from '../../assets/submit/figma/imgCharacterWalangJoy.svg'
 import './CaseSubmit.css'
@@ -41,7 +41,6 @@ function CaseSubmitPage() {
     setContent,
   } = useCaseSubmitDraft()
   const isSeoa = personaId === 'A'
-  const hasFocusedContent = useRef(false)
 
   const photoInputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -67,6 +66,23 @@ function CaseSubmitPage() {
       setFileNames((prev) => [...prev, ...files.map((file) => file.name)])
     }
     event.target.value = ''
+  }
+
+  /*
+   * 발표 시연용 예시 채우기.
+   * 예전에는 본문 칸을 누르면 저절로 채워졌는데, 직접 써 보려고 눌렀을 때도 글이 들어차
+   * 손댈 수가 없었다. 그래서 버튼으로 떼어내 누를 때만 채운다.
+   */
+  const handleDemoFill = () => {
+    setContent(isSeoa ? SEOA_CONTENT : JIHUN_CONTENT)
+    window.requestAnimationFrame(() => {
+      const field = document.getElementById(contentFieldId)
+      if (field instanceof HTMLTextAreaElement) {
+        field.focus()
+        field.setSelectionRange(field.value.length, field.value.length)
+        field.scrollTop = 0
+      }
+    })
   }
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -153,9 +169,13 @@ function CaseSubmitPage() {
         </div>
 
         <div className="case-submit__field">
-          <label className="case-submit__label" htmlFor={contentFieldId}>
-            사건 내용 <span className="case-submit__required">*</span>
-          </label>
+          <div className="case-submit__content-head">
+            <label className="case-submit__label" htmlFor={contentFieldId}>
+              사건 내용 <span className="case-submit__required">*</span>
+            </label>
+            {/* 발표 시연용. 누르면 예시 사건이 본문 칸에 바로 들어간다. */}
+            <button type="button" className="case-submit__demo" onClick={handleDemoFill}>내용 작성하기</button>
+          </div>
           <div className={`case-submit__textarea-box${content ? ' has-content' : ''}`}>
             <textarea
               id={contentFieldId}
@@ -163,10 +183,6 @@ function CaseSubmitPage() {
               placeholder={isSeoa ? '언제, 누구와 어떤 일이 있었나요?' : CONTENT_PLACEHOLDER}
               maxLength={CONTENT_MAX_LENGTH}
               value={content}
-              onFocus={() => {
-                if (isSeoa && !hasFocusedContent.current && !content) setContent(SEOA_CONTENT)
-                hasFocusedContent.current = true
-              }}
               onChange={(event) => setContent(event.target.value)}
               required
             />

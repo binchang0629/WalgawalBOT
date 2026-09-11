@@ -104,7 +104,7 @@
     --device-width: 402px;
     --device-height: 874px;
     --device-status-bar: 62px;   /* Figma top_nav 상단 62px = 시스템 상태바 */
-    --device-app-header: 67px;   /* Figma top_nav 하단 67px = 서비스 헤더 */
+    --device-app-header: 64px;   /* 서비스 헤더. 왈가왈후·사건·MY·접수 헤더가 모두 64px이라 여기에 맞췄다 */
     --device-bottom-nav: 100px;  /* Figma down_nav (홈 인디케이터 포함) */
     --content-gutter: 24px;
 }

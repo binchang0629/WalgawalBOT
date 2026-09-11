@@ -9,6 +9,7 @@ import BalanceGameSection from './components/BalanceGameSection'
 import CloseCallSection from './components/CloseCallSection'
 import AfterStorySection from './components/AfterStorySection'
 import AiRecommendSection from './components/AiRecommendSection'
+import CompactAiRecommendCard from './components/CompactAiRecommendCard'
 import './Home.css'
 
 /**
@@ -19,7 +20,7 @@ import './Home.css'
  *
  * 페이지는 섹션을 조립하는 역할만 한다. 각 섹션은 `components/`에 있다. (PROJECT_SPEC.md §7-2)
  *
- * 로그인 후 홈(`개발 > 홈/로그인 후`, 노드 `1473:8830`)은 아직 옮기지 않았다.
+ * 로그인 전후에 같은 홈을 재사용하고, 로그인 후에만 AI 맞춤 추천 섹션을 추가한다.
  */
 function HomePage() {
   const { sessionStatus, personaId } = useSession()
@@ -51,10 +52,11 @@ function HomePage() {
       <PopularCaseSection />
       <RecentCasesSection />
       <AdBanner />
+      {isAuthenticated && <AiRecommendSection />}
       <BalanceGameSection key={personaId} />
       <CloseCallSection cta={cta} />
       <AfterStorySection />
-      <AiRecommendSection />
+      <CompactAiRecommendCard />
     </main>
   )
 }

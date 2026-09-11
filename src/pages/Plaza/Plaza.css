@@ -12,6 +12,30 @@
     overflow-x: clip;
 }
 
+/* ---------- 헤더 ---------- */
+
+/* MY·왈가왈후와 같은 가운데 제목 헤더. 양옆 빈 칸이 제목을 정중앙에 세운다. */
+.plaza-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: 64px 1fr 64px;
+    align-items: center;
+    height: var(--device-app-header);
+    padding: 0 var(--content-gutter);
+    border-bottom: 1px solid var(--neutral-100);
+    background: #fff;
+}
+
+.plaza-header h1 {
+    margin: 0;
+    font-family: var(--font-title);
+    font-size: 20px;
+    line-height: 1.2;
+    text-align: center;
+}
+
 /* ---------- 랭킹 히어로 ---------- */
 
 /*
