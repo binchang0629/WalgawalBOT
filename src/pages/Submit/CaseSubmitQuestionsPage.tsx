@@ -63,9 +63,13 @@ function TriAnswerRow({ value, options, onChange }: TriAnswerRowProps) {
 }
 
 function CaseSubmitQuestionsPage() {
-  const { content, answers, setAnswers } = useCaseSubmitDraft()
+  const { personaId, content, answers, setAnswers } = useCaseSubmitDraft()
   const navigate = useNavigate()
   const handleBack = useWizardBack(PATHS.caseSubmit)
+
+  if (personaId === 'A') {
+    return <Navigate to={content.trim() ? PATHS.caseSubmitSummary : PATHS.caseSubmit} replace />
+  }
 
   // 1단계를 거치지 않고 바로 들어온 경우 빈 상태로 보여주지 않는다.
   if (!content.trim()) {

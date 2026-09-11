@@ -49,9 +49,29 @@
     align-items: flex-start;
     justify-content: space-around;
     padding: 19px 10px 16px;
-    border-radius: 24px 24px 0 0;
+    isolation: isolate;
+    background: transparent;
+}
+
+/*
+ * 중앙 상단에서 아래로 깊게 내려오는 U자 노치를 만들어 첨부 시안의 배경 윤곽을 맞춘다.
+ * 마스크에 drop-shadow를 적용해 외곽과 노치의 그림자가 같은 윤곽을 따른다.
+ */
+.bottom-nav::before {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    border-radius: 20px;
     background: #fff;
-    box-shadow: 0 -4px 16px rgba(37, 37, 37, .08);
+    filter: drop-shadow(0 -4px 16px rgba(37, 37, 37, .10));
+    mask-image: radial-gradient(circle 54px at 50% 0, transparent 99%, #000 100%);
+    -webkit-mask-image: radial-gradient(circle 54px at 50% 0, transparent 99%, #000 100%);
+}
+
+.bottom-nav__item {
+    position: relative;
+    z-index: 1;
 }
 
 /* 모바일에서는 홈 인디케이터 영역만큼 아래를 더 확보한다. */
@@ -69,12 +89,15 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 9px;
     padding: 0;
     border: 0;
     color: var(--neutral-600);
     background: none;
-    font-size: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+    text-decoration: none;
     white-space: nowrap;
 }
 
@@ -110,17 +133,17 @@
 
 /* 중앙 사건 접수 CTA */
 .bottom-nav .case-nav {
-    margin-top: -44px;
+    margin-top: -37px;
     color: var(--blue);
 }
 
 /* 중앙 CTA는 파란 원 안에 흰 아이콘을 둔다. mask 색만 흰색으로 바꾼다. */
 .bottom-nav .case-nav .bottom-nav__icon--cta {
-    width: 57px;
-    height: 57px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     background: var(--blue);
-    box-shadow: 0 5px 10px rgba(61, 92, 217, .25);
+    box-shadow: 0 8px 18px rgba(48, 67, 234, .26);
     mask: none;
     -webkit-mask: none;
     position: relative;
@@ -131,8 +154,8 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 33px;
-    height: 32px;
+    width: 35px;
+    height: 34px;
     transform: translate(-50%, -50%);
     background: #fff;
     mask-image: var(--nav-icon);
@@ -143,6 +166,10 @@
     -webkit-mask-repeat: no-repeat;
     -webkit-mask-position: center;
     -webkit-mask-size: contain;
+}
+
+.bottom-nav .case-nav .bottom-nav__label {
+    display: none;
 }
 
 .bottom-nav .case-nav:disabled .bottom-nav__icon--cta {

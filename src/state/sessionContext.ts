@@ -13,6 +13,7 @@ export interface SessionUser {
   name: string
   email: string
   nickname: string
+  anonymousAvatarUrl: string
 }
 
 export interface SessionValue {

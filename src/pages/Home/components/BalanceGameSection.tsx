@@ -112,8 +112,10 @@ function BalanceGameSection() {
             <button type="button"
               className={'balance-choice balance-choice--' + side + (choice === side ? ' is-selected' : '')}
               disabled={!!choice && choice !== side} aria-pressed={choice === side} onClick={() => handleChoose(side)}>
-              <img src={side === 'left' ? homeIcons.balloonTailLeft : homeIcons.balloonTailRight} alt="" aria-hidden="true" />
-              {side === 'left' ? question.leftLabel : question.rightLabel}
+              <svg className="balance-choice__outline" viewBox="0 0 140 64" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                <path d="M23 18.5H60L65 1.5L80 18.5H117A22.5 22.5 0 0 1 139.5 41V41A22.5 22.5 0 0 1 117 63.5H23A22.5 22.5 0 0 1 .5 41V41A22.5 22.5 0 0 1 23 18.5Z" vectorEffect="non-scaling-stroke" />
+              </svg>
+              <span className="balance-choice__label">{side === 'left' ? question.leftLabel : question.rightLabel}</span>
             </button>
           </div>
         ))}

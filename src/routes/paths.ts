@@ -6,11 +6,14 @@
 export const PATHS = {
   root: '/',
   demo: '/demo',
+  /** 로그인 시안 확정 전 임시 연결 화면. */
+  login: '/login',
   /** 회원가입 (데모). 컨펌 시안 없이 팀 결정으로 추가한 화면이다. (PROJECT_SPEC.md §9-2) */
   signup: '/signup',
   home: '/home',
   plaza: '/plaza',
   caseDetail: '/cases/:caseId',
+  caseResult: '/cases/:caseId/result',
   /** 사건 접수 1~4단계. 흐름은 지훈01~05(사건 작성 → 추가 질문 → 요약 확인 → AI 참고 의견·접수 → 접수 완료) 기준. */
   caseSubmit: '/cases/new',
   caseSubmitQuestions: '/cases/new/questions',
@@ -18,16 +21,25 @@ export const PATHS = {
   caseSubmitOpinion: '/cases/new/opinion',
   caseSubmitComplete: '/cases/new/complete',
   afterStory: '/afterstory',
+  afterStoryMine: '/afterstory/mine',
+  afterStoryCommunity: '/afterstory/community',
+  afterStoryWrite: '/afterstory/write/:caseId',
+  afterStoryPreview: '/afterstory/preview',
+  afterStoryComplete: '/afterstory/complete',
   afterStoryDetail: '/afterstory/:storyId',
   my: '/my',
   /** 챗봇(판멍이). Figma `Chatbot / Initial`·`Conversation`·`Conversation02`(node 1951:4051~4539) 기준. */
   chatbot: '/chatbot',
+  myCases: '/my/cases',
+  myCaseResult: '/my/cases/:caseId',
   notFound: '*',
 } as const
 
 /** 동적 경로 생성 함수. useParams로 읽는 값과 짝을 이룬다. */
 export const toCaseDetail = (caseId: string) => `/cases/${caseId}`
+export const toCaseResult = (caseId: string) => `/cases/${caseId}/result`
 export const toAfterStoryDetail = (storyId: string) => `/afterstory/${storyId}`
+export const toMyCaseResult = (caseId: string) => `/my/cases/${caseId}`
 
 /**
  * 상세 화면에 외부에서 바로 들어온 경우 돌아갈 기본 경로.

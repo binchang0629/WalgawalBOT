@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import useDragScroll from '../../../hooks/useDragScroll'
 import SectionTitle from '../../../components/common/SectionTitle'
 import { homeIcons, homeImages } from '../homeAssets'
 import {
@@ -17,7 +18,22 @@ import {
  * 봉투 세 장의 겹치는 위치는 이미지의 밑변 폭을 맞춰 계산했다(Home.css 참고).
  */
 function AfterStorySection() {
-  const [isOpened, setIsOpened] = useState(false)
+  const [letterState, setLetterState] = useState<'closed' | 'opening' | 'open'>('closed')
+  const transitionTimer = useRef<number | null>(null)
+  // 후일담 카드 줄은 마우스로도 끌어서 넘길 수 있어야 한다.
+  const storyScroll = useDragScroll<HTMLDivElement>()
+  const isLetterOpen = letterState === 'opening' || letterState === 'open'
+  const isAnimating = letterState === 'opening'
+
+  useEffect(() => () => {
+    if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current)
+  }, [])
+
+  function handleLetterToggle() {
+    if (isAnimating || isLetterOpen) return
+    setLetterState('opening')
+    transitionTimer.current = window.setTimeout(() => setLetterState('open'), 960)
+  }
 
   return (
     <section className="story-section">
@@ -27,8 +43,7 @@ function AfterStorySection() {
         action={homeSectionTitles.afterStory.action}
       />
 
-      <article className={isOpened ? 'letter is-open' : 'letter'}>
-        <img className="letter__mail" src={homeImages.letterEnvelope} alt="" aria-hidden="true" />
+      <article className={'letter letter--' + letterState + (isLetterOpen ? ' is-open' : '')}>
         <img className="letter__back" src={homeImages.envelopeBack} alt="" aria-hidden="true" />
 
         <img className="letter__paper" src={homeImages.letterPaper} alt="" aria-hidden="true" />
@@ -56,7 +71,7 @@ function AfterStorySection() {
         <img className="letter__closed" src={homeImages.envelopeClosed} alt="" aria-hidden="true" />
 
         <b className="letter__cta">
-          {isOpened ? featuredAfterStory.envelopeCta : '편지 열어보기'}
+          {isLetterOpen ? featuredAfterStory.envelopeCta : '편지 열어보기'}
         </b>
 
         {/*
@@ -66,15 +81,16 @@ function AfterStorySection() {
         <button
           type="button"
           className="letter__toggle"
-          aria-expanded={isOpened}
+          aria-expanded={isLetterOpen}
           aria-controls="featured-after-story"
-          onClick={() => setIsOpened((open) => !open)}
+          disabled={isAnimating || isLetterOpen}
+          onClick={handleLetterToggle}
         >
-          <span>{isOpened ? '후일담 편지 접기' : '후일담 편지 열어보기'}</span>
+          <span>{isLetterOpen ? '후일담 편지 열림' : '후일담 편지 열어보기'}</span>
         </button>
       </article>
 
-      <div className="story-scroll">
+      <div className="story-scroll" ref={storyScroll.ref} onDragStart={storyScroll.onDragStart}>
         {afterStoryQuotes.map((story) => (
           <article className="quote-card" key={story.id}>
             <div className="quote-card__body">

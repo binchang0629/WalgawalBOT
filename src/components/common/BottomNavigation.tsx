@@ -36,8 +36,8 @@ const NAV_ITEMS: NavItem[] = [
   { label: '홈', icon: homeIcon, to: PATHS.home, enabled: true },
   { label: '배심원 광장', icon: plazaIcon, to: PATHS.plaza, enabled: true },
   { label: '사건 접수', icon: submitIcon, to: PATHS.caseSubmit, enabled: true, isCta: true },
-  { label: '왈가왈후~', icon: afterStoryIcon, to: PATHS.afterStory, enabled: false },
-  { label: 'MY', icon: myIcon, to: PATHS.my, enabled: false },
+  { label: '왈가왈후~', icon: afterStoryIcon, to: PATHS.afterStory, enabled: true },
+  { label: 'MY', icon: myIcon, to: PATHS.my, enabled: true },
 ]
 
 function NavIcon({ src, isCta }: { src: string; isCta?: boolean }) {
@@ -74,7 +74,7 @@ function BottomNavigation() {
               title="시안 확정 후 연결됩니다"
             >
               <NavIcon src={item.icon} isCta={item.isCta} />
-              {item.label}
+              <span className="bottom-nav__label">{item.label}</span>
             </button>
           )
         }
@@ -84,9 +84,10 @@ function BottomNavigation() {
             key={item.label}
             to={item.to}
             className={({ isActive }) => (isActive ? `${className} active` : className)}
+            aria-label={item.isCta ? item.label : undefined}
           >
             <NavIcon src={item.icon} isCta={item.isCta} />
-            {item.label}
+            <span className="bottom-nav__label">{item.label}</span>
           </NavLink>
         )
       })}

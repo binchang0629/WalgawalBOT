@@ -1,9 +1,10 @@
 import { createContext } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import type { CaseSummary, QuestionAnswers, Relationship, Visibility } from './types'
+import type { PersonaId } from '../../types'
 
 /**
- * 사건 접수 1~4단계(지훈01~04)가 공유하는 화면 상태.
+ * 계정별 사건 접수 단계가 공유하는 화면 상태.
  * 각 단계가 독립적으로 방문·새로고침될 수 있는 라우트라서
  * 화면 로컬 state 대신 이 흐름 전용 Context에 둔다. (PROJECT_SPEC.md §7-8)
  *
@@ -11,6 +12,7 @@ import type { CaseSummary, QuestionAnswers, Relationship, Visibility } from './t
  * 사건 접수 화면 안에서만 쓰는 상태라 src/state/가 아니라 이 페이지 폴더에 둔다.
  */
 export interface CaseSubmitDraftValue {
+  personaId: PersonaId
   relationship: Relationship | null
   setRelationship: Dispatch<SetStateAction<Relationship | null>>
 
@@ -31,7 +33,7 @@ export interface CaseSubmitDraftValue {
   visibility: Visibility
   setVisibility: Dispatch<SetStateAction<Visibility>>
 
-  /** 지훈04에서 접수를 마쳤는지. 지훈05를 직접 URL로 열었을 때 빈 상태로 보여주지 않기 위해 쓴다. */
+  /** 접수 완료 경로에 직접 진입해 거짓 완료 화면이 나타나는 것을 막는다. */
   isSubmitted: boolean
   setIsSubmitted: Dispatch<SetStateAction<boolean>>
 }

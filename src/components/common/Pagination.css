@@ -1,0 +1,67 @@
+.app-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.app-pagination__pages {
+  display: flex;
+  flex: none;
+  gap: 10px;
+}
+
+.app-pagination__page {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid rgb(255 149 36 / 82%);
+  border-radius: 8px;
+  background: #fff;
+  color: rgb(255 149 36 / 82%);
+  font-family: 'Gmarket Sans', var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  box-shadow: 0 2px 1px rgb(31 36 128 / 10%);
+}
+
+.app-pagination__page[aria-current='page'] {
+  background: #ff9524;
+  color: #fff;
+}
+
+.app-pagination__arrow {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.app-pagination__arrow img {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+.app-pagination__arrow--next img {
+  transform: scaleX(-1);
+}
+
+.app-pagination__arrow:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.app-pagination button:focus-visible {
+  outline: 2px solid #ff9524;
+  outline-offset: 3px;
+}

@@ -8,11 +8,11 @@ import './CaseSubmit.css'
 import './CaseSubmitCompletePage.css'
 
 /**
- * 사건 접수 5단계 — 지훈05 / 접수 완료.
- * Figma node 1446:10071 기준. 진행률 바가 없고 헤더도 뒤로가기만 남는다.
+ * 접수 완료 — 서아04(1446:10207) / 지훈05(1446:10071).
+ * 계정별 제목·공개 범위를 표시하며 헤더는 뒤로가기만 남긴다.
  */
 function CaseSubmitCompletePage() {
-  const { isSubmitted, summary } = useCaseSubmitDraft()
+  const { personaId, isSubmitted, summary, visibility } = useCaseSubmitDraft()
   const navigate = useNavigate()
 
   // 실제로 접수를 마치지 않고 URL로 바로 들어온 경우 완료 화면을 보여주지 않는다.
@@ -23,8 +23,9 @@ function CaseSubmitCompletePage() {
   const handleBack = () => navigate(PATHS.home, { replace: true })
 
   return (
-    <div className="case-submit">
+    <div className={`case-submit${personaId === 'A' ? ' case-submit--seoa' : ''}`}>
       <CaseSubmitHeader onBack={handleBack} title="" showTempSave={false} />
+      {personaId === 'A' && <div className="case-submit__complete-spacer" aria-hidden="true" />}
 
       <div className="case-submit__complete-body">
         <img
@@ -41,7 +42,7 @@ function CaseSubmitCompletePage() {
 
         <div className="case-submit__receipt">
           <h3 className="case-submit__receipt-title">{summary.title}</h3>
-          <p className="case-submit__receipt-visibility">공개 범위&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;나만 보기</p>
+          <p className="case-submit__receipt-visibility">공개 범위&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;{visibility === 'community' ? '배심원 광장에 공개' : '나만 보기'}</p>
         </div>
 
         <p className="case-submit__complete-reminder">공개 범위는 내 사건에서 변경할 수 있어요.</p>

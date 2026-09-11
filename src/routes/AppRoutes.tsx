@@ -5,15 +5,26 @@ import AuthLayout from '../layouts/AuthLayout'
 import DetailLayout from '../layouts/DetailLayout'
 import HomePage from '../pages/Home/HomePage'
 import PlazaPage from '../pages/Plaza/PlazaPage'
+import CaseDetailPage from '../pages/Case/CaseDetailPage'
+import CaseResultPage from '../pages/Case/CaseResultPage'
 import SignupPage from '../pages/Auth/SignupPage'
+
+import LoginPage from '../pages/Auth/LoginPage'
+import MyPage from '../pages/My/MyPage'
+import MyCasesPage from '../pages/My/MyCasesPage'
+import MyCaseResultPage from '../pages/My/MyCaseResultPage'
+
 import CaseSubmitFlow from '../pages/Submit/CaseSubmitFlow'
 import CaseSubmitPage from '../pages/Submit/CaseSubmitPage'
 import CaseSubmitQuestionsPage from '../pages/Submit/CaseSubmitQuestionsPage'
 import CaseSubmitSummaryPage from '../pages/Submit/CaseSubmitSummaryPage'
 import CaseSubmitOpinionPage from '../pages/Submit/CaseSubmitOpinionPage'
 import CaseSubmitCompletePage from '../pages/Submit/CaseSubmitCompletePage'
+
 import ChatbotPage from '../pages/Chatbot/ChatbotPage'
+
 import NotFoundPage from '../pages/Error/NotFoundPage'
+import { AfterStoryHomePage, CompleteAfterStoryPage, PreviewAfterStoryPage, WriteAfterStoryPage } from '../pages/AfterStory/AfterStoryPage'
 import { PATHS } from './paths'
 
 /**
@@ -21,7 +32,9 @@ import { PATHS } from './paths'
  * 디자인이 확정되지 않은 화면은 아직 라우트를 만들지 않는다.
  *
  * 아직 연결하지 않은 경로 (디자인 확정 후 추가):
- *   /demo · /cases/:caseId · /afterstory · /my
+
+ *   /demo · /afterstory
+
  *
  * /signup은 컨펌 시안이 없지만 발표 시연을 위해 팀 결정으로 추가했다. (PROJECT_SPEC.md §9-2)
  *
@@ -47,29 +60,60 @@ function AppRoutes() {
         <Route element={<MainLayout />}>
           <Route path={PATHS.home} element={<HomePage />} />
           <Route path={PATHS.plaza} element={<PlazaPage />} />
+          <Route path={PATHS.caseDetail} element={<CaseDetailPage />} />
+          <Route path={PATHS.caseResult} element={<CaseResultPage />} />
+          <Route path={PATHS.my} element={<MyPage />} />
+          <Route path={PATHS.afterStory} element={<AfterStoryHomePage />} />
+
         </Route>
+
+        {/* MY 하위 상세 화면은 Figma 시안대로 하단 내비게이션 없이 표시한다. */}
+        <Route path={PATHS.myCases} element={<MyCasesPage />} />
+        <Route path={PATHS.myCaseResult} element={<MyCaseResultPage />} />
 
         {/* 가입·로그인 계열. 하단 내비게이션을 표시하지 않는다. */}
         <Route element={<AuthLayout />}>
+          <Route path={PATHS.login} element={<LoginPage />} />
           <Route path={PATHS.signup} element={<SignupPage />} />
         </Route>
 
-        {/*
-          사건 상세·접수 등 단일 화면 흐름. 하단 내비게이션을 두지 않는다.
-          5단계가 공유하는 입력 상태는 CaseSubmitFlow의 Context가 들고 있다.
-          로그인 필요 여부가 미정이라 아직 접근 가드를 걸지 않았다. (PROJECT_SPEC.md §9-9)
-        */}
-        <Route element={<DetailLayout />}>
-          <Route element={<CaseSubmitFlow />}>
-            <Route path={PATHS.caseSubmit} element={<CaseSubmitPage />} />
-            <Route path={PATHS.caseSubmitQuestions} element={<CaseSubmitQuestionsPage />} />
-            <Route path={PATHS.caseSubmitSummary} element={<CaseSubmitSummaryPage />} />
-            <Route path={PATHS.caseSubmitOpinion} element={<CaseSubmitOpinionPage />} />
-            <Route path={PATHS.caseSubmitComplete} element={<CaseSubmitCompletePage />} />
-          </Route>
+{/* 사건 접수는 진행 상태를 공유하는 5단계 흐름이며 하단 내비게이션을 표시하지 않는다. */}
+<Route element={<DetailLayout />}>
+  <Route
+    path={PATHS.afterStoryMine}
+    element={<Navigate to="/afterstory/write/friend" replace />}
+  />
 
-          {/* 챗봇. Figma `개발` 페이지의 Chatbot 프레임 3종(Initial·Conversation·Conversation02) 기준. */}
-          <Route path={PATHS.chatbot} element={<ChatbotPage />} />
+  <Route
+    path={PATHS.afterStoryCommunity}
+    element={<Navigate to={PATHS.afterStory} replace />}
+  />
+
+  <Route
+    path={PATHS.afterStoryWrite}
+    element={<WriteAfterStoryPage />}
+  />
+
+  <Route
+    path={PATHS.afterStoryPreview}
+    element={<PreviewAfterStoryPage />}
+  />
+
+  <Route
+    path={PATHS.afterStoryComplete}
+    element={<CompleteAfterStoryPage />}
+  />
+
+  <Route path={PATHS.caseSubmit} element={<CaseSubmitFlow />}>
+    <Route index element={<CaseSubmitPage />} />
+    <Route path="questions" element={<CaseSubmitQuestionsPage />} />
+    <Route path="summary" element={<CaseSubmitSummaryPage />} />
+    <Route path="opinion" element={<CaseSubmitOpinionPage />} />
+    <Route path="complete" element={<CaseSubmitCompletePage />} />
+  </Route>
+
+  <Route path={PATHS.chatbot} element={<ChatbotPage />} />
+</Route>
         </Route>
 
         {/* 잘못된 URL. 없는 사건 ID와는 구분해서 처리한다. (PROJECT_SPEC.md §7-3) */}
