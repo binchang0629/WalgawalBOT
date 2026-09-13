@@ -1,0 +1,5 @@
+import React, { useState } from 'react';
+import { createRoot } from 'react-dom/client';
+import VerdictScene from './VerdictScene.jsx';
+function Demo(){const [still,setStill]=useState(false);return <main style={{width:'100%',maxWidth:402,margin:'auto',background:'white',minHeight:'100dvh',padding:'28px 0',boxSizing:'border-box'}}><div style={{display:'flex',justifyContent:'center',gap:8,marginBottom:26}}>{[[false,'애니메이션'],[true,'정지 화면']].map(([value,label])=><button key={label} type="button" aria-pressed={still===value} onClick={()=>setStill(value)} style={{font:'inherit',fontSize:11,padding:'9px 14px',border:'1px solid #e5e7ec',borderRadius:20,background:still===value?'#2354ff':'white',color:still===value?'white':'#555'}}>{label}</button>)}</div><div style={{padding:'0 24px'}}><VerdictScene still={still} juryPercent={61} aiReason="계약에 명시된 수정 2회를 완료했고, 의뢰인이 결과물을 실제 사용하고 있다는 점을 고려했어요."/></div><p style={{fontSize:10,color:'#818691',textAlign:'center',padding:'20px 24px',lineHeight:1.6}}>인터랙션 시안 · 61%와 근거는 예시 값이야.</p></main>}
+createRoot(document.getElementById('root')).render(<React.StrictMode><Demo/></React.StrictMode>);
