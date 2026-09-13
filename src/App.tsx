@@ -1,5 +1,7 @@
 import AppRoutes from './routes/AppRoutes'
 import SessionProvider from './state/SessionProvider'
+import LoginGateProvider from './state/LoginGateProvider'
+import LoginRewardHost from './state/LoginRewardHost'
 
 /**
  * 전역 Provider와 라우트만 연결한다.
@@ -8,7 +10,12 @@ import SessionProvider from './state/SessionProvider'
 function App() {
   return (
     <SessionProvider>
-      <AppRoutes />
+      {/* 로그인 유도 팝업은 세션 상태를 읽으므로 SessionProvider 안에 둔다. */}
+      <LoginGateProvider>
+        <AppRoutes />
+        {/* 로그인·가입을 마치면 보던 화면 위에 출석 포인트 팝업을 띄운다. */}
+        <LoginRewardHost />
+      </LoginGateProvider>
     </SessionProvider>
   )
 }

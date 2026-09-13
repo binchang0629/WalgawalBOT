@@ -14,8 +14,14 @@ function FloatingChatButton() {
     || pathname === PATHS.afterStoryPreview
     || pathname === PATHS.afterStoryComplete
   const isCaseSubmitting = pathname === PATHS.caseSubmit || pathname.startsWith('/cases/new/')
+  // 로그인·회원가입 시안에는 챗봇 버튼이 없다. 하단 링크와도 겹친다.
+  const isAuthenticating = pathname === PATHS.login
+    || pathname === PATHS.signup
+    || pathname === PATHS.signupComplete
 
-  if (pathname === PATHS.chatbot || isAfterStoryWriting || isCaseSubmitting) return null
+  if (pathname === PATHS.chatbot || isAfterStoryWriting || isCaseSubmitting || isAuthenticating) {
+    return null
+  }
 
   const sitsAboveNavigation = [PATHS.home, PATHS.plaza, PATHS.afterStory, PATHS.my].some((route) => route === pathname)
     || /^\/cases\/[^/]+(?:\/result)?$/.test(pathname)

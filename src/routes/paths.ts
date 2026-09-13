@@ -10,6 +10,8 @@ export const PATHS = {
   login: '/login',
   /** 회원가입 (데모). 컨펌 시안 없이 팀 결정으로 추가한 화면이다. (PROJECT_SPEC.md §9-2) */
   signup: '/signup',
+  /** 가입 완료 환영 화면. Figma `2187:24600`. */
+  signupComplete: '/signup/complete',
   home: '/home',
   plaza: '/plaza',
   caseDetail: '/cases/:caseId',

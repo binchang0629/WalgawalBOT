@@ -1,0 +1,326 @@
+/*
+ * 출석 포인트 팝업. Figma `2187:24701` 섹션의 `loginRewardPopUp01`~`06`.
+ *
+ * 좌표·각도·크기는 시안의 relativeTransform 실측값이다. 소수점을 임의로 반올림하지 않는다.
+ * 모든 조각은 `transform-origin: 0 0` + `translate() rotate()` 순서로 놓는다.
+ * 시안의 변환 행렬이 그 순서라, 바꾸면 위치가 어긋난다.
+ *
+ * 클래스 이름은 기호 없이 camelCase로 쓴다. (사용자 요청)
+ */
+
+.loginRewardOverlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    background: rgb(37 37 37 / 70%);
+    pointer-events: auto;
+    overscroll-behavior: contain;
+    animation: loginRewardDimIn 240ms ease-out both;
+}
+
+/* 시안 팝업은 402 × 415. 판멍이가 위로 넘치므로 잘라내지 않는다. */
+.loginRewardPopUp {
+    position: relative;
+    width: 100%;
+    height: 415px;
+    overflow: visible;
+    border-radius: 12px 12px 0 0;
+    background: #fff;
+    color: var(--ink);
+    font-family: var(--font-body);
+    filter: drop-shadow(0 5px 20.5px rgb(45 44 41 / 70%));
+    animation: loginRewardPopUpIn 420ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.loginRewardPopUp:focus { outline: none; }
+
+@keyframes loginRewardDimIn {
+    from { background-color: rgb(37 37 37 / 0%); }
+    to { background-color: rgb(37 37 37 / 70%); }
+}
+
+@keyframes loginRewardPopUpIn {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+/* ---------- 머리말 ---------- */
+
+.loginRewardHeader {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    left: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.loginRewardHeader button {
+    display: grid;
+    place-items: center;
+    align-self: flex-end;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.loginRewardHeader img { display: block; width: 24px; height: 24px; }
+
+.loginRewardGreeting {
+    margin: 0;
+    color: var(--neutral-800);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.loginRewardGreeting b { color: var(--orange-700); font-weight: 700; }
+
+/* ---------- 포인트 그릇 ---------- */
+
+.loginRewardBowl {
+    position: absolute;
+    top: 105px;
+    left: 41px;
+    width: 320px;
+    height: 215px;
+}
+
+/* 그릇 그림은 위로 20px 넘겨 자른 창으로 보여준다. 시안의 크롭 값이다. */
+.loginRewardBowlImage {
+    position: absolute;
+    top: -20px;
+    left: 0;
+    width: 320px;
+    height: 215px;
+    overflow: hidden;
+}
+
+.loginRewardBowlImage img {
+    position: absolute;
+    top: -77.42%;
+    left: 0;
+    width: 100%;
+    height: 186.19%;
+    max-width: none;
+}
+
+/* 숫자 판. 시안 기준 그릇 그림 안쪽 (118, 151) 88 × 29. */
+.loginRewardBadge {
+    position: absolute;
+    top: 151px;
+    left: 118px;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 1px;
+    width: 88px;
+    height: 29px;
+    margin: 0;
+    overflow: hidden;
+    background: #060c1b;
+    color: #fff;
+    line-height: 1.3;
+}
+
+.loginRewardBadgeNumber { font-size: 25px; font-weight: 700; }
+.loginRewardBadgeUnit { font-size: 16px; font-weight: 400; }
+
+/* 동전이 닿는 순간 숫자가 한 번 튄다. */
+.loginRewardStage-gained .loginRewardBadgeNumber {
+    display: inline-block;
+    animation: loginRewardBadgePop 420ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes loginRewardBadgePop {
+    0% { transform: scale(1); }
+    35% { transform: scale(1.22); }
+    100% { transform: scale(1); }
+}
+
+/* ---------- 판멍이와 동전 ---------- */
+
+.loginRewardMascot {
+    position: absolute;
+    inset: 0;
+    overflow: visible;
+    pointer-events: none;
+}
+
+/*
+ * 조각마다 상자를 두고 그 안에서 그림을 잘라 쓴다.
+ * 아래 퍼센트는 시안이 그림을 어떻게 잘라 넣었는지를 그대로 옮긴 값이다.
+ * object-fit으로 흉내 내면 잘리는 위치가 달라진다.
+ */
+.loginRewardMascot > span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    overflow: hidden;
+    transform-origin: 0 0;
+}
+
+.loginRewardMascot img {
+    position: absolute;
+    display: block;
+    max-width: none;
+}
+
+/* 귀 — 움직이지 않는다. 그림이 상자를 그대로 채운다. */
+.loginRewardEar {
+    width: 81px;
+    height: 130px;
+    transform: translate(206px, -153px);
+}
+
+.loginRewardEar img { top: 0; left: 0; width: 100%; height: 100%; }
+
+/* 몸통 — 팔의 뿌리를 덮는다. */
+.loginRewardBase {
+    width: 306px;
+    height: 186px;
+    transform: translate(-17px, -165px);
+}
+
+.loginRewardBase img { top: -24.13%; left: -26.02%; width: 161.79%; height: 177.78%; }
+
+/*
+ * 오른팔 — 동전을 놓으며 내려온다.
+ * 01: (161, -8.55) -75.02°  →  02 이후: (177.85, -48.41) -22.59°
+ */
+.loginRewardArm {
+    width: 75px;
+    height: 126px;
+    transform: translate(161px, -8.55px) rotate(-75.02deg);
+    animation: loginRewardArmSwing 900ms cubic-bezier(.33, 0, .2, 1) 380ms both;
+}
+
+.loginRewardArm img { top: 0; left: -60.12%; width: 208.24%; height: 118.25%; }
+
+@keyframes loginRewardArmSwing {
+    0% { transform: translate(161px, -8.55px) rotate(-75.02deg); }
+    55%, 100% { transform: translate(177.85px, -48.41px) rotate(-22.59deg); }
+}
+
+/* 손 — 팔과 같은 박자로 움직인다. */
+.loginRewardHand {
+    width: 52px;
+    height: 52px;
+    transform: translate(241px, -12.33px) rotate(-73.92deg);
+    animation: loginRewardHandSwing 900ms cubic-bezier(.33, 0, .2, 1) 380ms both;
+}
+
+.loginRewardHand img { top: .45%; left: 1.46%; width: 97.79%; height: 99.38%; }
+
+@keyframes loginRewardHandSwing {
+    0% { transform: translate(241px, -12.33px) rotate(-73.92deg); }
+    55%, 100% { transform: translate(251.63px, -8.66px) rotate(25.47deg); }
+}
+
+/*
+ * 동전 — 손에서 놓여 그릇으로 떨어진다.
+ * 시안 네 장의 좌표를 이어 붙였다. 떨어질수록 작아지는 것도 시안 값이다.
+ *   01 (226, -28.85) 76.22px  →  02 (192, 35)  →  04 (188.31, 78.63) ×0.879
+ *   →  05 (191.28, 170.03) ×0.682
+ */
+.loginRewardCoin {
+    width: 76.22px;
+    height: 74.16px;
+    transform: translate(226px, -28.85px) rotate(-6.89deg);
+    animation: loginRewardCoinDrop 820ms cubic-bezier(.42, 0, .4, 1) 380ms both;
+}
+
+.loginRewardCoin img { top: -14.21%; left: -17.67%; width: 135.97%; height: 128.42%; }
+
+@keyframes loginRewardCoinDrop {
+    0% { transform: translate(226px, -28.85px) rotate(-6.89deg) scale(1); }
+    35% { transform: translate(192px, 35.04px) rotate(-16.81deg) scale(1); }
+    70% { transform: translate(188.31px, 78.63px) rotate(-24deg) scale(.879); }
+    100% { transform: translate(191.28px, 170.03px) rotate(-30deg) scale(.682); }
+}
+
+/* ---------- 하단 안내 ---------- */
+
+/* 시안 Footer / Sticky action — 높이 110, 위 12, 안내 52, 아래 46. */
+.loginRewardFooter {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 12px 24px 46px;
+}
+
+.showcase--mobile .loginRewardFooter {
+    padding-bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+}
+
+/* 숫자가 정리된 다음에 뜬다. 그 전에는 자리만 잡아 둔다. */
+.loginRewardNotice {
+    /*
+     * grid나 flex로 두면 글자 사이 공백이 사라지거나 칸 폭에 맞춰 접힌다.
+     * 시안은 한 줄이라 블록으로 두고 줄높이로 세로 가운데를 맞춘다.
+     */
+    display: block;
+    height: 52px;
+    white-space: nowrap;
+    margin: 0;
+    padding: 0 16px;
+    border-radius: 12px;
+    background: var(--orange-100);
+    color: var(--neutral-600);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 52px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 320ms ease-out, transform 320ms ease-out;
+}
+
+.loginRewardNotice b { color: var(--orange-900); font-weight: 400; }
+
+.loginRewardStage-settled .loginRewardNotice {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ---------- 움직임을 줄이는 설정 ---------- */
+
+/*
+ * 떨어지는 연출을 모두 끄고 마지막 장면만 보여준다.
+ * 동전은 그릇에 들어간 상태, 팔은 내린 상태다.
+ */
+@media (prefers-reduced-motion: reduce) {
+    .loginRewardOverlay,
+    .loginRewardPopUp,
+    .loginRewardBadgeNumber { animation: none; }
+
+    .loginRewardNotice { transition: none; }
+
+    .loginRewardArm {
+        animation: none;
+        transform: translate(177.85px, -48.41px) rotate(-22.59deg);
+    }
+
+    .loginRewardHand {
+        animation: none;
+        transform: translate(251.63px, -8.66px) rotate(25.47deg);
+    }
+
+    .loginRewardCoin {
+        animation: none;
+        transform: translate(191.28px, 170.03px) rotate(-30deg) scale(.682);
+    }
+}
+
+.loginRewardHeader button:focus-visible {
+    outline: 3px solid var(--blue-700);
+    outline-offset: 2px;
+}

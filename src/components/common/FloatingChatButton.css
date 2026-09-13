@@ -1,6 +1,8 @@
 .floating-chat-button {
     position: absolute;
-    right: 16px;
+    /* 시안은 우측 16px이지만 머리 스프라이트 좌우에 투명 여백이 있어
+       실제로는 더 안쪽으로 보인다. 6px 당겨 눈으로 맞춘 값이다. */
+    right: 10px;
     bottom: 16px;
     z-index: 30;
     display: grid;
@@ -18,8 +20,11 @@
     transition: transform .18s ease;
 }
 
+/* 시안(2191:3560)은 하단 내비에 딱 붙은 +0이다. 기존 +16px은 아이콘이 너무 떠 보인다는
+   피드백이 있어 내비 바로 위로 내렸고, 거기서 6px 더 내려 내비에 살짝 걸치게 했다.
+   머리 스프라이트 아래쪽에 투명 여백이 있어 실제로 가려지는 부분은 그보다 적다. */
 .floating-chat-button--above-nav {
-    bottom: calc(var(--device-bottom-nav) + 16px);
+    bottom: calc(var(--device-bottom-nav) - 6px);
 }
 
 .floating-chat-button span {
