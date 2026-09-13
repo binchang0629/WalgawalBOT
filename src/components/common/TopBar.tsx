@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import searchIcon from '../../assets/icons/search.svg'
 import notificationIcon from '../../assets/icons/notification.svg'
 import './TopBar.css'
@@ -15,15 +16,17 @@ import './TopBar.css'
  */
 
 interface TopBarProps {
+  /** 화면별 확정 시안에 별도 로고 표기가 있을 때만 지정한다. */
+  logo?: ReactNode
   /** 읽지 않은 알림 표시. 서버가 없어 지금은 화면에서 내려준다. */
   hasUnreadNotification?: boolean
 }
 
-function TopBar({ hasUnreadNotification = false }: TopBarProps) {
+function TopBar({ hasUnreadNotification = false, logo }: TopBarProps) {
   return (
     <header className="top-bar">
       <strong className="top-bar__logo">
-        왈가왈<span>BOT</span>
+        {logo ?? <>왈가왈<span>BOT</span></>}
       </strong>
       <div className="top-bar__actions">
         <button type="button" className="top-bar__action" aria-label="검색">

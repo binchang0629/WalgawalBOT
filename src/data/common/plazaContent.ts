@@ -12,8 +12,8 @@ export const rankingPanel = {
 
 export const jurorRanking: JurorRank[] = [
   { rank: 1, nickname: '정의의 다람쥐', point: 1045 },
-  { rank: 2, nickname: '판결 요정', point: 842 },
-  { rank: 3, nickname: '증거수집가', point: 756 },
+  { rank: 2, nickname: '판결 요정', point: 845 },
+  { rank: 3, nickname: '증거 수집가', point: 756 },
 ]
 
 export const caseCategories: (CaseCategory | '전체')[] = [
@@ -27,7 +27,7 @@ export const caseCategories: (CaseCategory | '전체')[] = [
 
 export const plazaSortOptions: { key: PlazaSortKey; label: string }[] = [
   { key: 'latest', label: '최신순' },
-  { key: 'popular', label: '인기순' },
+  { key: 'closed', label: '종결된 순' },
 ]
 
 type PlazaCase = CaseSummary & {
@@ -35,6 +35,10 @@ type PlazaCase = CaseSummary & {
   summary: string
   viewCount: number
   isVerdictAligned: boolean
+  /** 최신 광장 시안은 일치 여부와 독립적으로 배지 색을 지정한다. */
+  verdictTone?: 'blue' | 'orange'
+  /** 종결이 확인된 사건만 우선 정렬한다. 미확인 사례의 마감일은 만들지 않는다. */
+  isClosed?: boolean
 }
 
 /** 필터에서 선택할 수 있는 다섯 카테고리는 각각 네 건의 정적 시연 사례를 제공한다. */
@@ -43,27 +47,30 @@ export const plazaCases: PlazaCase[] = [
     id: 'case-company-874',
     category: '직장',
     tag: '직장',
-    title: '수정 2회를 마쳤는데,\n의뢰인이 잔금 지급을 미루고 있어요.',
-    summary: '카페 홍보영상을 제작한 뒤, 의뢰인이 추가 수정과 원본 파일 제공을 요구하며 잔금 지급을 미루고 있어요.',
+    title: '잔금과 원본 파일을 문제 삼는 의뢰인 때문에\n골치가 아픕니다.',
+    summary: '카페 홍보영상 제작을 180만원에 맡아 수정 2회 후 최종본을 전달했어요. 의뢰인은 영상을 SNS 광고에 게시했지만, 색감이 생각과 다르다며 추가 수정과 편집 원본 파일을 요구했습니다.',
     viewCount: 465,
     commentCount: 46,
     isVerdictAligned: true,
+    verdictTone: 'orange',
+    isClosed: true,
   },
   {
     id: 'case-secret-told',
     category: '친구',
     tag: '친구',
-    title: '친한 친구가 학교에서 저의 비밀을\n다른 친구에게 말했어요.',
-    summary: '믿고 털어놓은 비밀이 제 허락 없이 퍼졌어요.',
+    title: '친한 친구가 학교에서 저의 비밀을 다른 친구에게 말했어요',
+    summary: '믿고 털어놓은 비밀이 제 허락 없이 퍼졌어요',
     viewCount: 245,
     commentCount: 22,
     isVerdictAligned: false,
+    verdictTone: 'blue',
   },
   {
     id: 'case-parents-interfere',
     category: '가족',
     tag: '가족',
-    title: '부모님이 자꾸만 제 결정에 간섭하는데\n해결 방안을 알려주세요.',
+    title: '부모님이 자꾸만 제 결정에 간섭하는데 해결 방안을 알려주세요.',
     summary: '내 삶의 선택을 존중받고 싶은데 계속 설득하려 하세요.',
     viewCount: 125,
     commentCount: 14,
@@ -72,10 +79,10 @@ export const plazaCases: PlazaCase[] = [
   {
     id: 'case-invite-ex',
     category: '연인',
-    tag: '연인',
+    tag: '연애',
     title: '전 애인을 친구 모임에 초대해도\n괜찮을까요?',
-    summary: '친구로 지내고 싶지만 현재 연인이 불편해해요.',
-    viewCount: 144,
+    summary: '친구로 지내고 싶지만 현재 연인이 불편해해요',
+    viewCount: 147,
     commentCount: 47,
     isVerdictAligned: false,
   },
