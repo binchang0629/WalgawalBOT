@@ -1,3 +1,8 @@
+import commentAvatar1 from '../../assets/case/disagreement/comment-1.png'
+import commentAvatar2 from '../../assets/case/disagreement/comment-2.png'
+import commentAvatar3 from '../../assets/case/disagreement/comment-3.png'
+import commentAvatar4 from '../../assets/case/disagreement/comment-4.png'
+import commentAvatar5 from '../../assets/case/disagreement/comment-5.png'
 import authorAvatar from '../../assets/case/jihoon/author.png'
 import verdictArtwork from '../../assets/case/jihoon/verdict-artwork.png'
 
@@ -12,6 +17,7 @@ export interface JihoonSimilarComment {
   body: string
   likes: number
   dislikes: number
+  avatarUrl?: string
 }
 
 export const jihoonSimilarCase = {
@@ -59,9 +65,14 @@ export const jihoonSimilarResult = {
     { id: 'other', label: '상대방 입장이 더 타당해요', percent: 61 },
     { id: 'writer', label: '글쓴이 입장이 더 타당해요', percent: 9 },
     { id: 'both', label: '양쪽 모두 일리가 있어요', percent: 27 },
-    { id: 'neither', label: '양쪽 모두 타당하지 않아요', percent: 4 },
+    { id: 'neither', label: '양쪽 모두 타당하지 않아요', percent: 3 },
   ] as const,
   aiVerdict: {
+    summary: '약속한 수정은 완료했고,\n결과물도 사용하고 있다는 점',
+    comparisonReasons: [
+      '계약서에 명시된 수정 2회를 완료했고, 의뢰인이 영상을 실제 광고에 사용하고 있다는 점을 고려했어요.',
+      '계약 범위를 벗어난 추가 수정과 원본 파일 제공을 잔금 지급 조건으로 새롭게 요구하는 것은 타당하지 않다고 판단했어요.',
+    ],
     title: 'AI 판멍이는 글쓴이의 손을 들어줬어요.',
     reasons: [
       '계약서에 명시된 수정 2회를 모두 완료했고, 의뢰인이 영상을 실제 광고에 사용하고 있다는 점을 고려했어요.',
@@ -75,6 +86,7 @@ export const jihoonSimilarResult = {
   comments: [
     {
       id: 'jihoon-comment-1',
+      avatarUrl: commentAvatar1,
       nickname: '달이예쁘네요',
       createdAt: '1분 전',
       voteId: 'other',
@@ -85,6 +97,7 @@ export const jihoonSimilarResult = {
     },
     {
       id: 'jihoon-comment-2',
+      avatarUrl: commentAvatar2,
       nickname: '침낭펴야지?',
       createdAt: '3분 전',
       voteId: 'other',
@@ -95,6 +108,7 @@ export const jihoonSimilarResult = {
     },
     {
       id: 'jihoon-comment-3',
+      avatarUrl: commentAvatar3,
       nickname: '월요병말기',
       createdAt: '12분 전',
       voteId: 'both',
@@ -105,6 +119,7 @@ export const jihoonSimilarResult = {
     },
     {
       id: 'jihoon-comment-4',
+      avatarUrl: commentAvatar4,
       nickname: '판멍이는귀여워',
       createdAt: '11분 전',
       voteId: 'other',
@@ -115,6 +130,7 @@ export const jihoonSimilarResult = {
     },
     {
       id: 'jihoon-comment-5',
+      avatarUrl: commentAvatar5,
       nickname: '아아러버',
       createdAt: '15분 전',
       voteId: 'both',

@@ -1,0 +1,93 @@
+@font-face {
+  font-family: 'Verdict Paperlogy';
+  src: url('../../../assets/case/disagreement/fonts/Paperlogy-9Black.woff2') format('woff2');
+  font-weight: 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Verdict Noto';
+  src: url('../../../assets/case/disagreement/fonts/NotoSansKR-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+.disagreement-hero {
+  position: relative;
+  container-type: inline-size;
+  width: calc(100% + var(--result-gutter, var(--content-gutter)) * 2);
+  margin-inline: calc(var(--result-gutter, var(--content-gutter)) * -1);
+  padding: 26px 0 6px;
+  background: #fff;
+}
+.disagreement-hero h2 {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  padding-block: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font: 900 36px/1.2 'Verdict Paperlogy', Paperlogy, sans-serif;
+  text-align: center;
+  color: #252525;
+}
+.disagreement-hero h2 span { color: #374bff; }
+/* 354×362 무대의 장식만 비례 배치한다. 본문/제목/하단 문구는 일반 레이아웃이다. */
+.disagreement-hero__stage {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  aspect-ratio: 354 / 362;
+  overflow: visible;
+}
+.disagreement-hero__stage img {
+  position: absolute;
+  display: block;
+  max-width: none;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+}
+.disagreement-hero__background { left: 0; top: -1.9337%; width: 100%; aspect-ratio: 1; }
+.disagreement-hero__flow { left: 0; top: -2.7624%; width: 100%; height: 111.0497%; }
+.disagreement-hero__panmung {
+  left: 1%; top: 24.3094%; width: 64%; aspect-ratio: 1;
+  mask: url('../../../assets/case/disagreement/panmung-matte.svg') center / 100% 100% no-repeat;
+}
+.disagreement-hero__author { left: 44.9153%; top: 27.6243%; width: 24.0113%; aspect-ratio: 1; }
+.disagreement-hero__opponent { left: 57.9096%; top: 52.2099%; width: 31.9209%; aspect-ratio: 1; }
+.disagreement-hero__stage p { position: absolute; margin: 0; font-size: 3.9548cqw; font-weight: 600; }
+.disagreement-hero__ai { left: 3.2768%; top: 12.4309%; width: 34.4068%; color: #1035c7; text-align: center; font-family: Pretendard, sans-serif; line-height: 1.3; }
+.disagreement-hero__arrow { left: 18.0791%; top: 24.3094%; width: 7.9096%; height: 7.1823%; }
+.disagreement-hero__jury { left: 73.7288%; top: 9.9448%; width: 20.0565%; color: #f57200; text-align: center; line-height: 1.3; }
+.disagreement-hero__percent { position: absolute; left: 72.5989%; top: 32.5967%; width: 23.1638%; display: flex; flex-direction: column; }
+.disagreement-hero__percent strong { color: #ff9524; font: 900 11.8644cqw/1.190476 'Verdict Paperlogy', sans-serif; white-space: nowrap; }
+.disagreement-hero__percent small { font-size: 6.4972cqw; }
+.disagreement-hero__percent > span { text-align: center; font-size: 3.6723cqw; font-weight: 600; line-height: 1.4; color: #939094; white-space: nowrap; }
+.disagreement-hero__legend { margin: 0; display: flex; align-items: center; justify-content: center; gap: 12px; color: #374bff; font-size: 14px; font-weight: 600; line-height: 1.3; }
+.disagreement-hero__legend i { font-style: normal; }
+.disagreement-hero__legend span:last-child { color: #fd8013; }
+.disagreement-hero__sr { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.disagreement-hero__footer { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.disagreement-hero__replay { position: relative; display: grid; place-items: center; width: 24px; height: 24px; margin: 0; border: 0; padding: 0; background: transparent; cursor: pointer; }
+.disagreement-hero__replay::before { content: ''; position: absolute; inset: -8px; }
+.disagreement-hero__replay img { display: block; width: 22.934px; height: 20.8px; }
+
+.disagreement-hero__replay:disabled { opacity: .45; cursor: default; }
+.disagreement-hero__replay:focus-visible { outline: 2px solid #374bff; outline-offset: 2px; border-radius: 8px; }
+/* 사용자 제공 v2의 등장 순서와 타이밍을 유지한다. */
+.is-playing .disagreement-hero__panmung { animation: disagreement-entrance .65s both; }
+.is-playing .disagreement-hero__author { animation: disagreement-pop .55s .2s both; }
+.is-playing .disagreement-hero__opponent,
+.is-playing .disagreement-hero__percent,
+.is-playing .disagreement-hero__jury { animation: disagreement-pop .65s 1.65s both; }
+@keyframes disagreement-entrance { from { opacity: 0; transform: translateY(15px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes disagreement-pop { 0% { opacity: 0; transform: translateY(7px) scale(.72); } 72% { opacity: 1; transform: scale(1.055); } 100% { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .disagreement-hero * { animation: none !important; transition: none !important; } }
+
+/* HTML 원본: 발밑/말풍선 아래쪽을 기준으로 확대하고 투표지 뒤에서 빛난다. */
+.disagreement-hero__flow { position: absolute; pointer-events: none; }
+.disagreement-hero__panmung { transform-origin: 50% 95%; }
+.disagreement-hero__author, .disagreement-hero__opponent { transform-origin: 50% 90%; }
+.disagreement-hero__glow { position: absolute; width: 30%; height: 29%; left: 59%; top: 52%; background: radial-gradient(ellipse, #ffdeb2, transparent 70%); }
+.is-playing .disagreement-hero__glow { animation: disagreement-pop .65s 1.65s both; }
