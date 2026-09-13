@@ -1,0 +1,206 @@
+/*
+ * 로그인 유도 팝업. Figma 개발 페이지 `2298:16848` · `2298:17535` · `2298:17673` · `2298:17811`.
+ *
+ * 시안 프레임이 402px 기준이라 치수는 시안 값을 px 그대로 쓴다.
+ * 다만 캐릭터 이미지의 가로 위치만은 `left: 50%` + translate로 잡는다.
+ * 모바일에서 화면이 402보다 넓어도 캐릭터가 팝업 중앙을 따라가게 하려는 것이다.
+ *
+ * 클래스 이름은 기호 없이 camelCase로 쓴다. (사용자 요청)
+ */
+
+.loginPopUpOverlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    /* 시안 값: #252525 70%. 다른 시트(45% 검정)와 달리 이 화면만 이 값이다. */
+    background: rgb(37 37 37 / 70%);
+    pointer-events: auto;
+    overscroll-behavior: contain;
+    animation: loginPopUpDimIn 240ms ease-out both;
+}
+
+.loginPopUp {
+    position: relative;
+    width: 100%;
+    /* 캐릭터가 팝업 위로 튀어나오므로 잘리면 안 된다. */
+    overflow: visible;
+    padding: 12px 24px 46px;
+    border-radius: 20px 20px 0 0;
+    background: #fff;
+    color: var(--ink);
+    font-family: var(--font-body);
+    text-align: center;
+    animation: loginPopUpSlideIn 360ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.loginPopUp:focus { outline: none; }
+
+/*
+ * 모바일에는 목업 홈 인디케이터가 없다. 대신 기기의 안전 영역을 확보한다.
+ * PC의 46px은 시안에서 회색 버튼 아래 22px + 인디케이터 자리 24px이다.
+ */
+.showcase--mobile .loginPopUp {
+    padding-bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+}
+
+@keyframes loginPopUpDimIn {
+    from { background-color: rgb(37 37 37 / 0%); }
+    to { background-color: rgb(37 37 37 / 70%); }
+}
+
+@keyframes loginPopUpSlideIn {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .loginPopUpOverlay,
+    .loginPopUp { animation: none; }
+}
+
+/* ---------- 캐릭터 ---------- */
+
+/*
+ * 시안에서 캐릭터는 팝업 위쪽 바깥으로 걸쳐 있다.
+ * translateY(-100% + N)의 N은 이미지 아래 끝이 팝업 상단에서 얼마나 내려오는지다.
+ * translateX의 보정값은 이미지 중심과 팝업 중심의 차이다. 둘 다 시안 실측값이다.
+ */
+.loginPopUpMascot {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    pointer-events: none;
+}
+
+.loginPopUpMascot img {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.loginPopUpCaseSubmit .loginPopUpMascot {
+    width: 360px;
+    height: 208.743px;
+    /* 시안 실측값은 31.233px. 눈으로 보고 4px 더 내렸다. */
+    transform: translateX(calc(-50% + 1.312px)) translateY(calc(-100% + 35.233px));
+}
+
+.loginPopUpMy .loginPopUpMascot {
+    width: 301.902px;
+    height: 228.184px;
+    transform: translateX(calc(-50% + 6.049px)) translateY(calc(-100% + 50px));
+}
+
+/*
+ * AI 시안만 이미지에 벡터 마스크가 걸려 있다. 원본 SVG를 그대로 마스크로 쓴다.
+ * 마스크 크기·위치도 시안 실측값이라 이미지 크기를 바꾸면 같이 고쳐야 한다.
+ */
+.loginPopUpAiRecommend .loginPopUpMascot {
+    width: 296.484px;
+    height: 211.774px;
+    transform: translateX(calc(-50% + 3.694px)) translateY(calc(-100% + 44.756px));
+    mask: url("../../assets/auth/loginPopUpAiMask.svg") 5.431px 2.613px / 290.117px 184.404px no-repeat;
+    -webkit-mask: url("../../assets/auth/loginPopUpAiMask.svg") 5.431px 2.613px / 290.117px 184.404px no-repeat;
+}
+
+.loginPopUpDefault .loginPopUpMascot {
+    width: 276.691px;
+    height: 205.238px;
+    transform: translateX(calc(-50% + 4.396px)) translateY(calc(-100% + 40.538px));
+}
+
+/* 공통 시안에만 있는 열쇠 조각. 본 캐릭터 위에 따로 얹힌 레이어다. */
+.loginPopUpMascotKey {
+    position: absolute;
+    left: 138.35px;
+    top: 103.77px;
+    width: 67.1px;
+    height: 77.097px;
+    object-fit: cover;
+}
+
+/* ---------- 팝업 내용 ---------- */
+
+.loginPopUpHandle {
+    width: 40px;
+    height: 4px;
+    margin: 0 auto 8px;
+    border-radius: 999px;
+    background: var(--neutral-400);
+}
+
+.loginPopUpHeader {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 4px;
+}
+
+.loginPopUpHeader button {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    cursor: pointer;
+}
+
+.loginPopUpHeader img { display: block; width: 24px; height: 24px; }
+
+.loginPopUpTitle {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--neutral-900);
+}
+
+.loginPopUpBody {
+    margin: 20px 0 0;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--neutral-700);
+}
+
+.loginPopUpBody b { font-weight: 700; }
+
+.loginPopUpPrimary,
+.loginPopUpSecondary {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 52px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.loginPopUpPrimary {
+    margin-top: 32px;
+    background: var(--orange-700);
+    color: #fff;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.loginPopUpSecondary {
+    margin-top: 12px;
+    background: var(--neutral-100);
+    color: var(--neutral-400);
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.loginPopUpPrimary:focus-visible,
+.loginPopUpSecondary:focus-visible,
+.loginPopUpHeader button:focus-visible {
+    outline: 3px solid var(--blue-700);
+    outline-offset: 2px;
+}
