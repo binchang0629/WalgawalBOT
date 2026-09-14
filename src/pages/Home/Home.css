@@ -1201,23 +1201,6 @@
     border-radius: var(--radius-lg);
     background: #fff;
     filter: drop-shadow(0 4px 14px rgba(78, 62, 39, 0.09));
-    text-decoration: none;
-    color: inherit;
-}
-
-/*
- * 비로그인일 때만 버튼이 된다. 누르면 AI 맞춤 추천 로그인 안내 팝업이 뜬다.
- * 모양은 정적 카드와 같아야 하므로 버튼 기본 스타일만 지운다.
- */
-.ai-card--button {
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
-}
-
-.ai-card--button:focus-visible {
-    outline: 3px solid var(--blue-700);
-    outline-offset: 2px;
 }
 
 /* 시안은 판멍이를 좌우로 뒤집어 넣었다. */
@@ -1493,16 +1476,15 @@ img.ai-card__mascot {
  * 바늘은 두 겹이다.
  * 겉(span)은 비율에 따른 실제 각도를 맡고, 속(i)은 계속 흔들리는 몫을 맡는다.
  * 한 요소에 둘을 같이 걸면 흔들림 애니메이션이 각도 전환을 덮어써 버린다.
- * 회전축(아래 끝)은 시안 그대로 (154,111).
- * 길이는 시안이 63인데, 판멍이에 가려 보이는 구간이 짧아 68로 조금 늘렸다.
+ * 회전축은 눈금 중심(154,108) = 축 덮개의 한가운데다.
  */
 .close-card__needle {
     position: absolute;
     z-index: 1;
-    top: 43px;
+    top: 48px;
     left: calc(50% - 2px);
     width: 4px;
-    height: 68px;
+    height: 60px;
     transform: rotate(var(--close-needle-angle));
     transform-origin: 50% 100%;
     transition: transform 280ms ease;
@@ -1519,14 +1501,14 @@ img.ai-card__mascot {
     animation: close-needle-drift 11s ease-in-out infinite;
 }
 
-/* 바늘이 박혀 있는 축 덮개. 시안은 정원이 아니라 14 × 15.2 타원이다. */
+/* 바늘이 박혀 있는 축 덮개. */
 .close-card__knob {
     position: absolute;
     z-index: 1;
-    top: 101.25px;
+    top: 101px;
     left: calc(50% - 7px);
     width: 14px;
-    height: 15.24px;
+    height: 14px;
     border-radius: 50%;
     background: var(--gauge-ink);
 }
@@ -1585,11 +1567,10 @@ img.ai-card__mascot {
         transform: rotate(0deg);
     }
 }
-/* 시안 그대로 58 × 58, 눈금 상자 기준 (125, 73.4). */
 .close-card__mascot {
     position: absolute;
     z-index: 2;
-    top: 73.4px;
+    top: 73px;
     left: 50%;
     width: 58px;
     height: 58px;
@@ -1875,3 +1856,69 @@ img.ai-card__mascot {
  * opacity로 낮추면 레이어 전체가 흐려져 바깥 벽이 앞면과 어긋난다.
  */
 
+
+/*
+ * 깻잎은 젓가락과 잎을 따로 겹쳐 그린다. 겹쳐 두면 평소엔 한 장처럼 보이고,
+ * `절대 안됨`을 골랐을 때만 잎을 떼어 놓을 수 있다.
+ * 두 장 모두 원본 2배 해상도이며, 원본에 구워져 있던 그림자는 빼고 잘랐다.
+ * 그림자는 .balance-board__draggable의 drop-shadow가 두 장에 함께 걸린다.
+ */
+.balance-board__subject--perilla { position: relative; }
+.balance-board__leaf,
+.balance-board__chopsticks {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+/* 젓가락이 잎 위에 있어야 원본과 같은 그림이 된다. */
+.balance-board__chopsticks { z-index: 1; }
+/* 끝까지 살린 젓가락은 잎을 놓은 뒤에만 나온다. */
+.balance-board__chopsticks--full { opacity: 0; }
+.balance-section--result.balance-section--right:not(.balance-section--mint) .balance-board__chopsticks { opacity: 0; }
+.balance-section--result.balance-section--right:not(.balance-section--mint) .balance-board__chopsticks--full { opacity: 1; }
+
+/*
+ * `절대 안됨` = 떼어 주지 않는다. 그래서 젓가락이 집고 있던 깻잎을 도로 접시에 떨어뜨린다.
+ * 민트초코가 `그릇을 비워서` 답을 보여준다면, 깻잎은 `손을 놓아서` 답을 보여준다.
+ */
+.balance-section--result.balance-section--right:not(.balance-section--mint) .balance-board__leaf {
+    animation: perilla-drop 820ms cubic-bezier(.4, 0, .7, 1) 140ms both;
+}
+/* 빈 젓가락이 허공에 박제된 것처럼 보이지 않게, 놓는 순간 살짝 물러난다. */
+.balance-section--result.balance-section--right:not(.balance-section--mint) .balance-board__chopsticks,
+.balance-section--result.balance-section--right:not(.balance-section--mint) .balance-board__chopsticks--full {
+    animation: chopsticks-release 900ms cubic-bezier(.22, 1, .36, 1) 140ms both;
+}
+
+@keyframes perilla-drop {
+    /* 놓기 직전 잠깐 들렸다가 떨어진다. 바로 떨어뜨리면 놓는 동작이 안 보인다. */
+    0% { transform: none; }
+
+    16% { transform: translate(-3px, -10px) rotate(-8deg); }
+
+    100% { transform: translate(-76px, 58px) rotate(26deg); }
+}
+
+@keyframes chopsticks-release {
+    0% { transform: none; }
+
+    18% { transform: translate(0, -4px) rotate(-2deg); }
+
+    100% { transform: translate(4px, -10px) rotate(-5deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .balance-section--result.balance-section--right:not(.balance-section--mint) .balance-board__leaf {
+        animation: none;
+        transform: translate(-76px, 58px) rotate(26deg);
+    }
+
+    .balance-section--result.balance-section--right:not(.balance-section--mint) .balance-board__chopsticks,
+    .balance-section--result.balance-section--right:not(.balance-section--mint) .balance-board__chopsticks--full {
+        animation: none;
+        transform: translate(4px, -10px) rotate(-5deg);
+    }
+}
