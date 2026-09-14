@@ -19,7 +19,7 @@ function FloatingChatButton() {
     || pathname === PATHS.signup
     || pathname === PATHS.signupComplete
 
-  if (pathname === PATHS.chatbot || isAfterStoryWriting || isCaseSubmitting || isAuthenticating) {
+  if (pathname === PATHS.chatbot || pathname === PATHS.myPlan || isAfterStoryWriting || isCaseSubmitting || isAuthenticating) {
     return null
   }
 

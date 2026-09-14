@@ -460,8 +460,20 @@
     gap: 12px;
 }
 
+.case-overview--closed .case-overview__title {
+    white-space: pre-line;
+}
+
 .case-story--closed {
     gap: 21px;
+}
+
+.case-story--closed p {
+    white-space: pre-line;
+}
+
+.case-detail--closed .ai-summary {
+    border-radius: 8px;
 }
 
 .closed-case-result-link {

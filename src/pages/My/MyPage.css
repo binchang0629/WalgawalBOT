@@ -111,6 +111,8 @@
     color: #fff;
     box-shadow: 0 7px 18px rgba(31, 36, 128, .1);
 }
+.plan-card--active { display: block; text-decoration: none; }
+.plan-card--active:focus-visible { outline: 2px solid var(--blue-700); outline-offset: 3px; }
 .plan-card__header > div { gap: 8px; }
 .plan-card__header h2 { margin: 0; font-family: var(--font-title); font-size: 20px; line-height: 1; }
 .plan-card__header span { padding: 6px 12px; border-radius: 50px; color: var(--orange-700); background: #fff; font-size: 12px; font-weight: 500; line-height: 1; }
@@ -118,8 +120,44 @@
 .plan-card__details { margin-top: 12px; padding: 14px; border-radius: 8px; color: var(--brown); background: var(--orange-100); }
 .plan-card__details p { margin: 0 0 14px; font-size: 14px; line-height: 1.3; }
 .plan-card__details > div { gap: 8px; padding-top: 9px; border-top: 1px solid var(--brown); font-size: 14px; line-height: 1.3; }
-.plan-card__details button { display: flex; align-items: center; gap: 2px; padding: 0; border: 0; color: var(--brown); background: none; font-size: 12px; font-weight: 500; white-space: nowrap; }
-.plan-card__details button img { width: 12px; height: 13px; }
+.plan-card__manage-label { display: flex; align-items: center; gap: 2px; color: var(--brown); font-size: 12px; font-weight: 500; white-space: nowrap; }
+.plan-card__manage-label img { width: 12px; height: 13px; }
+
+.plan-card--empty {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 24px 16px 16px;
+    color: var(--ink);
+    background: var(--orange-050);
+}
+.plan-card__intro h2 {
+    margin: 0 70px 8px 0;
+    font-family: var(--font-title);
+    font-size: 16px;
+    line-height: 1;
+    word-break: keep-all;
+}
+.plan-card__intro p { margin: 0; color: var(--dark-brown); font-size: 13px; line-height: 1.3; word-break: keep-all; }
+.plan-card__mascot { position: absolute; top: 21px; right: 19px; display: block; width: 78px; height: 61px; object-fit: contain; pointer-events: none; }
+.plan-card__browse { width: calc(100% - 4px); min-height: 52px; margin-inline: 2px; padding: 12px 16px; border: 0; border-radius: 12px; color: #fff; background: var(--orange-700); font-size: 16px; font-weight: 700; line-height: 1.3; }
+.plan-card__browse:focus-visible { outline: 2px solid var(--blue-700); outline-offset: 3px; }
+
+/* 서아의 최신 시안만 적용해 지훈의 기존 마이페이지 간격을 유지한다. */
+.my-page--seoa .my-page__content { padding-bottom: 32px; }
+.my-page--seoa .profile-card { padding: 16px; }
+.my-page--seoa .profile-card__stats { padding-top: 14px; }
+.my-page--seoa .profile-card__stats dd { display: flex; align-items: center; justify-content: center; }
+.my-page--seoa .profile-card__switch { padding: 7px 13px; line-height: 1.3; }
+.my-page--seoa .profile-card__switch img { width: 10.5px; height: 10.5px; margin: 1.75px; }
+.my-page--seoa .my-menu__header { min-height: 47px; padding-block: 12px; }
+.my-page--seoa .my-menu__row { min-height: 57px; padding-block: 12px; }
+.my-page--seoa .my-menu__row:first-child { min-height: 56px; padding-bottom: 11px; }
+.my-page--seoa .my-menu__row.is-disabled { border-color: var(--neutral-400); }
+.my-page--seoa .my-menu__row:not(.is-disabled) { border-color: var(--neutral-400); }
+.my-page--seoa .expert-card.is-disabled { min-height: 62px; padding-block: 14px; color: var(--neutral-700); background: #fff; }
+.my-page--seoa .expert-card.is-disabled .my-menu__icon { color: var(--neutral-650); background: var(--neutral-200); }
 
 .my-menu {
     overflow: hidden;
@@ -140,7 +178,7 @@
 .my-menu__icon { display: grid; place-items: center; flex: none; width: 32px; height: 32px; border: 1px solid var(--neutral-400); border-radius: 50%; color: var(--orange-700); background: #fff; }
 .my-menu__row.is-disabled .my-menu__icon,
 .expert-card.is-disabled .my-menu__icon { border-color: transparent; color: #939094; background: var(--neutral-250); }
-.my-menu__icon::before { content: ''; width: 20px; height: 20px; background: currentColor; mask: var(--my-menu-icon) center / contain no-repeat; -webkit-mask: var(--my-menu-icon) center / contain no-repeat; }
+.my-menu__icon::before { content: ''; width: var(--my-menu-icon-size, 20px); height: var(--my-menu-icon-size, 20px); background: currentColor; mask: var(--my-menu-icon) center / contain no-repeat; -webkit-mask: var(--my-menu-icon) center / contain no-repeat; }
 .my-menu__chevron { flex: none; width: 14px; height: 14px; }
 .my-menu__row:not(.is-disabled) .my-menu__chevron {
     width: 5.25px;
@@ -172,4 +210,7 @@
     .profile-card__user small { white-space: normal; }
     .profile-card__switch { padding-inline: 10px; }
     .plan-card__details > div { align-items: flex-start; flex-direction: column; }
+    .plan-card__intro h2 { min-height: 32px; line-height: 1.2; }
+    .plan-card__mascot { width: 66px; height: 52px; right: 12px; }
+    .plan-card__intro p { padding-top: 4px; }
 }

@@ -1,7 +1,7 @@
 import { useId, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 
-import chevronIcon from '../../assets/case/result/breakdown-toggle.svg'
+import chevronIcon from '../../assets/case/disagreement/vote-chevron.svg'
 import dislikeIcon from '../../assets/case/result/dislike.svg'
 import emojiIcon from '../../assets/case/result/emoji.svg'
 import likeIcon from '../../assets/case/result/like.svg'
@@ -12,6 +12,7 @@ import submitIcon from '../../assets/case/result/submit.svg'
 import Pagination from '../../components/common/Pagination'
 import {
   jihoonSimilarCase,
+  jihoonSimilarReasonComparison,
   jihoonSimilarResult,
 } from '../../data/common/jihoonSimilarCaseContent'
 import type {
@@ -20,16 +21,18 @@ import type {
 } from '../../data/common/jihoonSimilarCaseContent'
 import useSession from '../../hooks/useSession'
 import CaseHeader from './components/CaseHeader'
+import VerdictDisagreementHero from './components/VerdictDisagreementHero'
+import VerdictReasonComparison from './components/VerdictReasonComparison'
 import './CaseResultPage.css'
 import './ClosedCaseResultPage.css'
 
 const COMMENTS_PER_PAGE = 5
 type CommentReaction = 'like' | 'dislike' | null
 
-const voteDisplay: Record<JihoonSimilarVoteId, { tone: 'blue' | 'orange' }> = {
+const voteDisplay: Record<JihoonSimilarVoteId, { tone: 'blue' | 'orange' | 'solid-orange' }> = {
   writer: { tone: 'blue' },
   other: { tone: 'orange' },
-  both: { tone: 'blue' },
+  both: { tone: 'solid-orange' },
   neither: { tone: 'orange' },
 }
 
@@ -40,16 +43,18 @@ function ResultBreakdown() {
 
   return (
     <div className="result-breakdown">
-      <button
-        type="button"
-        className="result-breakdown__toggle"
-        onClick={() => setIsExpanded((value) => !value)}
-        aria-expanded={isExpanded}
-        aria-controls={panelId}
-      >
-        <span>전체 결과 보기</span>
-        <img className={isExpanded ? 'is-open' : ''} src={chevronIcon} alt="" />
-      </button>
+      <h2 id="vote-result-title" className="result-breakdown__heading">
+        <button
+          type="button"
+          className="result-breakdown__toggle"
+          onClick={() => setIsExpanded((value) => !value)}
+          aria-expanded={isExpanded}
+          aria-controls={panelId}
+        >
+          <span>2심 배심원 투표 결과</span>
+          <img className={isExpanded ? 'is-open' : ''} src={chevronIcon} alt="" />
+        </button>
+      </h2>
 
       <div
         id={panelId}
@@ -82,14 +87,18 @@ function CommentItem({ comment, reaction, onReact }: {
   reaction: CommentReaction
   onReact: (reaction: Exclude<CommentReaction, null>) => void
 }) {
-  const tone = voteDisplay[comment.voteId].tone
+  const tone = comment.voteId ? voteDisplay[comment.voteId].tone : null
 
   return (
     <article className="result-comment">
       <div className="result-comment__head">
-        <div className="result-comment__avatar result-comment__avatar--placeholder" aria-hidden="true">{comment.nickname.slice(0, 1)}</div>
+        <div className="result-comment__avatar" aria-hidden="true">
+          <img src={comment.avatarUrl ?? jihoonSimilarResult.comments[0].avatarUrl} alt="" />
+        </div>
         <span>{comment.nickname} · {comment.createdAt}</span>
-        <strong className={'result-comment__badge is-' + tone}>{comment.voteLabel}</strong>
+        {tone && comment.voteLabel && (
+          <strong className={'result-comment__badge is-' + tone}>{comment.voteLabel}</strong>
+        )}
         <img className="result-comment__menu" src={menuIcon} alt="" aria-hidden="true" />
       </div>
       <p>{comment.body}</p>
@@ -145,9 +154,10 @@ function ClosedCaseResultPage() {
       {
         id: 'new-comment-' + nextCommentId.current++,
         nickname: currentUser?.nickname ?? '익명의 배심원',
+        avatarUrl: currentUser?.anonymousAvatarUrl ?? jihoonSimilarResult.comments[0].avatarUrl,
         createdAt: '방금 전',
-        voteId: 'both',
-        voteLabel: '의견 남김',
+        voteId: null,
+        voteLabel: null,
         body,
         likes: 0,
         dislikes: 0,
@@ -170,44 +180,21 @@ function ClosedCaseResultPage() {
       <div className="case-result__body case-result__body--closed">
         <section className="result-overview" aria-labelledby="result-case-title">
           <p className="result-overview__number">사건 번호 · {jihoonSimilarCase.caseNumber}</p>
-          <h2 id="result-case-title">{jihoonSimilarCase.title}</h2>
+          <h2 id="result-case-title">{jihoonSimilarCase.resultTitle}</h2>
           <div className="result-overview__author">
             <p>{jihoonSimilarCase.author.nickname} · {jihoonSimilarCase.age}</p>
           </div>
         </section>
 
-        <section className="vote-result" aria-labelledby="vote-result-title">
-          <div className="vote-result__heading">
-            <h2 id="vote-result-title">배심원 2심 결과</h2>
-          </div>
-          <div className="vote-result__artwork">
-            <img src={jihoonSimilarResult.artworkUrl} alt="판멍이가 배심원 결과를 발표하는 모습" />
-            <div className="vote-result__summary">
-              <span>{jihoonSimilarResult.verdict.label}</span>
-              <h3>{jihoonSimilarResult.verdict.title}</h3>
-              <p>{jihoonSimilarResult.verdict.description}</p>
-            </div>
-          </div>
-          <ResultBreakdown />
-        </section>
+        <VerdictDisagreementHero juryPercent={jihoonSimilarResult.breakdown[0].percent} />
 
-        <section className="ai-verdict ai-verdict--closed" aria-labelledby="ai-verdict-title">
-          <h2 id="ai-verdict-title">AI 1심 판결</h2>
-          <div className="ai-verdict__card">
-            <span>판멍이의 판단</span>
-            <h3>{jihoonSimilarResult.aiVerdict.title}</h3>
-            <div>
-              {jihoonSimilarResult.aiVerdict.reasons.map((reason) => <p key={reason}>{reason}</p>)}
-            </div>
-            <footer>
-              <span>판단 확신도 </span>
-              <strong>{jihoonSimilarResult.aiVerdict.confidence}%</strong>
-            </footer>
-          </div>
-          <div className="ai-verdict__comparison">
-            <strong>판단 비교</strong>
-            <p>{jihoonSimilarResult.aiVerdict.comparison}</p>
-          </div>
+        <VerdictReasonComparison
+          comparison={jihoonSimilarReasonComparison}
+          verdict={jihoonSimilarResult.aiVerdict}
+        />
+
+        <section className="vote-result" aria-labelledby="vote-result-title">
+          <ResultBreakdown />
         </section>
 
         <div className="case-result__section-divider case-result__section-divider--closed" />

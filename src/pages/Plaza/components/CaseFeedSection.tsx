@@ -12,7 +12,7 @@ import useSession from '../../../hooks/useSession'
 import { MY_CASES } from '../../../data/personas/myCases'
 import Pagination from '../../../components/common/Pagination'
 import { toCaseDetail } from '../../../routes/paths'
-import searchIcon from '../../../assets/icons/search-field.svg'
+import searchIcon from '../../../assets/plaza/search-field.svg'
 import chevronDown from '../../../assets/icons/chevron-down.svg'
 
 type CategoryFilter = CaseCategory | '전체'
@@ -171,8 +171,8 @@ function CaseFeedSection() {
                     </span>
                     <span
                       className={
-                        item.isVerdictAligned
-                          ? 'case-card__verdict is-aligned'
+                        (item.verdictTone ?? (item.isVerdictAligned ? 'blue' : 'orange')) === 'blue'
+                          ? 'case-card__verdict is-blue'
                           : 'case-card__verdict'
                       }
                     >
@@ -188,7 +188,7 @@ function CaseFeedSection() {
                   <p className="case-card__summary">{item.summary}</p>
 
                   <div className="case-card__info">
-                    <span>조회수 {item.viewCount}명</span>
+                    <span>조회수 {item.viewCount}</span>
                     <span>댓글 {item.commentCount}</span>
                   </div>
                 </>
@@ -222,6 +222,7 @@ function CaseFeedSection() {
           totalPages={totalPages}
           onPageChange={setCurrentPage}
           ariaLabel="사건 목록 페이지"
+          neutralArrows
         />
       </div>
     </section>
