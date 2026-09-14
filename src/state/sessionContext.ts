@@ -16,10 +16,20 @@ export interface SessionUser {
   anonymousAvatarUrl: string
 }
 
+export interface ActivityStats {
+  submittedCases: number
+  juryParticipations: number
+  points: number
+}
+
 export interface SessionValue {
   personaId: PersonaId
   sessionStatus: SessionStatus
   currentUser: SessionUser | null
+  /** 현재 계정의 데모 활동 집계. 실제 서버 기록이나 결제 포인트가 아니다. */
+  activityStats: ActivityStats
+  recordCaseSubmission: (submissionId: string) => void
+  recordJuryVote: (caseId: string) => void
   /** 가입·로그인 완료. 해당 퍼소나의 데모 계정으로 로그인 상태가 된다. */
   signIn: (personaId: PersonaId) => void
   signOut: () => void

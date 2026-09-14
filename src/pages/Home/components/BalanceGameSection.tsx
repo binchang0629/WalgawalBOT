@@ -6,22 +6,39 @@ import perilla from '../../../assets/home/figma/perilla.png'
 import perillaPile from '../../../assets/home/figma/perilla-pile.png'
 import plateLeft from '../../../assets/home/figma/plate-left.png'
 import plateRight from '../../../assets/home/figma/plate-right.png'
-import { balanceQuestions, homeSectionTitles } from '../../../data/common/homeContent'
+import mintScoop from '../../../assets/home/figma/mint-scoop.png'
+import mintBowlRed from '../../../assets/home/figma/mint-bowl-red.png'
+import mintBowlBlue from '../../../assets/home/figma/mint-bowl-blue.png'
+import mintBowlFilled from '../../../assets/home/figma/mint-bowl-filled-blue.png'
+import { balanceQuestions, mintBalanceQuestion, homeSectionTitles } from '../../../data/common/homeContent'
 
 type BalanceChoice = 'left' | 'right'
 
-/** Figma 1692:12930. 선택은 문항별 로컬 상태이며 새로고침하면 초기화된다. */
+const playableQuestions = [balanceQuestions[0], mintBalanceQuestion] as const
+
+/** 두 문항이 드래그·버튼·다시하기 동작을 공유한다. 문항 전환 시 이전 타이머를 정리한다. */
 function BalanceGameSection() {
+  const [questionIndex, setQuestionIndex] = useState(0)
+  return <BalanceRound key={playableQuestions[questionIndex].id} questionIndex={questionIndex}
+    onNext={() => setQuestionIndex(index => (index + 1) % playableQuestions.length)} />
+}
+
+function BalanceRound({ questionIndex, onNext }: { questionIndex: number; onNext: () => void }) {
   const [choice, setChoice] = useState<BalanceChoice | null>(null)
   const [phase, setPhase] = useState<'idle' | 'placing' | 'expanding' | 'result'>('idle')
   const [hoverChoice, setHoverChoice] = useState<BalanceChoice | null>(null)
   const [dragOffset, setDragOffset] = useState(0)
   const drag = useRef<{ id: number; x: number; y: number; scale: number; min: number; max: number } | null>(null)
-  const question = balanceQuestions[0]
+  const question = playableQuestions[questionIndex]
+  const isMint = question.id === 'balance-mint'
+  const subject = isMint ? mintScoop : perilla
+  const leftBowl = isMint ? mintBowlBlue : plateLeft
+  const rightBowl = isMint ? mintBowlRed : plateRight
+  const gameName = isMint ? '민트초코' : '깻잎'
 
   // 재시작·화면 이탈 때 이전 애니메이션 타이머를 모두 정리한다.
   useEffect(() => {
-    if (!choice) return
+    if (!choice || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     // 놓은 접시 위치를 한 번 그린 뒤 같은 위치에서 결과로 확대한다.
     const expand = window.setTimeout(() => setPhase('expanding'), 80)
     const finish = window.setTimeout(() => setPhase('result'), 1030)
@@ -33,7 +50,7 @@ function BalanceGameSection() {
     setDragOffset(0)
     setHoverChoice(null)
     setChoice(value)
-    setPhase('placing')
+    setPhase(window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'result' : 'placing')
   }
 
   function handleReset() {
@@ -87,28 +104,35 @@ function BalanceGameSection() {
   }
 
   return (
-    <section className={'balance-section balance-section--' + phase + (choice ? ' balance-section--' + choice : '') + (hoverChoice ? ' balance-section--hover-' + hoverChoice : '')} aria-label="밸런스 게임">
+    <section className={'balance-section balance-section--' + phase + (isMint ? ' balance-section--mint' : '') + (choice ? ' balance-section--' + choice : '') + (hoverChoice ? ' balance-section--hover-' + hoverChoice : '')} aria-label="밸런스 게임">
       <SectionTitle title={homeSectionTitles.balance.title}
         titleSuffix={
-          <button type="button" className="balance-section__refresh" aria-label="깻잎 게임 다시하기" onClick={handleReset}>
+          <button type="button" className="balance-section__refresh" aria-label={gameName + ' 게임 다시하기'} onClick={handleReset}>
             <img src={homeIcons.refreshIcon} alt="" aria-hidden="true" />
           </button>
         }
-        actionSlot={<p className="balance-section__pager" aria-live="polite"><b>1</b>/4</p>}
+        actionSlot={<div className="balance-section__navigation">
+          <p className="balance-section__pager" aria-live="polite"><b>{questionIndex + 1}</b>/{playableQuestions.length}</p>
+          <button type="button" className="balance-section__next" onClick={onNext}
+            aria-label={'다음 밸런스 게임: ' + (isMint ? '깻잎' : '민트초코')}>다음 ›</button>
+        </div>}
       />
-      <p className="balance-question" id="balance-question"><b>{question.order}</b> {phase === 'result' ? <>깻잎 논쟁, 나의 선택은 <span className="balance-answer">{choice === 'left' ? question.leftLabel : question.rightLabel}.</span></> : question.title}</p>
+      <p className="balance-question" id="balance-question"><b>{question.order}</b> {phase === 'result' ? <>{isMint ? '민트초코' : '깻잎 논쟁'}, 나의 선택은 <span className="balance-answer">{choice === 'left' ? question.leftLabel : question.rightLabel}.</span></> : question.title}</p>
       <div className="balance-board" role="group" aria-labelledby="balance-question">
         <div key={question.id} className="balance-board__draggable"
           style={choice ? undefined : { transform: 'translateX(' + dragOffset + 'px)' }}
           onPointerDown={handlePointerDown} onPointerMove={handlePointerMove}
           onPointerUp={handlePointerEnd} onPointerCancel={handlePointerEnd}
           onLostPointerCapture={handlePointerEnd}>
-          <img className="balance-board__subject" src={perilla} alt={question.scenario} draggable={false} />
+          <img className="balance-board__subject" src={subject} alt={question.scenario} draggable={false} />
         </div>
-        <img className="balance-board__pile" src={perillaPile} alt="접시에 수북이 쌓인 깻잎" aria-hidden={phase !== 'result'} />
+        {(!isMint || choice !== 'right') && <img className="balance-board__pile"
+          src={isMint ? mintBowlFilled : perillaPile}
+          alt={isMint ? '파란색 그릇에 가득 담긴 민트초코 아이스크림' : '접시에 수북이 쌓인 깻잎'}
+          aria-hidden={phase !== 'result'} />}
         {(['left', 'right'] as const).map(side => (
           <div key={side} className={'balance-board__side balance-board__side--' + side}>
-            <img className="balance-board__plate" src={side === 'left' ? plateLeft : plateRight} alt="" aria-hidden="true" />
+            <img className="balance-board__plate" src={side === 'left' ? leftBowl : rightBowl} alt="" aria-hidden="true" />
             <button type="button"
               className={'balance-choice balance-choice--' + side + (choice === side ? ' is-selected' : '')}
               disabled={!!choice && choice !== side} aria-pressed={choice === side} onClick={() => handleChoose(side)}>

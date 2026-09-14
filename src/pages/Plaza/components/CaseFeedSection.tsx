@@ -1,15 +1,18 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   caseCategories,
   categoryDotColor,
   plazaCases,
-  plazaSortOptions,
+  plazaViewOptions,
 } from '../../../data/common/plazaContent'
+import type { PlazaViewKey } from '../../../data/common/plazaContent'
 import type { CaseCategory } from '../../../types'
+import useSession from '../../../hooks/useSession'
+import { MY_CASES } from '../../../data/personas/myCases'
 import Pagination from '../../../components/common/Pagination'
 import { toCaseDetail } from '../../../routes/paths'
-import searchIcon from '../../../assets/icons/search-field.svg'
+import searchIcon from '../../../assets/plaza/search-field.svg'
 import chevronDown from '../../../assets/icons/chevron-down.svg'
 
 type CategoryFilter = CaseCategory | '전체'
@@ -18,18 +21,71 @@ const CASES_PER_PAGE = 4
 
 function CaseFeedSection() {
   const [category, setCategory] = useState<CategoryFilter>('전체')
+  const [view, setView] = useState<PlazaViewKey>('latest')
+  const [isViewOpen, setIsViewOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
+  const viewRef = useRef<HTMLDivElement>(null)
+
+  const { personaId } = useSession()
+  /** 추천사건은 내가 올린 사건과 같은 분야를 보여준다. 서아는 친구, 지훈은 직장이다. */
+  const myCategory = MY_CASES[personaId].category
+
+  const currentView = plazaViewOptions.find((option) => option.key === view) ?? plazaViewOptions[0]
+
+  /*
+   * 보기 기준은 목록을 고르거나 순서를 바꾼다.
+   * 최신사건은 데이터에 적힌 순서를 그대로 쓴다. 위에 있을수록 최근에 올라온 사건이다.
+   */
+  const viewedCases = useMemo(() => {
+    switch (view) {
+      case 'popular':
+        return [...plazaCases].sort((a, b) => b.viewCount - a.viewCount)
+      case 'voting':
+        return plazaCases.filter((item) => item.status === 'voting')
+      case 'closed':
+        return plazaCases.filter((item) => item.status === 'closed')
+      case 'recommended':
+        return plazaCases.filter((item) => item.category === myCategory)
+      default:
+        return plazaCases
+    }
+  }, [view, myCategory])
 
   const filteredCases =
-    category === '전체' ? plazaCases : plazaCases.filter((item) => item.category === category)
+    category === '전체' ? viewedCases : viewedCases.filter((item) => item.category === category)
   const totalPages = Math.max(1, Math.ceil(filteredCases.length / CASES_PER_PAGE))
   const pageCases = filteredCases.slice(
     (currentPage - 1) * CASES_PER_PAGE,
     currentPage * CASES_PER_PAGE,
   )
 
+  // 바깥을 누르거나 Esc를 누르면 메뉴를 닫는다. 열려 있을 때만 듣는다.
+  useEffect(() => {
+    if (!isViewOpen) return
+
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!viewRef.current?.contains(event.target as Node)) setIsViewOpen(false)
+    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsViewOpen(false)
+    }
+
+    document.addEventListener('mousedown', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isViewOpen])
+
   const handleCategoryChange = (nextCategory: CategoryFilter) => {
     setCategory(nextCategory)
+    setCurrentPage(1)
+  }
+
+  const handleViewChange = (nextView: PlazaViewKey) => {
+    setView(nextView)
+    setIsViewOpen(false)
     setCurrentPage(1)
   }
 
@@ -40,10 +96,41 @@ function CaseFeedSection() {
           <h2 className="case-feed__title">전체 사건</h2>
           <p className="case-feed__description">다른 배심원들의 판단을 기다리는 이야기</p>
         </div>
-        <button type="button" className="case-feed__sort" disabled title="정렬 동작은 시안 확정 후 연결됩니다">
-          {plazaSortOptions[0].label}
-          <img src={chevronDown} alt="" width={18} height={18} />
-        </button>
+
+        <div className={isViewOpen ? 'case-feed__view is-open' : 'case-feed__view'} ref={viewRef}>
+          <button
+            type="button"
+            className="case-feed__sort"
+            aria-haspopup="listbox"
+            aria-expanded={isViewOpen}
+            onClick={() => setIsViewOpen((open) => !open)}
+          >
+            {currentView.label}
+            <img src={chevronDown} alt="" width={18} height={18} />
+          </button>
+
+          {isViewOpen && (
+            <div className="case-feed__view-menu" role="listbox" aria-label="사건 보기 기준">
+              {plazaViewOptions.map((option) => (
+                <button
+                  key={option.key}
+                  type="button"
+                  role="option"
+                  aria-selected={option.key === view}
+                  className={
+                    option.key === view
+                      ? 'case-feed__view-item is-current'
+                      : 'case-feed__view-item'
+                  }
+                  onClick={() => handleViewChange(option.key)}
+                >
+                  <b>{option.label}</b>
+                  <small>{option.description}</small>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="case-search">
@@ -84,8 +171,8 @@ function CaseFeedSection() {
                     </span>
                     <span
                       className={
-                        item.isVerdictAligned
-                          ? 'case-card__verdict is-aligned'
+                        (item.verdictTone ?? (item.isVerdictAligned ? 'blue' : 'orange')) === 'blue'
+                          ? 'case-card__verdict is-blue'
                           : 'case-card__verdict'
                       }
                     >
@@ -101,7 +188,7 @@ function CaseFeedSection() {
                   <p className="case-card__summary">{item.summary}</p>
 
                   <div className="case-card__info">
-                    <span>조회수 {item.viewCount}명</span>
+                    <span>조회수 {item.viewCount}</span>
                     <span>댓글 {item.commentCount}</span>
                   </div>
                 </>
@@ -126,7 +213,7 @@ function CaseFeedSection() {
           </ul>
 
           {pageCases.length === 0 && (
-            <p className="case-list__empty">아직 이 카테고리에 올라온 사건이 없어요.</p>
+            <p className="case-list__empty">아직 이 조건에 맞는 사건이 없어요.</p>
           )}
         </div>
 
@@ -135,6 +222,7 @@ function CaseFeedSection() {
           totalPages={totalPages}
           onPageChange={setCurrentPage}
           ariaLabel="사건 목록 페이지"
+          neutralArrows
         />
       </div>
     </section>

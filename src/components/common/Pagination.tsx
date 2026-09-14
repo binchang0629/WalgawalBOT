@@ -12,6 +12,8 @@ interface PaginationProps {
   totalPages: number
   onPageChange: (page: number) => void
   ariaLabel?: string
+  /** 광장 시안은 이동 가능한 화살표도 기본 회색으로 표시한다. */
+  neutralArrows?: boolean
 }
 
 type ArrowDirection = 'previous' | 'next'
@@ -31,7 +33,7 @@ const arrowIcons: Record<ArrowDirection, Record<ArrowState, string>> = {
 }
 
 /** Figma 페이지네이션: 이동 불가·이동 가능·누르는 순간의 화살표 상태를 모두 제공한다. */
-function Pagination({ currentPage, totalPages, onPageChange, ariaLabel = '페이지 선택' }: PaginationProps) {
+function Pagination({ currentPage, totalPages, onPageChange, ariaLabel = '페이지 선택', neutralArrows = false }: PaginationProps) {
   const [pressedArrow, setPressedArrow] = useState<ArrowDirection | null>(null)
   const pageCount = Number.isFinite(totalPages) ? Math.max(0, Math.floor(totalPages)) : 0
   if (pageCount === 0) return null
@@ -44,6 +46,7 @@ function Pagination({ currentPage, totalPages, onPageChange, ariaLabel = '페이
 
   const arrowState = (direction: ArrowDirection, disabled: boolean): ArrowState => {
     if (disabled) return 'default'
+    if (neutralArrows && pressedArrow !== direction) return 'default'
     return pressedArrow === direction ? 'click' : 'able'
   }
 

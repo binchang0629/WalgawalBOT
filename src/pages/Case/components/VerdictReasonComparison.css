@@ -1,0 +1,196 @@
+.verdict-reason-comparison {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 32px;
+  font-family: var(--font-body);
+}
+
+.verdict-reason-comparison__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 8px;
+}
+
+.verdict-reason-comparison__heading p {
+  margin: 0;
+  color: var(--blue-700);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.verdict-reason-comparison__heading h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: pre-line;
+}
+
+.verdict-reason-comparison__criteria {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px;
+}
+
+.verdict-criterion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 18px 8px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.verdict-criterion--ai {
+  background: var(--blue-100);
+  color: var(--blue-700);
+}
+
+.verdict-criterion--jury {
+  background: var(--orange-100);
+  color: var(--orange-700);
+}
+
+.verdict-criterion__label {
+  margin: 0;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.verdict-criterion__icon {
+  display: block;
+  width: 32px;
+  height: 32px;
+}
+
+.verdict-criterion h3 {
+  margin: 0;
+  color: inherit;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.verdict-criterion__description {
+  margin: 0;
+  color: var(--neutral-700);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.3;
+  white-space: pre-line;
+}
+
+.reason-details__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  color: var(--neutral-600);
+  font-family: 'Verdict Reason Noto', var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.reason-details__toggle img {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  transition: transform 200ms ease;
+}
+
+.reason-details__toggle img.is-open {
+  transform: rotate(180deg);
+}
+
+.reason-details__toggle:focus-visible {
+  outline: 2px solid var(--blue-700);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.reason-details__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 250ms ease, opacity 200ms ease;
+}
+
+.reason-details__panel.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.reason-details__clip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.reason-details__content {
+  padding-top: 12px;
+}
+
+.reason-details__content > h3 {
+  margin: 0 0 10px;
+  padding-left: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.reason-details__card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 18px;
+  border-radius: 12px;
+  background: var(--blue-050);
+}
+
+.reason-details__summary {
+  margin: 0;
+  color: var(--blue-900);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: pre-line;
+}
+
+.reason-details__body {
+  display: flex;
+  flex-direction: column;
+  gap: 18.2px;
+}
+
+.reason-details__body p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reason-details__toggle img,
+  .reason-details__panel {
+    transition: none;
+  }
+}
+@font-face {
+  font-family: 'Verdict Reason Noto';
+  src: url('../../../assets/case/disagreement/fonts/NotoSansKR-ReasonMedium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+}

@@ -1,3 +1,8 @@
+import commentAvatar1 from '../../assets/case/disagreement/comment-1.png'
+import commentAvatar2 from '../../assets/case/disagreement/comment-2.png'
+import commentAvatar3 from '../../assets/case/disagreement/comment-3.png'
+import commentAvatar4 from '../../assets/case/disagreement/comment-4.png'
+import commentAvatar5 from '../../assets/case/disagreement/comment-5.png'
 import authorAvatar from '../../assets/case/jihoon/author.png'
 import verdictArtwork from '../../assets/case/jihoon/verdict-artwork.png'
 
@@ -7,11 +12,12 @@ export interface JihoonSimilarComment {
   id: string
   nickname: string
   createdAt: string
-  voteId: JihoonSimilarVoteId
-  voteLabel: string
+  voteId: JihoonSimilarVoteId | null
+  voteLabel: string | null
   body: string
   likes: number
   dislikes: number
+  avatarUrl?: string
 }
 
 export const jihoonSimilarCase = {
@@ -23,11 +29,13 @@ export const jihoonSimilarCase = {
     avatarUrl: authorAvatar,
   },
   title: '수정 2회를 마쳤는데, 의뢰인이 잔금 지급을 미루고 있어요.',
+  detailTitle: '수정 2회를 마쳤는데, 의뢰인이\n잔금 지급을 미루고 있어요.',
+  resultTitle: '수정 2회를 마쳤는데,\n의뢰인이 잔금 지급을 미루고 있어요.',
   caseNumber: 'CASE-COMPANY-874',
   age: '3일 전',
   participantCount: 450,
   paragraphs: [
-    '카페 홍보영상을 180만 원에 제작했습니다. 계약에는 수정 2회와 원본 파일 제공이 포함됐고, 최종 승인 후 잔금 90만 원을 받기로 했어요.',
+    '카페 홍보영상을 180만 원에 제작했습니다.\n계약에는 수정 2회와 원본 파일 제공이 포함됐고, 최종 승인 후 잔금 90만 원을 받기로 했어요.',
     '의뢰인은 처음부터 밝고 따뜻한 색감을 요청했지만, 저는 차분한 색감이 카페와 더 잘 어울린다고 판단해 두 번의 수정에서도 밝기만 조금 조절했습니다.',
     '의뢰인은 요청한 색감이 반영되지 않았다며 추가 수정과 원본 파일을 요구하고 있어요. 영상은 광고 일정 때문에 먼저 게시했을 뿐, 최종 승인한 것은 아니라고 합니다.',
     '저는 약속한 수정 횟수를 모두 채웠는데도 다시 수정해야 할까요?',
@@ -48,6 +56,25 @@ export const jihoonSimilarCase = {
   ],
 } as const
 
+export const jihoonSimilarReasonComparison = {
+  eyebrow: '왜 달랐을까요?',
+  title: '‘작업 완료’의\n기준이 달랐어요',
+  criteria: [
+    {
+      id: 'ai',
+      label: '판멍이가 본 기준',
+      keyword: '수정 횟수',
+      description: '약속한 수정\n2회를 마쳤어요',
+    },
+    {
+      id: 'jury',
+      label: '배심원 댓글의 기준',
+      keyword: '요청 반영',
+      description: '요청한 색감은\n반영되지 않았어요',
+    },
+  ],
+} as const
+
 export const jihoonSimilarResult = {
   artworkUrl: verdictArtwork,
   verdict: {
@@ -59,9 +86,14 @@ export const jihoonSimilarResult = {
     { id: 'other', label: '상대방 입장이 더 타당해요', percent: 61 },
     { id: 'writer', label: '글쓴이 입장이 더 타당해요', percent: 9 },
     { id: 'both', label: '양쪽 모두 일리가 있어요', percent: 27 },
-    { id: 'neither', label: '양쪽 모두 타당하지 않아요', percent: 4 },
+    { id: 'neither', label: '양쪽 모두 타당하지 않아요', percent: 3 },
   ] as const,
   aiVerdict: {
+    summary: '약속한 수정은 완료했고,\n결과물도 사용하고 있다는 점',
+    comparisonReasons: [
+      '계약서에 명시된 수정 2회를 완료했고, 의뢰인이 영상을 실제 광고에 사용하고 있다는 점을 고려했어요.',
+      '계약 범위를 벗어난 추가 수정과 원본 파일 제공을 잔금 지급 조건으로 새롭게 요구하는 것은 타당하지 않다고 판단했어요.',
+    ],
     title: 'AI 판멍이는 글쓴이의 손을 들어줬어요.',
     reasons: [
       '계약서에 명시된 수정 2회를 모두 완료했고, 의뢰인이 영상을 실제 광고에 사용하고 있다는 점을 고려했어요.',
@@ -75,6 +107,7 @@ export const jihoonSimilarResult = {
   comments: [
     {
       id: 'jihoon-comment-1',
+      avatarUrl: commentAvatar1,
       nickname: '달이예쁘네요',
       createdAt: '1분 전',
       voteId: 'other',
@@ -85,6 +118,7 @@ export const jihoonSimilarResult = {
     },
     {
       id: 'jihoon-comment-2',
+      avatarUrl: commentAvatar2,
       nickname: '침낭펴야지?',
       createdAt: '3분 전',
       voteId: 'other',
@@ -95,6 +129,7 @@ export const jihoonSimilarResult = {
     },
     {
       id: 'jihoon-comment-3',
+      avatarUrl: commentAvatar3,
       nickname: '월요병말기',
       createdAt: '12분 전',
       voteId: 'both',
@@ -105,6 +140,7 @@ export const jihoonSimilarResult = {
     },
     {
       id: 'jihoon-comment-4',
+      avatarUrl: commentAvatar4,
       nickname: '판멍이는귀여워',
       createdAt: '11분 전',
       voteId: 'other',
@@ -115,6 +151,7 @@ export const jihoonSimilarResult = {
     },
     {
       id: 'jihoon-comment-5',
+      avatarUrl: commentAvatar5,
       nickname: '아아러버',
       createdAt: '15분 전',
       voteId: 'both',

@@ -79,6 +79,6 @@ export interface JurorRank {
 }
 
 /** 광장 사건 목록 정렬 기준. URL 쿼리로 관리한다. (PROJECT_SPEC.md §7-7) */
-export type PlazaSortKey = 'latest' | 'popular'
+export type PlazaSortKey = 'latest' | 'popular' | 'closed'
 
 export type SessionStatus = 'restoring' | 'anonymous' | 'authenticated'

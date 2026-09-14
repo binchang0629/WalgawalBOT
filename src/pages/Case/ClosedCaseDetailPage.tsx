@@ -26,7 +26,7 @@ function ClosedCaseDetailPage() {
             </div>
           </div>
 
-          <h2 id="case-title" className="case-overview__title">{jihoonSimilarCase.title}</h2>
+          <h2 id="case-title" className="case-overview__title">{jihoonSimilarCase.detailTitle}</h2>
           <p className="case-overview__meta">
             사건 번호 · #{jihoonSimilarCase.caseNumber} · {jihoonSimilarCase.age} · 배심원{' '}
             {jihoonSimilarCase.participantCount}명 참여

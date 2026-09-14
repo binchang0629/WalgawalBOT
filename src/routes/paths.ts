@@ -32,6 +32,7 @@ export const PATHS = {
   afterStoryComplete: '/afterstory/complete',
   afterStoryDetail: '/afterstory/:storyId',
   my: '/my',
+  myPlan: '/my/plan',
   myCases: '/my/cases',
   myCaseResult: '/my/cases/:caseId',
   chatbot: '/chatbot',

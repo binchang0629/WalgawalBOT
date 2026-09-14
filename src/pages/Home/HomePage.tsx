@@ -11,6 +11,7 @@ import AfterStorySection from './components/AfterStorySection'
 import AiRecommendSection from './components/AiRecommendSection'
 import CompactAiRecommendCard from './components/CompactAiRecommendCard'
 import './Home.css'
+import './components/BalanceGame.css'
 
 /**
  * 홈 화면. Figma `개발 > 홈/로그인 전 > 홈 수정 후` (노드 `1402:7104`) 기준.

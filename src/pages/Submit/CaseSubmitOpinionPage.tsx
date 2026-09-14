@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { PATHS } from '../../routes/paths'
 import CaseSubmitHeader from './components/CaseSubmitHeader'
@@ -5,6 +6,7 @@ import CaseSubmitProgress from './components/CaseSubmitProgress'
 import CaseSubmitFooter from './components/CaseSubmitFooter'
 import useCaseSubmitDraft from './useCaseSubmitDraft'
 import useWizardBack from '../../hooks/useWizardBack'
+import useSession from '../../hooks/useSession'
 import { SUBMIT_SCENARIOS } from './caseSubmitContent'
 import radioSelected from '../../assets/submit/figma/imgRadioSelected.svg'
 import radioDefault from '../../assets/submit/figma/imgRadioDefault.svg'
@@ -18,7 +20,9 @@ import './CaseSubmitOpinionPage.css'
  * 처음 진입은 모두 미선택이며 허용된 범위를 선택한 뒤에만 시연 접수가 가능하다.
  */
 function CaseSubmitOpinionPage() {
-  const { personaId, content, answers, summary, visibility, setVisibility, setIsSubmitted } = useCaseSubmitDraft()
+  const { personaId, content, answers, summary, visibility, setVisibility, isSubmitted, setIsSubmitted } = useCaseSubmitDraft()
+  const { recordCaseSubmission } = useSession()
+  const [submissionId] = useState(() => `submission-${crypto.getRandomValues(new Uint32Array(4)).join('-')}`)
   const isSeoa = personaId === 'A'
   const scenario = SUBMIT_SCENARIOS[personaId]
   const opinion = scenario.opinion
@@ -41,6 +45,8 @@ function CaseSubmitOpinionPage() {
 
   const handleSubmit = () => {
     if (!canSubmit) return
+    // 같은 초안의 뒤로가기/재클릭은 한 번만 집계한다. 실제 접수 목록은 아직 별도 시연 자료다.
+    if (!isSubmitted) recordCaseSubmission(submissionId)
     setIsSubmitted(true)
     navigate(PATHS.caseSubmitComplete)
   }
