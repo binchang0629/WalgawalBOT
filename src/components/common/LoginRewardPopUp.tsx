@@ -78,7 +78,10 @@ function LoginRewardPopUp({ kind, name, startPoint, onSettled, onClose }: Props)
 
   useEffect(() => {
     openerRef.current = document.activeElement as HTMLElement | null
-    popUpRef.current?.focus()
+    // 진입 애니메이션이 도는 동안(translateY(100%) 근처) 포커스를 주면
+    // 브라우저가 이 요소를 화면에 보이려고 스크롤을 시도할 수 있다.
+    // 그러면 등장 방향이 아래→위가 아니라 위에서 떨어지듯 보인다.
+    popUpRef.current?.focus({ preventScroll: true })
     return () => {
       if (closeTimerRef.current !== null) window.clearTimeout(closeTimerRef.current)
       openerRef.current?.focus?.()

@@ -282,6 +282,20 @@
     box-shadow: 0 2px 8px -2px rgba(0, 0, 0, .05), 0 1px 3px -1px rgba(0, 0, 0, .03);
 }
 .expert-card > span { min-width: 0; gap: 12px; }
+
+.my-page__logout {
+    align-self: center;
+    text-align: center;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+
+.my-page__logout:focus-visible {
+    outline: 2px solid var(--orange-700);
+    outline-offset: 3px;
+}
+
 .my-menu__header:focus-visible,
 .my-menu__row:focus-visible { outline: 2px solid var(--orange-700); outline-offset: -3px; }
 

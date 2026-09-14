@@ -9,6 +9,7 @@ import jihunProfileImage from '../../assets/my/account-jihun.png'
 import guestMascotImage from '../../assets/auth/loginPopUpMy.webp'
 import planMascot from '../../assets/home/figma/img1What.png'
 import AccountSwitchSheet from './components/AccountSwitchSheet'
+import LogoutConfirmDialog from './components/LogoutConfirmDialog'
 import useToast from '../../hooks/useToast'
 import switchIcon from '../../assets/my/switch.svg'
 import chevronBrownIcon from '../../assets/my/chevron-brown.svg'
@@ -74,6 +75,7 @@ function MyPage() {
   const [activityOpen, setActivityOpen] = useState(true)
   const [settingsOpen, setSettingsOpen] = useState(true)
   const [accountSheetOpen, setAccountSheetOpen] = useState(false)
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false)
   const pointValueRef = useRef<HTMLElement>(null)
   const previousPointsRef = useRef(activityStats.points)
   useEffect(() => {
@@ -93,6 +95,7 @@ function MyPage() {
     return () => animation.cancel()
   }, [activityStats.points])
   const closeAccountSheet = useCallback(() => setAccountSheetOpen(false), [])
+  const closeLogoutDialog = useCallback(() => setLogoutDialogOpen(false), [])
   const displayName = currentUser?.name ?? (personaId === 'A' ? '윤서아' : '곽지훈')
   const displayNickname = currentUser?.nickname ?? DEMO_ACCOUNTS[personaId].nickname
 
@@ -221,7 +224,27 @@ function MyPage() {
           <span><MenuIcon icon={expertIcon} />전문가 정보 기록</span>
           <img className="my-menu__chevron" src={isSeoa ? chevronExpertIcon : chevronDisabledIcon} alt="" />
         </button>
+        <button
+          type="button"
+          className="my-page__logout profile-switch-confirm__logout"
+          aria-haspopup="dialog"
+          aria-expanded={logoutDialogOpen}
+          onClick={() => setLogoutDialogOpen(true)}
+        >
+          로그아웃 하기
+        </button>
       </div>
+      {logoutDialogOpen && (
+        <LogoutConfirmDialog
+          onClose={closeLogoutDialog}
+          onConfirm={() => {
+            closeLogoutDialog()
+            signOut()
+            navigate(PATHS.home, { replace: true })
+            showToast('로그아웃 되었습니다')
+          }}
+        />
+      )}
       {accountSheetOpen && (
         <AccountSwitchSheet
           key={personaId}
@@ -236,6 +259,7 @@ function MyPage() {
             signOut()
             closeAccountSheet()
             navigate(PATHS.home)
+            showToast('로그아웃 되었습니다')
           }}
         />
       )}
