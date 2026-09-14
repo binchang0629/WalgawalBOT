@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import FloatingChatButton from '../common/FloatingChatButton'
+import ClickSpark from '../common/ClickSpark'
 import './AppViewport.css'
 
 interface AppViewportProps {
@@ -16,7 +17,7 @@ interface AppViewportProps {
 function AppViewport({ children }: AppViewportProps) {
   return (
     <div className="app-viewport" id="app-viewport">
-      {children}
+      <ClickSpark>{children}</ClickSpark>
       <FloatingChatButton />
       {/* 모달·바텀시트 portal 대상. 스크롤 콘텐츠 바깥이면서 기기 내부에 있다. */}
       <div id="app-overlay-root" />

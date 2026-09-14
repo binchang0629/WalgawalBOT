@@ -22,6 +22,7 @@ import { PATHS } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
 import useDemoCountdown from './components/useDemoCountdown'
 import './CaseResultPage.css'
+import './WeddingGiftResultPage.css'
 
 interface ResultRouteState {
   selectedVote?: WeddingGiftVoteId
@@ -148,7 +149,13 @@ function CaseResultPage() {
 
   const routeState = location.state as ResultRouteState | null
   const selectedVote = isVoteId(routeState?.selectedVote) ? routeState.selectedVote : 'writer'
-  const allComments = [...addedComments, ...weddingGiftResult.comments]
+  const seededComments = Array.from({ length: weddingGiftResult.commentCount }, (_, index) => {
+    const comment = weddingGiftResult.comments[index % weddingGiftResult.comments.length]
+    return index < weddingGiftResult.comments.length
+      ? comment
+      : { ...comment, id: comment.id + '-page-' + index }
+  })
+  const allComments = [...addedComments, ...seededComments]
   const totalPages = Math.max(1, Math.ceil(allComments.length / COMMENTS_PER_PAGE))
   const visibleComments = allComments.slice((currentPage - 1) * COMMENTS_PER_PAGE, currentPage * COMMENTS_PER_PAGE)
 
@@ -182,7 +189,7 @@ function CaseResultPage() {
   }
 
   return (
-    <main className="case-result">
+    <main className="case-result case-result--wedding">
       <CaseHeader />
 
       <div className="case-result__body">
@@ -196,7 +203,7 @@ function CaseResultPage() {
 
         <section className="vote-result" aria-labelledby="vote-result-title">
           <div className="vote-result__heading">
-            <h2 id="vote-result-title">투표 결과</h2>
+            <h2 id="vote-result-title">배심원 2심</h2>
             <p className="vote-result__deadline">투표 마감까지&nbsp;&nbsp;{countdown}</p>
           </div>
           <div className="vote-result__artwork">
@@ -210,13 +217,11 @@ function CaseResultPage() {
           <ResultBreakdown />
         </section>
 
-        <div className="case-result__section-divider" />
-
-        <section className="ai-verdict" aria-labelledby="ai-verdict-title">
-          <h2 id="ai-verdict-title">판멍이의 판결 이유</h2>
+        <section className="ai-verdict ai-verdict--wedding" aria-labelledby="ai-verdict-title">
+          <h2 id="ai-verdict-title">AI 1심 결과</h2>
           <div className="ai-verdict__card">
-            <span>판멍이의 최종 판결</span>
-            <h3>AI 판멍이는 상대방의 손을 들어줬어요.</h3>
+            <span>{weddingGiftResult.aiVerdictLabel}</span>
+            <h3>{weddingGiftResult.aiVerdictTitle}</h3>
             <div>
               {weddingGiftResult.aiReasons.map((reason) => <p key={reason}>{reason}</p>)}
             </div>
@@ -231,7 +236,7 @@ function CaseResultPage() {
           </div>
         </section>
 
-        <div className="case-result__section-divider" />
+        <div className="case-result__section-divider case-result__section-divider--wedding" />
 
         <section className="comment-section" aria-labelledby="comments-title">
           <div className="comment-section__heading">
@@ -278,7 +283,7 @@ function CaseResultPage() {
         </section>
 
         <section className="after-story" aria-labelledby="after-story-title">
-          <h2 id="after-story-title">후일담</h2>
+          <h2 id="after-story-title">비슷한 사건의 후일담</h2>
           <article>
             <blockquote>{weddingGiftResult.afterStory.quote}</blockquote>
             <img className="after-story__divider" src={quoteDivider} alt="" />

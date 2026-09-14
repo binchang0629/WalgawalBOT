@@ -27,7 +27,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 66px;
+    height: var(--device-app-header);
     padding: 16px var(--content-gutter);
     background: rgba(255, 255, 255, .3);
     backdrop-filter: blur(2px);

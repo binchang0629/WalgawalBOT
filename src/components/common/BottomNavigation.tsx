@@ -1,11 +1,14 @@
 import type React from 'react'
 import { NavLink } from 'react-router-dom'
+import useLoginGate from '../../hooks/useLoginGate'
+import type { LoginGateReason } from '../../state/loginGateContext'
 import { PATHS } from '../../routes/paths'
 import homeIcon from '../../assets/icons/nav-home.svg'
 import plazaIcon from '../../assets/icons/nav-plaza.svg'
 import submitIcon from '../../assets/icons/nav-submit.svg'
 import afterStoryIcon from '../../assets/icons/nav-afterstory.svg'
 import myIcon from '../../assets/icons/nav-my.svg'
+import navBackground from '../../assets/home/figma/imgDownNav.svg'
 
 /**
  * 공통 하단 내비게이션.
@@ -30,14 +33,20 @@ interface NavItem {
   /** 해당 화면의 라우트가 아직 없으면 false. 디자인 확정 후 켠다. */
   enabled: boolean
   isCta?: boolean
+  /**
+   * 로그인해야 들어갈 수 있는 메뉴면 이유를 적는다.
+   * 비로그인으로 누르면 이동하지 않고 보던 화면 위에 안내 팝업이 뜬다.
+   * 홈·배심원 광장·왈가왈후~는 둘러보기 대상이라 비워 둔다. (PROJECT_SPEC.md §0-6, §7-5)
+   */
+  gate?: LoginGateReason
 }
 
 const NAV_ITEMS: NavItem[] = [
   { label: '홈', icon: homeIcon, to: PATHS.home, enabled: true },
   { label: '배심원 광장', icon: plazaIcon, to: PATHS.plaza, enabled: true },
-  { label: '사건 접수', icon: submitIcon, to: PATHS.caseSubmit, enabled: true, isCta: true },
+  { label: '사건 접수', icon: submitIcon, to: PATHS.caseSubmit, enabled: true, isCta: true, gate: 'caseSubmit' },
   { label: '왈가왈후~', icon: afterStoryIcon, to: PATHS.afterStory, enabled: true },
-  { label: 'MY', icon: myIcon, to: PATHS.my, enabled: true },
+  { label: 'MY', icon: myIcon, to: PATHS.my, enabled: true, gate: 'my' },
 ]
 
 function NavIcon({ src, isCta }: { src: string; isCta?: boolean }) {
@@ -58,8 +67,11 @@ function NavIcon({ src, isCta }: { src: string; isCta?: boolean }) {
 }
 
 function BottomNavigation() {
+  const { requireLogin } = useLoginGate()
+
   return (
     <nav className="bottom-nav" aria-label="주요 메뉴">
+      <img className="bottom-nav__background" src={navBackground} alt="" aria-hidden="true" />
       {NAV_ITEMS.map((item) => {
         const className = item.isCta ? 'bottom-nav__item case-nav' : 'bottom-nav__item'
 
@@ -85,6 +97,12 @@ function BottomNavigation() {
             to={item.to}
             className={({ isActive }) => (isActive ? `${className} active` : className)}
             aria-label={item.isCta ? item.label : undefined}
+            onClick={(event) => {
+              // 비로그인이면 이동을 막고 안내 팝업만 띄운다. 보던 화면은 그대로 남는다.
+              if (item.gate && !requireLogin(item.gate, item.to)) {
+                event.preventDefault()
+              }
+            }}
           >
             <NavIcon src={item.icon} isCta={item.isCta} />
             <span className="bottom-nav__label">{item.label}</span>

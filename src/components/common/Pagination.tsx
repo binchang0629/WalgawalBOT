@@ -1,5 +1,10 @@
-import previousIcon from '../../assets/icons/pagination-prev.svg'
-import nextIcon from '../../assets/icons/pagination-next.svg'
+import { useState } from 'react'
+import previousAbleIcon from '../../assets/icons/pagination/prev-able.svg'
+import previousClickIcon from '../../assets/icons/pagination/prev-click.svg'
+import previousDefaultIcon from '../../assets/icons/pagination/prev-default.svg'
+import nextAbleIcon from '../../assets/icons/pagination/next-able.svg'
+import nextClickIcon from '../../assets/icons/pagination/next-click.svg'
+import nextDefaultIcon from '../../assets/icons/pagination/next-default.svg'
 import './Pagination.css'
 
 interface PaginationProps {
@@ -9,8 +14,25 @@ interface PaginationProps {
   ariaLabel?: string
 }
 
-/** Controlled pagination with up to five page buttons in the shared Figma layout. */
+type ArrowDirection = 'previous' | 'next'
+type ArrowState = 'default' | 'able' | 'click'
+
+const arrowIcons: Record<ArrowDirection, Record<ArrowState, string>> = {
+  previous: {
+    default: previousDefaultIcon,
+    able: previousAbleIcon,
+    click: previousClickIcon,
+  },
+  next: {
+    default: nextDefaultIcon,
+    able: nextAbleIcon,
+    click: nextClickIcon,
+  },
+}
+
+/** Figma 페이지네이션: 이동 불가·이동 가능·누르는 순간의 화살표 상태를 모두 제공한다. */
 function Pagination({ currentPage, totalPages, onPageChange, ariaLabel = '페이지 선택' }: PaginationProps) {
+  const [pressedArrow, setPressedArrow] = useState<ArrowDirection | null>(null)
   const pageCount = Number.isFinite(totalPages) ? Math.max(0, Math.floor(totalPages)) : 0
   if (pageCount === 0) return null
 
@@ -20,24 +42,56 @@ function Pagination({ currentPage, totalPages, onPageChange, ariaLabel = '페이
   const firstPage = Math.floor((activePage - 1) / 5) * 5 + 1
   const pages = Array.from({ length: Math.min(5, pageCount - firstPage + 1) }, (_, index) => firstPage + index)
 
-  return (
-    <nav className="app-pagination" aria-label={ariaLabel}>
+  const arrowState = (direction: ArrowDirection, disabled: boolean): ArrowState => {
+    if (disabled) return 'default'
+    return pressedArrow === direction ? 'click' : 'able'
+  }
+
+  const renderArrow = (direction: ArrowDirection) => {
+    const isPrevious = direction === 'previous'
+    const isDisabled = isPrevious ? activePage === 1 : activePage === pageCount
+    const nextPage = isPrevious ? activePage - 1 : activePage + 1
+    const state = arrowState(direction, isDisabled)
+
+    return (
       <button
         type="button"
-        className="app-pagination__arrow"
-        aria-label="이전 페이지"
-        disabled={activePage === 1}
-        onClick={() => onPageChange(activePage - 1)}
+        className={
+          isPrevious
+            ? 'app-pagination__arrow'
+            : 'app-pagination__arrow app-pagination__arrow--next'
+        }
+        aria-label={isPrevious ? '이전 페이지' : '다음 페이지'}
+        disabled={isDisabled}
+        onClick={() => onPageChange(nextPage)}
+        onPointerDown={() => setPressedArrow(direction)}
+        onPointerUp={() => setPressedArrow(null)}
+        onPointerLeave={() => setPressedArrow(null)}
+        onPointerCancel={() => setPressedArrow(null)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') setPressedArrow(direction)
+        }}
+        onKeyUp={() => setPressedArrow(null)}
       >
-        <img src={previousIcon} alt="" />
+        <img
+          className={isPrevious ? 'app-pagination__arrow-icon' : 'app-pagination__arrow-icon app-pagination__arrow-icon--next'}
+          src={arrowIcons[direction][state]}
+          alt=""
+        />
       </button>
+    )
+  }
+
+  return (
+    <nav className="app-pagination" aria-label={ariaLabel}>
+      {renderArrow('previous')}
       <div className="app-pagination__pages">
         {pages.map((page) => (
           <button
             key={page}
             type="button"
             className="app-pagination__page"
-            aria-label={`${page}페이지`}
+            aria-label={String(page) + '페이지'}
             aria-current={activePage === page ? 'page' : undefined}
             onClick={() => { if (page !== activePage) onPageChange(page) }}
           >
@@ -45,15 +99,7 @@ function Pagination({ currentPage, totalPages, onPageChange, ariaLabel = '페이
           </button>
         ))}
       </div>
-      <button
-        type="button"
-        className="app-pagination__arrow app-pagination__arrow--next"
-        aria-label="다음 페이지"
-        disabled={activePage === pageCount}
-        onClick={() => onPageChange(activePage + 1)}
-      >
-        <img src={nextIcon} alt="" />
-      </button>
+      {renderArrow('next')}
     </nav>
   )
 }

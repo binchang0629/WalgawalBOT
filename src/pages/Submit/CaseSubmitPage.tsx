@@ -8,7 +8,8 @@ import CaseSubmitFooter from './components/CaseSubmitFooter'
 import useCaseSubmitDraft from './useCaseSubmitDraft'
 import useWizardBack from '../../hooks/useWizardBack'
 import { RELATIONSHIPS } from './types'
-import { DUMMY_CASE_CONTENT, SUBMIT_SCENARIOS } from './caseSubmitContent'
+import { JIHUN_CONTENT, SEOA_CONTENT, SUBMIT_SCENARIOS } from './caseSubmitContent'
+import checkMark from '../../assets/submit/figma/imgCheck.svg'
 import walangJoy from '../../assets/submit/figma/imgCharacterWalangJoy.svg'
 import './CaseSubmit.css'
 import './CaseSubmitPage.css'
@@ -40,7 +41,6 @@ function CaseSubmitPage() {
     setContent,
   } = useCaseSubmitDraft()
   const isSeoa = personaId === 'A'
-  const hasFocusedContent = useRef(false)
 
   const photoInputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -51,11 +51,6 @@ function CaseSubmitPage() {
 
   const canProceed = content.trim().length > 0
   const hasAttachments = photoNames.length > 0 || fileNames.length > 0
-
-  const handleFillDummyContent = () => {
-    if (!hasFocusedContent.current && !content) setContent(DUMMY_CASE_CONTENT[personaId])
-    hasFocusedContent.current = true
-  }
 
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? [])
@@ -71,6 +66,23 @@ function CaseSubmitPage() {
       setFileNames((prev) => [...prev, ...files.map((file) => file.name)])
     }
     event.target.value = ''
+  }
+
+  /*
+   * 발표 시연용 예시 채우기.
+   * 예전에는 본문 칸을 누르면 저절로 채워졌는데, 직접 써 보려고 눌렀을 때도 글이 들어차
+   * 손댈 수가 없었다. 그래서 버튼으로 떼어내 누를 때만 채운다.
+   */
+  const handleDemoFill = () => {
+    setContent(isSeoa ? SEOA_CONTENT : JIHUN_CONTENT)
+    window.requestAnimationFrame(() => {
+      const field = document.getElementById(contentFieldId)
+      if (field instanceof HTMLTextAreaElement) {
+        field.focus()
+        field.setSelectionRange(field.value.length, field.value.length)
+        field.scrollTop = 0
+      }
+    })
   }
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -91,9 +103,7 @@ function CaseSubmitPage() {
         </div>
 
         <fieldset className="case-submit__field">
-          <legend className="case-submit__label">
-            상대와의 관계 <span className="case-submit__required">*</span>
-          </legend>
+          <legend className="case-submit__label">상대와의 관계</legend>
           <div className="case-submit__chip-grid">
             {RELATIONSHIPS.map((option) => {
               const isSelected = relationship === option
@@ -106,6 +116,9 @@ function CaseSubmitPage() {
                   onClick={() => setRelationship(option)}
                 >
                   {option}
+                  {isSelected && (
+                    <img src={checkMark} alt="" className="case-submit__choice-check" width={9.5} height={7} />
+                  )}
                 </button>
               )
             })}
@@ -113,7 +126,10 @@ function CaseSubmitPage() {
         </fieldset>
 
         <div className="case-submit__field">
-          <p className="case-submit__attachment-label">사진·파일 첨부(선택)</p>
+          <div className="case-submit__attachment-heading">
+            <span className="case-submit__label">사진·파일 첨부{isSeoa ? '(선택)' : ''}</span>
+            {!isSeoa && <span className="case-submit__optional">선택</span>}
+          </div>
           <div className="case-submit__attachment-actions">
             <button
               type="button"
@@ -153,13 +169,12 @@ function CaseSubmitPage() {
         </div>
 
         <div className="case-submit__field">
-          <div className="case-submit__content-header">
+          <div className="case-submit__content-head">
             <label className="case-submit__label" htmlFor={contentFieldId}>
               사건 내용 <span className="case-submit__required">*</span>
             </label>
-            <button type="button" className="case-submit__dummy-fill" onClick={handleFillDummyContent}>
-              더미 텍스트 입력
-            </button>
+            {/* 발표 시연용. 누르면 예시 사건이 본문 칸에 바로 들어간다. */}
+            <button type="button" className="case-submit__demo" onClick={handleDemoFill}>내용 작성하기</button>
           </div>
           <div className={`case-submit__textarea-box${content ? ' has-content' : ''}`}>
             <textarea
@@ -168,7 +183,6 @@ function CaseSubmitPage() {
               placeholder={isSeoa ? '언제, 누구와 어떤 일이 있었나요?' : CONTENT_PLACEHOLDER}
               maxLength={CONTENT_MAX_LENGTH}
               value={content}
-              onFocus={handleFillDummyContent}
               onChange={(event) => setContent(event.target.value)}
               required
             />

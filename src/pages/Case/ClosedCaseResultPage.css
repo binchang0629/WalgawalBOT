@@ -1,0 +1,15 @@
+.case-result--closed .case-result__body {
+  padding-bottom: 120px;
+}
+
+.case-result--closed .ai-verdict--closed {
+  margin-top: 50px;
+}
+
+.case-result--closed .case-result__section-divider--closed {
+  margin: 64px 0 40px;
+}
+
+.case-result--closed .comment-list {
+  gap: 20px;
+}

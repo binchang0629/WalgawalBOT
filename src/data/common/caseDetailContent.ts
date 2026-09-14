@@ -18,8 +18,8 @@ export const weddingGiftCase = {
     avatarUrl: authorWalang,
   },
   title: '10년 지기 친구 결혼식에 축의금 10만 원을 냈는데, 적은 건가요?',
-  caseNumber: '#CASE-MARRY-01',
-  age: '1시간 전',
+  caseNumber: '#CASE-MARRY-87',
+  age: '7시간 전',
   participantCount: 611,
   deadline: '01:01',
   paragraphs: [

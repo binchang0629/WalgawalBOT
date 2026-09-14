@@ -1,21 +1,13 @@
-import { homeImages } from '../homeAssets'
-import { adBanner } from '../../../data/common/homeContent'
+import banner from '../../../assets/home/figma/ad-panmung-school-banner.png'
+import './AdBanner.css'
 
-/**
- * AdBox — 광고 자리. Figma `1402:7196`
- *
- * 실제 광고가 아니라 시안에 있는 자리 표시다. 링크를 걸지 않는다.
- * 제목의 Cafe24 Ssukssuk은 이 배너에만 쓰는 장식 폰트다. (PROJECT_SPEC.md §1-2)
- */
+/** 개발 홈 최종 수정 > AdBox (1881:9599), 402 × 88.
+ * 클릭하지 않는 광고 이미지. CookieRun 제목까지 포함한 Figma 원본 렌더다.
+ * 이전 광고는 ./archive/LegacyAdBanner.tsx에 별도로 보관한다. */
 function AdBanner() {
   return (
-    <aside className="ad-banner" aria-label="광고">
-      <div className="ad-banner__copy">
-        <p className="ad-banner__lead">{adBanner.lead}</p>
-        <strong className="ad-banner__title">{adBanner.title}</strong>
-      </div>
-      <img className="ad-banner__art" src={homeImages.adShell} alt="" aria-hidden="true" />
-      <span className="ad-banner__label">{adBanner.label}</span>
+    <aside className="school-ad-banner" aria-label="광고">
+      <img src={banner} width={402} height={88} alt="대화 조정 갈등 교육, 판멍 스쿨. 광고" />
     </aside>
   )
 }

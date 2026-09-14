@@ -10,10 +10,14 @@ export const PATHS = {
   login: '/login',
   /** 회원가입 (데모). 컨펌 시안 없이 팀 결정으로 추가한 화면이다. (PROJECT_SPEC.md §9-2) */
   signup: '/signup',
+  /** 가입 완료 환영 화면. Figma `2187:24600`. */
+  signupComplete: '/signup/complete',
   home: '/home',
   plaza: '/plaza',
   caseDetail: '/cases/:caseId',
   caseResult: '/cases/:caseId/result',
+  jihoonCaseDetail: '/cases/case-company-874',
+  jihoonCaseResult: '/cases/case-company-874/result',
   /** 사건 접수 1~4단계. 흐름은 지훈01~05(사건 작성 → 추가 질문 → 요약 확인 → AI 참고 의견·접수 → 접수 완료) 기준. */
   caseSubmit: '/cases/new',
   caseSubmitQuestions: '/cases/new/questions',

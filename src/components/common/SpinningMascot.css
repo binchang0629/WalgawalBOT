@@ -1,0 +1,39 @@
+/*
+ * 스프라이트 시트 재생.
+ * 가로 애니메이션이 한 행(15프레임)을 1초에 넘기고,
+ * 세로 애니메이션이 12초에 12행을 넘긴다. 12 × 1초 = 12초라 두 축이 어긋나지 않는다.
+ */
+.spinning-mascot {
+    --mascot-size: 48px;
+    --mascot-cols: 15;
+    --mascot-rows: 12;
+
+    display: block;
+    width: var(--mascot-size);
+    height: var(--mascot-size);
+    background-image: url('../../assets/chatbot/mascot-spin-sheet.webp');
+    background-repeat: no-repeat;
+    background-size: calc(var(--mascot-size) * var(--mascot-cols)) calc(var(--mascot-size) * var(--mascot-rows));
+    background-position: 0 0;
+    animation:
+        spinning-mascot-col 1s steps(15) infinite,
+        spinning-mascot-row 12s steps(12) infinite;
+}
+
+@keyframes spinning-mascot-col {
+    from { background-position-x: 0; }
+    to   { background-position-x: calc(var(--mascot-size) * var(--mascot-cols) * -1); }
+}
+
+@keyframes spinning-mascot-row {
+    from { background-position-y: 0; }
+    to   { background-position-y: calc(var(--mascot-size) * var(--mascot-rows) * -1); }
+}
+
+/* 모션을 줄이도록 설정한 사용자에게는 정면 한 컷만 보여준다. */
+@media (prefers-reduced-motion: reduce) {
+    .spinning-mascot {
+        animation: none;
+        background-position: 0 0;
+    }
+}

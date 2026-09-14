@@ -5,6 +5,7 @@ import { weddingGiftCase } from '../../data/common/caseDetailContent'
 import type { WeddingGiftVoteId } from '../../data/common/caseDetailContent'
 import { PATHS, toCaseResult } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
+import CaseVoteSection from './components/CaseVoteSection'
 import useDemoCountdown from './components/useDemoCountdown'
 import './CaseDetailPage.css'
 
@@ -115,57 +116,14 @@ function CaseDetailPage() {
           </ol>
         </section>
 
-        <section className="case-vote" aria-labelledby="case-vote-title">
-          <div className="case-vote__heading">
-            <h2 id="case-vote-title">당신의 판단은?</h2>
-            <p>나의 판단은 익명으로 반영돼요.</p>
-          </div>
-
-          <div className="case-vote__grid">
-            {weddingGiftCase.choices.map((choice) => (
-              <button
-                key={choice.id}
-                type="button"
-                className={selectedVote === choice.id ? 'vote-choice is-selected' : 'vote-choice'}
-                onClick={() => handleVoteChoice(choice.id)}
-                disabled={!isAuthenticated}
-                aria-pressed={selectedVote === choice.id}
-              >
-                <span className={`vote-choice__artwork vote-choice__artwork--${choice.id}`}>
-                  <img src={choice.imageUrl} alt="" width={62} height={62} />
-                </span>
-                <span>{choice.label[0]}<br />{choice.label[1]}</span>
-              </button>
-            ))}
-          </div>
-
-          {!isAuthenticated && (
-            <div className="case-vote__login">
-              <div>
-                <p>로그인 후 투표할 수 있어요</p>
-                <Link to={loginPath}>로그인하고 나도 투표하기</Link>
-              </div>
-            </div>
-          )}
-
-          {isAuthenticated && (
-            <>
-              <button type="button" className="case-vote__submit" onClick={handleVoteSubmit}>
-                투표하기
-              </button>
-              {voteMessage && (
-                <p
-                  className={
-                    selectedVote ? 'case-vote__message is-success' : 'case-vote__message'
-                  }
-                  role="status"
-                >
-                  {voteMessage}
-                </p>
-              )}
-            </>
-          )}
-        </section>
+        <CaseVoteSection
+          isAuthenticated={isAuthenticated}
+          loginPath={loginPath}
+          selectedVote={selectedVote}
+          voteMessage={voteMessage}
+          onSelect={handleVoteChoice}
+          onSubmit={handleVoteSubmit}
+        />
       </div>
     </main>
   )

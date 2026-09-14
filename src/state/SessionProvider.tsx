@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { PersonaId, SessionStatus } from '../types'
-import { DEMO_ACCOUNTS } from '../data/personas'
+import { DEMO_ACCOUNTS, PERSONAS } from '../data/personas'
 import { DEMO } from '../config/app'
 import { SessionContext } from './sessionContext'
 import type { SessionUser } from './sessionContext'
@@ -70,8 +70,18 @@ function createInitialState(): SessionState {
     }
   }
 
-  // 발표 기본 진입은 서아 로그인. 저장된 전환/명시적 로그아웃은 위에서 그대로 복원한다.
-  return { personaId: 'A', sessionStatus: 'authenticated' }
+  // 처음 들어오면 서아의 시작 상태, 즉 비로그인이다.
+  return { personaId: 'A', sessionStatus: startStatusOf('A') }
+}
+
+/**
+ * 퍼소나마다 시연을 시작하는 로그인 상태가 다르다.
+ *
+ *   서아(신규) : 비로그인으로 시작한다. 투표하려다 로그인 안내를 만나고, 가입하고 돌아오는 흐름이다.
+ *   지훈(기존) : 이미 회원이라 로그인된 채로 시작한다. 가입 단계를 거치지 않는다.
+ */
+function startStatusOf(personaId: PersonaId): SessionStatus {
+  return PERSONAS[personaId].kind === 'new' ? 'anonymous' : 'authenticated'
 }
 
 function toUser(personaId: PersonaId): SessionUser {
@@ -104,9 +114,13 @@ function SessionProvider({ children }: { children: ReactNode }) {
     setSession((current) => ({ ...current, sessionStatus: 'anonymous' }))
   }, [])
 
-  // 계정 전환은 로그인 상태를 유지한 채 사람만 바꾼다.
+  /*
+   * 계정 전환은 그 퍼소나의 시연 시작 지점으로 되돌린다.
+   * 서아를 고르면 비로그인, 지훈을 고르면 로그인 상태다.
+   * 서아로 돌아왔는데 앞선 시연에서 로그인한 상태가 남아 있으면 가입 흐름을 다시 못 보여준다.
+   */
   const switchPersona = useCallback((personaId: PersonaId) => {
-    setSession({ personaId, sessionStatus: 'authenticated' })
+    setSession({ personaId, sessionStatus: startStatusOf(personaId) })
   }, [])
 
   const value = useMemo(
