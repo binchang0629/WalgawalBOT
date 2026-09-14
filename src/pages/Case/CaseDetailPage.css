@@ -18,47 +18,21 @@
     gap: 12px;
 }
 
+/*
+ * 사건 결과 화면의 `.vote-result__deadline`과 같은 알약이다.
+ * 두 화면의 마감 표시를 같은 모양으로 통일했다. (2026-09-14 팀 요청)
+ * 값이 바뀌어도 폭이 흔들리지 않게 `tabular-nums`를 쓴다.
+ */
 .case-overview__deadline {
-    height: 22px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--neutral-700);
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.vote-countdown {
-    display: flex;
-    align-items: center;
-    gap: 1px;
-}
-
-.vote-countdown>span {
-    display: flex;
-    align-items: center;
-    gap: 1px;
-}
-
-.vote-countdown b {
-    width: 18px;
-    height: 22px;
-    display: grid;
-    place-items: center;
-    border-radius: 4px;
-    background: var(--neutral-500);
+    align-self: flex-start;
+    margin: 0;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: var(--negative);
     color: #fff;
-    font-size: 12px;
-    line-height: 1;
-}
-
-.vote-countdown i {
-    width: 5px;
-    color: var(--neutral-500);
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 700;
-    text-align: center;
+    font-size: 11px;
+    line-height: 1.4;
+    font-variant-numeric: tabular-nums;
 }
 
 .case-overview__category {

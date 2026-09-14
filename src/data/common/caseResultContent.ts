@@ -4,6 +4,7 @@ import avatar3 from '../../assets/case/result/comment-avatar-3.png'
 import avatar4 from '../../assets/case/result/comment-avatar-4.png'
 import avatar5 from '../../assets/case/result/comment-avatar-5.png'
 import resultArtwork from '../../assets/case/result/verdict-artwork.png'
+import { weddingGiftCase } from './caseDetailContent'
 import type { WeddingGiftVoteId } from './caseDetailContent'
 
 export interface CaseResultComment {
@@ -23,7 +24,8 @@ export interface CaseResultComment {
  * 서버 연결 전 시연용이며 새 댓글은 화면 상태에만 추가된다.
  */
 export const weddingGiftResult = {
-  deadline: '01:32:47',
+  /** 사건 상세와 같은 마감 시각을 쓴다. 값은 `caseDetailContent.ts` 한 곳에서 관리한다. */
+  deadline: weddingGiftCase.deadline,
   artworkUrl: resultArtwork,
   verdict: {
     label: '실시간 투표 중',

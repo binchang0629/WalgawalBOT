@@ -10,10 +10,11 @@ import { toCaseDetail } from '../../../routes/paths'
  *
  * 카운트다운은 자리마다 한 칸씩 그리고 실제로 매초 줄어든다.
  * 서버가 없어 사건별 마감 일시를 받을 수 없으므로 화면을 연 시점부터 센다.
- * (`todayCase.countdownHours` — PROJECT_SPEC.md §1-5)
+ * 남은 시간은 사건 상세·결과 화면과 같은 값을 쓴다.
+ * (`todayCase.deadline` → `weddingGiftCase.deadline` — PROJECT_SPEC.md §1-5)
  */
 function PopularCaseSection() {
-  const countdown = useCountdown(todayCase.countdownHours)
+  const countdown = useCountdown(todayCase.deadline)
   const pad = (value: number) => String(value).padStart(2, '0')
   // `02:41:07` 같은 문자열을 한 글자씩 쪼개 칸으로 그린다. `:`은 구분자 칸이 된다.
   const countdownSlots = `${pad(countdown.hours)}:${pad(countdown.minutes)}:${pad(countdown.seconds)}`.split('')

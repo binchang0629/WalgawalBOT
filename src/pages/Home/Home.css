@@ -61,6 +61,11 @@
     gap: 1.2px;
 }
 
+/*
+ * 숫자 칸은 시안의 회색(gray_600) 대신 파랑을 쓴다. 2026-09-14 팀 요청.
+ * 처음에는 Primary(#374BFF)로 넣었으나 너무 진해 눈에 띈다는 의견이 있어
+ * 한 단계 옅은 Blue/600(#4D8EFD)으로 바꿨다. 시안과 다른 부분이라 근거를 남긴다.
+ */
 .countdown__digit {
     display: flex;
     align-items: center;
@@ -68,7 +73,7 @@
     width: 18px;
     height: 22px;
     border-radius: 3.6px;
-    background: var(--neutral-500);
+    background: var(--blue-400);
     color: #fff;
     font-size: 12px;
     font-weight: 700;
@@ -77,7 +82,7 @@
 
 .countdown__colon {
     width: 5px;
-    color: var(--neutral-500);
+    color: var(--blue-400);
     font-size: 12px;
     font-style: normal;
     font-weight: 700;

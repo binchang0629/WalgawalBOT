@@ -3,6 +3,7 @@
 ## 홈 민트초코 밸런스 게임 (2026-09-14)
 
 ### 색상 통일 후속 수정
+- `싫다` 결과에서 흰 사각형이 보이던 문제를 수정했다. 기존 RGB 이미지 `mint-bowl-red.png`는 보존하고, 실제 알파 채널이 있는 `mint-bowl-red-transparent.png`를 새로 생성해 연결했다. Sharp 검사 결과 `isOpaque: false`를 확인했다.
 - 최신 사용자 요청에 따라 왼쪽 `좋다`는 파란 그릇, 오른쪽 `싫다`는 빨간(코랄) 빈 그릇으로 통일했다. 아래 최초 기록의 보라/파랑 배치는 이전 버전이다. 선택지 글자·결과 강조·선택 테두리는 민트 전용 파란색 덮어쓰기를 제거하여 깻잎과 같은 `--blue-600` / `--negative`를 그대로 사용한다.
 - `mint-bowl-blue.png`를 왼쪽에 재사용하고, 새 파일 `src/assets/home/figma/mint-bowl-red.png`, `src/assets/home/figma/mint-bowl-filled-blue.png`를 추가했다. 기존 보라 그릇·보라 결과 이미지는 삭제하지 않았다. 내장 이미지 생성 도구로 그릇만 색을 바꿨으며 흰 배경 RGB PNG로 저장했다. 그릇 모양·스쿱·질문·배치·드래그 동작은 유지한다.
 - 파란 결과 프롬프트: `Use case: precise-object-edit. Image 1 is the edit target: mint chocolate ice cream in a lavender scalloped pedestal dessert bowl. Image 2 is the color reference: the same empty bowl in pale cornflower blue. Change ONLY the entire bowl color in image 1 (rim, fluted cup, stem, foot) from purple to the light blue of image 2. Keep the green ice cream and brown chocolate completely unchanged. Preserve exact object size, framing, shape, lighting, shadows on object, and white background of image 1. No spoon, no decorations. Pure white background, no checkerboard.`
