@@ -13,7 +13,7 @@ import './Plaza.css'
 function PlazaPage() {
   return (
     <main className="plaza-screen">
-      <TopBar logo="왈가왈BOT LOGO" />
+      <TopBar title="배심원 광장" />
       <RankingHeroSection />
       <CaseFeedSection />
     </main>

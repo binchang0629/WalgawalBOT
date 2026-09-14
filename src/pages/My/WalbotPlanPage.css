@@ -1,5 +1,5 @@
 .walbot-plan {
-    --device-app-header: 66px;
+    --device-app-header: 64px;
     color: var(--ink);
     font-family: var(--font-body);
 }
