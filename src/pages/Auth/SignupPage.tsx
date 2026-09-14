@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import useSession from '../../hooks/useSession'
 import { PATHS } from '../../routes/paths'
 import { AUTH_DEMO_ACCOUNT, EMAIL_DOMAINS } from './authDemoAccount'
@@ -49,7 +49,6 @@ const MONTH_OPTIONS: AuthSelectOption[] = Array.from({ length: 12 }, (_, index) 
 function SignupPage() {
   const { personaId, signIn } = useSession()
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
 
   const [nickname, setNickname] = useState('')
   const [emailId, setEmailId] = useState('')
@@ -68,10 +67,6 @@ function SignupPage() {
    * 동의 줄로 스스로 열었는지, 가입 완료를 눌러 확인차 떴는지에 따라 제목이 다르다.
    */
   const [agreeOpenReason, setAgreeOpenReason] = useState<AgreeOpenReason | null>(null)
-
-  /** 가입 후 돌아갈 곳. 앱 내부 경로만 허용한다. (PROJECT_SPEC.md §7-5) */
-  const rawFrom = searchParams.get('from')
-  const from = rawFrom && rawFrom.startsWith('/') && !rawFrom.startsWith('//') ? rawFrom : PATHS.home
 
   const isNicknameValid = nickname.length >= 2 && nickname.length <= 6
   const isPasswordMatched = password !== '' && password === passwordConfirm
@@ -93,8 +88,8 @@ function SignupPage() {
   const handleComplete = () => {
     setAgreeOpenReason(null)
     signIn(personaId)
-    // 환영 화면을 거쳐 원래 가려던 곳으로 이어진다.
-    navigate(`${PATHS.signupComplete}?from=${encodeURIComponent(from)}`, { replace: true })
+    // 가입 완료 흐름은 이전 진입 경로와 무관하게 환영 화면을 거쳐 홈으로 이어진다.
+    navigate(PATHS.signupComplete, { replace: true })
   }
 
   return (
@@ -301,7 +296,7 @@ function SignupPage() {
             </div>
           </div>
           <p className="signUpHelp signUpHelpBirth">
-            생년월일 입력시 생일 때 <b>ai판결 추가 이용권</b>을 지급해드려요.
+            생년월일 입력시 생일 때 <b>AI 판결 추가 이용권</b>을 지급해드려요.
           </p>
         </div>
       </div>
@@ -327,7 +322,7 @@ function SignupPage() {
           onClick={() => setAgreeOpenReason('submit')}
           disabled={!canOpenAgree}
         >
-          회원 가입 완료하기
+          회원가입 완료하기
         </button>
       </div>
 

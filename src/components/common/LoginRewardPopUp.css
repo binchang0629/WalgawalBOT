@@ -45,6 +45,24 @@
     to { transform: translateY(0); }
 }
 
+.loginRewardOverlay.isClosing {
+    animation: loginRewardDimOut 320ms ease-out both;
+}
+
+.loginRewardPopUp.isClosing {
+    animation: loginRewardPopUpOut 320ms cubic-bezier(.4, 0, 1, 1) both;
+}
+
+@keyframes loginRewardDimOut {
+    from { background-color: rgb(37 37 37 / 70%); }
+    to { background-color: rgb(37 37 37 / 0%); }
+}
+
+@keyframes loginRewardPopUpOut {
+    from { transform: translateY(0); }
+    to { transform: translateY(100%); }
+}
+
 /* ---------- 머리말 ---------- */
 
 .loginRewardHeader {

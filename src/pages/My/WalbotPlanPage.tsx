@@ -4,6 +4,7 @@ import useSession from '../../hooks/useSession'
 import useWizardBack from '../../hooks/useWizardBack'
 import { PATHS } from '../../routes/paths'
 import CaseSubmitHeader from '../Submit/components/CaseSubmitHeader'
+import useToast from '../../hooks/useToast'
 import WalbotPlanManagePage from './WalbotPlanManagePage'
 import selectedIcon from '../../assets/my/plan/radio-selected.svg'
 import adFreeIcon from '../../assets/my/plan/benefit-ad-free.svg'
@@ -24,15 +25,15 @@ const benefits = [
 
 function WalbotPlanSelectionPage() {
   const navigate = useNavigate()
+  const { showToast } = useToast()
   const handleBack = useWizardBack(PATHS.my)
   const [selectedPlan, setSelectedPlan] = useState<typeof plans[number]['id']>('annual')
-  const [showNotice, setShowNotice] = useState(false)
 
   return (
     <main className="case-submit walbot-plan">
       <CaseSubmitHeader title="왈봇 플랜" showTempSave={false} onBack={handleBack} />
 
-      <form className="walbot-plan__form" onSubmit={(event) => { event.preventDefault(); setShowNotice(true) }}>
+      <form className="walbot-plan__form" onSubmit={(event) => { event.preventDefault(); showToast('무료체험 신청 기능은 준비 중이에요.') }}>
         <div className="case-submit__body walbot-plan__body">
           <div className="case-submit__intro walbot-plan__intro">
             <h2 className="case-submit__heading">7일 무료체험으로<br />시작해보세요</h2>
@@ -49,7 +50,7 @@ function WalbotPlanSelectionPage() {
                     name="plan-period"
                     value={plan.id}
                     checked={selectedPlan === plan.id}
-                    onChange={() => { setSelectedPlan(plan.id); setShowNotice(false) }}
+                    onChange={() => setSelectedPlan(plan.id)}
                     aria-label={`${plan.name} ${plan.accessiblePrice}`}
                     aria-describedby={`plan-${plan.id}-billing`}
                   />
@@ -83,7 +84,6 @@ function WalbotPlanSelectionPage() {
         </div>
 
         <footer className="case-submit__footer walbot-plan__footer">
-          {showNotice && <p className="walbot-plan__notice" role="status">무료체험 신청 기능은 준비 중이에요.</p>}
           <button type="submit" className="case-submit__primary">무료체험 시작하기</button>
           <button type="button" className="case-submit__footer-helper walbot-plan__skip" onClick={() => navigate(PATHS.my)}>다음에 할게요</button>
         </footer>

@@ -59,10 +59,15 @@ function LoginPage() {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault()
     if (!canSubmit) return
+
+    // 모바일 키보드·포커스가 남아 있으면 도착 화면의 하단 내비가 밀려 보일 수 있다.
+    // 먼저 포커스를 해제하고 목적지 화면을 한 프레임 완성한 뒤 보상 팝업을 띄운다.
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
     signIn(personaId)
-    // 도착한 화면 위에 출석 포인트 팝업이 뜬다.
-    requestLoginReward('login')
     navigate(from, { replace: true })
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => requestLoginReward('login'))
+    })
   }
 
   return (

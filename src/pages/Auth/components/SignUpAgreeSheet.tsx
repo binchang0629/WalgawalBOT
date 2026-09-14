@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Dispatch, KeyboardEvent, SetStateAction } from 'react'
 import { createPortal } from 'react-dom'
+import InfoNotice from '../../../components/common/InfoNotice'
 import closeIcon from '../../../assets/auth/loginPopUpClose.svg'
-import infoIcon from '../../../assets/auth/signUpInfo.svg'
 import type { AgreeState } from './signUpAgreeState'
 import './SignUpAgreeSheet.css'
 
@@ -12,7 +12,7 @@ import './SignUpAgreeSheet.css'
  * 시안에 펼친 모습이 있는 건 첫 항목(왈가왈BOT 약관)뿐이다.
  * 나머지 셋은 화살표만 있고 펼친 화면이 없어 열리지 않게 뒀다. → PROJECT_SPEC.md §9
  *
- * 필수 두 항목에 모두 동의해야 `회원 가입 완료하기`가 켜진다.
+ * 필수 두 항목은 기본 선택되며, 둘 다 동의한 상태에서 `회원가입 완료하기`가 켜진다.
  */
 
 /** 시안 `2264:13294`의 약관 본문. */
@@ -68,9 +68,21 @@ function SignUpAgreeSheet({ value, openReason, onChange, onClose, onSubmit }: Pr
 
   useEffect(() => {
     openerRef.current = document.activeElement as HTMLElement | null
-    sheetRef.current?.focus()
-    return () => openerRef.current?.focus?.()
-  }, [])
+    const scroll = portalRoot?.parentElement?.querySelector<HTMLElement>('.auth-layout__scroll')
+    const scrollTop = scroll?.scrollTop ?? 0
+    const previousOverflow = scroll?.style.overflowY ?? ''
+
+    if (scroll) scroll.style.overflowY = 'hidden'
+    sheetRef.current?.focus({ preventScroll: true })
+
+    return () => {
+      if (scroll) {
+        scroll.style.overflowY = previousOverflow
+        scroll.scrollTop = scrollTop
+      }
+      openerRef.current?.focus?.({ preventScroll: true })
+    }
+  }, [portalRoot])
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -173,13 +185,12 @@ function SignUpAgreeSheet({ value, openReason, onChange, onClose, onSubmit }: Pr
           ))}
         </ul>
 
-        <p className="signUpAgreeNotice">
-          <img src={infoIcon} alt="" aria-hidden="true" />
+        <InfoNotice className="signUpAgreeNotice">
           프로필-설정에서 선택 동의 설정을 수정 가능해요.
-        </p>
+        </InfoNotice>
 
         <button type="button" className="signUpAgreeSubmit" onClick={onSubmit} disabled={!canSubmit}>
-          회원 가입 완료하기
+          회원가입 완료하기
         </button>
       </div>
     </div>,

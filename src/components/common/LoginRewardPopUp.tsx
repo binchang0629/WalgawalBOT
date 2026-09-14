@@ -25,8 +25,8 @@ import './LoginRewardPopUp.css'
  * 좌표·각도·크기는 시안의 `relativeTransform` 실측값을 그대로 옮겼다.
  * 그래서 CSS 값에 소수점이 남아 있다. 임의로 반올림하면 시안과 어긋난다.
  *
- * 로그인과 회원가입 모두 이 팝업을 쓴다. 다른 건 인사말과 시작 포인트뿐이다.
- * 회원가입은 이제 막 가입한 참이라 0PT에서 시작한다.
+ * 로그인과 회원가입 모두 이 팝업을 쓰며 인사말만 다르다.
+ * 두 흐름 모두 0PT에서 시작해 출석 보상 후 10PT가 된다.
  */
 
 export type LoginRewardKind = 'login' | 'signup'
@@ -40,68 +40,107 @@ interface Props {
   name: string
   /** 적립 전 포인트. 회원가입은 0이다. */
   startPoint: number
+  /** 팝업 숫자가 최종 합계로 정리되는 순간 호출한다. */
+  onSettled?: (totalPoint: number) => void
   onClose: () => void
 }
 
 /** 애니메이션 단계. 숫자가 바뀌는 시점을 나누려고 둔다. */
 type Stage = 'dropping' | 'gained' | 'settled'
 
-function LoginRewardPopUp({ kind, name, startPoint, onClose }: Props) {
+function LoginRewardPopUp({ kind, name, startPoint, onSettled, onClose }: Props) {
   // 움직임을 줄이는 설정이면 처음부터 마지막 장면으로 시작한다.
   // 첫 렌더의 초기값에서 정한다. effect 안에서 상태를 바꾸면 렌더가 연쇄로 일어난다.
   const [stage, setStage] = useState<Stage>(() => (
     window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'settled' : 'dropping'
   ))
+  const [isClosing, setIsClosing] = useState(false)
   const popUpRef = useRef<HTMLDivElement>(null)
   const openerRef = useRef<HTMLElement | null>(null)
+  const closingRef = useRef(false)
+  const closeTimerRef = useRef<number | null>(null)
   const portalRoot = document.getElementById('app-overlay-root')
+  const totalPoint = startPoint + REWARD_POINT
+
+  /** 수동·자동 종료 모두 같은 아래 방향 모션을 거친다. */
+  const dismiss = useCallback(() => {
+    if (closingRef.current) return
+    closingRef.current = true
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      onClose()
+      return
+    }
+
+    setIsClosing(true)
+    closeTimerRef.current = window.setTimeout(onClose, 320)
+  }, [onClose])
 
   useEffect(() => {
     openerRef.current = document.activeElement as HTMLElement | null
     popUpRef.current?.focus()
-    return () => openerRef.current?.focus?.()
+    return () => {
+      if (closeTimerRef.current !== null) window.clearTimeout(closeTimerRef.current)
+      openerRef.current?.focus?.()
+    }
   }, [])
 
   // 동전이 그릇에 닿는 순간과 숫자가 정리되는 순간. CSS 애니메이션 시간과 맞춰 둔다.
   useEffect(() => {
-    if (stage === 'settled') return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      onSettled?.(totalPoint)
+      return
+    }
     const toGained = window.setTimeout(() => setStage('gained'), 1200)
-    const toSettled = window.setTimeout(() => setStage('settled'), 2100)
+    const toSettled = window.setTimeout(() => {
+      setStage('settled')
+      onSettled?.(totalPoint)
+    }, 2100)
     return () => {
       window.clearTimeout(toGained)
       window.clearTimeout(toSettled)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [onSettled, totalPoint])
+
+  // 최종 포인트와 하단 안내 바를 충분히 보여준 뒤 자동으로 닫는다.
+  useEffect(() => {
+    if (stage !== 'settled') return
+    const timer = window.setTimeout(dismiss, 3000)
+    return () => window.clearTimeout(timer)
+  }, [dismiss, stage])
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.stopPropagation()
-        onClose()
+        dismiss()
       }
     },
-    [onClose],
+    [dismiss],
   )
 
   if (!portalRoot) return null
 
   const greeting = kind === 'signup' ? '처음을 환영해요!' : '오늘도 어서오세요!'
-  const totalPoint = startPoint + REWARD_POINT
-
   return createPortal(
-    <div className="loginRewardOverlay" role="presentation" onClick={onClose} onKeyDown={handleKeyDown}>
+    <div
+      className={`loginRewardOverlay${isClosing ? ' isClosing' : ''}`}
+      role="presentation"
+      onClick={dismiss}
+      onKeyDown={handleKeyDown}
+    >
       <div
         ref={popUpRef}
-        className={`loginRewardPopUp loginRewardStage-${stage}`}
+        className={`loginRewardPopUp loginRewardStage-${stage}${isClosing ? ' isClosing' : ''}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="loginRewardGreeting"
         tabIndex={-1}
+        inert={isClosing}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="loginRewardHeader">
-          <button type="button" onClick={onClose} aria-label="닫기">
+          <button type="button" onClick={dismiss} aria-label="닫기">
             <img src={closeIcon} alt="" aria-hidden="true" />
           </button>
           <p className="loginRewardGreeting" id="loginRewardGreeting">
@@ -136,7 +175,7 @@ function LoginRewardPopUp({ kind, name, startPoint, onClose }: Props) {
 
         <div className="loginRewardFooter">
           <p className="loginRewardNotice">
-            오늘의 <b>출석 포인트({REWARD_POINT}pt)</b>를 지급 했어요.
+            오늘의 <b>출석 포인트({REWARD_POINT}pt)</b>를 지급했어요.
           </p>
         </div>
       </div>

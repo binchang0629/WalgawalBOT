@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import SectionTitle from '../../components/common/SectionTitle'
+import useToast from '../../hooks/useToast'
 import useWizardBack from '../../hooks/useWizardBack'
 import { PATHS } from '../../routes/paths'
 import CaseSubmitHeader from '../Submit/components/CaseSubmitHeader'
@@ -12,8 +12,6 @@ import chevron from '../../assets/my/plan/chevron.svg'
 import './WalbotPlanManagePage.css'
 
 const paymentHistory = ['2026.08.25', '2026.07.25'] as const
-
-type Notice = { section: 'payment' | 'history' | 'management'; message: string }
 
 function KakaoPayLogo() {
   return (
@@ -29,7 +27,7 @@ function KakaoPayLogo() {
 
 export default function WalbotPlanManagePage() {
   const handleBack = useWizardBack(PATHS.my)
-  const [notice, setNotice] = useState<Notice | null>(null)
+  const { showToast } = useToast()
 
   return (
     <main className="case-submit walbot-plan-manage">
@@ -63,7 +61,7 @@ export default function WalbotPlanManagePage() {
               type="button"
               className="walbot-plan-manage__payment"
               aria-label="카카오페이 결제수단 변경"
-              onClick={() => setNotice({ section: 'payment', message: '결제수단 변경 기능은 준비 중이에요. 현재 연결된 결제수단은 유지됩니다.' })}
+              onClick={() => showToast('결제수단 변경 기능은 준비 중이에요. 현재 연결된 결제수단은 유지됩니다.')}
             >
               <KakaoPayLogo />
               <span className="walbot-plan-manage__payment-info">
@@ -72,14 +70,13 @@ export default function WalbotPlanManagePage() {
               </span>
               <span className="walbot-plan-manage__payment-action">변경<img src={chevron} width={6} height={10} alt="" /></span>
             </button>
-            {notice?.section === 'payment' && <p className="walbot-plan-manage__notice" role="status">{notice.message}</p>}
           </section>
 
           <section className="walbot-plan-manage__section" aria-label="결제 내역">
             <SectionTitle
               title="결제 내역"
               action="전체보기"
-              onActionClick={() => setNotice({ section: 'history', message: '현재 확인할 수 있는 결제 내역 2건을 모두 표시하고 있어요.' })}
+              onActionClick={() => showToast('현재 확인할 수 있는 결제 내역 2건을 모두 표시하고 있어요.')}
             />
             <ul className="walbot-plan-manage__history">
               {paymentHistory.map((date) => (
@@ -92,7 +89,6 @@ export default function WalbotPlanManagePage() {
                 </li>
               ))}
             </ul>
-            {notice?.section === 'history' && <p className="walbot-plan-manage__notice" role="status">{notice.message}</p>}
           </section>
 
           <section className="walbot-plan-manage__section" aria-label="플랜 관리">
@@ -100,7 +96,7 @@ export default function WalbotPlanManagePage() {
             <div className="walbot-plan-manage__actions">
               <button
                 type="button"
-                onClick={() => setNotice({ section: 'management', message: '연간 플랜 변경 기능은 준비 중이에요. 현재 월간 플랜은 유지됩니다.' })}
+                onClick={() => showToast('연간 플랜 변경 기능은 준비 중이에요. 현재 월간 플랜은 유지됩니다.')}
               >
                 <span>연간 플랜으로 변경</span>
                 <img src={chevron} width={6} height={10} alt="" />
@@ -108,13 +104,12 @@ export default function WalbotPlanManagePage() {
               <button
                 type="button"
                 className="walbot-plan-manage__cancel"
-                onClick={() => setNotice({ section: 'management', message: '구독 해지 기능은 준비 중이에요. 현재 구독은 해지되지 않았어요.' })}
+                onClick={() => showToast('구독 해지 기능은 준비 중이에요. 현재 구독은 해지되지 않았어요.')}
               >
                 <span>구독 해지</span>
                 <img src={chevron} width={6} height={10} alt="" />
               </button>
             </div>
-            {notice?.section === 'management' && <p className="walbot-plan-manage__notice" role="status">{notice.message}</p>}
           </section>
         </div>
 

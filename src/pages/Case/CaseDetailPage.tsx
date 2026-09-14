@@ -6,6 +6,7 @@ import type { WeddingGiftVoteId } from '../../data/common/caseDetailContent'
 import { PATHS, toCaseResult } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
 import CaseVoteSection from './components/CaseVoteSection'
+import useToast from '../../hooks/useToast'
 import useDemoCountdown from './components/useDemoCountdown'
 import './CaseDetailPage.css'
 
@@ -40,8 +41,8 @@ function CaseDetailPage() {
   const location = useLocation()
   const navigate = useNavigate()
   const { sessionStatus, recordJuryVote } = useSession()
+  const { showToast } = useToast()
   const [selectedVote, setSelectedVote] = useState<WeddingGiftVoteId | null>(null)
-  const [voteMessage, setVoteMessage] = useState('')
 
   if (caseId !== weddingGiftCase.id) return <MissingCase />
 
@@ -50,12 +51,11 @@ function CaseDetailPage() {
 
   const handleVoteChoice = (choiceId: WeddingGiftVoteId) => {
     setSelectedVote(choiceId)
-    setVoteMessage('')
   }
 
   const handleVoteSubmit = () => {
     if (!selectedVote) {
-      setVoteMessage('투표를 먼저 해주세요.')
+      showToast('투표를 먼저 해주세요.')
       return
     }
 
@@ -121,7 +121,6 @@ function CaseDetailPage() {
           isAuthenticated={isAuthenticated}
           loginPath={loginPath}
           selectedVote={selectedVote}
-          voteMessage={voteMessage}
           onSelect={handleVoteChoice}
           onSubmit={handleVoteSubmit}
         />

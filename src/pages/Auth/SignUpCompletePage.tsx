@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import useSession from '../../hooks/useSession'
 import { PATHS } from '../../routes/paths'
 import { requestLoginReward } from '../../state/loginRewardSignal'
@@ -11,16 +11,11 @@ import './SignUpCompletePage.css'
  * 시안에는 상단 헤더가 없다. 되돌아갈 곳이 없는 마무리 화면이라
  * AuthLayout이 아니라 ShowcaseLayout 아래에 바로 둔다.
  *
- * `왈가왈BOT 시작하기`를 누르면 가입 전에 가려던 화면으로 간다.
+ * `왈가왈BOT 시작하기`를 누르면 항상 홈으로 간다.
  */
 function SignUpCompletePage() {
   const { currentUser } = useSession()
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-
-  /** 앱 내부 경로만 허용한다. (PROJECT_SPEC.md §7-5) */
-  const rawFrom = searchParams.get('from')
-  const from = rawFrom && rawFrom.startsWith('/') && !rawFrom.startsWith('//') ? rawFrom : PATHS.home
 
   // 가입 직후라 이름이 있다. 복원 중이면 시안 문구의 기본값을 쓴다.
   const name = currentUser?.name.replace(/^윤/, '') ?? '서아'
@@ -44,9 +39,12 @@ function SignUpCompletePage() {
           type="button"
           className="signUpCompleteStart"
           onClick={() => {
-            // 가입은 처음이라 0PT에서 시작하는 팝업이 뜬다.
-            requestLoginReward('signup')
-            navigate(from, { replace: true })
+            // 홈과 하단 내비를 먼저 고정한 뒤 팝업만 아래에서 올라오게 한다.
+            if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
+            navigate(PATHS.home, { replace: true })
+            window.requestAnimationFrame(() => {
+              window.requestAnimationFrame(() => requestLoginReward('signup'))
+            })
           }}
         >
           왈가왈BOT 시작하기

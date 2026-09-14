@@ -2,10 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { DEMO_ACCOUNTS } from '../../../data/personas'
 import type { PersonaId } from '../../../types'
+import InfoNotice from '../../../components/common/InfoNotice'
 import seoaPhoto from '../../../assets/my/account-seoa.png'
 import jihunPhoto from '../../../assets/my/account-jihun.png'
 import closeIcon from '../../../assets/my/account-close.svg'
-import infoIcon from '../../../assets/my/account-info.svg'
 import selectedIcon from '../../../assets/my/account-selected.svg'
 import profileCloseIcon from '../../../assets/my/profile-close.svg'
 import './AccountSwitchSheet.css'
@@ -160,10 +160,9 @@ function AccountSwitchSheet({ currentPersona, onClose, onConfirm, onLogout }: Pr
               </span>
             </label>
           </section>
-          <aside className="account-switch-sheet__notice">
-            <img src={infoIcon} alt="" width={20} height={20} />
-            <p>계정을 전환하면 작성 중인 사건의 임시 저장 내역과 설정이 각 프로필에 맞게 분리되어 유지됩니다.</p>
-          </aside>
+          <InfoNotice>
+            계정을 전환하면 작성 중인 사건의 임시 저장 내역과 설정이 각 프로필에 맞게 분리되어 유지됩니다.
+          </InfoNotice>
         </div>
         <footer className="account-switch-sheet__footer">
           <button type="button" aria-disabled={!selected} onClick={() => {

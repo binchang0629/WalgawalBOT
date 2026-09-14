@@ -64,7 +64,7 @@ export const DEMO_ACCOUNTS: Record<PersonaId, DemoAccount> = {
   A: {
     personaId: 'A',
     name: '윤서아',
-    email: 'seoa_daily@gmail.com',
+    email: 'seoa1001@wgwb.com',
     nickname: '익명의 왈가닥',
     submittedCases: 0,
     juryParticipations: 0,
@@ -75,7 +75,7 @@ export const DEMO_ACCOUNTS: Record<PersonaId, DemoAccount> = {
   B: {
     personaId: 'B',
     name: '곽지훈',
-    email: 'kwak_freelancer@gmail.com',
+    email: 'kwak_isfree@wgwb.com',
     nickname: '익명의 왈랑이',
     submittedCases: 4,
     juryParticipations: 24,
