@@ -62,13 +62,11 @@ export function CaseVoteLocked({ choices, loginPath }: { choices: readonly Choic
 export function CaseVoteForm({
   choices,
   selectedVote,
-  voteMessage,
   onSelect,
   onSubmit,
 }: {
   choices: readonly Choice[]
   selectedVote: WeddingGiftVoteId | null
-  voteMessage: string
   onSelect: (choiceId: WeddingGiftVoteId) => void
   onSubmit: () => void
 }) {
@@ -78,14 +76,6 @@ export function CaseVoteForm({
       <button type="button" className="case-vote__submit" onClick={onSubmit}>
         투표하기
       </button>
-      {voteMessage && (
-        <p
-          className={selectedVote ? 'case-vote__message is-success' : 'case-vote__message'}
-          role="status"
-        >
-          {voteMessage}
-        </p>
-      )}
     </>
   )
 }
@@ -100,14 +90,12 @@ function CaseVoteSection({
   isAuthenticated,
   loginPath,
   selectedVote,
-  voteMessage,
   onSelect,
   onSubmit,
 }: {
   isAuthenticated: boolean
   loginPath: string
   selectedVote: WeddingGiftVoteId | null
-  voteMessage: string
   onSelect: (choiceId: WeddingGiftVoteId) => void
   onSubmit: () => void
 }) {
@@ -124,7 +112,6 @@ function CaseVoteSection({
         <CaseVoteForm
           choices={choices}
           selectedVote={selectedVote}
-          voteMessage={voteMessage}
           onSelect={onSelect}
           onSubmit={onSubmit}
         />

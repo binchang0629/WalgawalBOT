@@ -1,14 +1,15 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
-import { createPortal } from 'react-dom'
 import { DEMO_ACCOUNTS } from '../../data/personas'
 import { Link, useNavigate } from 'react-router-dom'
 import useSession from '../../hooks/useSession'
 import { PATHS } from '../../routes/paths'
 import profileImage from '../../assets/my/profile.png'
 import jihunProfileImage from '../../assets/my/account-jihun.png'
+import guestMascotImage from '../../assets/auth/loginPopUpMy.webp'
 import planMascot from '../../assets/home/figma/img1What.png'
 import AccountSwitchSheet from './components/AccountSwitchSheet'
+import useToast from '../../hooks/useToast'
 import switchIcon from '../../assets/my/switch.svg'
 import chevronBrownIcon from '../../assets/my/chevron-brown.svg'
 import collapseIcon from '../../assets/my/collapse.svg'
@@ -67,24 +68,65 @@ function MenuRow({ label, icon, iconSize, disabled = false, onClick }: MenuItem)
 
 function MyPage() {
   const navigate = useNavigate()
+  const { showToast } = useToast()
   const { personaId, currentUser, activityStats, switchPersona, signOut } = useSession()
   const isSeoa = personaId === 'A'
   const [activityOpen, setActivityOpen] = useState(true)
   const [settingsOpen, setSettingsOpen] = useState(true)
   const [accountSheetOpen, setAccountSheetOpen] = useState(false)
-  const [noticeMessage, setNoticeMessage] = useState('')
+  const pointValueRef = useRef<HTMLElement>(null)
+  const previousPointsRef = useRef(activityStats.points)
   useEffect(() => {
-    if (!noticeMessage) return
-    const timer = window.setTimeout(() => setNoticeMessage(''), 3500)
-    return () => window.clearTimeout(timer)
-  }, [noticeMessage])
+    if (previousPointsRef.current === activityStats.points) return
+    previousPointsRef.current = activityStats.points
+    const pointValue = pointValueRef.current
+    if (!pointValue || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const animation = pointValue.animate(
+      [
+        { transform: 'scale(1)' },
+        { transform: 'scale(1.18)', offset: 0.42 },
+        { transform: 'scale(1)' },
+      ],
+      { duration: 420, easing: 'cubic-bezier(.22, 1, .36, 1)' },
+    )
+    return () => animation.cancel()
+  }, [activityStats.points])
   const closeAccountSheet = useCallback(() => setAccountSheetOpen(false), [])
   const displayName = currentUser?.name ?? (personaId === 'A' ? '윤서아' : '곽지훈')
   const displayNickname = currentUser?.nickname ?? DEMO_ACCOUNTS[personaId].nickname
 
   const handleSwitchAccount = () => {
-    setNoticeMessage('')
     setAccountSheetOpen(true)
+  }
+
+  if (!currentUser) {
+    const from = encodeURIComponent(PATHS.my)
+
+    return (
+      <main className="my-page my-page--guest">
+        <header className="my-page__header">
+          <span className="my-page__header-spacer" aria-hidden="true" />
+          <h1>MY</h1>
+          <span className="my-page__header-spacer" aria-hidden="true" />
+        </header>
+
+        <section className="my-guest" aria-labelledby="my-guest-title">
+          <img className="my-guest__mascot" src={guestMascotImage} alt="" aria-hidden="true" />
+          <div className="my-guest__copy">
+            <h2 id="my-guest-title">로그인이 필요해요</h2>
+            <p>로그인하고 내 사건과 배심 활동,<br />포인트를 한곳에서 확인해보세요.</p>
+          </div>
+          <Link className="my-guest__login" to={`${PATHS.login}?from=${from}`}>
+            로그인하기
+          </Link>
+          <p className="my-guest__signup">
+            아직 계정이 없나요?
+            <Link to={`${PATHS.signup}?from=${from}`}>회원가입</Link>
+          </p>
+        </section>
+      </main>
+    )
   }
 
   return (
@@ -115,7 +157,7 @@ function MyPage() {
           <dl className="profile-card__stats">
             <div><dt>접수한 사건</dt><dd><strong>{activityStats.submittedCases}</strong>건</dd></div>
             <div><dt>배심 참여</dt><dd><strong>{activityStats.juryParticipations}</strong>건</dd></div>
-            <div><dt>포인트</dt><dd className="profile-card__points"><strong>{activityStats.points}</strong><span>pt</span></dd></div>
+            <div><dt>포인트</dt><dd className="profile-card__points"><strong ref={pointValueRef}>{activityStats.points}</strong><span>pt</span></dd></div>
           </dl>
         </section>
 
@@ -188,7 +230,7 @@ function MyPage() {
           onConfirm={(nextPersona) => {
             switchPersona(nextPersona)
             closeAccountSheet()
-            setNoticeMessage(`${DEMO_ACCOUNTS[nextPersona].name} 프로필로 전환되었습니다`)
+            showToast(`${DEMO_ACCOUNTS[nextPersona].name} 프로필로 전환되었습니다`)
           }}
           onLogout={() => {
             signOut()
@@ -196,10 +238,6 @@ function MyPage() {
             navigate(PATHS.home)
           }}
         />
-      )}
-      {noticeMessage && document.getElementById('app-overlay-root') && createPortal(
-        <p className="profile-switch-toast" role="status" aria-live="polite">{noticeMessage}</p>,
-        document.getElementById('app-overlay-root')!,
       )}
     </main>
   )

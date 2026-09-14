@@ -30,6 +30,8 @@ export interface SessionValue {
   activityStats: ActivityStats
   recordCaseSubmission: (submissionId: string) => void
   recordJuryVote: (caseId: string) => void
+  /** 리워드 팝업의 최종 숫자와 MY의 포인트 합계를 같은 시점에 맞춘다. */
+  syncRewardPointTotal: (totalPoints: number) => void
   /** 가입·로그인 완료. 해당 퍼소나의 데모 계정으로 로그인 상태가 된다. */
   signIn: (personaId: PersonaId) => void
   signOut: () => void

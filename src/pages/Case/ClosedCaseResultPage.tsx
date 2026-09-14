@@ -1,5 +1,6 @@
 import { useId, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
+import { useLocation } from 'react-router-dom'
 
 import chevronIcon from '../../assets/case/disagreement/vote-chevron.svg'
 import dislikeIcon from '../../assets/case/result/dislike.svg'
@@ -20,6 +21,7 @@ import type {
   JihoonSimilarVoteId,
 } from '../../data/common/jihoonSimilarCaseContent'
 import useSession from '../../hooks/useSession'
+import useLoginGate from '../../hooks/useLoginGate'
 import CaseHeader from './components/CaseHeader'
 import VerdictDisagreementHero from './components/VerdictDisagreementHero'
 import VerdictReasonComparison from './components/VerdictReasonComparison'
@@ -126,13 +128,23 @@ function CommentItem({ comment, reaction, onReact }: {
 }
 
 function ClosedCaseResultPage() {
-  const { currentUser } = useSession()
+  const { currentUser, sessionStatus } = useSession()
+  const { requireLogin } = useLoginGate()
+  const location = useLocation()
   const [draft, setDraft] = useState('')
   const [addedComments, setAddedComments] = useState<JihoonSimilarComment[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [commentReactions, setCommentReactions] = useState<Record<string, CommentReaction>>({})
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const nextCommentId = useRef(1)
+  const isAuthenticated = sessionStatus === 'authenticated'
+
+  const requestCommentLogin = () => {
+    if (isAuthenticated) return true
+    textareaRef.current?.blur()
+    requireLogin('default', location.pathname)
+    return false
+  }
 
 
   const seededComments = Array.from({ length: jihoonSimilarResult.commentCount }, (_, index) => {
@@ -147,6 +159,7 @@ function ClosedCaseResultPage() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (!requestCommentLogin()) return
     const body = draft.trim()
     if (!body) return
 
@@ -169,6 +182,7 @@ function ClosedCaseResultPage() {
   }
 
   const handleEmoji = () => {
+    if (!requestCommentLogin()) return
     setDraft((value) => value + '🙂')
     textareaRef.current?.focus()
   }
@@ -210,15 +224,22 @@ function ClosedCaseResultPage() {
               ref={textareaRef}
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
+              onFocus={requestCommentLogin}
               placeholder="댓글을 입력해주세요."
               aria-label="댓글 내용"
+              readOnly={!isAuthenticated}
               maxLength={300}
             />
             <div>
               <button type="button" className="comment-composer__emoji" onClick={handleEmoji} aria-label="이모지 추가">
                 <img src={emojiIcon} alt="" />
               </button>
-              <button type="submit" className="comment-composer__submit" disabled={!draft.trim()}>
+              <button
+                type="submit"
+                className="comment-composer__submit"
+                disabled={isAuthenticated && !draft.trim()}
+                aria-label={isAuthenticated ? '댓글 등록' : '로그인하고 댓글 쓰기'}
+              >
                 <img src={submitIcon} alt="" /> 등록
               </button>
             </div>

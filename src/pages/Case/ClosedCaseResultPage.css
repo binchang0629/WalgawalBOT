@@ -11,7 +11,7 @@
 
 .case-result--closed .case-result__section-divider--closed {
   margin: 40px 0;
-  background: var(--neutral-400);
+  background: var(--neutral-250);
 }
 
 .case-result--closed .comment-list {
@@ -86,8 +86,6 @@
 .case-result--closed .result-comment__badge.is-solid-orange { background: #ffa748; color: #fafafa; }
 .case-result--closed .app-pagination__page { font-family: 'Closed Case Inter', var(--font-body); }
 .case-result--closed .after-story > h2 { font-family: 'Verdict Noto', sans-serif; line-height: 28px; }
-.case-result--closed .after-story > article { padding: 18px 0; background: #fff; }
-.case-result--closed .after-story__divider { width: calc(100% - 28px); margin: 10px auto; }
 
 @media (max-width: 374px) {
   .case-result--closed .case-result__body { --result-gutter: 18px; }

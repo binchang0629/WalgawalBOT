@@ -1,6 +1,6 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { PATHS } from '../routes/paths'
-import backIcon from '../assets/icons/tail-arrow-left.svg'
+import CaseSubmitHeader from '../pages/Submit/components/CaseSubmitHeader'
 import './AuthLayout.css'
 
 /**
@@ -9,8 +9,8 @@ import './AuthLayout.css'
  *
  * 레이아웃과 접근 권한은 별개다. 이 레이아웃을 쓴다고 모두 비로그인 전용은 아니다.
  *
- * 상단 헤더는 로그인(`2187:24325`)과 회원가입(`2264:10514`) 시안이 같은 모양이라
- * 페이지마다 그리지 않고 여기서 한 번만 그린다. 제목만 경로로 고른다.
+ * 상단 헤더는 사건 접수 흐름과 같은 공통 헤더를 재사용한다.
+ * 페이지마다 그리지 않고 여기서 한 번만 그리며 제목만 경로로 고른다.
  */
 
 /** 경로별 헤더 제목. 시안의 문구를 그대로 쓴다. */
@@ -37,14 +37,7 @@ function AuthLayout() {
 
   return (
     <div className="auth-layout">
-      <header className="auth-layout__bar">
-        <button type="button" className="auth-layout__back" onClick={handleBack} aria-label="뒤로 가기">
-          <img src={backIcon} alt="" aria-hidden="true" />
-        </button>
-        <h1 className="auth-layout__title">{title}</h1>
-        {/* 시안은 좌우 대칭을 위해 오른쪽에도 같은 크기의 빈 자리를 둔다. */}
-        <span className="auth-layout__spacer" aria-hidden="true" />
-      </header>
+      <CaseSubmitHeader onBack={handleBack} title={title} showTempSave={false} />
       <div className="auth-layout__scroll">
         <Outlet />
       </div>

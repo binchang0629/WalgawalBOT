@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Dispatch, KeyboardEvent, SetStateAction } from 'react'
 import { createPortal } from 'react-dom'
+import InfoNotice from '../../../components/common/InfoNotice'
 import closeIcon from '../../../assets/auth/loginPopUpClose.svg'
-import infoIcon from '../../../assets/auth/signUpInfo.svg'
 import type { AgreeState } from './signUpAgreeState'
 import './SignUpAgreeSheet.css'
 
@@ -12,7 +12,7 @@ import './SignUpAgreeSheet.css'
  * 시안에 펼친 모습이 있는 건 첫 항목(왈가왈BOT 약관)뿐이다.
  * 나머지 셋은 화살표만 있고 펼친 화면이 없어 열리지 않게 뒀다. → PROJECT_SPEC.md §9
  *
- * 필수 두 항목에 모두 동의해야 `회원 가입 완료하기`가 켜진다.
+ * 필수 두 항목은 기본 선택되며, 둘 다 동의한 상태에서 `회원가입 완료하기`가 켜진다.
  */
 
 /** 시안 `2264:13294`의 약관 본문. */
@@ -39,15 +39,28 @@ const ROWS: Row[] = [
   { key: 'notification', required: false, label: '통합 알림 수신 동의', expandable: false },
 ]
 
+/**
+ * 시트를 어떻게 열었는지. 제목 문구만 달라진다.
+ *   agree   동의 줄을 눌러 스스로 열어 본 경우
+ *   submit  동의를 거치지 않고 가입 완료를 눌러, 확인차 뜬 경우
+ */
+export type AgreeOpenReason = 'agree' | 'submit'
+
+const TITLE: Record<AgreeOpenReason, string> = {
+  agree: '동의가 필요해요',
+  submit: '동의하고 회원가입 할게요',
+}
+
 interface Props {
   value: AgreeState
+  openReason: AgreeOpenReason
   /* 여러 항목을 빠르게 연달아 누르면 이전 값을 덮어쓰므로 갱신 함수로 받는다. */
   onChange: Dispatch<SetStateAction<AgreeState>>
   onClose: () => void
   onSubmit: () => void
 }
 
-function SignUpAgreeSheet({ value, onChange, onClose, onSubmit }: Props) {
+function SignUpAgreeSheet({ value, openReason, onChange, onClose, onSubmit }: Props) {
   const [expanded, setExpanded] = useState(false)
   const sheetRef = useRef<HTMLDivElement>(null)
   const openerRef = useRef<HTMLElement | null>(null)
@@ -55,9 +68,21 @@ function SignUpAgreeSheet({ value, onChange, onClose, onSubmit }: Props) {
 
   useEffect(() => {
     openerRef.current = document.activeElement as HTMLElement | null
-    sheetRef.current?.focus()
-    return () => openerRef.current?.focus?.()
-  }, [])
+    const scroll = portalRoot?.parentElement?.querySelector<HTMLElement>('.auth-layout__scroll')
+    const scrollTop = scroll?.scrollTop ?? 0
+    const previousOverflow = scroll?.style.overflowY ?? ''
+
+    if (scroll) scroll.style.overflowY = 'hidden'
+    sheetRef.current?.focus({ preventScroll: true })
+
+    return () => {
+      if (scroll) {
+        scroll.style.overflowY = previousOverflow
+        scroll.scrollTop = scrollTop
+      }
+      openerRef.current?.focus?.({ preventScroll: true })
+    }
+  }, [portalRoot])
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -88,7 +113,7 @@ function SignUpAgreeSheet({ value, onChange, onClose, onSubmit }: Props) {
         <div className="signUpAgreeHandle" aria-hidden="true" />
 
         <div className="signUpAgreeHeader">
-          <h2 id="signUpAgreeTitle">동의가 필요해요</h2>
+          <h2 id="signUpAgreeTitle">{TITLE[openReason]}</h2>
           <button type="button" onClick={onClose} aria-label="닫기">
             <img src={closeIcon} alt="" aria-hidden="true" />
           </button>
@@ -160,13 +185,12 @@ function SignUpAgreeSheet({ value, onChange, onClose, onSubmit }: Props) {
           ))}
         </ul>
 
-        <p className="signUpAgreeNotice">
-          <img src={infoIcon} alt="" aria-hidden="true" />
+        <InfoNotice className="signUpAgreeNotice">
           프로필-설정에서 선택 동의 설정을 수정 가능해요.
-        </p>
+        </InfoNotice>
 
         <button type="button" className="signUpAgreeSubmit" onClick={onSubmit} disabled={!canSubmit}>
-          회원 가입 완료하기
+          회원가입 완료하기
         </button>
       </div>
     </div>,

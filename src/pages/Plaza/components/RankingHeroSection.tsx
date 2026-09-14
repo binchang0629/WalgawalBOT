@@ -58,6 +58,9 @@ function RankingHeroSection() {
                 )
               })}
             </ol>
+            <div className="ranking-confetti" aria-hidden="true">
+              {Array.from({ length: 14 }, (_, index) => <i key={index} />)}
+            </div>
           </div>
         </div>
       </div>

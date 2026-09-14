@@ -11,15 +11,11 @@ import { clearLoginReward, getLoginReward, subscribeLoginReward } from './loginR
  * 신호는 `loginRewardSignal`이 들고 있다.
  */
 
-/**
- * 로그인은 시안(`loginRewardPopUp01`)의 50PT에서 시작한다.
- * 회원가입은 이제 막 가입한 참이라 0PT다.
- * 시안의 50PT는 `DEMO_ACCOUNTS`의 보유 포인트와 다르다. → PROJECT_SPEC.md §9
- */
-const LOGIN_START_POINT = 50
+/** 회원가입과 서아 로그인 모두 같은 신규 계정 시연 흐름으로 0PT에서 시작한다. */
+const REWARD_START_POINT = 0
 
 function LoginRewardHost() {
-  const { currentUser } = useSession()
+  const { currentUser, syncRewardPointTotal } = useSession()
   const kind = useSyncExternalStore(subscribeLoginReward, getLoginReward, getLoginReward)
 
   if (!kind) return null
@@ -32,7 +28,8 @@ function LoginRewardHost() {
     <LoginRewardPopUp
       kind={kind}
       name={name}
-      startPoint={kind === 'signup' ? 0 : LOGIN_START_POINT}
+      startPoint={REWARD_START_POINT}
+      onSettled={syncRewardPointTotal}
       onClose={clearLoginReward}
     />
   )
