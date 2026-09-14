@@ -110,14 +110,25 @@
     transform: translateX(calc(-50% + 4.396px)) translateY(calc(-100% + 40.538px));
 }
 
-/* 공통 시안에만 있는 열쇠 조각. 본 캐릭터 위에 따로 얹힌 레이어다. */
-.loginPopUpMascotKey {
+/*
+ * 공통 시안의 자물쇠(Figma loginImage04). 마스코트 박스를 기준으로 놓는다.
+ * 시안 실측 — 팝업 기준 67.100 × 77.097 @ (205.400, -60.934).
+ * 마스코트가 (67.055, -164.695)라 상대 좌표는 (138.345, 103.761)이다.
+ *
+ * 선택자에 img를 붙여 둔 이유가 있다. 위의 `.loginPopUpMascot img` 규칙이
+ * width/height를 100%로 잡고 있어서, 클래스만으로는 우선순위에서 밀려
+ * 자물쇠가 마스코트와 같은 277 × 205로 부풀어 설명 문구를 덮었다.
+ *
+ * 원본 에셋은 720 × 534 캔버스에 그림이 (197, 69) 389 × 451로 들어 있어
+ * 둘레 여백이 컸다. 그림만 잘라 268 × 311로 다시 구워 넣었으므로
+ * 여기서는 object-fit 없이 상자 크기만 맞추면 된다.
+ */
+.loginPopUpMascot img.loginPopUpMascotKey {
     position: absolute;
-    left: 138.35px;
-    top: 103.77px;
+    left: 138.345px;
+    top: 103.761px;
     width: 67.1px;
     height: 77.097px;
-    object-fit: cover;
 }
 
 /* ---------- 팝업 내용 ---------- */

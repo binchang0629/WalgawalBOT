@@ -39,15 +39,28 @@ const ROWS: Row[] = [
   { key: 'notification', required: false, label: '통합 알림 수신 동의', expandable: false },
 ]
 
+/**
+ * 시트를 어떻게 열었는지. 제목 문구만 달라진다.
+ *   agree   동의 줄을 눌러 스스로 열어 본 경우
+ *   submit  동의를 거치지 않고 가입 완료를 눌러, 확인차 뜬 경우
+ */
+export type AgreeOpenReason = 'agree' | 'submit'
+
+const TITLE: Record<AgreeOpenReason, string> = {
+  agree: '동의가 필요해요',
+  submit: '동의하고 회원가입 할게요',
+}
+
 interface Props {
   value: AgreeState
+  openReason: AgreeOpenReason
   /* 여러 항목을 빠르게 연달아 누르면 이전 값을 덮어쓰므로 갱신 함수로 받는다. */
   onChange: Dispatch<SetStateAction<AgreeState>>
   onClose: () => void
   onSubmit: () => void
 }
 
-function SignUpAgreeSheet({ value, onChange, onClose, onSubmit }: Props) {
+function SignUpAgreeSheet({ value, openReason, onChange, onClose, onSubmit }: Props) {
   const [expanded, setExpanded] = useState(false)
   const sheetRef = useRef<HTMLDivElement>(null)
   const openerRef = useRef<HTMLElement | null>(null)
@@ -88,7 +101,7 @@ function SignUpAgreeSheet({ value, onChange, onClose, onSubmit }: Props) {
         <div className="signUpAgreeHandle" aria-hidden="true" />
 
         <div className="signUpAgreeHeader">
-          <h2 id="signUpAgreeTitle">동의가 필요해요</h2>
+          <h2 id="signUpAgreeTitle">{TITLE[openReason]}</h2>
           <button type="button" onClick={onClose} aria-label="닫기">
             <img src={closeIcon} alt="" aria-hidden="true" />
           </button>

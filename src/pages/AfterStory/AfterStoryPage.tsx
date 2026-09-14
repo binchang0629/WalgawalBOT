@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import type { FormEvent } from 'react'
+import useLoginGate from '../../hooks/useLoginGate'
 import { PATHS } from '../../routes/paths'
 import backIcon from '../../assets/my/back.svg'
 import walangJoy from '../../assets/submit/figma/imgCharacterWalangJoy.svg'
@@ -85,6 +86,8 @@ function CaseContextCard() {
 }
 
 export function AfterStoryHomePage() {
+  const { requireLogin } = useLoginGate()
+
   return (
     <main className="afterstory-home">
       <AfterStoryHeader title="왈가왈후~" />
@@ -96,7 +99,20 @@ export function AfterStoryHomePage() {
         </section>
 
         <section className="afterstory-entry-cards" aria-label="후일담 둘러보기">
-          <Link className="afterstory-entry-card afterstory-entry-card--write" to={PATHS.afterStoryMine}>
+          {/*
+            내 사건을 다루는 화면이라 로그인이 필요하다.
+            비로그인이면 이동을 막고 보던 화면 위에 안내 팝업만 띄운다.
+            라우트로 막지 않는 이유는 LoginGateProvider 주석 참고.
+          */}
+          <Link
+            className="afterstory-entry-card afterstory-entry-card--write"
+            to={PATHS.afterStoryMine}
+            onClick={(event) => {
+              if (!requireLogin('default', PATHS.afterStoryMine)) {
+                event.preventDefault()
+              }
+            }}
+          >
             <img className="afterstory-entry-card__art" src={writePencil} alt="" />
             <strong>내 이야기<br />남기기</strong>
             <small>내 사건의 그 후를 기록해요</small>

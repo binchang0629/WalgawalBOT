@@ -217,7 +217,12 @@
 
 .signUpAgreeOpen b { color: var(--orange-700); font-size: 14px; font-weight: 400; }
 .signUpAgreeOpen img { display: block; width: 20px; height: 20px; }
-.signUpAgreeOpen:disabled { cursor: default; opacity: .45; }
+/*
+ * 아직 누를 수 없을 때도 흐리게 만들지 않는다.
+ * 동의는 빠뜨리면 안 되는 항목이라 눈에 띄어야 한다는 팀 판단이다.
+ * 누를 수 있는지는 커서 모양으로만 구분한다.
+ */
+.signUpAgreeOpen:disabled { cursor: default; }
 
 /* 시안의 Footer / Sticky action — 높이 110, 위 12 아래 20. */
 .signUpFooter {
