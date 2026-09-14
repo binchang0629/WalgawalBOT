@@ -6,8 +6,9 @@ import { AUTH_DEMO_ACCOUNT, EMAIL_DOMAINS } from './authDemoAccount'
 import AuthSelect from './components/AuthSelect'
 import type { AuthSelectOption } from './components/AuthSelect'
 import SignUpAgreeSheet from './components/SignUpAgreeSheet'
-import { EMPTY_AGREE } from './components/signUpAgreeState'
+import { DEFAULT_AGREE } from './components/signUpAgreeState'
 import type { AgreeState } from './components/signUpAgreeState'
+import type { AgreeOpenReason } from './components/SignUpAgreeSheet'
 import eyeOnIcon from '../../assets/auth/loginEyeOn.svg'
 import eyeOffIcon from '../../assets/auth/loginEyeOff.svg'
 import checkOnIcon from '../../assets/auth/signUpCheckOn.svg'
@@ -61,8 +62,12 @@ function SignupPage() {
   const [birthYear, setBirthYear] = useState('')
   const [birthMonth, setBirthMonth] = useState('')
   const [birthDay, setBirthDay] = useState('')
-  const [agree, setAgree] = useState<AgreeState>(EMPTY_AGREE)
-  const [isAgreeOpen, setIsAgreeOpen] = useState(false)
+  const [agree, setAgree] = useState<AgreeState>(DEFAULT_AGREE)
+  /*
+   * 시트를 연 경로를 기억한다. null 이면 닫힌 상태다.
+   * 동의 줄로 스스로 열었는지, 가입 완료를 눌러 확인차 떴는지에 따라 제목이 다르다.
+   */
+  const [agreeOpenReason, setAgreeOpenReason] = useState<AgreeOpenReason | null>(null)
 
   /** 가입 후 돌아갈 곳. 앱 내부 경로만 허용한다. (PROJECT_SPEC.md §7-5) */
   const rawFrom = searchParams.get('from')
@@ -86,7 +91,7 @@ function SignupPage() {
   }
 
   const handleComplete = () => {
-    setIsAgreeOpen(false)
+    setAgreeOpenReason(null)
     signIn(personaId)
     // 환영 화면을 거쳐 원래 가려던 곳으로 이어진다.
     navigate(`${PATHS.signupComplete}?from=${encodeURIComponent(from)}`, { replace: true })
@@ -305,7 +310,7 @@ function SignupPage() {
       <button
         type="button"
         className="signUpAgreeOpen"
-        onClick={() => setIsAgreeOpen(true)}
+        onClick={() => setAgreeOpenReason('agree')}
         disabled={!canOpenAgree}
         title={canOpenAgree ? undefined : '위 항목을 모두 채우면 열 수 있어요'}
       >
@@ -319,18 +324,19 @@ function SignupPage() {
         <button
           type="button"
           className="signUpSubmit"
-          onClick={() => setIsAgreeOpen(true)}
+          onClick={() => setAgreeOpenReason('submit')}
           disabled={!canOpenAgree}
         >
           회원 가입 완료하기
         </button>
       </div>
 
-      {isAgreeOpen && (
+      {agreeOpenReason && (
         <SignUpAgreeSheet
           value={agree}
+          openReason={agreeOpenReason}
           onChange={setAgree}
-          onClose={() => setIsAgreeOpen(false)}
+          onClose={() => setAgreeOpenReason(null)}
           onSubmit={handleComplete}
         />
       )}

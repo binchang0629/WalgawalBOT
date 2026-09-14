@@ -15,9 +15,14 @@ export interface AgreeState {
   notification: boolean
 }
 
-export const EMPTY_AGREE: AgreeState = {
-  terms: false,
-  privacy: false,
+/*
+ * 시트를 열었을 때의 초기 상태.
+ * 필수 두 항목은 시안(2264:13125)에서 이미 켜진 채로 그려져 있다.
+ * 빠뜨리면 진행이 막히는 항목이라 미리 켜 두고, 선택 두 개만 사용자가 고른다.
+ */
+export const DEFAULT_AGREE: AgreeState = {
+  terms: true,
+  privacy: true,
   marketing: false,
   notification: false,
 }
