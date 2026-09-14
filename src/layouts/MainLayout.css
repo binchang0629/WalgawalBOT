@@ -73,15 +73,15 @@
 
 /* 모바일에서는 홈 인디케이터 영역만큼 아래를 더 확보한다. */
 .showcase--mobile .bottom-nav {
-    height: calc(var(--device-bottom-nav) + env(safe-area-inset-bottom, 0px));
-    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    height: max(var(--device-bottom-nav), calc(66px + env(safe-area-inset-bottom, 0px)));
+    padding-bottom: max(24px, env(safe-area-inset-bottom, 0px));
 }
 
 /*
  * 실제 아이폰에서 하단바가 화면 바닥에서 떠 보이던 문제를 막는다.
  *
- * 위에서 홈 인디케이터 높이(env(safe-area-inset-bottom), 아이폰 기준 약 34px)만큼
- * 바를 키우는데, 배경 imgDownNav.svg는 제 비율대로만 커진다. 이 SVG는 434×132이고
+ * 하단바는 최소 100px이며, 안전영역이 34px보다 큰 기기에서만 그만큼 더 커진다.
+ * 배경 imgDownNav.svg는 제 비율대로만 커진다. 이 SVG는 434×132이고
  * 흰 바는 그 안에서 y 19~119 구간이다. 폭이 402+32=434라 배율이 1이고 top이 -19px이므로,
  * 흰 바는 바 안에서 0~100px만 덮는다. 늘어난 34px에는 배경이 없어서 그 사이로 본문이 비쳤다.
  *
@@ -103,7 +103,7 @@
 }
 
 .showcase--mobile .main-layout__scroll {
-    padding-bottom: calc(var(--device-bottom-nav) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: max(var(--device-bottom-nav), calc(66px + env(safe-area-inset-bottom, 0px)));
 }
 
 .bottom-nav__item {
