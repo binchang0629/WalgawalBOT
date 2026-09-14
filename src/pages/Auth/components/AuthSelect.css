@@ -1,0 +1,129 @@
+/*
+ * 회원가입 펼침 선택 상자. Figma `2264:13030`.
+ *
+ * 닫힘  border gray 100(#F0EEF1) · 값 한 줄 · 아래 화살표
+ * 열림  border gray 300(#E0DDE2) · 위 8 아래 12 · 여섯 줄이 190px
+ *       줄 높이는 16 + 14×5 = 86이라 줄 사이를 16.4로 두면 190이 딱 맞는다
+ *
+ * 클래스 이름은 기호 없이 camelCase로 쓴다. (사용자 요청)
+ */
+
+.authSelect { position: relative; }
+
+.authSelectButton,
+.authSelectCurrent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.authSelectValue {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    min-width: 0;
+    color: var(--neutral-600);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+/* 단위 글자와 화살표를 4px 띄워 한 묶음으로 오른쪽에 둔다. */
+.authSelectTail {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
+}
+
+/* 파일에 박힌 색을 CSS가 정하도록 mask로 얹는다. 원본은 위를 향한 화살표다. */
+.authSelectChevron {
+    display: block;
+    flex: none;
+    width: 16px;
+    height: 16px;
+    background: currentcolor;
+    color: var(--neutral-650);
+    mask: url("../../../assets/auth/signUpChevron.svg") center / 16px 16px no-repeat;
+    -webkit-mask: url("../../../assets/auth/signUpChevron.svg") center / 16px 16px no-repeat;
+    transform: rotate(180deg);
+    transition: transform 180ms ease;
+}
+
+.authSelectChevronOpen { transform: rotate(0deg); }
+
+/*
+ * 펼친 목록. 닫힌 상자와 같은 자리에서 아래로 덮는다.
+ * 실제로 상자를 키우면 옆 칸과 아래 내용이 밀린다.
+ */
+.authSelectPanel {
+    position: absolute;
+    top: -9px;      /* 닫힌 상자의 테두리 1 + 위 여백 8만큼 올려 글자 위치를 맞춘다 */
+    left: -13px;    /* 테두리 1 + 왼쪽 여백 12 */
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 16.4px;
+    box-sizing: content-box;
+    width: 100%;
+    min-height: 168px;
+    padding: 8px 8px 12px 12px;
+    border: 1px solid var(--neutral-250);
+    border-radius: 8px;
+    background: #fff;
+}
+
+/* 월처럼 선택지가 많으면 190px을 넘기지 않고 안에서 스크롤한다. */
+.authSelectPanelScroll {
+    min-height: 0;
+    max-height: 168px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    /* 기기 안에 데스크톱 스크롤바가 보이지 않게 한다. 스크롤 자체는 유지된다. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.authSelectPanelScroll::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+.authSelectList {
+    display: flex;
+    flex-direction: column;
+    gap: 16.4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.authSelectOption {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--neutral-600);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+    text-align: left;
+    cursor: pointer;
+}
+
+/* 마우스를 올리거나 키보드로 옮겨 온 줄. 시안에 없는 상태라 색만 진하게 한다. */
+.authSelectOptionActive { color: var(--neutral-900); }
+
+.authSelectButton:focus-visible,
+.authSelectCurrent:focus-visible,
+.authSelectOption:focus-visible {
+    outline: 3px solid var(--blue-700);
+    outline-offset: 2px;
+}

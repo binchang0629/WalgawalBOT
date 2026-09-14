@@ -10,6 +10,7 @@ import CaseResultPage from '../pages/Case/CaseResultPage'
 import ClosedCaseDetailPage from '../pages/Case/ClosedCaseDetailPage'
 import ClosedCaseResultPage from '../pages/Case/ClosedCaseResultPage'
 import SignupPage from '../pages/Auth/SignupPage'
+import SignUpCompletePage from '../pages/Auth/SignUpCompletePage'
 import LoginPage from '../pages/Auth/LoginPage'
 import MyPage from '../pages/My/MyPage'
 import WalbotPlanPage from '../pages/My/WalbotPlanPage'
@@ -73,6 +74,9 @@ function AppRoutes() {
           <Route path={PATHS.login} element={<LoginPage />} />
           <Route path={PATHS.signup} element={<SignupPage />} />
         </Route>
+
+        {/* 가입 완료 환영 화면은 시안에 헤더가 없어 AuthLayout 밖에 둔다. */}
+        <Route path={PATHS.signupComplete} element={<SignUpCompletePage />} />
 
         {/* 사건 접수는 진행 상태를 공유하는 5단계 흐름이며 하단 내비게이션을 표시하지 않는다. */}
         <Route element={<DetailLayout />}>
