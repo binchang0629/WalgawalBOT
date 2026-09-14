@@ -226,7 +226,6 @@ function CaseFeedSection() {
           totalPages={totalPages}
           onPageChange={setCurrentPage}
           ariaLabel="사건 목록 페이지"
-          neutralArrows
         />
       </div>
     </section>
