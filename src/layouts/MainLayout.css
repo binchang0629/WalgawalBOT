@@ -47,8 +47,8 @@
     height: var(--device-bottom-nav);
     display: flex;
     align-items: flex-start;
-    justify-content: space-around;
-    padding: 19px 10px 16px;
+    justify-content: space-between;
+    padding: 20px 12px 24px;
     isolation: isolate;
     background: transparent;
 }
@@ -74,7 +74,7 @@
 /* 모바일에서는 홈 인디케이터 영역만큼 아래를 더 확보한다. */
 .showcase--mobile .bottom-nav {
     height: calc(var(--device-bottom-nav) + env(safe-area-inset-bottom, 0px));
-    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
 }
 
 .showcase--mobile .main-layout__scroll {
@@ -82,11 +82,11 @@
 }
 
 .bottom-nav__item {
-    flex: 1;
+    flex: 0 0 64px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 9px;
+    gap: 8px;
     padding: 0;
     border: 0;
     color: var(--neutral-600);
@@ -106,7 +106,7 @@
 .bottom-nav__icon {
     display: block;
     width: 24px;
-    height: 25px;
+    height: 24px;
     background: currentColor;
     /* --nav-icon은 BottomNavigation이 메뉴별 SVG 경로로 넘긴다. */
     mask-image: var(--nav-icon);
@@ -130,17 +130,18 @@
 
 /* 중앙 사건 접수 CTA */
 .bottom-nav .case-nav {
-    margin-top: -37px;
+    flex-basis: 60px;
+    margin-top: -38.5px;
     color: var(--blue);
 }
 
 /* 중앙 CTA는 파란 원 안에 흰 아이콘을 둔다. mask 색만 흰색으로 바꾼다. */
 .bottom-nav .case-nav .bottom-nav__icon--cta {
-    width: 60px;
-    height: 60px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
     background: var(--blue);
-    box-shadow: 0 8px 18px rgba(48, 67, 234, .26);
+    box-shadow: 0 5px 10px rgb(61 92 217 / 22%), inset 1px 2px 5px rgb(255 255 255 / 35%);
     mask: none;
     -webkit-mask: none;
     position: relative;
@@ -172,4 +173,16 @@
 .bottom-nav .case-nav:disabled .bottom-nav__icon--cta {
     background: var(--blue-200);
     box-shadow: none;
+}
+
+@media (max-width: 374px) {
+    .bottom-nav__item {
+        flex: 1;
+        min-width: 0;
+        font-size: 12px;
+    }
+
+    .bottom-nav .case-nav {
+        flex: 0 0 60px;
+    }
 }

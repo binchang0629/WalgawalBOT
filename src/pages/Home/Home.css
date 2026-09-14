@@ -1091,7 +1091,9 @@
 .story-scroll {
     display: flex;
     gap: 12px;
-    width: 100%;
+    /* 카드 줄은 화면 양끝까지 열고, 섹션 제목·봉투만 기존 콘텐츠 여백을 유지한다. */
+    width: calc(100% + var(--content-gutter) + var(--content-gutter));
+    margin-inline: calc(-1 * var(--content-gutter));
     overflow-x: auto;
     padding-bottom: 4px;
     scrollbar-width: none;

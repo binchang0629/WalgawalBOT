@@ -41,6 +41,33 @@ export const plazaViewOptions: { key: PlazaViewKey; label: string; description: 
   { key: 'recommended', label: '추천사건', description: '내 사건과 같은 분야' },
 ]
 
+/**
+ * 최신사건의 시연용 게시 순서. 조회·댓글 수와 무관하게 최근에 접수된 진행 사건이 먼저 보인다.
+ * 실제 서버 연결 시에는 이 목록 대신 게시 시각으로 정렬한다.
+ */
+export const latestPlazaCaseIds = [
+  'case-parents-interfere',
+  'case-school-lab-data',
+  'case-dating-travel-cost',
+  'case-work-new-hire',
+  'case-dating-phone',
+  'case-friend-group-chat',
+  'case-family-moving',
+  'case-invite-ex',
+  'case-secret-told',
+  'case-group-project-credit',
+  'case-dating-anniversary',
+  'case-friend-trip-cancel',
+  'case-school-attendance',
+  'case-family-living-expenses',
+  'case-friend-loan',
+  'case-school-ai-report',
+  'case-work-after-hours',
+  'case-family-care',
+  'case-work-credit',
+  'case-company-874',
+] as const
+
 type PlazaCase = CaseSummary & {
   category: CaseCategory
   summary: string

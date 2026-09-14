@@ -641,24 +641,3 @@
     .case-card__verdict { padding-inline: 8px; font-size: 11px; }
 }
 
-/* 공통 하단바의 광장 시안 치수만 한정 적용한다. */
-.main-layout:has(.plaza-screen) .bottom-nav {
-    padding: 20px 12px 24px;
-    justify-content: space-between;
-}
-.main-layout:has(.plaza-screen) .bottom-nav__item {
-    flex: 0 0 64px;
-    gap: 8px;
-}
-.main-layout:has(.plaza-screen) .bottom-nav__icon { height: 24px; }
-.main-layout:has(.plaza-screen) .case-nav { flex-basis: 60px; margin-top: -38.5px; }
-.main-layout:has(.plaza-screen) .bottom-nav__icon--cta {
-    width: 64px;
-    height: 64px;
-    box-shadow: 0 5px 10px rgb(61 92 217 / 22%), inset 1px 2px 5px rgb(255 255 255 / 35%);
-}
-.main-layout:has(.plaza-screen) .bottom-nav__icon--cta::after { width: 33px; height: 32px; }
-@media (max-width: 374px) {
-    .main-layout:has(.plaza-screen) .bottom-nav__item { flex: 1; min-width: 0; font-size: 12px; }
-    .main-layout:has(.plaza-screen) .case-nav { flex-basis: 60px; flex-grow: 0; }
-}
