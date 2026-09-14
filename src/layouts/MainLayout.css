@@ -77,6 +77,31 @@
     padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
 }
 
+/*
+ * 실제 아이폰에서 하단바가 화면 바닥에서 떠 보이던 문제를 막는다.
+ *
+ * 위에서 홈 인디케이터 높이(env(safe-area-inset-bottom), 아이폰 기준 약 34px)만큼
+ * 바를 키우는데, 배경 imgDownNav.svg는 제 비율대로만 커진다. 이 SVG는 434×132이고
+ * 흰 바는 그 안에서 y 19~119 구간이다. 폭이 402+32=434라 배율이 1이고 top이 -19px이므로,
+ * 흰 바는 바 안에서 0~100px만 덮는다. 늘어난 34px에는 배경이 없어서 그 사이로 본문이 비쳤다.
+ *
+ * PC 목업과 안드로이드에서는 safe-area가 0이라 이 현상이 안 나타난다.
+ * 그래서 실제 기기에서만 보였다.
+ *
+ * SVG의 아래 둥근 모서리가 시작하는 자리(100 - 24)부터 화면 바닥까지 같은 흰색으로 메운다.
+ * safe-area가 0인 기기에서는 이 띠가 바 바닥과 정확히 겹쳐서 보이지 않는다.
+ */
+.showcase--mobile .bottom-nav::before {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    top: calc(var(--device-bottom-nav) - 24px);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: #fff;
+}
+
 .showcase--mobile .main-layout__scroll {
     padding-bottom: calc(var(--device-bottom-nav) + env(safe-area-inset-bottom, 0px));
 }
