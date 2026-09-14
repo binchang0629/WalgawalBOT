@@ -21,7 +21,7 @@
 .popular-case {
     position: relative;
     overflow: hidden;
-    padding: 51px var(--content-gutter) 0;
+    padding: 51px var(--content-gutter) 60px;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.6) 32.741%, rgba(255, 246, 220, 0.6) 100%);
 }
 
