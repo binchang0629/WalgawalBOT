@@ -1,5 +1,23 @@
 # 왈가왈BOT 현재 상태
 
+## 홈 민트초코 밸런스 게임 (2026-09-14)
+
+### 색상 통일 후속 수정
+- 최신 사용자 요청에 따라 왼쪽 `좋다`는 파란 그릇, 오른쪽 `싫다`는 빨간(코랄) 빈 그릇으로 통일했다. 아래 최초 기록의 보라/파랑 배치는 이전 버전이다. 선택지 글자·결과 강조·선택 테두리는 민트 전용 파란색 덮어쓰기를 제거하여 깻잎과 같은 `--blue-600` / `--negative`를 그대로 사용한다.
+- `mint-bowl-blue.png`를 왼쪽에 재사용하고, 새 파일 `src/assets/home/figma/mint-bowl-red.png`, `src/assets/home/figma/mint-bowl-filled-blue.png`를 추가했다. 기존 보라 그릇·보라 결과 이미지는 삭제하지 않았다. 내장 이미지 생성 도구로 그릇만 색을 바꿨으며 흰 배경 RGB PNG로 저장했다. 그릇 모양·스쿱·질문·배치·드래그 동작은 유지한다.
+- 파란 결과 프롬프트: `Use case: precise-object-edit. Image 1 is the edit target: mint chocolate ice cream in a lavender scalloped pedestal dessert bowl. Image 2 is the color reference: the same empty bowl in pale cornflower blue. Change ONLY the entire bowl color in image 1 (rim, fluted cup, stem, foot) from purple to the light blue of image 2. Keep the green ice cream and brown chocolate completely unchanged. Preserve exact object size, framing, shape, lighting, shadows on object, and white background of image 1. No spoon, no decorations. Pure white background, no checkerboard.`
+- 빨간 빈 그릇 프롬프트: `Use case: precise-object-edit. Image 1 is the edit target: EMPTY blue scalloped pedestal ice cream dessert bowl. Image 2 is a COLOR REFERENCE ONLY, a coral red plate. Recolor ONLY the bowl of image 1 to the soft coral-red/salmon color of image 2. Keep the exact scalloped pedestal bowl shape, stem, base, viewing angle, lighting and proportions of image 1, NOT the flat plate shape. Bowl remains completely EMPTY. Maintain original framing: object fills about 88 percent of width, 96 percent of height, aspect ratio 268:188. White background #FFFFFF, no checkerboard, no floor shadow. No ice cream, no spoon, no other objects, no lettering.`
+
+### 최초 구현 기록
+
+- 기존 깻잎 게임 옆에 민트초코 문항을 추가했다. 제목 옆 `다음 ›`으로 1/2 깻잎 ↔ 2/2 민트초코를 전환한다. 새로고침은 현재 문항 다시하기다. 다른 홈 섹션·광장은 수정하지 않았다.
+- 질문 `민트초코,당신의 선택은?`, 왼쪽 보라색 그릇 `좋다`, 오른쪽 파란색 그릇 `싫다`. 스쿱을 좌우로 드래그해 손을 놓거나 선택 버튼을 누른다. 드래그 중에는 확대 미리보기만 하고, 짧은 이동·취소는 확정하지 않는다.
+- `좋다`: 선택 그릇 확대 후 민트초코가 채워진 보라색 그릇으로 전환. `싫다`: 파란색 빈 그릇만 확대하며 스쿱과 채워진 결과 이미지는 남기지 않는다. 두 문항은 `BalanceRound`의 Pointer Events·타이머·선택 상태를 공유하고 민트 전용 배치만 `BalanceGame.css`로 분리했다.
+- 원본 세 소재를 `src/assets/home/figma/mint-scoop.png`, `mint-bowl-purple.png`, `mint-bowl-blue.png`로 복사했다. 원본 파일은 보존했다. 결과 이미지는 같은 폴더 `mint-bowl-filled.png`에 저장했다. **기본 내장 이미지 생성 도구**로 제작했으며 흰색 게임 배경에 쓰는 RGB PNG다(투명 PNG로 표기하지 않는다).
+- 이미지 생성 요청: 제공된 보라색 꽃잎형 굽 그릇의 형태·색·각도를 유지하고 민트초코 3스쿱으로 채우기, 스푼·장식·글자 없음. 최종 배경 보정 프롬프트: `Replace the checkered background with SOLID PURE WHITE (#FFFFFF). This is a white-background product photograph. No transparency pattern, NO checkerboard, NO gray squares. Keep the mint ice cream and lavender pedestal bowl unchanged. Entire background must be featureless pure white. No floor shadow. Single isolated object on pure white.`
+- 문항을 바꾸거나 퍼소나를 전환하면 로컬 선택을 초기화한다. 서버 투표나 집계 수치는 추가하지 않았다. 모션 줄이기 설정에서는 중간 연출 없이 결과를 즉시 표시한다.
+- 검증: `npm run build`·`npm run lint` 통과. Edge 자동화로 402px에서 선택 전/좋다/싫다 화면 캡처와 양쪽 선택, 다시하기, 깻잎 결과 회귀 확인. 360·390·402·430px 및 1440px PC 목업에서 오른쪽 드래그, 키보드 Enter 선택, 결과 영역 잘림 없음, 모션 줄이기 확인. 문항 전환 시 타이머 정리·짧은 드래그·취소도 확인했다. 실기기 터치는 미검증. 번들 500kB 초과 경고는 남아 있다.
+
 ## 챗봇 플로팅 아이콘 3D 회전 (2026-09-11)
 - Figma 개발 페이지 `2191:3560`(Frame 3465555, 56 × 56, 우측 16px·하단 내비 바로 위)의 챗봇 아이콘 자리에 판멍이 머리가 360도 회전하는 표현을 넣었다. 아이콘 슬롯과 챗봇 화면은 다른 담당자의 작업이라 `FloatingChatButton`의 내부 이미지 한 줄만 교체했다.
 - 원본 `AIchat360.glb`는 136.9MB(메시 11개·정점 594만, 그중 mesh 1이 589만으로 99.2%)다. 56px 아이콘에 싣기에는 JS 번들(455kB)의 300배라 그대로 쓰지 않았다. three.js 실시간 렌더도 공용 `package.json`에 런타임 의존성이 생겨(§7-11) 채택하지 않았다.

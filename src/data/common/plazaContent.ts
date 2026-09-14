@@ -1,4 +1,4 @@
-import type { CaseCategory, CaseSummary, JurorRank, PlazaSortKey } from '../../types'
+import type { CaseCategory, CaseSummary, JurorRank } from '../../types'
 
 export const rankingTabs = [
   { key: 'juror', label: '명판관 배심원' },
@@ -25,9 +25,20 @@ export const caseCategories: (CaseCategory | '전체')[] = [
   '학업',
 ]
 
-export const plazaSortOptions: { key: PlazaSortKey; label: string }[] = [
-  { key: 'latest', label: '최신순' },
-  { key: 'popular', label: '인기순' },
+/**
+ * 전체 사건 목록의 보기 기준.
+ *
+ * 다섯 항목 모두 `어떤 사건을 보여줄까`에만 답한다. 고르면 목록이 줄거나 순서가 바뀔 뿐,
+ * 항목끼리 성격이 어긋나지 않는다. 글자 수와 끝말(`사건`)을 맞춰 한 덩어리로 읽힌다.
+ */
+export type PlazaViewKey = 'latest' | 'popular' | 'voting' | 'closed' | 'recommended'
+
+export const plazaViewOptions: { key: PlazaViewKey; label: string; description: string }[] = [
+  { key: 'latest', label: '최신사건', description: '방금 올라온 순서' },
+  { key: 'popular', label: '인기사건', description: '조회가 많은 순서' },
+  { key: 'voting', label: '진행사건', description: '아직 투표 중' },
+  { key: 'closed', label: '해결사건', description: '판결이 끝남' },
+  { key: 'recommended', label: '추천사건', description: '내 사건과 같은 분야' },
 ]
 
 type PlazaCase = CaseSummary & {
@@ -35,6 +46,8 @@ type PlazaCase = CaseSummary & {
   summary: string
   viewCount: number
   isVerdictAligned: boolean
+  /** 투표가 진행 중인지, 판결이 끝났는지. 시연용 고정값이다. */
+  status: 'voting' | 'closed'
 }
 
 /** 필터에서 선택할 수 있는 다섯 카테고리는 각각 네 건의 정적 시연 사례를 제공한다. */
@@ -48,6 +61,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 465,
     commentCount: 46,
     isVerdictAligned: true,
+    status: 'closed',
   },
   {
     id: 'case-secret-told',
@@ -58,6 +72,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 245,
     commentCount: 22,
     isVerdictAligned: false,
+    status: 'closed',
   },
   {
     id: 'case-parents-interfere',
@@ -68,6 +83,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 125,
     commentCount: 14,
     isVerdictAligned: true,
+    status: 'voting',
   },
   {
     id: 'case-invite-ex',
@@ -78,6 +94,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 144,
     commentCount: 47,
     isVerdictAligned: false,
+    status: 'voting',
   },
   {
     id: 'case-group-project-credit',
@@ -88,6 +105,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 318,
     commentCount: 31,
     isVerdictAligned: false,
+    status: 'closed',
   },
 
   {
@@ -99,6 +117,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 214,
     commentCount: 26,
     isVerdictAligned: true,
+    status: 'closed',
   },
   {
     id: 'case-dating-phone',
@@ -109,6 +128,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 189,
     commentCount: 18,
     isVerdictAligned: false,
+    status: 'voting',
   },
   {
     id: 'case-dating-travel-cost',
@@ -119,6 +139,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 166,
     commentCount: 20,
     isVerdictAligned: true,
+    status: 'voting',
   },
 
   {
@@ -130,6 +151,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 352,
     commentCount: 39,
     isVerdictAligned: true,
+    status: 'closed',
   },
   {
     id: 'case-friend-trip-cancel',
@@ -140,6 +162,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 231,
     commentCount: 28,
     isVerdictAligned: false,
+    status: 'closed',
   },
   {
     id: 'case-friend-group-chat',
@@ -150,6 +173,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 197,
     commentCount: 24,
     isVerdictAligned: false,
+    status: 'voting',
   },
 
   {
@@ -161,6 +185,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 286,
     commentCount: 35,
     isVerdictAligned: true,
+    status: 'closed',
   },
   {
     id: 'case-family-living-expenses',
@@ -171,6 +196,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 203,
     commentCount: 19,
     isVerdictAligned: false,
+    status: 'closed',
   },
   {
     id: 'case-family-moving',
@@ -181,6 +207,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 164,
     commentCount: 16,
     isVerdictAligned: true,
+    status: 'voting',
   },
 
   {
@@ -192,6 +219,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 401,
     commentCount: 52,
     isVerdictAligned: false,
+    status: 'closed',
   },
   {
     id: 'case-work-after-hours',
@@ -202,6 +230,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 257,
     commentCount: 33,
     isVerdictAligned: true,
+    status: 'closed',
   },
   {
     id: 'case-work-new-hire',
@@ -212,6 +241,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 178,
     commentCount: 17,
     isVerdictAligned: false,
+    status: 'voting',
   },
 
   {
@@ -223,6 +253,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 221,
     commentCount: 27,
     isVerdictAligned: true,
+    status: 'closed',
   },
   {
     id: 'case-school-ai-report',
@@ -233,6 +264,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 265,
     commentCount: 34,
     isVerdictAligned: false,
+    status: 'closed',
   },
   {
     id: 'case-school-lab-data',
@@ -243,6 +275,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 149,
     commentCount: 15,
     isVerdictAligned: true,
+    status: 'voting',
   },
 ]
 

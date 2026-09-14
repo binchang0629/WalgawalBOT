@@ -1,0 +1,40 @@
+/* 민트초코 전용 소재 비율. 깻잎의 기존 좌표·애니메이션에는 적용하지 않는다. */
+.balance-section__navigation { display: flex; align-items: center; gap: 8px; }
+.balance-section__next {
+  min-width: 44px; min-height: 44px; padding: 0; border: 0;
+  background: none; color: var(--blue-600); font: inherit; font-size: 13px; cursor: pointer;
+}
+.balance-section__next:focus-visible { outline: 2px solid var(--blue-600); outline-offset: 3px; border-radius: 4px; }
+.balance-section--mint .balance-board { height: 320px; }
+.balance-section--mint .balance-board__draggable { height: 117px; filter: none; z-index: 2; }
+.balance-section--mint .balance-board__plate { height: 105px; top: 108px; }
+.balance-section--mint .balance-board .balance-choice { top: 218px; }
+.balance-section--mint .balance-board__guide { top: 287px; }
+/* 선택지·결과·선택 테두리의 파랑/빨강은 깻잎의 공통 규칙을 그대로 상속한다. */
+.balance-section--mint .balance-board__pile {
+  width: 300px; height: 250px; max-width: 100%; top: 0;
+  left: 50%; transform: translateX(-50%); z-index: 1;
+}
+.balance-section--mint .balance-board .balance-choice { z-index: 3; }
+.balance-section--mint:is(.balance-section--expanding, .balance-section--result).balance-section--left .balance-board__side--left .balance-board__plate,
+.balance-section--mint:is(.balance-section--expanding, .balance-section--result).balance-section--right .balance-board__side--right .balance-board__plate {
+  top: 95px; left: calc(50% - 75px); right: auto; transform: scale(1.85);
+}
+.balance-section--mint:is(.balance-section--expanding, .balance-section--result) .balance-board .balance-choice.is-selected {
+  top: 260px; left: 50%; transform: translateX(-50%);
+}
+.balance-section--mint.balance-section--placing .balance-board__draggable { top: 40px; }
+.balance-section--mint.balance-section--expanding .balance-board__draggable {
+  top: 60px; opacity: 0; transition: left 900ms ease, top 900ms ease, opacity 450ms ease;
+}
+.balance-section--mint.balance-section--result .balance-board__draggable { opacity: 0; visibility: hidden; }
+.balance-section--mint.balance-section--result.balance-section--right .balance-board__side--right .balance-board__plate {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .balance-section .balance-board .balance-choice,
+  .balance-section .balance-board__draggable,
+  .balance-section .balance-board__pile,
+  .balance-section .balance-board__plate,
+  .balance-section .balance-board__side { transition: none; }
+}
