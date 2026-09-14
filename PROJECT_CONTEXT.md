@@ -751,6 +751,9 @@ Figma `자료종합` 페이지(노드 `1264:12056`)의 최상위 16개 항목을
 - 팝업은 `#app-overlay-root`에 portal로 붙여 기기 내부에서만 어두워진다. 딤은 시안 값인 `#252525` 70%로, 기존 계정 전환 시트의 45% 검정과 다르다.
 - 에셋은 `src/assets/auth/`에 넣었다. Figma 원본 PNG 4.5MB를 브라우저 캔버스로 720px WebP(품질 0.92)로 구워 189kB로 줄였다. 새 라이브러리는 설치하지 않았다. AI 시안만 이미지에 벡터 마스크가 걸려 있어 원본 SVG를 CSS mask로 쓴다.
 - 에셋·컴포넌트·CSS 클래스 이름은 사용자 요청대로 기호 없는 camelCase다(`loginPopUpCaseFiling.webp`, `.loginPopUpOverlay`). 프로젝트의 기존 kebab-case 규칙과 다르다.
+- 공통 팝업의 자물쇠(`loginImage04`)가 마스코트와 같은 277 × 205로 부풀어 설명 문구를 덮고 있었다. `.loginPopUpMascot img`의 `width/height: 100%`가 `.loginPopUpMascotKey`보다 우선순위가 높아 시안 치수가 무시된 것이다. 선택자를 `.loginPopUpMascot img.loginPopUpMascotKey`로 올려 고쳤다.
+- 자물쇠 에셋도 다시 구웠다. 원본이 720 × 534 캔버스에 그림이 (197, 69) 389 × 451로 들어 있어 여백이 커서 `object-fit: cover`가 엉뚱하게 잘라냈다. 그림만 잘라 268 × 311로 바꿔 24.9kB → 18.7kB가 됐고, 이제 object-fit 없이 상자 크기만 맞추면 된다.
+- 402px 폭 실측으로 시안과 대조했다. 자물쇠 67.00 × 76.99 @ (205.11, −60.86), 마스코트 276.30 × 204.95 @ (66.96, −164.47)로 시안과 0.4px 안에서 맞고 설명 문구와 겹치지 않는다.
 - **직접 URL 접근은 아직 막지 않는다.** 비로그인으로 `/cases/new`나 `/my`를 주소창에 직접 치면 그대로 열린다. 시안이 클릭 시점의 팝업만 정의하고 있어 `RequireAuth` 가드는 넣지 않았다. → 확인 필요
 - 검증: `npm run lint`·`npm run typecheck`·`npm run build` 통과. 브라우저에서 비로그인 상태로 사건 접수·MY·AI 카드 세 진입점의 팝업, 닫은 뒤 화면 유지, `로그인하기` → `/login?from=%2Fcases%2Fnew` → 데모 로그인 → `/cases/new` 복귀를 확인했다. 실기기는 미검증.
 
