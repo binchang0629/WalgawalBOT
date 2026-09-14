@@ -12,8 +12,8 @@ export interface JihoonSimilarComment {
   id: string
   nickname: string
   createdAt: string
-  voteId: JihoonSimilarVoteId
-  voteLabel: string
+  voteId: JihoonSimilarVoteId | null
+  voteLabel: string | null
   body: string
   likes: number
   dislikes: number
@@ -29,11 +29,13 @@ export const jihoonSimilarCase = {
     avatarUrl: authorAvatar,
   },
   title: '수정 2회를 마쳤는데, 의뢰인이 잔금 지급을 미루고 있어요.',
+  detailTitle: '수정 2회를 마쳤는데, 의뢰인이\n잔금 지급을 미루고 있어요.',
+  resultTitle: '수정 2회를 마쳤는데,\n의뢰인이 잔금 지급을 미루고 있어요.',
   caseNumber: 'CASE-COMPANY-874',
   age: '3일 전',
   participantCount: 450,
   paragraphs: [
-    '카페 홍보영상을 180만 원에 제작했습니다. 계약에는 수정 2회와 원본 파일 제공이 포함됐고, 최종 승인 후 잔금 90만 원을 받기로 했어요.',
+    '카페 홍보영상을 180만 원에 제작했습니다.\n계약에는 수정 2회와 원본 파일 제공이 포함됐고, 최종 승인 후 잔금 90만 원을 받기로 했어요.',
     '의뢰인은 처음부터 밝고 따뜻한 색감을 요청했지만, 저는 차분한 색감이 카페와 더 잘 어울린다고 판단해 두 번의 수정에서도 밝기만 조금 조절했습니다.',
     '의뢰인은 요청한 색감이 반영되지 않았다며 추가 수정과 원본 파일을 요구하고 있어요. 영상은 광고 일정 때문에 먼저 게시했을 뿐, 최종 승인한 것은 아니라고 합니다.',
     '저는 약속한 수정 횟수를 모두 채웠는데도 다시 수정해야 할까요?',
@@ -50,6 +52,25 @@ export const jihoonSimilarCase = {
     {
       title: '게시와 최종 승인은 별개',
       body: '광고 일정 때문에 영상을 먼저 게시한 것만으로 최종 승인했다고 단정하기는 어려워요.',
+    },
+  ],
+} as const
+
+export const jihoonSimilarReasonComparison = {
+  eyebrow: '왜 달랐을까요?',
+  title: '‘작업 완료’의\n기준이 달랐어요',
+  criteria: [
+    {
+      id: 'ai',
+      label: '판멍이가 본 기준',
+      keyword: '수정 횟수',
+      description: '약속한 수정\n2회를 마쳤어요',
+    },
+    {
+      id: 'jury',
+      label: '배심원 댓글의 기준',
+      keyword: '요청 반영',
+      description: '요청한 색감은\n반영되지 않았어요',
     },
   ],
 } as const

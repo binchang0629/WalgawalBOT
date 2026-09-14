@@ -1,5 +1,5 @@
 import type { Persona, PersonaId } from '../../types'
-import seoaAnonymousAvatar from '../../assets/case/result/comment-avatar-2.png'
+import seoaAnonymousAvatar from '../../assets/case/disagreement/comment-2.png'
 import jihunAnonymousAvatar from '../../assets/case/result/comment-avatar-3.png'
 
 /**

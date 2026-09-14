@@ -80,7 +80,7 @@ export default function VerdictDisagreementHero({ juryPercent }: { juryPercent: 
         <img className="disagreement-hero__panmung" src={panmung} alt="" />
         <img className="disagreement-hero__author" src={author} alt="" />
         <img className="disagreement-hero__opponent" src={opponent} alt="" />
-        <p className="disagreement-hero__ai">AI는<br />글쓴이 편이에요!</p>
+        <p className="disagreement-hero__ai">판멍이는<br />글쓴이 편이에요!</p>
         <img className="disagreement-hero__arrow" src={aiArrow} alt="" />
         <p className="disagreement-hero__jury">배심원은<br />상대편을<br />선택했어요!</p>
         <div className="disagreement-hero__percent">
@@ -89,9 +89,6 @@ export default function VerdictDisagreementHero({ juryPercent }: { juryPercent: 
         </div>
       </div>
       <div className="disagreement-hero__footer">
-      <p className="disagreement-hero__legend">
-        <span>판멍이는 글쓴이</span><i aria-hidden="true">|</i><span>배심원은 상대방</span>
-      </p>
       <button className="disagreement-hero__replay" type="button" onClick={() => replay.current()} disabled={reduced || !run} aria-label="판단 비교 애니메이션 다시 보기" title="다시 보기"><img src={refreshIcon} alt="" /></button>
       </div>
       <p className="disagreement-hero__sr">AI는 글쓴이를, 배심원은 상대방을 선택했어요. 배심원 최다 선택 비율은 {juryPercent}%예요.</p>

@@ -13,9 +13,8 @@
 .disagreement-hero {
   position: relative;
   container-type: inline-size;
-  width: calc(100% + var(--result-gutter, var(--content-gutter)) * 2);
-  margin-inline: calc(var(--result-gutter, var(--content-gutter)) * -1);
-  padding: 26px 0 6px;
+  width: 100%;
+  padding: 6px 0;
   background: #fff;
 }
 .disagreement-hero h2 {
@@ -37,7 +36,7 @@
   isolation: isolate;
   width: 100%;
   aspect-ratio: 354 / 362;
-  overflow: visible;
+  overflow: hidden;
 }
 .disagreement-hero__stage img {
   position: absolute;
@@ -47,7 +46,7 @@
   user-select: none;
   pointer-events: none;
 }
-.disagreement-hero__background { left: 0; top: -1.9337%; width: 100%; aspect-ratio: 1; }
+.disagreement-hero__background { left: -7.4859%; top: -1.9337%; width: 114.9718%; aspect-ratio: 1; }
 .disagreement-hero__flow { left: 0; top: -2.7624%; width: 100%; height: 111.0497%; }
 .disagreement-hero__panmung {
   left: 1%; top: 24.3094%; width: 64%; aspect-ratio: 1;
@@ -56,16 +55,13 @@
 .disagreement-hero__author { left: 44.9153%; top: 27.6243%; width: 24.0113%; aspect-ratio: 1; }
 .disagreement-hero__opponent { left: 57.9096%; top: 52.2099%; width: 31.9209%; aspect-ratio: 1; }
 .disagreement-hero__stage p { position: absolute; margin: 0; font-size: 3.9548cqw; font-weight: 600; }
-.disagreement-hero__ai { left: 3.2768%; top: 12.4309%; width: 34.4068%; color: #1035c7; text-align: center; font-family: Pretendard, sans-serif; line-height: 1.3; }
+.disagreement-hero__ai { left: 7.3446%; top: 12.4309%; width: 26.2712%; color: #1035c7; text-align: center; font-family: Pretendard, sans-serif; line-height: 1.3; }
 .disagreement-hero__arrow { left: 18.0791%; top: 24.3094%; width: 7.9096%; height: 7.1823%; }
-.disagreement-hero__jury { left: 73.7288%; top: 9.9448%; width: 20.0565%; color: #f57200; text-align: center; line-height: 1.3; }
+.disagreement-hero__jury { left: 74.5763%; top: 9.9448%; width: 18.3616%; color: #f57200; text-align: center; line-height: 1.3; }
 .disagreement-hero__percent { position: absolute; left: 72.5989%; top: 32.5967%; width: 23.1638%; display: flex; flex-direction: column; }
 .disagreement-hero__percent strong { color: #ff9524; font: 900 11.8644cqw/1.190476 'Verdict Paperlogy', sans-serif; white-space: nowrap; }
 .disagreement-hero__percent small { font-size: 6.4972cqw; }
 .disagreement-hero__percent > span { text-align: center; font-size: 3.6723cqw; font-weight: 600; line-height: 1.4; color: #939094; white-space: nowrap; }
-.disagreement-hero__legend { margin: 0; display: flex; align-items: center; justify-content: center; gap: 12px; color: #374bff; font-size: 14px; font-weight: 600; line-height: 1.3; }
-.disagreement-hero__legend i { font-style: normal; }
-.disagreement-hero__legend span:last-child { color: #fd8013; }
 .disagreement-hero__sr { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 .disagreement-hero__footer { display: flex; flex-direction: column; align-items: center; gap: 16px; }
