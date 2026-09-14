@@ -20,6 +20,13 @@
 }
 
 /* 시안 팝업은 402 × 415. 판멍이가 위로 넘치므로 잘라내지 않는다. */
+/*
+ * filter: drop-shadow()는 overflow: visible + transform 애니메이션과 같이 쓰면
+ * 크로미움에서 레이어 합성이 늦게 잡혀 처음 한두 프레임에 팝업이 제자리에
+ * 떠 있다가 아래로 훅 꺼지는 것처럼 보이는 경우가 있다 (아래에서 올라오는
+ * 것이 아니라 위에서 떨어지는 것처럼 보이는 원인). 같은 모양은 box-shadow로도
+ * 충분해서 그쪽으로 바꾸고, will-change로 트랜스폼 레이어를 미리 잡아 둔다.
+ */
 .loginRewardPopUp {
     position: relative;
     width: 100%;
@@ -29,7 +36,8 @@
     background: #fff;
     color: var(--ink);
     font-family: var(--font-body);
-    filter: drop-shadow(0 5px 20.5px rgb(45 44 41 / 70%));
+    box-shadow: 0 5px 20.5px rgb(45 44 41 / 70%);
+    will-change: transform;
     animation: loginRewardPopUpIn 420ms cubic-bezier(.22, 1, .36, 1) both;
 }
 

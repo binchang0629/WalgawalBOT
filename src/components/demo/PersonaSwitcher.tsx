@@ -1,6 +1,13 @@
 import useSession from '../../hooks/useSession'
 import { PERSONAS, PERSONA_ORDER } from '../../data/personas'
+import seoaProfileImage from '../../assets/my/account-seoa.png'
+import jihunProfileImage from '../../assets/my/account-jihun.png'
 import './PersonaSwitcher.css'
+
+const PROFILE_IMAGES = {
+  A: seoaProfileImage,
+  B: jihunProfileImage,
+} as const
 
 /**
  * 시연용 계정 전환 도구.
@@ -39,9 +46,17 @@ function PersonaSwitcher() {
               onClick={() => switchPersona(id)}
               aria-pressed={isCurrent}
             >
-              <span className="persona-switcher__name">{persona.name}</span>
-              <span className="persona-switcher__kind">
-                {persona.kind === 'new' ? '신규 사용자' : '기존 사용자'}
+              <img
+                className="persona-switcher__avatar"
+                src={PROFILE_IMAGES[id]}
+                alt=""
+                aria-hidden="true"
+              />
+              <span className="persona-switcher__copy">
+                <span className="persona-switcher__name">{persona.name}</span>
+                <span className="persona-switcher__kind">
+                  {persona.kind === 'new' ? '신규 사용자' : '기존 사용자'}
+                </span>
               </span>
             </button>
           )

@@ -151,6 +151,13 @@
 .profile-switch-confirm__logout { min-height: 36px; padding: 8px; border: 0; background: none; color: var(--neutral-500); font-size: 13px; font-weight: 500; line-height: 1.3; }
 .profile-switch-confirm :focus-visible { outline: 2px solid var(--orange-700); outline-offset: 3px; }
 
+/* 텍스트 확인 팝업: 공통 컨테이너·버튼을 쓰고 내용별 여백만 지정한다. */
+.profile-switch-confirm--message { padding: 32px 24px 24px; }
+.profile-switch-confirm--message .profile-switch-confirm__header { justify-content: center; text-align: center; }
+.profile-switch-confirm--message .profile-switch-confirm__actions { margin-top: 28px; gap: 8px; }
+.profile-switch-confirm--message .profile-switch-confirm__submit { min-height: 48px; }
+.profile-switch-confirm--message .profile-switch-confirm__logout { min-height: 44px; }
+
 @media (max-width: 370px) {
     .account-switch-sheet__account { padding-inline: 8px; gap: 8px; }
 }

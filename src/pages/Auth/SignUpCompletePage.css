@@ -1,5 +1,5 @@
 /*
- * 가입 완료 환영 화면. Figma `2187:24600`.
+ * 가입 완료 환영 화면. 문구 스타일: Figma `2378:31776` · `2378:31778`.
  *
  * 시안은 모든 요소를 402 × 874 절대 좌표로 놓았지만, 화면 높이가 달라지면 겹치므로
  * 세로 흐름으로 옮기고 시안의 간격을 그대로 썼다.
@@ -24,6 +24,7 @@
 .signUpCompleteArt {
     position: relative;
     width: 317px;
+    max-width: 100%;
     height: 280px;
 }
 
@@ -46,13 +47,19 @@
     object-fit: contain;
 }
 
+.signUpCompleteVideo {
+    display: block;
+    pointer-events: none;
+}
+
 .signUpCompleteTitle {
     margin: 58px 0 0;
     width: 252px;
     color: var(--blue-700);
+    font-family: var(--font-title);
     font-size: 22px;
-    font-weight: 500;
-    line-height: 1.4;
+    font-weight: 700;
+    line-height: 1.2;
 }
 
 .signUpCompleteLead {
@@ -61,7 +68,7 @@
     color: var(--neutral-600);
     font-size: 18px;
     font-weight: 400;
-    line-height: 1.4;
+    line-height: 1.2;
 }
 
 /*

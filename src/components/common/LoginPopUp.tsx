@@ -142,7 +142,11 @@ function LoginPopUp({ reason, onLogin, onClose }: Props) {
   // 닫은 뒤 원래 누른 버튼으로 포커스를 돌려준다.
   useEffect(() => {
     openerRef.current = document.activeElement as HTMLElement | null
-    popUpRef.current?.focus()
+    // 진입 애니메이션 중(translateY(100%) 근처)에는 팝업이 화면 아래 바깥에 있다.
+    // 이때 그냥 focus()를 부르면 브라우저가 `.app-viewport`(overflow: hidden이라도
+    // scrollTop은 그대로 움직인다)를 스크롤해 보이는 화면을 끌어올리면서,
+    // 팝업 뒤 화면이 저절로 스크롤된 것처럼 보인다. preventScroll로 막는다.
+    popUpRef.current?.focus({ preventScroll: true })
     return () => openerRef.current?.focus?.()
   }, [])
 
