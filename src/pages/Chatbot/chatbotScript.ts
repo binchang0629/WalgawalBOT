@@ -78,6 +78,13 @@ export const RESTART_STEP_ID = 'restart'
 /** 자유 입력이 스크립트에 없을 때 "다른 도움 받기"를 고르면 이동하는 안내 스텝. */
 export const OTHER_HELP_STEP_ID = 'otherHelp'
 
+/**
+ * 로그인 전 상태에서 "내 사건에 대해 물어볼게요" → 사건 없음 안내(`caseIntroEmpty`) →
+ * "다른 질문 할게요"로 들어오는 공통 메뉴. `restart`와 달리 "내 사건에 대해 물어볼게요"를
+ * 다시 보여주지 않는다 — 방금 그 선택지 때문에 이 화면에 왔기 때문이다.
+ */
+export const GUEST_MENU_STEP_ID = 'guestMenu'
+
 export const STEP_MAP: Record<string, BotStep> = {
   restart: {
     id: 'restart',
@@ -154,6 +161,21 @@ export const STEP_MAP: Record<string, BotStep> = {
     options: [
       { id: 'toSubmit', label: '사건 접수하러 갈게요', next: RESTART_STEP_ID },
       { id: 'more', label: '다른 질문 할게요', next: RESTART_STEP_ID },
+    ],
+  },
+
+  /**
+   * 로그인 전 공통 "다른 질문 할게요" 메뉴. `caseIntroEmpty`에서만 쓰인다 —
+   * ChatbotPage.tsx의 resolveNextStepId가 로그인 전일 때만 이 스텝으로 보낸다.
+   */
+  guestMenu: {
+    id: GUEST_MENU_STEP_ID,
+    blocks: [p('좋아요. 어떤 내용이 궁금한가요?'), p('아래에서 궁금한 내용을 골라주세요.')],
+    options: [
+      { id: 'how-to-use', label: '왈가왈봇 이용 방법이 궁금해요', next: 'howToUse' },
+      { id: 'ai-result', label: 'AI 판정·배심원 결과가 궁금해요', next: 'aiResultInfo' },
+      { id: 'need-expert', label: '전문가 상담이 필요한지 궁금해요', next: 'needExpertInfo' },
+      { id: 'trouble', label: '이용 중 문제가 생겼어요', next: 'troubleInfo' },
     ],
   },
 

@@ -5,7 +5,7 @@ import useWizardBack from '../../hooks/useWizardBack'
 import { BACK_FALLBACK, PATHS } from '../../routes/paths'
 import { requestChatbotReply } from '../../services/chatbotService'
 import type { ChatOption } from './chatbotScript'
-import { CASE_ROUTED_OPTION_IDS, INITIAL_OPTIONS } from './chatbotScript'
+import { CASE_ROUTED_OPTION_IDS, GUEST_MENU_STEP_ID, INITIAL_OPTIONS } from './chatbotScript'
 import type { ChatTurn } from './types'
 import ChatbotHeader from './components/ChatbotHeader'
 import ChatEmptyState from './components/ChatEmptyState'
@@ -44,7 +44,7 @@ const SELECT_FEEDBACK_MS = 320
 function ChatbotPage() {
   const navigate = useNavigate()
   const handleBack = useWizardBack(BACK_FALLBACK.chatbot)
-  const { personaId } = useSession()
+  const { personaId, sessionStatus } = useSession()
 
   const [turns, setTurns] = useState<ChatTurn[]>([])
   const [activeStepId, setActiveStepId] = useState<string | null>(null)
@@ -71,11 +71,26 @@ function ChatbotPage() {
   /**
    * 지금은 곽지훈(B)만 최근에 접수한 사건이 있는 데모 상태다. (PROJECT_SPEC.md §9-1)
    * 실제 서비스에서는 로그인한 사용자의 최근 사건 목록에서 판단해야 한다.
+   *
+   * 로그인 여부를 먼저 보고, 로그인된 경우에만 계정(personaId)으로 나눈다.
+   * 비로그인이면 어떤 계정을 선택해 뒀든 사건 데이터에 접근할 수 없다 — 계정 선택은
+   * 로그인 후에만 의미가 있는 시연 상태이지, 그 자체로 로그인을 대신하지 않는다. (PROJECT_SPEC.md §7-5)
    */
-  const hasRecentCase = personaId === 'B'
+  const hasRecentCase = sessionStatus === 'authenticated' && personaId === 'B'
 
-  const resolveNextStepId = (option: ChatOption) =>
-    CASE_ROUTED_OPTION_IDS.has(option.id) && !hasRecentCase ? 'caseIntroEmpty' : option.next
+  /**
+   * "다른 질문 할게요"(id: 'more')는 여러 스텝에서 공유하는 버튼이라 기본은 그대로 `option.next`
+   * (= restart, 5개 메뉴)를 따른다. 다만 로그인 전 상태에서 `caseIntroEmpty`(사건 없음 안내)
+   * 바로 다음에 눌렀을 때만 "내 사건에 대해 물어볼게요"를 뺀 `guestMenu`로 보낸다 —
+   * 로그인 후 시나리오나 다른 스텝의 "다른 질문 할게요"는 건드리지 않는다.
+   */
+  const resolveNextStepId = (option: ChatOption) => {
+    if (CASE_ROUTED_OPTION_IDS.has(option.id) && !hasRecentCase) return 'caseIntroEmpty'
+    if (option.id === 'more' && activeStepId === 'caseIntroEmpty' && sessionStatus !== 'authenticated') {
+      return GUEST_MENU_STEP_ID
+    }
+    return option.next
+  }
 
   const runRequest = async (
     request: { kind: 'option'; option: ChatOption } | { kind: 'text'; text: string },

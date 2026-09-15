@@ -1,5 +1,13 @@
 # 왈가왈BOT 현재 상태
 
+## 챗봇 로그인 전 "다른 질문" 메뉴 분리 (2026-09-15)
+
+- 로그인 전 상태에서 `내 사건에 대해 물어볼게요` → `caseIntroEmpty`(사건 없음 안내) → `다른 질문 할게요`로 들어오면, 기존에는 `restart` 스텝(문구 "더 궁금한 점이 있으면 골라주세요." + `내 사건에 대해 물어볼게요`를 포함한 5개 메뉴)이 그대로 다시 나와 방금 겪은 흐름이 반복되는 느낌이 있었다.
+- `chatbotScript.ts`에 새 스텝 `guestMenu`(`GUEST_MENU_STEP_ID`)를 추가했다. 문구는 "좋아요. 어떤 내용이 궁금한가요? / 아래에서 궁금한 내용을 골라주세요."이고, `내 사건에 대해 물어볼게요`를 뺀 4개(이용 방법·AI 판정·전문가 상담·이용 중 문제)만 보여준다. 각 버튼의 `next`는 기존 `howToUse`/`aiResultInfo`/`needExpertInfo`/`troubleInfo`를 그대로 재사용해 이후 응답은 기존 플로우 그대로다.
+- 라우팅은 `ChatbotPage.tsx`의 `resolveNextStepId`에서만 처리했다. `다른 질문 할게요`(id `more`)는 여러 스텝이 공유하는 버튼이라, "직전 스텝이 `caseIntroEmpty`이고 `sessionStatus !== 'authenticated'`일 때만" `guestMenu`로 보내고 그 외에는 기존처럼 `restart`로 간다. 계정(personaId)은 보지 않고 로그인 여부만 본다 — 서아·지훈 로그인 전 모두 동일하게 `guestMenu`로 가고, 로그인 후(예: 서아 인증 상태에서 우연히 caseIntroEmpty에 닿는 경우)는 이번 변경 이전과 똑같이 `restart`(5개 메뉴)로 간다. `caseIntroEmpty` 스텝 데이터 자체와 다른 스텝들의 `다른 질문 할게요`(howToUse, troubleInfo 등)는 손대지 않았다.
+- `ChatOptionButtons`, 선택 인터랙션(오렌지 표시 → 그룹 제거 → 사용자 버블 추가), 버튼 스타일은 변경하지 않았다.
+- `npm run lint`, `npm run typecheck`, `npm run build` 통과. 기존 500kB 초과 청크 경고는 유지된다. 실제 브라우저 클릭 시연은 이번 세션에서 실행하지 않고 `resolveNextStepId` → `requestChatbotReply` → `STEP_MAP` 경로를 코드로 추적해 서아/지훈 로그인 전 두 경우 모두 `guestMenu`로 귀결됨을 확인했다. → 확인 필요(실제 브라우저 검증)
+
 ## 챗봇 자유 입력 안내 플로우 변경 (2026-09-15)
 
 - 사용자가 선택 버튼 없이 임의의 텍스트를 입력했을 때(현재 스텝에 `freeTextNext`가 없을 때) 나오던 "음, 지금은 정해진 답변만 드릴 수 있어요. 아래에서 골라볼래요?" + 그 스텝의 기존 선택지 재노출을, "혹시 다른 도움이 필요하신가요? 지금 하던 내용을 이어가거나, 다른 도움을 받을 수 있어요." + `이어서 진행하기`/`다른 도움 받기` 2버튼으로 바꿨다.
