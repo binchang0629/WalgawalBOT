@@ -1,4 +1,5 @@
 import type { CaseSummary } from '../../types'
+import { weddingGiftCase } from './caseDetailContent'
 
 /**
  * 홈 화면 정적 데이터.
@@ -22,11 +23,13 @@ export const todayCase = {
   ] as const,
   titleSecondLine: '적당한가?',
   /**
-   * 투표 마감까지 남은 시간(시간 단위).
-   * 서버가 없어 사건별 마감 일시를 받을 수 없으므로, 화면을 연 시점부터 이만큼을 센다.
-   * 실제 API가 붙으면 이 값 대신 사건의 마감 일시를 쓴다. (PROJECT_SPEC.md §1-5)
+   * 투표 마감까지 남은 시간 `hh:mm:ss`.
+   *
+   * 홈·사건 상세·사건 결과가 모두 같은 축의금 사건을 보여주므로 값을 하나로 쓴다.
+   * 출처는 `caseDetailContent.ts`의 `weddingGiftCase.deadline` 한 곳이다.
+   * 서버가 없어 화면을 연 시점부터 이만큼을 센다. (PROJECT_SPEC.md §1-5)
    */
-  countdownHours: 2,
+  deadline: weddingGiftCase.deadline,
   countdownLabel: '투표 마감까지',
   participantCount: 1245,
   ctaLabel: '투표하러 가기',

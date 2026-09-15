@@ -46,6 +46,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: '배심원 광장', icon: plazaIcon, to: PATHS.plaza, enabled: true },
   { label: '사건 접수', icon: submitIcon, to: PATHS.caseSubmit, enabled: true, isCta: true, gate: 'caseSubmit' },
   { label: '왈가왈후~', icon: afterStoryIcon, to: PATHS.afterStory, enabled: true },
+  // 비로그인 상태에서는 현재 화면을 유지하고 MY 전용 로그인 팝업을 띄운다.
   { label: 'MY', icon: myIcon, to: PATHS.my, enabled: true, gate: 'my' },
 ]
 

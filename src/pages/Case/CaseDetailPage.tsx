@@ -6,22 +6,22 @@ import type { WeddingGiftVoteId } from '../../data/common/caseDetailContent'
 import { PATHS, toCaseResult } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
 import CaseVoteSection from './components/CaseVoteSection'
+import useToast from '../../hooks/useToast'
 import useDemoCountdown from './components/useDemoCountdown'
 import './CaseDetailPage.css'
 
-function VoteCountdown({ value }: { value: string }) {
+/**
+ * 투표 마감까지 남은 시간.
+ * 사건 결과 화면(`CaseResultPage`의 `.vote-result__deadline`)과 같은 알약 한 덩어리로 맞췄다.
+ * 예전에는 숫자를 칸칸이 나눠 그렸다. (2026-09-14 팀 요청)
+ */
+function VoteDeadline({ value }: { value: string }) {
   const countdown = useDemoCountdown(value)
-  const digits = countdown.replace(':', '').split('')
 
   return (
-    <span className="vote-countdown" aria-label={`남은 시간 ${countdown}`}>
-      {digits.map((digit, index) => (
-        <span key={`${index}-${digit}`}>
-          {index === 2 && <i aria-hidden="true">:</i>}
-          <b aria-hidden="true">{digit}</b>
-        </span>
-      ))}
-    </span>
+    <p className="case-overview__deadline" aria-label={`투표 마감까지 ${countdown}`}>
+      <span aria-hidden="true">투표 마감까지&nbsp;&nbsp;{countdown}</span>
+    </p>
   )
 }
 
@@ -40,8 +40,8 @@ function CaseDetailPage() {
   const location = useLocation()
   const navigate = useNavigate()
   const { sessionStatus, recordJuryVote } = useSession()
+  const { showToast } = useToast()
   const [selectedVote, setSelectedVote] = useState<WeddingGiftVoteId | null>(null)
-  const [voteMessage, setVoteMessage] = useState('')
 
   if (caseId !== weddingGiftCase.id) return <MissingCase />
 
@@ -50,12 +50,11 @@ function CaseDetailPage() {
 
   const handleVoteChoice = (choiceId: WeddingGiftVoteId) => {
     setSelectedVote(choiceId)
-    setVoteMessage('')
   }
 
   const handleVoteSubmit = () => {
     if (!selectedVote) {
-      setVoteMessage('투표를 먼저 해주세요.')
+      showToast('투표를 먼저 해주세요.')
       return
     }
 
@@ -69,10 +68,7 @@ function CaseDetailPage() {
 
       <div className="case-detail__body">
         <section className="case-overview" aria-labelledby="case-title">
-          <div className="case-overview__deadline">
-            <span>투표 마감까지</span>
-            <VoteCountdown value={weddingGiftCase.deadline} />
-          </div>
+          <VoteDeadline value={weddingGiftCase.deadline} />
 
           <div className="case-overview__category">
             <i aria-hidden="true" />
@@ -121,7 +117,6 @@ function CaseDetailPage() {
           isAuthenticated={isAuthenticated}
           loginPath={loginPath}
           selectedVote={selectedVote}
-          voteMessage={voteMessage}
           onSelect={handleVoteChoice}
           onSubmit={handleVoteSubmit}
         />

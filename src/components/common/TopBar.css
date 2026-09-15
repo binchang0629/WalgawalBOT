@@ -14,13 +14,27 @@
     align-items: center;
     justify-content: space-between;
     background: #fff;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--neutral-100);
 }
 
 .top-bar__logo {
     font-size: 19px;
     letter-spacing: -1px;
     color: var(--ink);
+}
+
+.top-bar--title {
+    display: grid;
+    grid-template-columns: 64px 1fr 64px;
+}
+
+.top-bar--title h1 {
+    margin: 0;
+    font-family: var(--font-title);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
 }
 
 .top-bar__logo span {

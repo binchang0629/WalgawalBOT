@@ -31,7 +31,7 @@
     padding: 16px var(--content-gutter);
     background: rgba(255, 255, 255, .3);
     backdrop-filter: blur(2px);
-    border-bottom: 1px solid var(--blue-050);
+    border-bottom: 1px solid var(--neutral-100);
 }
 
 .chatbot-header__back {

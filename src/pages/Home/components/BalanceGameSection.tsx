@@ -2,12 +2,15 @@ import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent } from 'react'
 import SectionTitle from '../../../components/common/SectionTitle'
 import { homeIcons } from '../homeAssets'
-import perilla from '../../../assets/home/figma/perilla.png'
+import perillaLeaf from '../../../assets/home/figma/perilla-leaf.png'
+import perillaChopsticks from '../../../assets/home/figma/perilla-chopsticks.png'
+import perillaChopsticksFull from '../../../assets/home/figma/perilla-chopsticks-full.png'
 import perillaPile from '../../../assets/home/figma/perilla-pile.png'
+import perillaPileRed from '../../../assets/home/figma/perilla-pile-red.png'
 import plateLeft from '../../../assets/home/figma/plate-left.png'
 import plateRight from '../../../assets/home/figma/plate-right.png'
 import mintScoop from '../../../assets/home/figma/mint-scoop.png'
-import mintBowlRed from '../../../assets/home/figma/mint-bowl-red.png'
+import mintBowlRed from '../../../assets/home/figma/mint-bowl-red-transparent.png'
 import mintBowlBlue from '../../../assets/home/figma/mint-bowl-blue.png'
 import mintBowlFilled from '../../../assets/home/figma/mint-bowl-filled-blue.png'
 import { balanceQuestions, mintBalanceQuestion, homeSectionTitles } from '../../../data/common/homeContent'
@@ -31,7 +34,6 @@ function BalanceRound({ questionIndex, onNext }: { questionIndex: number; onNext
   const drag = useRef<{ id: number; x: number; y: number; scale: number; min: number; max: number } | null>(null)
   const question = playableQuestions[questionIndex]
   const isMint = question.id === 'balance-mint'
-  const subject = isMint ? mintScoop : perilla
   const leftBowl = isMint ? mintBowlBlue : plateLeft
   const rightBowl = isMint ? mintBowlRed : plateRight
   const gameName = isMint ? '민트초코' : '깻잎'
@@ -124,11 +126,35 @@ function BalanceRound({ questionIndex, onNext }: { questionIndex: number; onNext
           onPointerDown={handlePointerDown} onPointerMove={handlePointerMove}
           onPointerUp={handlePointerEnd} onPointerCancel={handlePointerEnd}
           onLostPointerCapture={handlePointerEnd}>
-          <img className="balance-board__subject" src={subject} alt={question.scenario} draggable={false} />
+          {isMint ? (
+            <img className="balance-board__subject" src={mintScoop} alt={question.scenario} draggable={false} />
+          ) : (
+            /*
+             * 깻잎은 젓가락과 잎을 따로 겹쳐 놓는다. 겹쳐 두면 평소에는 한 장처럼 보이고,
+             * `절대 안됨`을 골랐을 때만 잎을 떨어뜨릴 수 있다. (아래 perilla-drop)
+             */
+            <span className="balance-board__subject balance-board__subject--perilla">
+              <img className="balance-board__leaf" src={perillaLeaf} alt={question.scenario} draggable={false} />
+              {/*
+                젓가락은 두 장이다. 깻잎을 집고 있는 동안은 끝이 잎에 가린 원래 그림을 쓰고,
+                잎을 놓은 뒤에는 가려져 있던 끝까지 살린 그림으로 바꾼다.
+                두 장을 함께 두는 이유는 바꾸는 순간 이미지가 늦게 떠서 깜빡이지 않게 하려는 것이다.
+              */}
+              <img className="balance-board__chopsticks" src={perillaChopsticks} alt="" aria-hidden="true" draggable={false} />
+              <img className="balance-board__chopsticks balance-board__chopsticks--full" src={perillaChopsticksFull} alt="" aria-hidden="true" draggable={false} />
+            </span>
+          )}
         </div>
+        {/*
+          깻잎 더미 그림에는 접시가 함께 그려져 있다. 그래서 고른 쪽 접시 색에 맞춰
+          두 장을 바꿔 쓴다. 상관 없음이면 파란 접시, 절대 안됨이면 빨간 접시다.
+          더미는 결과 단계에서야 보이므로 고른 직후 바꿔도 깜빡이지 않는다.
+        */}
         {(!isMint || choice !== 'right') && <img className="balance-board__pile"
-          src={isMint ? mintBowlFilled : perillaPile}
-          alt={isMint ? '파란색 그릇에 가득 담긴 민트초코 아이스크림' : '접시에 수북이 쌓인 깻잎'}
+          src={isMint ? mintBowlFilled : choice === 'right' ? perillaPileRed : perillaPile}
+          alt={isMint
+            ? '파란색 그릇에 가득 담긴 민트초코 아이스크림'
+            : (choice === 'right' ? '빨간 접시에 수북이 쌓인 깻잎' : '파란 접시에 수북이 쌓인 깻잎')}
           aria-hidden={phase !== 'result'} />}
         {(['left', 'right'] as const).map(side => (
           <div key={side} className={'balance-board__side balance-board__side--' + side}>

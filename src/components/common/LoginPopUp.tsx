@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { KeyboardEvent, ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import type { LoginGateReason } from '../../state/loginGateContext'
@@ -88,14 +88,65 @@ interface Props {
 
 function LoginPopUp({ reason, onLogin, onClose }: Props) {
   const variant = VARIANTS[reason]
+  const [isClosing, setIsClosing] = useState(false)
   const popUpRef = useRef<HTMLDivElement>(null)
   const openerRef = useRef<HTMLElement | null>(null)
+  const closingRef = useRef(false)
+  const exitAnimations = useRef<Animation[]>([])
   const portalRoot = document.getElementById('app-overlay-root')
+
+  // 계정 전환 시트와 동일하게, 현재 위치에서 아래로 내려간 뒤 닫는다.
+  const dismiss = useCallback((afterClose: () => void = onClose) => {
+    if (closingRef.current) return
+    closingRef.current = true
+    const dialog = popUpRef.current
+    const overlay = dialog?.parentElement
+    if (!dialog || !overlay || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      afterClose()
+      return
+    }
+
+    setIsClosing(true)
+    const style = getComputedStyle(dialog)
+    const options: KeyframeAnimationOptions = {
+      duration: 240,
+      easing: 'cubic-bezier(.4, 0, 1, 1)',
+      fill: 'forwards',
+    }
+    const animations = [
+      dialog.animate(
+        [
+          { transform: style.transform, opacity: style.opacity },
+          { transform: 'translateY(100%)', opacity: 1 },
+        ],
+        options,
+      ),
+      overlay.animate(
+        [
+          { backgroundColor: getComputedStyle(overlay).backgroundColor },
+          { backgroundColor: 'rgb(37 37 37 / 0%)' },
+        ],
+        { ...options, easing: 'ease-out' },
+      ),
+    ]
+    exitAnimations.current = animations
+    void Promise.all(animations.map((animation) => animation.finished))
+      .then(afterClose)
+      .catch(() => {})
+  }, [onClose])
+
+  useEffect(() => () => {
+    exitAnimations.current.forEach((animation) => animation.cancel())
+  }, [])
 
   // 닫은 뒤 원래 누른 버튼으로 포커스를 돌려준다.
   useEffect(() => {
     openerRef.current = document.activeElement as HTMLElement | null
-    popUpRef.current?.focus()
+    // 진입 애니메이션 중(translateY(100%) 근처)에는 팝업이 화면 아래 바깥에 있다.
+    // 이때 그냥 focus()를 부르면 브라우저가 `.app-viewport`(overflow: hidden이라도
+    // scrollTop은 그대로 움직인다)를 스크롤해 보이는 화면을 끌어올리면서,
+    // 팝업 뒤 화면이 저절로 스크롤된 것처럼 보인다. preventScroll로 막는다.
+    popUpRef.current?.focus({ preventScroll: true })
     return () => openerRef.current?.focus?.()
   }, [])
 
@@ -103,10 +154,10 @@ function LoginPopUp({ reason, onLogin, onClose }: Props) {
     (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.stopPropagation()
-        onClose()
+        dismiss()
       }
     },
-    [onClose],
+    [dismiss],
   )
 
   if (!portalRoot) return null
@@ -115,7 +166,7 @@ function LoginPopUp({ reason, onLogin, onClose }: Props) {
     <div
       className="loginPopUpOverlay"
       role="presentation"
-      onClick={onClose}
+      onClick={() => dismiss()}
       onKeyDown={handleKeyDown}
     >
       <div
@@ -125,6 +176,7 @@ function LoginPopUp({ reason, onLogin, onClose }: Props) {
         aria-modal="true"
         aria-labelledby="loginPopUpTitle"
         tabIndex={-1}
+        inert={isClosing}
         onClick={(event) => event.stopPropagation()}
       >
         {/*
@@ -141,7 +193,7 @@ function LoginPopUp({ reason, onLogin, onClose }: Props) {
         <div className="loginPopUpHandle" aria-hidden="true" />
 
         <div className="loginPopUpHeader">
-          <button type="button" onClick={onClose} aria-label="닫기">
+          <button type="button" onClick={() => dismiss()} aria-label="닫기">
             <img src={closeIcon} alt="" aria-hidden="true" />
           </button>
         </div>
@@ -151,10 +203,10 @@ function LoginPopUp({ reason, onLogin, onClose }: Props) {
         </h2>
         <p className="loginPopUpBody">{variant.body}</p>
 
-        <button type="button" className="loginPopUpPrimary" onClick={onLogin}>
+        <button type="button" className="loginPopUpPrimary" onClick={() => dismiss(onLogin)}>
           로그인하기
         </button>
-        <button type="button" className="loginPopUpSecondary" onClick={onClose}>
+        <button type="button" className="loginPopUpSecondary" onClick={() => dismiss()}>
           다음에 할게요
         </button>
       </div>

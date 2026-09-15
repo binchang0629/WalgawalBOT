@@ -9,6 +9,10 @@ import eyeOffIcon from '../../assets/auth/loginEyeOff.svg'
 import googleIcon from '../../assets/auth/loginSocialGoogle.png'
 import naverIcon from '../../assets/auth/loginSocialNaver.svg'
 import kakaoIcon from '../../assets/auth/loginSocialKakao.svg'
+import loginMascot from '../../assets/auth/brand/loginMascot.png'
+import wordmarkKorean from '../../assets/auth/brand/loginWordmarkKorean.svg'
+import wordmarkEnglish from '../../assets/auth/brand/loginWordmarkEnglish.svg'
+import wordmarkGavel from '../../assets/auth/brand/loginWordmarkGavel.svg'
 import './LoginPage.css'
 
 /**
@@ -59,18 +63,29 @@ function LoginPage() {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault()
     if (!canSubmit) return
+
+    // 모바일 키보드·포커스가 남아 있으면 도착 화면의 하단 내비가 밀려 보일 수 있다.
+    // 먼저 포커스를 해제하고 목적지 화면을 한 프레임 완성한 뒤 보상 팝업을 띄운다.
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
     signIn(personaId)
-    // 도착한 화면 위에 출석 포인트 팝업이 뜬다.
-    requestLoginReward('login')
     navigate(from, { replace: true })
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => requestLoginReward('login'))
+    })
   }
 
   return (
     <main className="login">
       <div className="login__brand">
-        {/* 시안의 로고 자리. 실제 로고 에셋이 아직 없어 시안의 회색 상자를 그대로 둔다. */}
-        <div className="login__logo" aria-hidden="true">logo</div>
-        <p className="login__service">왈가왈BOT</p>
+        <img className="login__logo" src={loginMascot} width="62" height="62" alt="" />
+        {/* Figma 2264:13801 원본 벡터를 모든 로그인 상태에서 함께 사용한다. */}
+        <div className="login__service" role="img" aria-label="왈가왈BOT">
+          <img className="login__wordmarkKorean" src={wordmarkKorean} width="69" height="21" alt="" />
+          <img className="login__wordmarkEnglish" src={wordmarkEnglish} width="54" height="21" alt="" />
+          <span className="login__wordmarkGavel">
+            <img src={wordmarkGavel} width="17.8387" height="18.4959" alt="" />
+          </span>
+        </div>
         <p className="login__tagline">AI와 유저가 심판해주는 고민 판결 커뮤니티</p>
       </div>
 

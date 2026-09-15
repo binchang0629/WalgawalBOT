@@ -4,6 +4,7 @@ import avatar3 from '../../assets/case/result/comment-avatar-3.png'
 import avatar4 from '../../assets/case/result/comment-avatar-4.png'
 import avatar5 from '../../assets/case/result/comment-avatar-5.png'
 import resultArtwork from '../../assets/case/result/verdict-artwork.png'
+import { weddingGiftCase } from './caseDetailContent'
 import type { WeddingGiftVoteId } from './caseDetailContent'
 
 export interface CaseResultComment {
@@ -23,12 +24,13 @@ export interface CaseResultComment {
  * 서버 연결 전 시연용이며 새 댓글은 화면 상태에만 추가된다.
  */
 export const weddingGiftResult = {
-  deadline: '01:32:47',
+  /** 사건 상세와 같은 마감 시각을 쓴다. 값은 `caseDetailContent.ts` 한 곳에서 관리한다. */
+  deadline: weddingGiftCase.deadline,
   artworkUrl: resultArtwork,
   verdict: {
-    label: '실시간 투표 중',
-    title: '아직은 글쓴이 입장이\n더 우세해요',
-    description: '최근 교류가 뜸했다면\n10만 원은 무리 없는 축의금이라는 의견이에요.',
+    label: '판멍이의 판단',
+    title: '글쓴이의\n손을 들어줬어요',
+    description: '축의금은 관계뿐 아니라\n개인의 상황도 함께 살펴야 해요.',
   },
   breakdown: [
     { id: 'writer', label: '글쓴이 입장이 더 타당해요', percent: 48 },
@@ -36,12 +38,11 @@ export const weddingGiftResult = {
     { id: 'both', label: '양쪽 모두 일리가 있어요', percent: 22 },
     { id: 'neither', label: '양쪽 모두 타당하지 않아요', percent: 4 },
   ],
-  aiVerdictLabel: '판멍이의 판단',
-  aiVerdictTitle: '판멍이는 상대방의 손을 들어줬어요.',
+  aiVerdictLabel: '판멍이가 주목한 점',
+  aiVerdictTitle: '10만 원은 통상적인 축의금이고,\n소원해진 관계라면 충분한 금액이에요',
   aiReasons: [
-    '유사 사례와 일반적인 축의금 범위를 분석한 결과, 결혼식에 참석한 경우 5만~10만 원이 가장 일반적인 범위로 나타났어요.',
-    '두 사람이 10년간 알고 지냈더라도 최근 연락과 만남이 줄어든 상황이라면 10만 원은 충분히 통상적인 금액이에요.',
-    '오랜 관계라는 이유만으로 더 큰 금액을 기대하거나 금액으로 우정을 평가하는 것은 상대방에게 부담을 줄 수 있다고 판단했어요.',
+    '결혼식에 참석한 경우 축의금은 보통 5만~10만 원 선이에요. 최근 연락과 만남이 줄어든 관계라면 10만 원은 충분히 일반적인 금액이에요.',
+    '오래 알고 지냈다는 이유만으로 더 큰 금액을 기대하거나, 축의금 액수로 우정을 판단하는 것은 상대방에게 부담을 줄 수 있어요.',
   ],
   confidence: 68,
   comparison: '판멍이와 배심원 다수 모두\n상대방의 입장이 더 타당하다고 판단했어요.',

@@ -20,9 +20,21 @@ interface TopBarProps {
   logo?: ReactNode
   /** 읽지 않은 알림 표시. 서버가 없어 지금은 화면에서 내려준다. */
   hasUnreadNotification?: boolean
+  /** 페이지 이름만 가운데에 두는 상세형 헤더. */
+  title?: string
 }
 
-function TopBar({ hasUnreadNotification = false, logo }: TopBarProps) {
+function TopBar({ hasUnreadNotification = false, logo, title }: TopBarProps) {
+  if (title) {
+    return (
+      <header className="top-bar top-bar--title">
+        <span aria-hidden="true" />
+        <h1>{title}</h1>
+        <span aria-hidden="true" />
+      </header>
+    )
+  }
+
   return (
     <header className="top-bar">
       <strong className="top-bar__logo">

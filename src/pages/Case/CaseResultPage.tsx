@@ -1,7 +1,7 @@
-import { useId, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
-import chevronIcon from '../../assets/case/result/breakdown-toggle.svg'
+import juryStatusCharacter from '../../assets/case/vote-other-updated.svg'
 import dislikeIcon from '../../assets/case/result/dislike.svg'
 import emojiIcon from '../../assets/case/result/emoji.svg'
 import likeIcon from '../../assets/case/result/like.svg'
@@ -42,49 +42,6 @@ function MissingCase() {
       <p>삭제되었거나 잘못된 사건 주소예요.</p>
       <Link to={PATHS.plaza}>배심원 광장으로 가기</Link>
     </main>
-  )
-}
-
-function ResultBreakdown() {
-  const [isExpanded, setIsExpanded] = useState(true)
-  const panelId = useId()
-
-  return (
-    <div className="result-breakdown">
-      <button
-        type="button"
-        className="result-breakdown__toggle"
-        onClick={() => setIsExpanded((value) => !value)}
-        aria-expanded={isExpanded}
-        aria-controls={panelId}
-      >
-        <span>전체 결과 보기</span>
-        <img className={isExpanded ? 'is-open' : ''} src={chevronIcon} alt="" />
-      </button>
-
-      <div
-        id={panelId}
-        className={`result-breakdown__panel${isExpanded ? ' is-open' : ''}`}
-        aria-hidden={!isExpanded}
-        inert={!isExpanded}
-      >
-        <div className="result-breakdown__clip">
-          <ul className="result-breakdown__list">
-            {weddingGiftResult.breakdown.map((item) => (
-              <li key={item.id} className={item.id === 'writer' ? 'is-leading' : undefined}>
-                <div>
-                  <span>{item.label}</span>
-                  <strong>{item.percent}%</strong>
-                </div>
-                <span className={`result-breakdown__track result-breakdown__track--${item.id}`}>
-                  <i style={{ width: `${item.percent}%` }} />
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </div>
   )
 }
 
@@ -202,9 +159,16 @@ function CaseResultPage() {
         </section>
 
         <section className="vote-result" aria-labelledby="vote-result-title">
+          <p className="vote-result__deadline">투표 마감까지&nbsp;&nbsp;{countdown}</p>
+          <div className="vote-result__status">
+            <img src={juryStatusCharacter} alt="" />
+            <div>
+              <strong>2심 배심원 투표 집계 중</strong>
+              <p>투표 종료 후 1심과 2심의 판단을 비교할 수 있어요.</p>
+            </div>
+          </div>
           <div className="vote-result__heading">
-            <h2 id="vote-result-title">배심원 2심</h2>
-            <p className="vote-result__deadline">투표 마감까지&nbsp;&nbsp;{countdown}</p>
+            <h2 id="vote-result-title">1심 · 판멍이의 판단</h2>
           </div>
           <div className="vote-result__artwork">
             <img src={weddingGiftResult.artworkUrl} alt="판멍이가 판결 결과를 발표하는 모습" />
@@ -214,26 +178,26 @@ function CaseResultPage() {
               <p>{weddingGiftResult.verdict.description}</p>
             </div>
           </div>
-          <ResultBreakdown />
         </section>
 
         <section className="ai-verdict ai-verdict--wedding" aria-labelledby="ai-verdict-title">
-          <h2 id="ai-verdict-title">AI 1심 결과</h2>
+          <h2 id="ai-verdict-title">{weddingGiftResult.aiVerdictLabel}</h2>
           <div className="ai-verdict__card">
-            <span>{weddingGiftResult.aiVerdictLabel}</span>
             <h3>{weddingGiftResult.aiVerdictTitle}</h3>
             <div>
               {weddingGiftResult.aiReasons.map((reason) => <p key={reason}>{reason}</p>)}
             </div>
-            <footer>
-              <span>판단 확신도 </span>
-              <strong>{weddingGiftResult.confidence}%</strong>
-            </footer>
           </div>
-          <div className="ai-verdict__comparison">
-            <strong>판단 비교</strong>
-            <p>{weddingGiftResult.comparison}</p>
+        </section>
+
+        <section className="jury-verdict-pending" aria-label="2심 배심원 투표 진행 상태">
+          <div className="jury-verdict-pending__marker" aria-hidden="true">
+            <i />
+            <span />
+            <i />
           </div>
+          <strong>2심 배심원 투표는 아직 진행 중이에요</strong>
+          <p>투표 종료 후<br />AI와 배심원의 판단을 비교할 수 있어요.</p>
         </section>
 
         <div className="case-result__section-divider case-result__section-divider--wedding" />

@@ -1,5 +1,5 @@
 .walbot-plan {
-    --device-app-header: 66px;
+    --device-app-header: 64px;
     color: var(--ink);
     font-family: var(--font-body);
 }
@@ -47,8 +47,6 @@
 .walbot-plan .case-submit__primary:focus-visible,
 .walbot-plan .case-submit__back:focus-visible,
 .walbot-plan__skip:focus-visible { outline: 2px solid var(--blue-700); outline-offset: 3px; }
-.walbot-plan__notice { position: absolute; bottom: calc(100% + 4px); left: var(--content-gutter); right: var(--content-gutter); margin: 0; padding: 14px 16px; border-radius: var(--radius-lg); color: #fff; background: var(--neutral-900); font-size: 13px; line-height: 1.4; text-align: center; }
-
 @media (max-width: 370px) {
     .walbot-plan { --content-gutter: 18px; }
     .walbot-plan__option { padding-inline: 13px; }

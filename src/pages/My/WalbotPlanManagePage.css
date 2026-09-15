@@ -1,5 +1,5 @@
 .walbot-plan-manage {
-    --device-app-header: 66px;
+    --device-app-header: 64px;
     color: var(--ink);
     font-family: var(--font-body);
 }
@@ -53,7 +53,6 @@
 .walbot-plan-manage__actions button + button { border-top: 1px solid var(--neutral-250); }
 .walbot-plan-manage__actions .walbot-plan-manage__cancel { color: var(--negative); }
 .walbot-plan-manage__helper { margin: 0; color: var(--neutral-600); font-size: 11px; line-height: 1.4; word-break: keep-all; }
-.walbot-plan-manage__notice { margin: 0; padding: 12px 14px; border-radius: var(--radius-md); color: var(--neutral-700); background: var(--neutral-050); font-size: 13px; line-height: 1.4; word-break: keep-all; }
 .walbot-plan-manage button:focus-visible { outline: 2px solid var(--blue-700); outline-offset: 3px; }
 
 @media (max-width: 370px) {

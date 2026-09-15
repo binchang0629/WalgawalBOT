@@ -20,6 +20,13 @@
 }
 
 /* 시안 팝업은 402 × 415. 판멍이가 위로 넘치므로 잘라내지 않는다. */
+/*
+ * filter: drop-shadow()는 overflow: visible + transform 애니메이션과 같이 쓰면
+ * 크로미움에서 레이어 합성이 늦게 잡혀 처음 한두 프레임에 팝업이 제자리에
+ * 떠 있다가 아래로 훅 꺼지는 것처럼 보이는 경우가 있다 (아래에서 올라오는
+ * 것이 아니라 위에서 떨어지는 것처럼 보이는 원인). 같은 모양은 box-shadow로도
+ * 충분해서 그쪽으로 바꾸고, will-change로 트랜스폼 레이어를 미리 잡아 둔다.
+ */
 .loginRewardPopUp {
     position: relative;
     width: 100%;
@@ -29,7 +36,8 @@
     background: #fff;
     color: var(--ink);
     font-family: var(--font-body);
-    filter: drop-shadow(0 5px 20.5px rgb(45 44 41 / 70%));
+    box-shadow: 0 5px 20.5px rgb(45 44 41 / 70%);
+    will-change: transform;
     animation: loginRewardPopUpIn 420ms cubic-bezier(.22, 1, .36, 1) both;
 }
 
@@ -43,6 +51,24 @@
 @keyframes loginRewardPopUpIn {
     from { transform: translateY(100%); }
     to { transform: translateY(0); }
+}
+
+.loginRewardOverlay.isClosing {
+    animation: loginRewardDimOut 320ms ease-out both;
+}
+
+.loginRewardPopUp.isClosing {
+    animation: loginRewardPopUpOut 320ms cubic-bezier(.4, 0, 1, 1) both;
+}
+
+@keyframes loginRewardDimOut {
+    from { background-color: rgb(37 37 37 / 70%); }
+    to { background-color: rgb(37 37 37 / 0%); }
+}
+
+@keyframes loginRewardPopUpOut {
+    from { transform: translateY(0); }
+    to { transform: translateY(100%); }
 }
 
 /* ---------- 머리말 ---------- */
@@ -226,24 +252,62 @@
 
 /*
  * 동전 — 손에서 놓여 그릇으로 떨어진다.
- * 시안 네 장의 좌표를 이어 붙였다. 떨어질수록 작아지는 것도 시안 값이다.
- *   01 (226, -28.85) 76.22px  →  02 (192, 35)  →  04 (188.31, 78.63) ×0.879
- *   →  05 (191.28, 170.03) ×0.682
+ * 시작 (226, -28.85) ×1  →  끝 (191.28, 170.03) ×0.682 는 시안 값 그대로다.
+ *
+ * 그 사이는 시안 네 장을 직접 잇지 않고 낙하 곡선으로 다시 깔았다.
+ * 시안 좌표를 그대로 이으면 구간별 낙하 거리가 63.9 → 43.6 → 91.4 인데
+ * 시간은 35% → 35% → 30% 라, 떨어지다 가운데서 느려졌다가 다시 빨라진다.
+ * x 도 226 → 192 → 188.31 → 191.28 로 마지막에 오른쪽으로 되돌아와 흔들렸다.
+ * 게다가 easing 이 구간마다 걸려 키프레임마다 멈칫했다.
+ *
+ * 지금은 키프레임 29개가 경로를 직접 들고 있고 타이밍은 linear 다.
+ *   y     t² (중력)            — 계속 빨라진다
+ *   x     easeOutCubic (공기저항) — 한 방향으로만 흘러간다
+ *   회전  등속
+ *   크기  y 와 같은 t² — 멀어질수록 작아진다
+ * 86% 에 그릇에 닿고 남은 14% 는 공 더미에 5px 잠겼다 제자리로 돌아오는 마무리다.
+ * 끝나는 시각(380 + 820 = 1200ms)은 숫자가 +10PT 로 바뀌는 시점과 맞춰 둔 것이라
+ * 길이를 바꾸면 그쪽도 같이 봐야 한다.
  */
 .loginRewardCoin {
     width: 76.22px;
     height: 74.16px;
     transform: translate(226px, -28.85px) rotate(-6.89deg);
-    animation: loginRewardCoinDrop 820ms cubic-bezier(.42, 0, .4, 1) 380ms both;
+    animation: loginRewardCoinDrop 820ms linear 380ms both;
 }
 
 .loginRewardCoin img { top: -14.21%; left: -17.67%; width: 135.97%; height: 128.42%; }
 
 @keyframes loginRewardCoinDrop {
     0% { transform: translate(226px, -28.85px) rotate(-6.89deg) scale(1); }
-    35% { transform: translate(192px, 35.04px) rotate(-16.81deg) scale(1); }
-    70% { transform: translate(188.31px, 78.63px) rotate(-24deg) scale(.879); }
-    100% { transform: translate(191.28px, 170.03px) rotate(-30deg) scale(.682); }
+    3.91% { transform: translate(221.48px, -28.44px) rotate(-7.94deg) scale(0.999); }
+    7.82% { transform: translate(217.37px, -27.21px) rotate(-8.99deg) scale(0.997); }
+    11.73% { transform: translate(213.65px, -25.15px) rotate(-10.04deg) scale(0.994); }
+    15.64% { transform: translate(210.3px, -22.28px) rotate(-11.09deg) scale(0.989); }
+    19.55% { transform: translate(207.3px, -18.58px) rotate(-12.14deg) scale(0.984); }
+    23.45% { transform: translate(204.64px, -14.06px) rotate(-13.19deg) scale(0.976); }
+    27.36% { transform: translate(202.28px, -8.72px) rotate(-14.24deg) scale(0.968); }
+    31.27% { transform: translate(200.23px, -2.55px) rotate(-15.29deg) scale(0.958); }
+    35.18% { transform: translate(198.44px, 4.43px) rotate(-16.34deg) scale(0.947); }
+    39.09% { transform: translate(196.91px, 12.24px) rotate(-17.39deg) scale(0.934); }
+    43% { transform: translate(195.62px, 20.87px) rotate(-18.45deg) scale(0.92); }
+    46.91% { transform: translate(194.54px, 30.32px) rotate(-19.5deg) scale(0.905); }
+    50.82% { transform: translate(193.66px, 40.59px) rotate(-20.55deg) scale(0.889); }
+    54.73% { transform: translate(192.95px, 51.69px) rotate(-21.6deg) scale(0.871); }
+    58.64% { transform: translate(192.4px, 63.6px) rotate(-22.65deg) scale(0.852); }
+    62.55% { transform: translate(191.98px, 76.34px) rotate(-23.7deg) scale(0.832); }
+    66.45% { transform: translate(191.69px, 89.9px) rotate(-24.75deg) scale(0.81); }
+    70.36% { transform: translate(191.49px, 104.28px) rotate(-25.8deg) scale(0.787); }
+    74.27% { transform: translate(191.37px, 119.49px) rotate(-26.85deg) scale(0.763); }
+    78.18% { transform: translate(191.31px, 135.51px) rotate(-27.9deg) scale(0.737); }
+    82.09% { transform: translate(191.28px, 152.36px) rotate(-28.95deg) scale(0.71); }
+    86% { transform: translate(191.28px, 170.03px) rotate(-30deg) scale(0.682); }
+    88.33% { transform: translate(191.28px, 172.36px) rotate(-30deg) scale(0.682); }
+    90.67% { transform: translate(191.28px, 173.78px) rotate(-30deg) scale(0.682); }
+    93% { transform: translate(191.28px, 174.03px) rotate(-30deg) scale(0.682); }
+    95.33% { transform: translate(191.28px, 173.21px) rotate(-30deg) scale(0.682); }
+    97.67% { transform: translate(191.28px, 171.7px) rotate(-30deg) scale(0.682); }
+    100% { transform: translate(191.28px, 170.03px) rotate(-30deg) scale(0.682); }
 }
 
 /* ---------- 하단 안내 ---------- */

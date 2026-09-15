@@ -141,6 +141,7 @@ function toUser(personaId: PersonaId): SessionUser {
 
 function SessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<SessionState>(createInitialState)
+  const [rewardPointAdjustments, setRewardPointAdjustments] = useState<Partial<Record<PersonaId, number>>>({})
   const [activityRecords, setActivityRecords] = useState<ActivityRecords>(() => ({
     A: readActivity('A'),
     B: readActivity('B'),
@@ -198,6 +199,21 @@ function SessionProvider({ children }: { children: ReactNode }) {
     recordActivity('votedCaseIds', caseId)
   }, [recordActivity])
 
+  const syncRewardPointTotal = useCallback((totalPoints: number) => {
+    if (!Number.isFinite(totalPoints) || totalPoints < 0) return
+    const personaId = session.personaId
+    const account = DEMO_ACCOUNTS[personaId]
+    const activity = activityRecords[personaId]
+    const earnedPoints = account.points
+      + (personaId === 'A' ? activity.votedCaseIds.length * DEMO_JURY_VOTE_POINTS : 0)
+
+    // 현재 합계와 목표 합계의 차이만 보관해 이후 배심 포인트도 계속 누적되게 한다.
+    setRewardPointAdjustments((current) => ({
+      ...current,
+      [personaId]: totalPoints - earnedPoints,
+    }))
+  }, [session.personaId, activityRecords])
+
   const activityStats = useMemo(() => {
     const account = DEMO_ACCOUNTS[session.personaId]
     const activity = activityRecords[session.personaId]
@@ -206,9 +222,11 @@ function SessionProvider({ children }: { children: ReactNode }) {
     return {
       submittedCases: account.submittedCases + submittedCases,
       juryParticipations: account.juryParticipations + juryParticipations,
-      points: account.points + juryParticipations * DEMO_JURY_VOTE_POINTS,
+      points: account.points
+        + juryParticipations * DEMO_JURY_VOTE_POINTS
+        + (rewardPointAdjustments[session.personaId] ?? 0),
     }
-  }, [session.personaId, activityRecords])
+  }, [session.personaId, activityRecords, rewardPointAdjustments])
 
   const value = useMemo(
     () => ({
@@ -219,11 +237,12 @@ function SessionProvider({ children }: { children: ReactNode }) {
       activityStats,
       recordCaseSubmission,
       recordJuryVote,
+      syncRewardPointTotal,
       signIn,
       signOut,
       switchPersona,
     }),
-    [session, activityStats, recordCaseSubmission, recordJuryVote, signIn, signOut, switchPersona],
+    [session, activityStats, recordCaseSubmission, recordJuryVote, syncRewardPointTotal, signIn, signOut, switchPersona],
   )
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>

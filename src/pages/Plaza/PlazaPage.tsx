@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import RankingHeroSection from './components/RankingHeroSection'
 import CaseFeedSection from './components/CaseFeedSection'
 import TopBar from '../../components/common/TopBar'
@@ -11,10 +13,20 @@ import './Plaza.css'
  * 시스템 상태바는 DeviceFrame, 하단바는 MainLayout이 담당한다.
  */
 function PlazaPage() {
+  const [searchParams] = useSearchParams()
+  const pageRef = useRef<HTMLElement>(null)
+  const isCaseOnly = searchParams.get('section') === 'cases'
+
+  // 왈가왈후 CTA처럼 목록 전용으로 진입했을 땐, 직전 화면의 스크롤 위치를 이어받지 않는다.
+  useEffect(() => {
+    if (!isCaseOnly) return
+    pageRef.current?.closest<HTMLElement>('.main-layout__scroll')?.scrollTo({ top: 0 })
+  }, [isCaseOnly])
+
   return (
-    <main className="plaza-screen">
-      <TopBar logo="왈가왈BOT LOGO" />
-      <RankingHeroSection />
+    <main className={isCaseOnly ? 'plaza-screen plaza-screen--case-only' : 'plaza-screen'} ref={pageRef}>
+      <TopBar title="배심원 광장" />
+      {!isCaseOnly && <RankingHeroSection />}
       <CaseFeedSection />
     </main>
   )

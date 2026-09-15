@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import {
   caseCategories,
   categoryDotColor,
+  latestPlazaCaseIds,
   plazaCases,
   plazaViewOptions,
 } from '../../../data/common/plazaContent'
@@ -20,8 +21,11 @@ type CategoryFilter = CaseCategory | '전체'
 const CASES_PER_PAGE = 4
 
 function CaseFeedSection() {
+  const [searchParams] = useSearchParams()
   const [category, setCategory] = useState<CategoryFilter>('전체')
-  const [view, setView] = useState<PlazaViewKey>('latest')
+  const [view, setView] = useState<PlazaViewKey>(() => (
+    searchParams.get('view') === 'closed' ? 'closed' : 'latest'
+  ))
   const [isViewOpen, setIsViewOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const viewRef = useRef<HTMLDivElement>(null)
@@ -34,7 +38,7 @@ function CaseFeedSection() {
 
   /*
    * 보기 기준은 목록을 고르거나 순서를 바꾼다.
-   * 최신사건은 데이터에 적힌 순서를 그대로 쓴다. 위에 있을수록 최근에 올라온 사건이다.
+   * 최신사건은 조회·댓글 수가 아닌 시연용 게시 순서를 따른다.
    */
   const viewedCases = useMemo(() => {
     switch (view) {
@@ -47,7 +51,10 @@ function CaseFeedSection() {
       case 'recommended':
         return plazaCases.filter((item) => item.category === myCategory)
       default:
-        return plazaCases
+        return [...plazaCases].sort(
+          (a, b) => latestPlazaCaseIds.indexOf(a.id as typeof latestPlazaCaseIds[number])
+            - latestPlazaCaseIds.indexOf(b.id as typeof latestPlazaCaseIds[number]),
+        )
     }
   }, [view, myCategory])
 
@@ -222,7 +229,6 @@ function CaseFeedSection() {
           totalPages={totalPages}
           onPageChange={setCurrentPage}
           ariaLabel="사건 목록 페이지"
-          neutralArrows
         />
       </div>
     </section>
