@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useLocation } from 'react-router-dom'
 
@@ -41,7 +41,81 @@ const voteDisplay: Record<JihoonSimilarVoteId, { tone: 'blue' | 'orange' | 'soli
 
 function ResultBreakdown() {
   const [isExpanded, setIsExpanded] = useState(true)
+  const [animationProgress, setAnimationProgress] = useState(() => (
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 0
+  ))
+  const breakdownListRef = useRef<HTMLUListElement>(null)
+  const hasAnimatedRef = useRef(false)
   const panelId = useId()
+
+  useEffect(() => {
+    const breakdownList = breakdownListRef.current
+    if (!breakdownList || hasAnimatedRef.current) return
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      hasAnimatedRef.current = true
+      return
+    }
+
+    const scrollRoot = breakdownList.closest<HTMLElement>('.main-layout__scroll')
+    if (!scrollRoot) return
+
+    let animationFrameId: number | null = null
+    let hasScrollIntent = false
+
+    const startAnimation = () => {
+      if (hasAnimatedRef.current) return
+      hasAnimatedRef.current = true
+
+      const duration = 1100
+      let startedAt: number | null = null
+
+      const animate = (timestamp: number) => {
+        startedAt ??= timestamp
+        const elapsed = Math.min((timestamp - startedAt) / duration, 1)
+        const easedProgress = 1 - Math.pow(1 - elapsed, 3)
+
+        setAnimationProgress(easedProgress)
+
+        if (elapsed < 1) {
+          animationFrameId = window.requestAnimationFrame(animate)
+        }
+      }
+
+      animationFrameId = window.requestAnimationFrame(animate)
+    }
+
+    const markScrollIntent = () => {
+      hasScrollIntent = true
+    }
+
+    const handleScroll = () => {
+      if (!hasScrollIntent || hasAnimatedRef.current) return
+
+      const rootRect = scrollRoot.getBoundingClientRect()
+      const listRect = breakdownList.getBoundingClientRect()
+      const triggerLine = rootRect.top + rootRect.height * 0.78
+
+      if (listRect.top <= triggerLine && listRect.bottom > rootRect.top) {
+        startAnimation()
+      }
+    }
+
+    scrollRoot.addEventListener('wheel', markScrollIntent, { passive: true })
+    scrollRoot.addEventListener('touchstart', markScrollIntent, { passive: true })
+    scrollRoot.addEventListener('pointerdown', markScrollIntent, { passive: true })
+    scrollRoot.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('keydown', markScrollIntent)
+
+    return () => {
+      scrollRoot.removeEventListener('wheel', markScrollIntent)
+      scrollRoot.removeEventListener('touchstart', markScrollIntent)
+      scrollRoot.removeEventListener('pointerdown', markScrollIntent)
+      scrollRoot.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('keydown', markScrollIntent)
+      if (animationFrameId !== null) window.cancelAnimationFrame(animationFrameId)
+    }
+  }, [])
 
   return (
     <div className="result-breakdown">
@@ -65,15 +139,15 @@ function ResultBreakdown() {
         inert={!isExpanded}
       >
         <div className="result-breakdown__clip">
-          <ul className="result-breakdown__list">
+          <ul ref={breakdownListRef} className="result-breakdown__list">
             {jihoonSimilarResult.breakdown.map((item, index) => (
               <li key={item.id} className={index === 0 ? 'is-leading' : undefined}>
                 <div>
                   <span>{item.label}</span>
-                  <strong>{item.percent}%</strong>
+                  <strong>{Math.round(item.percent * animationProgress)}%</strong>
                 </div>
                 <span className={'result-breakdown__track' + (index === 0 ? ' result-breakdown__track--leader' : '')}>
-                  <i style={{ width: String(item.percent) + '%' }} />
+                  <i style={{ width: `${item.percent * animationProgress}%` }} />
                 </span>
               </li>
             ))}

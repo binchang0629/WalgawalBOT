@@ -12,7 +12,7 @@ import type { CaseCategory } from '../../../types'
 import useSession from '../../../hooks/useSession'
 import { MY_CASES } from '../../../data/personas/myCases'
 import Pagination from '../../../components/common/Pagination'
-import { toCaseDetail } from '../../../routes/paths'
+import { PATHS } from '../../../routes/paths'
 import searchIcon from '../../../assets/plaza/search-field.svg'
 import chevronDown from '../../../assets/icons/chevron-down.svg'
 
@@ -203,17 +203,13 @@ function CaseFeedSection() {
 
               return (
                 <li className="case-card" key={item.id}>
-                  {item.id === 'case-company-874' ? (
-                    <Link
-                      className="case-card__link"
-                      to={toCaseDetail(item.id)}
-                      aria-label={item.title.replace('\n', ' ') + ' 사건 상세 보기'}
-                    >
-                      {cardContent}
-                    </Link>
-                  ) : (
-                    <div className="case-card__content">{cardContent}</div>
-                  )}
+                  <Link
+                    className="case-card__link"
+                    to={PATHS.jihoonCaseDetail}
+                    aria-label={item.title.replace('\n', ' ') + ' 지난 사건 상세 보기'}
+                  >
+                    {cardContent}
+                  </Link>
                 </li>
               )
             })}

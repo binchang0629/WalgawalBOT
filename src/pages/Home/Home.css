@@ -125,8 +125,67 @@
 }
 
 .popular-case__meta b {
+    display: inline-flex;
+    justify-content: flex-end;
+    min-width: 4.2ch;
     color: var(--neutral-700);
-    font-weight: 500;
+    font-size: 15px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.participant-count__digit {
+    width: .68em;
+    height: 1.3em;
+    display: inline-block;
+    overflow: hidden;
+    perspective: 80px;
+}
+
+.participant-count__track {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+    transform: translateY(0);
+}
+
+.participant-count__track > span {
+    height: 1.3em;
+    flex: none;
+    backface-visibility: hidden;
+}
+
+.participant-count__digit.is-changing .participant-count__track {
+    animation: participant-digit-roll 480ms cubic-bezier(.22, 1, .36, 1) forwards;
+}
+
+.participant-count__comma {
+    width: .38em;
+    line-height: 1.3;
+    text-align: center;
+}
+
+@keyframes participant-digit-roll {
+    0% {
+        opacity: .55;
+        transform: translateY(0) rotateX(0deg);
+    }
+    55% {
+        opacity: 1;
+        transform: translateY(-.78em) rotateX(-18deg);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(-1.3em) rotateX(0deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .participant-count__digit.is-changing .participant-count__track {
+        animation: none;
+        transform: translateY(-1.3em);
+    }
 }
 
 .popular-case__cta {

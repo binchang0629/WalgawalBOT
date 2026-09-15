@@ -34,11 +34,11 @@ export const caseCategories: (CaseCategory | '전체')[] = [
 export type PlazaViewKey = 'latest' | 'popular' | 'voting' | 'closed' | 'recommended'
 
 export const plazaViewOptions: { key: PlazaViewKey; label: string; description: string }[] = [
-  { key: 'latest', label: '최신사건', description: '방금 올라온 순서' },
-  { key: 'popular', label: '인기사건', description: '조회가 많은 순서' },
-  { key: 'voting', label: '진행사건', description: '아직 투표 중' },
-  { key: 'closed', label: '해결사건', description: '판결이 끝남' },
-  { key: 'recommended', label: '추천사건', description: '내 사건과 같은 분야' },
+  { key: 'latest', label: '최신 사건', description: '방금 올라온 순서' },
+  { key: 'popular', label: '인기 사건', description: '조회가 많은 순서' },
+  { key: 'voting', label: '진행 사건', description: '아직 투표 중' },
+  { key: 'closed', label: '해결 사건', description: '판결이 끝남' },
+  { key: 'recommended', label: '추천 사건', description: '내 사건과 같은 분야' },
 ]
 
 /**

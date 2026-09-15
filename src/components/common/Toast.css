@@ -11,15 +11,12 @@
 
 /* 하단 내비게이션이나 고정 액션이 있는 화면에서는 UI를 가리지 않는다. */
 .app-viewport:has(.main-layout) .app-toast-layer {
-    padding-bottom: calc(var(--device-bottom-nav) + env(safe-area-inset-bottom, 0px) + 16px);
+    /* 중앙 사건 접수 CTA가 내비 위로 솟아 있으므로 실제 외곽선과도 여백을 둔다. */
+    padding-bottom: calc(var(--device-bottom-nav) + env(safe-area-inset-bottom, 0px) + 32px);
 }
 
 .app-viewport:has(.case-submit__footer) .app-toast-layer {
     padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
-}
-
-.app-viewport:has(.walbot-plan__footer) .app-toast-layer {
-    padding-bottom: calc(158px + env(safe-area-inset-bottom, 0px));
 }
 
 .app-toast {

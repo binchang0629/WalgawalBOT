@@ -1,3 +1,5 @@
+import showcaseBackground from '../assets/showcase/showcase-background.png'
+
 /**
  * 서비스·기기·시연 설정을 한곳에 모은다.
  * 배경, 기기 크기, 브레이크포인트를 바꿀 때는 이 파일만 고친다. (PROJECT_SPEC.md §2, §3)
@@ -5,7 +7,7 @@
 
 export const SERVICE = {
   name: '왈가왈BOT',
-  tagline: '갈등을 안전하게 정리하고, 다음 행동을 함께 찾는 곳',
+  tagline: 'AI 분석과 배심원 투표 결과를 한눈에',
 } as const
 
 /**
@@ -53,7 +55,7 @@ export const DESKTOP_BREAKPOINT = 1024
  * 이미지를 받으면 backgroundImage에 경로를 넣는다.
  */
 export const SHOWCASE_BACKGROUND = {
-  backgroundImage: null as string | null,
+  backgroundImage: showcaseBackground as string | null,
   gradient: 'linear-gradient(160deg, #eaf6ff 0%, #d8eaff 45%, #f9fafd 100%)',
   overlayOpacity: 0,
 } as const

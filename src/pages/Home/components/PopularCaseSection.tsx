@@ -1,9 +1,24 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import useCountdown from '../../../hooks/useCountdown'
 import SectionTitle from '../../../components/common/SectionTitle'
 import { homeIcons, homeImages } from '../homeAssets'
 import { homeSectionTitles, todayCase } from '../../../data/common/homeContent'
 import { toCaseDetail } from '../../../routes/paths'
+
+const PARTICIPANT_UPDATE_MIN_DELAY = 1000
+const PARTICIPANT_UPDATE_MAX_DELAY = 2600
+const PARTICIPANT_TARGET_COUNT = 1420
+const PARTICIPANT_INCREMENTS = [2, 3, 4, 4, 5, 6, 7, 8] as const
+
+function getRandomParticipantDelay() {
+  return PARTICIPANT_UPDATE_MIN_DELAY
+    + Math.random() * (PARTICIPANT_UPDATE_MAX_DELAY - PARTICIPANT_UPDATE_MIN_DELAY)
+}
+
+function getRandomParticipantIncrement() {
+  return PARTICIPANT_INCREMENTS[Math.floor(Math.random() * PARTICIPANT_INCREMENTS.length)]
+}
 
 /**
  * 01 Popular Case — 오늘의 사건. Figma `1402:7105`
@@ -15,9 +30,54 @@ import { toCaseDetail } from '../../../routes/paths'
  */
 function PopularCaseSection() {
   const countdown = useCountdown(todayCase.deadline, todayCase.id)
+  const [{ current: participantCount, previous: previousParticipantCount }, setParticipantCount] = useState<{
+    current: number
+    previous: number
+  }>({
+    current: todayCase.participantCount,
+    previous: todayCase.participantCount,
+  })
   const pad = (value: number) => String(value).padStart(2, '0')
   // `02:41:07` 같은 문자열을 한 글자씩 쪼개 칸으로 그린다. `:`은 구분자 칸이 된다.
   const countdownSlots = `${pad(countdown.hours)}:${pad(countdown.minutes)}:${pad(countdown.seconds)}`.split('')
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    let timerId: number | null = null
+    let currentCount: number = todayCase.participantCount
+
+    const scheduleNextUpdate = () => {
+      if (document.hidden || currentCount >= PARTICIPANT_TARGET_COUNT) return
+
+      timerId = window.setTimeout(() => {
+        const previous = currentCount
+        currentCount = Math.min(
+          currentCount + getRandomParticipantIncrement(),
+          PARTICIPANT_TARGET_COUNT,
+        )
+        setParticipantCount({ current: currentCount, previous })
+        scheduleNextUpdate()
+      }, getRandomParticipantDelay())
+    }
+
+    const handleVisibilityChange = () => {
+      if (timerId !== null) window.clearTimeout(timerId)
+      timerId = null
+      scheduleNextUpdate()
+    }
+
+    scheduleNextUpdate()
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      if (timerId !== null) window.clearTimeout(timerId)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [])
+
+  const participantCharacters = participantCount.toLocaleString().split('')
+  const previousParticipantCharacters = previousParticipantCount.toLocaleString().split('')
 
   return (
     <section className="popular-case">
@@ -63,8 +123,31 @@ function PopularCaseSection() {
                 <br />
                 {todayCase.titleSecondLine}
               </h1>
-              <p className="popular-case__meta">
-                배심원 <b>{todayCase.participantCount.toLocaleString()}</b>명 참여중
+              <p className="popular-case__meta" aria-label={`배심원 ${participantCount.toLocaleString()}명 참여 중`}>
+                배심원{' '}
+                <b className="participant-count" aria-hidden="true">
+                  {participantCharacters.map((character, index) => {
+                    if (character === ',') {
+                      return <span className="participant-count__comma" key={`comma-${index}`}>,</span>
+                    }
+
+                    const previousCharacter = previousParticipantCharacters[index] ?? character
+                    const isChanging = previousCharacter !== character
+
+                    return (
+                      <span
+                        className={`participant-count__digit${isChanging ? ' is-changing' : ''}`}
+                        key={`${participantCount}-${index}`}
+                      >
+                        <span className="participant-count__track">
+                          {isChanging && <span>{previousCharacter}</span>}
+                          <span>{character}</span>
+                        </span>
+                      </span>
+                    )
+                  })}
+                </b>
+                명 참여중
               </p>
             </div>
 

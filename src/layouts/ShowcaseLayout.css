@@ -59,23 +59,52 @@
 
 /* 왼쪽 패널은 기기 쪽으로 붙여 읽히도록 오른쪽 정렬한다. */
 .showcase__aside--left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
     text-align: right;
 }
 
 .showcase__title {
+    width: 266px;
     margin: 0;
-    font-family: var(--font-title);
-    font-size: 26px;
-    font-weight: 700;
-    line-height: 1.3;
-    color: var(--neutral-900);
+}
+
+.showcase__title img {
+    display: block;
+    width: 266px;
+    height: auto;
+    margin-left: auto;
 }
 
 .showcase__tagline {
-    margin: 8px 0 0;
-    font-size: 14px;
-    line-height: 1.5;
-    color: var(--neutral-600);
+    width: 266px;
+    margin: 14px 0 0;
+    color: var(--neutral-900);
+    font-family: var(--font-title);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.45;
+    letter-spacing: .34px;
+    text-align: right;
+    white-space: nowrap;
+    word-break: keep-all;
+}
+
+.showcase__tagline > span {
+    display: block;
+}
+
+.showcase__tagline strong {
+    font-weight: 700;
+}
+
+.showcase__tagline-ai {
+    color: var(--blue-700);
+}
+
+.showcase__tagline-jury {
+    color: var(--orange-700);
 }
 
 .showcase__hint {
@@ -87,6 +116,13 @@
     color: var(--blue-700);
     font-size: 13px;
     font-weight: 600;
+    align-self: flex-end;
+    transition: opacity 180ms ease;
+}
+
+.showcase__hint.is-hidden {
+    visibility: hidden;
+    opacity: 0;
 }
 
 .showcase__toggle {
