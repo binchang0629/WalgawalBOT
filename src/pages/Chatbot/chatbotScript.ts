@@ -75,11 +75,25 @@ export const ALWAYS_DISABLED_OPTION_IDS = new Set([
 
 export const RESTART_STEP_ID = 'restart'
 
+/** 자유 입력이 스크립트에 없을 때 "다른 도움 받기"를 고르면 이동하는 안내 스텝. */
+export const OTHER_HELP_STEP_ID = 'otherHelp'
+
 export const STEP_MAP: Record<string, BotStep> = {
   restart: {
     id: 'restart',
     blocks: [p('더 궁금한 점이 있으면 골라주세요.')],
     options: INITIAL_OPTIONS,
+  },
+
+  /** 자유 입력 안내(`services/chatbotService.ts`의 clarify 스텝)에서 "다른 도움 받기"를 골랐을 때. */
+  otherHelp: {
+    id: OTHER_HELP_STEP_ID,
+    blocks: [p('어떤 도움이 필요한지 선택해주세요.')],
+    options: [
+      { id: 'prep-questions', label: '상담 준비하기', next: 'questionList' },
+      { id: 'match-expert', label: '전문가 매칭 받기', next: 'expertMatchUnavailable' },
+      { id: 'expert-ranking', label: '전문가 랭킹 보기', next: 'expertRankingUnavailable' },
+    ],
   },
 
   howToUse: {

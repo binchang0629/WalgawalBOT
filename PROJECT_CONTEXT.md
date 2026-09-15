@@ -1,5 +1,14 @@
 # 왈가왈BOT 현재 상태
 
+## 챗봇 자유 입력 안내 플로우 변경 (2026-09-15)
+
+- 사용자가 선택 버튼 없이 임의의 텍스트를 입력했을 때(현재 스텝에 `freeTextNext`가 없을 때) 나오던 "음, 지금은 정해진 답변만 드릴 수 있어요. 아래에서 골라볼래요?" + 그 스텝의 기존 선택지 재노출을, "혹시 다른 도움이 필요하신가요? 지금 하던 내용을 이어가거나, 다른 도움을 받을 수 있어요." + `이어서 진행하기`/`다른 도움 받기` 2버튼으로 바꿨다.
+- `services/chatbotService.ts`의 `buildClarifyStep` 하나만 고쳤다. 이 함수가 자유 입력 안내가 나오는 유일한 지점이라(옵션 클릭이나 `freeTextNext`가 있는 스텝의 자유 입력은 그대로 기존 플로우를 탄다), 다른 대화 흐름은 건드리지 않았다.
+- `이어서 진행하기`(`continue-flow`)의 `next`는 자유 입력 직전에 있던 스텝의 id(`resumeStepId`, 없으면 `RESTART_STEP_ID`) 그대로다. `STEP_MAP`에서 같은 키를 다시 찾아오는 것뿐이라 원래 보여주던 문구·선택지가 그대로 복원된다. `reply.kind === 'clarify'`일 때는 기존처럼 `activeStepId`를 바꾸지 않으므로, 이 안내 화면에서 또 자유 입력을 보내도 원래 스텝 기준으로 같은 분기를 다시 탄다.
+- `다른 도움 받기`(`other-help`)는 새 스텝 `otherHelp`(`chatbotScript.ts`, `OTHER_HELP_STEP_ID`)로 이동한다. "어떤 도움이 필요한지 선택해주세요." 안내와 함께 `상담 준비하기`/`전문가 매칭 받기`/`전문가 랭킹 보기` 3개를 보여주는데, 이 세 id(`prep-questions`/`match-expert`/`expert-ranking`)는 이미 `consultCheck`에서 쓰던 것과 같아 `ALWAYS_DISABLED_OPTION_IDS`에 그대로 걸려 버튼만 보이고 클릭은 안 된다 — 기획대로 이 프로젝트에서 이후 화면·기능은 만들지 않는다.
+- `ChatOptionButtons`·선택 인터랙션(오렌지색 표시 → 그룹 사라짐 → 사용자 버블 추가 → 다음 응답)과 사용자/챗봇 메시지 버블 디자인은 전혀 건드리지 않았다. 새 스텝도 기존 `BotStep`/`p()` 형태를 그대로 썼다. `step.optionsLayout`은 기존에도 더 이상 읽지 않는 필드라 새 스텝에 넣지 않았다.
+- `npm run lint`, `npm run typecheck`, `npm run build` 통과. 기존 500kB 초과 청크 경고는 유지된다. 실제 브라우저 클릭 시연은 이번 세션에서 실행하지 않았다. → 확인 필요
+
 ## 챗봇 뒤로가기 기본 경로 보완 (2026-09-15)
 
 - 09-14 병합 기록에 남아 있던 "챗봇 직접 진입 뒤로가기 기본 경로 누락"을 해결했다. `ChatbotPage.tsx`는 이미 `useWizardBack(BACK_FALLBACK.chatbot)`을 쓰고 있었지만 `routes/paths.ts`의 `BACK_FALLBACK`에 `chatbot` 키 자체가 없어 값이 `undefined`였다.

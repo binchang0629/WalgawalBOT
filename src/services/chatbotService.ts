@@ -1,4 +1,10 @@
-import { RESTART_STEP_ID, STEP_MAP, type BotStep, type ChatOption } from '../pages/Chatbot/chatbotScript'
+import {
+  OTHER_HELP_STEP_ID,
+  RESTART_STEP_ID,
+  STEP_MAP,
+  type BotStep,
+  type ChatOption,
+} from '../pages/Chatbot/chatbotScript'
 
 /**
  * 챗봇 응답 처리 경계.
@@ -37,15 +43,26 @@ function pickStep(stepId: string): BotStep {
   return step
 }
 
+/**
+ * 자유 입력이 스크립트에 없을 때(현재 스텝에 `freeTextNext`가 없을 때) 보여주는 안내.
+ * 정해진 답변만 다시 보여주는 대신, 하던 대화를 이어갈지·다른 도움을 받을지 고르게 한다.
+ * `resumeStepId`가 원래 스텝과 같은 STEP_MAP 키라서 "이어서 진행하기"를 누르면
+ * `pickStep`이 그 스텝을 그대로 다시 돌려준다 — 원래 있던 선택지로 복귀하는 셈이다.
+ */
 function buildClarifyStep(currentStepId: string | null): BotStep {
   const currentStep = currentStepId ? STEP_MAP[currentStepId] : null
-  const fallbackOptions = currentStep?.options ?? STEP_MAP[RESTART_STEP_ID].options
+  const resumeStepId = currentStep?.id ?? RESTART_STEP_ID
 
   return {
-    id: currentStep?.id ?? RESTART_STEP_ID,
-    blocks: [{ kind: 'p', text: '음, 지금은 정해진 답변만 드릴 수 있어요. 아래에서 골라볼래요?' }],
-    optionsLayout: currentStep?.optionsLayout,
-    options: fallbackOptions,
+    id: resumeStepId,
+    blocks: [
+      { kind: 'p', text: '혹시 다른 도움이 필요하신가요?' },
+      { kind: 'p', text: '지금 하던 내용을 이어가거나, 다른 도움을 받을 수 있어요.' },
+    ],
+    options: [
+      { id: 'continue-flow', label: '이어서 진행하기', next: resumeStepId },
+      { id: 'other-help', label: '다른 도움 받기', next: OTHER_HELP_STEP_ID },
+    ],
   }
 }
 
