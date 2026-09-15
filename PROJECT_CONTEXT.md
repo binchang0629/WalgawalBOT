@@ -1,5 +1,24 @@
 # 왈가왈BOT 현재 상태
 
+## 챗봇 선택지 UI 개편 (2026-09-15)
+
+- 사용자 첨부 디자인 기준으로 챗봇(`/chatbot`) 대화 중 선택지 UI를 일괄 교체했다. 대상은 `ChatOptionButtons`(공용 선택 버튼 컴포넌트) 하나뿐이었다 — `STEP_MAP`의 모든 스텝(`caseIntro`의 2버튼 `actions`, `caseFocused`·`expertCheck`·`consultCheck` 등 여러 스텝의 세로 `chips`)이 같은 컴포넌트를 공유하고 있어 전수 검색으로 확인했다. 대화 시작 전 첫 화면(`ChatEmptyState`)의 추천 질문 칩은 애초에 메시지에 붙어 있던 적이 없는 별개 Figma 화면(`Chatbot/Initial`)이라 이번 범위에서 제외했다.
+- 선택지를 챗봇 말풍선(`chatbot-bot-content`) 안에서 빼내 `chatbot-msg--bot`의 형제 요소로 옮겼다. 부모가 이미 `align-items: center`라 별도 래퍼 없이 대화창 중앙에 놓인다. 기존 `actions`(2버튼 가로) / `chips`(세로 목록) 구분과 그 CSS(`chatbot-action*`, `chatbot-option*`)는 지우고, 모든 선택지가 같은 너비로 한 줄씩 쌓이는 `chatbot-select-group` / `chatbot-select-option` 하나로 통일했다. `step.optionsLayout` 데이터 필드 자체는 스크립트 데이터라 남겨뒀지만 더 이상 읽지 않는다.
+- 버튼은 `min-height`(고정 `height` 아님)로 만들어 문구가 길면 잘리지 않고 높이가 늘어난다. 기본 흰 배경, 고른 선택지만 `--orange-700`(#ff9524, 확정 스타일가이드 Secondary orange) 배경 + 흰 글자로 바뀐다.
+- 동작 흐름: 클릭 즉시 `pendingSelection` 상태로 같은 그룹의 다른 버튼과 재클릭을 막고 고른 버튼에 오렌지색(`selectedOptionId`)을 표시 → 320ms(`SELECT_FEEDBACK_MS`) 뒤 해당 봇 턴에 `optionsHidden: true`를 표시해 선택지 그룹 전체를 화면에서 제거하면서, 동시에 고른 문구를 기존 사용자 말풍선 컴포넌트로 대화 기록에 추가 → 이어서 기존 `runRequest`가 다음 봇 응답을 스크립트대로 가져온다. `ChatTurn`(`bot` variant)에 `optionsHidden?: boolean` 필드를 추가했다. 페이지 이탈 시 지연 타이머는 `useEffect` cleanup으로 정리한다.
+- 과거 턴은 `optionsHidden`이 참이면 `ChatOptionButtons` 자체를 렌더링하지 않아(이전에는 비활성 상태로 계속 남아 있었다) 다시 선택할 수 있는 것처럼 보이지 않는다. `isLatest && !isPending && !pendingSelection` 조건으로 항상 최신·미응답 선택지만 클릭 가능하다.
+- 대화 순서·분기(`STEP_MAP`)·`chatbotService.ts`의 mock 요청 로직·`ALWAYS_DISABLED_OPTION_IDS` 처리(예: "다른 사건 선택할래요")는 변경하지 않았다.
+- 검증: `npm run typecheck`, `npm run lint`, `npm run build` 통과(기존 500kB 청크 경고는 이번 변경과 무관하게 유지). 전체 검색으로 옛 `chatbot-action*`/`chatbot-option-list`/`chatbot-option` 클래스가 이 두 파일(`ChatOptionButtons.tsx`, `Chatbot.css`) 밖에는 없었음을 확인했다. 실제 브라우저 클릭 시연·402px 외 폭에서의 시각 검증은 이번 세션에서 실행하지 않았다. → 확인 필요
+
+### 챗봇 선택지 UI — Figma 디테일 보정 (2026-09-15)
+
+- 사용자 지정 Figma `ChatMessageList`(node `2168:6389`, 개발 페이지)를 `get_design_context` + `get_metadata`로 직접 읽어 위 개편에서 추측했던 값을 실측치로 맞췄다. `chatbot-select-option`·`chatbot-select-group`·`chatbot-msg--bot`(`Chatbot.css`)만 수정했고 컴포넌트 구조·상태 로직(`ChatbotPage.tsx`, `ChatOptionButtons.tsx`)은 건드리지 않았다.
+- 바뀐 값: 버튼 사이 간격 10→8px, 좌우 패딩 20→16px, 그림자 `rgba(0,0,0,.08)`→`.05`(Figma 그대로), 글자 15px/1.4→14px/1.3(Figma `text/txt/14_M`), 정렬 가운데→왼쪽(`text-align:left`, `justify-content:flex-start`), 글자색 `var(--neutral-900)`→`#000`(Figma가 문자 그대로 `text-black`을 쓰고 있어 그대로 반영). 기본 상태에 옅은 파랑 테두리(`1px solid #d9e4ff`)를 추가하고, 선택된 버튼에는 흰색 1px 테두리(`border-color:#fff`)를 더했다 — 둘 다 기존 코드엔 없던 값이다. `min-height`는 47px로 맞췄다(Figma에 같은 문구의 40px짜리 그룹도 섞여 있었지만, `get_metadata` 좌표로 대조해보니 실제 대화 흐름 위치가 아니라 같은 자리에 겹쳐진 사양 참고용 중복 노드였다 — 실제 흐름에 있는 두 인스턴스는 모두 47px).
+- `.chatbot-msg--bot`의 말풍선-선택지 간격을 16→40px로 올렸다. Figma에서 말풍선과 선택지 그룹 사이 간격이 다른 턴 사이 간격(`chatbot-thread`의 40px)과 정확히 같았다.
+- 선택지 그룹 폭은 그대로 `100%`(부모 콘텐츠 폭)를 유지했다. Figma는 328px/282px 같은 고정값을 쓰지만 402px 프레임 전용 값이라 더 좁은 화면(예 360px, 콘텐츠 폭 312px)에서는 그대로 쓰면 넘친다 — 직전 개편에서 정한 반응형 원칙(PROJECT_SPEC.md 3장)을 우선했다.
+- 검증: `npm run typecheck`, `npm run lint`, `npm run build` 통과(기존 500kB 청크 경고 유지). 실제 브라우저 시각 대조는 이번 세션에서 실행하지 않았다. → 확인 필요
+- 후속 사용자 요청으로 선택지 그룹 폭을 `100%`에서 `300px`(고정)로 바꿨다. 다만 콘텐츠 폭이 300px보다 좁은 화면에서 넘치지 않도록 `max-width: 100%`를 함께 둬서, 300px가 확보되면 300px로 고정되고 그보다 좁으면 폭에 맞춰 줄어든다. 부모(`chatbot-msg--bot`)가 `align-items: center`라 줄어든 폭에서도 계속 가운데 정렬된다.
+
 ## 왈가왈후 해결사건 연결 (2026-09-14)
 
 - 중복 인용문을 `다른 후일담 보러가기` CTA로 교체했다.
