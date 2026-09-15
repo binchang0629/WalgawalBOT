@@ -23,7 +23,7 @@ function FloatingChatButton() {
     return null
   }
 
-  const sitsAboveNavigation = [PATHS.home, PATHS.plaza, PATHS.afterStory, PATHS.my].some((route) => route === pathname)
+  const sitsAboveNavigation = [PATHS.home, PATHS.plaza, PATHS.afterStory, PATHS.afterStoryMine, PATHS.my].some((route) => route === pathname)
     || /^\/cases\/[^/]+(?:\/result)?$/.test(pathname)
 
   return (

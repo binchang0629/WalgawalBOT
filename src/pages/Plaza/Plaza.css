@@ -312,6 +312,12 @@
     background: var(--neutral-050);
 }
 
+/* 왈가왈후에서 들어오는 해결사건 전용 보기: 광장 홈 섹션 없이 목록에 집중한다. */
+.plaza-screen--case-only .case-feed {
+    min-height: calc(100dvh - var(--device-app-header));
+    padding-top: 28px;
+}
+
 .case-feed__header {
     display: flex;
     align-items: flex-start;

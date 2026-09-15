@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import {
   caseCategories,
   categoryDotColor,
@@ -21,8 +21,11 @@ type CategoryFilter = CaseCategory | '전체'
 const CASES_PER_PAGE = 4
 
 function CaseFeedSection() {
+  const [searchParams] = useSearchParams()
   const [category, setCategory] = useState<CategoryFilter>('전체')
-  const [view, setView] = useState<PlazaViewKey>('latest')
+  const [view, setView] = useState<PlazaViewKey>(() => (
+    searchParams.get('view') === 'closed' ? 'closed' : 'latest'
+  ))
   const [isViewOpen, setIsViewOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const viewRef = useRef<HTMLDivElement>(null)

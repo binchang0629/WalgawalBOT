@@ -140,8 +140,10 @@ export function AfterStoryHomePage() {
         </section>
 
         <section className="afterstory-story-summary">
-          <p>“먼저 사과한 뒤,<br />서로의 의견을 묻게 됐어요.”</p>
-          <small>친구 · 조별 과제에서 친구를 공개적으로 지적한 사건<br />공감 73 · 댓글 18</small>
+          <p>다른 사람들의 변화도<br />함께 살펴보세요.</p>
+          <Link className="afterstory-story-summary__link" to={`${PATHS.plaza}?view=closed&section=cases`}>
+            다른 후일담 보러가기 <span aria-hidden="true">→</span>
+          </Link>
         </section>
       </div>
     </main>
