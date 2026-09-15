@@ -1160,6 +1160,12 @@
     scrollbar-width: none;
     /* 마우스로 끌 수 있다는 걸 커서로 알린다. 터치는 원래대로 손가락 스와이프. */
     cursor: grab;
+    transition: margin-top 760ms cubic-bezier(.22, 1, .36, 1);
+}
+
+/* 열린 봉투의 아래 그림자와 후기 카드가 맞닿지 않도록 여백을 확보한다. */
+.letter.is-open + .story-scroll {
+    margin-top: 20px;
 }
 
 .story-scroll.is-dragging {
@@ -1943,6 +1949,8 @@ img.ai-card__mascot {
     opacity: 1;
     transform: translateX(-50%) translateY(0) scale(1);
     transition-delay: 160ms;
+    /* 위쪽 그림자는 남기되, 봉투 아래로 빠지는 종이 하단은 가린다. */
+    clip-path: inset(-24px 0 39px);
 }
 .letter .letter__content {
     opacity: 0;
