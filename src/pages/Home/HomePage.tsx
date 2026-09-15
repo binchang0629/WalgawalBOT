@@ -51,13 +51,13 @@ function HomePage() {
     <main className="home-screen">
       <TopBar />
       <PopularCaseSection />
-      <RecentCasesSection />
+      {isAuthenticated && <RecentCasesSection />}
       <AdBanner />
+      {!isAuthenticated && <CompactAiRecommendCard />}
       {isAuthenticated && <AiRecommendSection />}
       <BalanceGameSection key={personaId} />
       <CloseCallSection cta={cta} />
       <AfterStorySection />
-      <CompactAiRecommendCard />
     </main>
   )
 }

@@ -15,8 +15,8 @@ import './CaseDetailPage.css'
  * 사건 결과 화면(`CaseResultPage`의 `.vote-result__deadline`)과 같은 알약 한 덩어리로 맞췄다.
  * 예전에는 숫자를 칸칸이 나눠 그렸다. (2026-09-14 팀 요청)
  */
-function VoteDeadline({ value }: { value: string }) {
-  const countdown = useDemoCountdown(value)
+function VoteDeadline({ value, caseId }: { value: string; caseId: string }) {
+  const countdown = useDemoCountdown(value, caseId)
 
   return (
     <p className="case-overview__deadline" aria-label={`투표 마감까지 ${countdown}`}>
@@ -68,7 +68,7 @@ function CaseDetailPage() {
 
       <div className="case-detail__body">
         <section className="case-overview" aria-labelledby="case-title">
-          <VoteDeadline value={weddingGiftCase.deadline} />
+          <VoteDeadline value={weddingGiftCase.deadline} caseId={weddingGiftCase.id} />
 
           <div className="case-overview__category">
             <i aria-hidden="true" />

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import SectionTitle from '../../../components/common/SectionTitle'
 import { homeIcons } from '../homeAssets'
@@ -76,6 +76,8 @@ function needleAngle(splitAngle: number) {
 /** 최신 Figma 개발 시안의 게이지형 막상막하. 바꿔보기는 두 사건을 실제로 교환한다. */
 function CloseCallSection({ cta }: CloseCallSectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [isGaugeVisible, setIsGaugeVisible] = useState(false)
+  const sectionRef = useRef<HTMLElement>(null)
   const currentCase = closeCallCases[currentIndex]
   const nextCase = closeCallCases[(currentIndex + 1) % closeCallCases.length]
   const gap = Math.abs(currentCase.leftPercent - currentCase.rightPercent)
@@ -94,8 +96,28 @@ function CloseCallSection({ cta }: CloseCallSectionProps) {
     setCurrentIndex((index) => (index + 1) % closeCallCases.length)
   }
 
+  // 카드가 충분히 화면 안에 들어왔을 때 한 번만 채운다.
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+
+    if (!('IntersectionObserver' in window)) {
+      const frame = requestAnimationFrame(() => setIsGaugeVisible(true))
+      return () => cancelAnimationFrame(frame)
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      setIsGaugeVisible(true)
+      observer.disconnect()
+    }, { threshold: 0.35 })
+
+    observer.observe(section)
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <section className="close-section">
+    <section ref={sectionRef} className={isGaugeVisible ? 'close-section close-section--gauge-visible' : 'close-section'}>
       <SectionTitle
         title={homeSectionTitles.closeCall.title}
         description={homeSectionTitles.closeCall.description}
@@ -109,8 +131,8 @@ function CloseCallSection({ cta }: CloseCallSectionProps) {
         <div className="close-card__gauge" style={gaugeStyle}>
           {/* 눈금은 둥근 끝을 살려야 해서 conic-gradient 대신 선(stroke) 두 개로 그린다. */}
           <svg className="close-card__arc" viewBox="0 0 309 191" aria-hidden="true" focusable="false">
-            <path className="close-card__arc-left" d={arcPath(180, splitAngle)} />
-            <path className="close-card__arc-right" d={arcPath(splitAngle, 0)} />
+            <path className="close-card__arc-left" pathLength="100" d={arcPath(180, splitAngle)} />
+            <path className="close-card__arc-right" pathLength="100" d={arcPath(splitAngle, 0)} />
           </svg>
           {/* 겉은 실제 비율 각도, 속 <i>는 계속 흔들리는 몫. 둘을 나눠야 서로 안 엉킨다. */}
           <span className="close-card__needle" aria-hidden="true"><i /></span>

@@ -14,7 +14,7 @@ import { toCaseDetail } from '../../../routes/paths'
  * (`todayCase.deadline` → `weddingGiftCase.deadline` — PROJECT_SPEC.md §1-5)
  */
 function PopularCaseSection() {
-  const countdown = useCountdown(todayCase.deadline)
+  const countdown = useCountdown(todayCase.deadline, todayCase.id)
   const pad = (value: number) => String(value).padStart(2, '0')
   // `02:41:07` 같은 문자열을 한 글자씩 쪼개 칸으로 그린다. `:`은 구분자 칸이 된다.
   const countdownSlots = `${pad(countdown.hours)}:${pad(countdown.minutes)}:${pad(countdown.seconds)}`.split('')

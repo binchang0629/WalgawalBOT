@@ -1187,15 +1187,15 @@
 /* ---------------------------------------------------------------- */
 
 /*
- * 시안의 아래 여백은 160px이지만 그중 100px은 down_nav가 덮는 자리다.
- * 앱에서는 하단바가 이 스크롤 영역 바깥에 있으므로 60px만 남긴다.
+ * 위 광고와는 60px을 두고, 아래 밸런스 게임의 상단 60px과 겹치지 않도록
+ * 자체 하단 여백은 두지 않는다.
  */
 .ai-section {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 20px;
-    padding: 10px var(--content-gutter) 60px;
+    padding: 60px var(--content-gutter) 0;
 }
 
 .ai-card {
@@ -1259,6 +1259,21 @@ img.ai-card__mascot {
     filter: none;
 }
 .balance-board__draggable:active { cursor: grabbing; }
+/* 이미지 주변도 잡히는 투명 터치 영역. 실제 그림·이동 기준은 바꾸지 않는다. */
+.balance-board__draggable::before {
+    content: '';
+    position: absolute;
+    inset: -24px;
+    pointer-events: auto;
+}
+/* 깻잎은 젓가락 끝이 아닌 잎 중심(드래그 기준점 35%)을 중심으로 잡히게 한다. */
+.balance-section:not(.balance-section--mint) .balance-board__draggable::before {
+    top: -24px;
+    bottom: -24px;
+    left: -42px;
+    right: auto;
+    width: 172px;
+}
 .balance-board__subject {
     display: block;
     width: 100%;
@@ -1476,9 +1491,13 @@ img.ai-card__mascot {
     fill: none;
     stroke-width: 18;
     stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    transition: stroke-dashoffset 720ms cubic-bezier(.22, 1, .36, 1);
 }
 .close-card__arc-left { stroke: var(--blue-700); }
-.close-card__arc-right { stroke: var(--negative); }
+.close-card__arc-right { stroke: var(--negative); transition-delay: 70ms; }
+.close-section--gauge-visible .close-card__arc path { stroke-dashoffset: 0; }
 /*
  * 바늘은 두 겹이다.
  * 겉(span)은 비율에 따른 실제 각도를 맡고, 속(i)은 계속 흔들리는 몫을 맡는다.
@@ -1494,8 +1513,10 @@ img.ai-card__mascot {
     height: 60px;
     transform: rotate(var(--close-needle-angle));
     transform-origin: 50% 100%;
+    opacity: 0;
     transition: transform 280ms ease;
 }
+.close-section--gauge-visible .close-card__needle { opacity: 1; transition: opacity 180ms ease 520ms, transform 280ms ease; }
 
 .close-card__needle i {
     display: block;
@@ -1518,7 +1539,10 @@ img.ai-card__mascot {
     height: 14px;
     border-radius: 50%;
     background: var(--gauge-ink);
+    opacity: 0;
+    transition: opacity 180ms ease 520ms;
 }
+.close-section--gauge-visible .close-card__knob { opacity: 1; }
 
 /*
  * NYT 선거 바늘 방식. 기준값(실제 비율)을 중심으로 정해진 폭 안에서만 천천히 배회한다.
@@ -1582,7 +1606,10 @@ img.ai-card__mascot {
     width: 58px;
     height: 58px;
     transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 180ms ease 520ms;
 }
+.close-section--gauge-visible .close-card__mascot { opacity: 1; }
 .close-card__choice {
     position: absolute;
     top: 69px;
@@ -1592,7 +1619,10 @@ img.ai-card__mascot {
     gap: 1px;
     width: 56px;
     height: auto;
+    opacity: 0;
+    transition: opacity 180ms ease 520ms;
 }
+.close-section--gauge-visible .close-card__choice { opacity: 1; }
 .close-card__choice--left { left: 0; }
 .close-card__choice--right { right: 0; }
 .close-card__choice p {
@@ -1635,7 +1665,10 @@ img.ai-card__mascot {
     line-height: 1;
     text-align: center;
     transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 180ms ease 520ms;
 }
+.close-section--gauge-visible .close-card__gap { opacity: 1; }
 .close-card__gap b {
     color: var(--orange-700);
     font-family: var(--font-title);
@@ -1681,8 +1714,13 @@ img.ai-card__mascot {
     font-weight: 700;
 }
 @media (prefers-reduced-motion: reduce) {
-    .close-card__needle, .swap-card__bar i { transition: none; }
+    .close-card__arc path, .close-card__needle, .close-card__knob,
+    .close-card__mascot, .close-card__choice, .close-card__gap,
+    .swap-card__bar i { transition: none; }
     .close-card__needle i { animation: none; }
+    .close-card__arc path { stroke-dashoffset: 0; }
+    .close-card__needle, .close-card__knob, .close-card__mascot,
+    .close-card__choice, .close-card__gap { opacity: 1; }
 }
 
 /* 말풍선 꼬리와 본체는 하나의 SVG 외곽선으로 그려, 경계가 끊기지 않게 한다. */
@@ -1693,6 +1731,8 @@ img.ai-card__mascot {
     border: 0;
     border-radius: 0;
     background: transparent;
+    /* 그림자는 SVG 외곽선에만 적용한다. 버튼 상자에 적용하면 꼬리 아래에서 잘린다. */
+    filter: none;
     isolation: isolate;
 }
 .balance-choice__outline {
@@ -1703,6 +1743,7 @@ img.ai-card__mascot {
     width: 100%;
     height: calc(100% + 18px);
     overflow: visible;
+    filter: drop-shadow(0 4px 6px rgba(18, 20, 64, 0.08));
     pointer-events: none;
 }
 .balance-choice__outline path {

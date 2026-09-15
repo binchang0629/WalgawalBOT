@@ -97,7 +97,7 @@ function CaseResultPage() {
   const [commentReactions, setCommentReactions] = useState<Record<string, CommentReaction>>({})
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const nextCommentId = useRef(1)
-  const countdown = useDemoCountdown(weddingGiftResult.deadline)
+  const countdown = useDemoCountdown(weddingGiftResult.deadline, weddingGiftCase.id)
 
   if (caseId !== weddingGiftCase.id) return <MissingCase />
 

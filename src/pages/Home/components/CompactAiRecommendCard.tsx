@@ -1,14 +1,15 @@
 import useLoginGate from '../../../hooks/useLoginGate'
 import useSession from '../../../hooks/useSession'
+import SectionTitle from '../../../components/common/SectionTitle'
 import mascot from '../../../assets/home/figma/chat-mascot.png'
-import { aiRecommendation } from '../../../data/common/homeContent'
+import { aiRecommendation, homeSectionTitles } from '../../../data/common/homeContent'
 
 /**
  * 사용자 첨부 홈 최종 수정의 하단 소형 카드.
  *
  * 비로그인일 때는 AI 맞춤 추천의 진입점이 된다. 누르면 안내 팝업이 뜬다.
  * (Figma `2298:17673`) 로그인 상태에서는 위쪽 `AiRecommendSection`이 실제 추천을
- * 보여주므로 이 카드는 시안대로 정적 안내로 남는다.
+ * 보여주므로 홈에서는 비로그인 사용자에게만 렌더한다.
  */
 function CompactAiRecommendCard() {
   const { sessionStatus } = useSession()
@@ -27,6 +28,10 @@ function CompactAiRecommendCard() {
 
   return (
     <aside className="ai-section" aria-label="AI 추천 안내">
+      <SectionTitle
+        title={homeSectionTitles.aiRecommend.title}
+        description={homeSectionTitles.aiRecommend.description}
+      />
       {isAuthenticated ? (
         <div className="ai-card">{content}</div>
       ) : (

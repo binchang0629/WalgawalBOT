@@ -40,7 +40,7 @@ export const todayCase = {
     tail: ' 10만원은 적당한 금액일까요?',
   },
   aiKeyPoint: {
-    badge: '판별이가 짚은 핵심',
+    badge: '판멍이가 짚은 핵심',
     first: '관계의 깊이',
     second: '최근 교류',
     connector: '와 ',
