@@ -48,44 +48,14 @@
 }
 
 .login__service {
-    position: relative;
+    display: block;
     width: 134px;
-    height: 24.839px;
+    height: auto;
     margin-top: 16px;
 }
 
-.login__service img {
-    display: block;
-}
-
-.login__wordmarkKorean,
-.login__wordmarkEnglish {
-    position: absolute;
-    top: 2.52px;
-    height: 21px;
-}
-
-.login__wordmarkKorean { left: 0; width: 69px; }
-.login__wordmarkEnglish { left: 73px; width: 54px; }
-
-.login__wordmarkGavel {
-    position: absolute;
-    top: 0;
-    left: 108.94px;
-    display: grid;
-    place-items: center;
-    width: 25.061px;
-    height: 24.839px;
-}
-
-.login__wordmarkGavel img {
-    width: 17.8387px;
-    height: 18.4959px;
-    transform: rotate(-58.81deg);
-}
-
 .login__tagline {
-    margin: 12.161px 0 0;
+    margin: 14px 0 0;
     color: var(--neutral-800);
     font-size: 14px;
     font-weight: 400;

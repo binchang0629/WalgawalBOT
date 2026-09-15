@@ -221,6 +221,72 @@
     100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+.ranking-trophy-shines {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+}
+
+.ranking-trophy-shine {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 8px 2px rgb(255 244 177 / 72%);
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(18deg) scale(.2);
+    animation: ranking-trophy-glint 3.2s cubic-bezier(.2, .75, .25, 1) infinite both;
+}
+
+.ranking-trophy-shine::before,
+.ranking-trophy-shine::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, #fff 32% 68%, transparent);
+    transform: translate(-50%, -50%);
+}
+
+.ranking-trophy-shine::before {
+    width: 24px;
+    height: 2px;
+}
+
+.ranking-trophy-shine::after {
+    width: 2px;
+    height: 24px;
+    background: linear-gradient(180deg, transparent, #fff 32% 68%, transparent);
+}
+
+.ranking-trophy-shine--2 {
+    left: 21.5%;
+    top: 42%;
+    animation-delay: 1.2s;
+}
+
+.ranking-trophy-shine--1 {
+    left: 50%;
+    top: 34%;
+    animation-delay: 1.38s;
+}
+
+.ranking-trophy-shine--3 {
+    left: 78%;
+    top: 42%;
+    animation-delay: 1.56s;
+}
+
+@keyframes ranking-trophy-glint {
+    0% { opacity: 0; transform: translate(-50%, -50%) rotate(18deg) scale(.2); }
+    7% { opacity: .95; transform: translate(-50%, -50%) rotate(18deg) scale(1); }
+    14% { opacity: .72; transform: translate(-50%, -50%) rotate(18deg) scale(.72); }
+    22%, 100% { opacity: 0; transform: translate(-50%, -50%) rotate(18deg) scale(.25); }
+}
+
 .ranking-confetti {
     position: absolute;
     inset: 0;
@@ -276,6 +342,10 @@
     }
 
     .ranking-confetti {
+        display: none;
+    }
+
+    .ranking-trophy-shines {
         display: none;
     }
 }
@@ -430,14 +500,51 @@
 }
 
 .case-search {
+    --case-search-stroke-angle: 0deg;
+    position: relative;
     display: flex;
     align-items: center;
     gap: 8px;
     height: 46px;
     padding: 0 14px;
-    border: 1px solid var(--neutral-250);
+    border: 2px solid transparent;
     border-radius: 23px;
-    background: #fff;
+    background:
+        linear-gradient(#fff, #fff) padding-box,
+        conic-gradient(
+            from var(--case-search-stroke-angle),
+            var(--blue-100) 0deg 212deg,
+            var(--blue-150) 238deg,
+            rgb(143 192 255) 270deg,
+            var(--blue-200) 300deg,
+            rgb(143 192 255) 328deg,
+            var(--blue-150) 350deg,
+            var(--blue-100) 360deg
+        ) border-box;
+    box-shadow:
+        0 0 0 1px rgb(129 183 255 / 8%),
+        0 4px 12px rgb(77 142 253 / 7%);
+    overflow: hidden;
+    animation: case-search-stroke-orbit 2.6s linear infinite;
+    transition: box-shadow 160ms ease;
+}
+
+.case-search:focus-within {
+    box-shadow:
+        0 0 0 3px rgb(129 183 255 / 12%),
+        0 4px 12px rgb(55 75 255 / 5%);
+}
+
+@property --case-search-stroke-angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+}
+
+@keyframes case-search-stroke-orbit {
+    to {
+        --case-search-stroke-angle: 360deg;
+    }
 }
 
 .case-search__input {
@@ -457,6 +564,26 @@
 
 .case-search__input:focus {
     outline: none;
+}
+
+.case-search__result {
+    margin: 0;
+    color: var(--neutral-600);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.case-search__result b {
+    color: var(--blue-700);
+    font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .case-search {
+        --case-search-stroke-angle: 305deg;
+        animation: none;
+    }
+
 }
 
 .case-feed__body {
@@ -524,6 +651,19 @@
     border-radius: 12px;
     background: #fff;
     filter: drop-shadow(0 7px 9px rgba(31, 36, 128, .04));
+    animation: case-card-stagger-in 480ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes case-card-stagger-in {
+    from {
+        opacity: 0;
+        transform: translateY(16px) scale(.99);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .case-card__meta {
@@ -614,6 +754,12 @@
     outline: 2px solid var(--blue-700);
     outline-offset: 3px;
     border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .case-card {
+        animation: none;
+    }
 }
 
 .plaza-screen .app-pagination__page {

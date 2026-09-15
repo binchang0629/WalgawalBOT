@@ -6,7 +6,10 @@
 .signUp {
     display: flex;
     flex-direction: column;
-    min-height: 100%;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
     font-family: var(--font-body);
 }
 
@@ -28,8 +31,8 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 30px;
-    padding: 36px 24px 0;
+    gap: 20px;
+    padding: 48px 24px 0;
 }
 
 /*
@@ -39,7 +42,7 @@
  */
 .signUpDemoFill {
     position: absolute;
-    top: 8px;
+    top: 24px;
     right: 24px;
     padding: 0 0 1px;
     border: 0;
@@ -103,6 +106,12 @@
 
 .signUpInput:focus { outline: none; }
 .signUpInputNarrow { width: auto; flex: 1; }
+
+/* 발표용 자동 채우기 값은 실제 입력값보다 한 단계 부드럽게 보인다. */
+.signUpDemoValues .signUpInput,
+.signUpDemoValues .signUpSelectMonth {
+    color: var(--neutral-700);
+}
 
 .signUpAt {
     flex: none;
@@ -199,7 +208,7 @@
     align-items: center;
     justify-content: space-between;
     width: calc(100% - 48px);
-    margin: 30px 24px 0;
+    margin: 20px 24px 0;
     padding: 8px 0;
     border: 0;
     border-bottom: 1px solid var(--neutral-100);
@@ -260,4 +269,25 @@
 .signUpClear:focus-visible {
     outline: 3px solid var(--blue-700);
     outline-offset: 2px;
+}
+
+/* 작은 모바일 화면에서도 키 입력 전 전체 폼과 하단 CTA가 한 화면에 들어오게 압축한다. */
+@media (max-height: 760px) {
+    .signUpFields {
+        gap: 12px;
+        padding-top: 32px;
+    }
+
+    .signUpDemoFill {
+        top: 8px;
+    }
+
+    .signUpAgreeOpen {
+        margin-top: 14px;
+    }
+
+    .signUpFooter {
+        padding-top: 10px;
+        padding-bottom: 14px;
+    }
 }

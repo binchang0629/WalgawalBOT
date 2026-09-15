@@ -10,7 +10,7 @@
  * 실제 백엔드가 없는 데모 값이며 비밀번호는 어디에도 저장하지 않는다. (PROJECT_SPEC.md §6)
  */
 export const AUTH_DEMO_ACCOUNT = {
-  nickname: '서아',
+  nickname: '윤서아',
   emailId: 'seoa1001',
   emailDomain: 'wgwb.com',
   password: 'seoa123#',

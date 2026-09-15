@@ -34,6 +34,32 @@
     padding: 32px var(--content-gutter) 64px;
 }
 
+.my-page__content > .profile-card,
+.my-page__content > .plan-card,
+.my-page__content > .my-menu,
+.my-page__content > .expert-card,
+.my-page__content > .my-page__logout {
+    animation: my-section-rise-in 520ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.my-page__content > :nth-child(2) { animation-delay: 90ms; }
+.my-page__content > :nth-child(3) { animation-delay: 180ms; }
+.my-page__content > :nth-child(4) { animation-delay: 270ms; }
+.my-page__content > :nth-child(5) { animation-delay: 360ms; }
+.my-page__content > :nth-child(6) { animation-delay: 450ms; }
+
+@keyframes my-section-rise-in {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(.992);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
 /* ---------- 로그인 전 ---------- */
 
 .my-page--guest {
@@ -307,4 +333,14 @@
     .plan-card__intro h2 { min-height: 32px; line-height: 1.2; }
     .plan-card__mascot { width: 66px; height: 52px; right: 12px; }
     .plan-card__intro p { padding-top: 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .my-page__content > .profile-card,
+    .my-page__content > .plan-card,
+    .my-page__content > .my-menu,
+    .my-page__content > .expert-card,
+    .my-page__content > .my-page__logout {
+        animation: none;
+    }
 }

@@ -10,9 +10,7 @@ import googleIcon from '../../assets/auth/loginSocialGoogle.png'
 import naverIcon from '../../assets/auth/loginSocialNaver.svg'
 import kakaoIcon from '../../assets/auth/loginSocialKakao.svg'
 import loginMascot from '../../assets/auth/brand/loginMascot.png'
-import wordmarkKorean from '../../assets/auth/brand/loginWordmarkKorean.svg'
-import wordmarkEnglish from '../../assets/auth/brand/loginWordmarkEnglish.svg'
-import wordmarkGavel from '../../assets/auth/brand/loginWordmarkGavel.svg'
+import wgwbLogo from '../../assets/brand/wgwb-logo.svg'
 import './LoginPage.css'
 
 /**
@@ -45,10 +43,7 @@ function LoginPage() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [isDemoFilled, setIsDemoFilled] = useState(false)
 
-  /**
-   * 로그인 후 돌아갈 곳. 로그인 유도 팝업이 `from`으로 넘겨준다.
-   * 앱 내부 경로만 허용한다. 외부 URL은 받지 않는다. (PROJECT_SPEC.md §7-5)
-   */
+  /** 회원가입으로 이동할 때만 안전한 앱 내부 진입 경로를 이어준다. */
   const rawFrom = searchParams.get('from')
   const from = rawFrom && rawFrom.startsWith('/') && !rawFrom.startsWith('//') ? rawFrom : PATHS.home
 
@@ -68,7 +63,7 @@ function LoginPage() {
     // 먼저 포커스를 해제하고 목적지 화면을 한 프레임 완성한 뒤 보상 팝업을 띄운다.
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
     signIn(personaId)
-    navigate(from, { replace: true })
+    navigate(PATHS.home, { replace: true })
     window.requestAnimationFrame(() => {
       window.requestAnimationFrame(() => requestLoginReward('login'))
     })
@@ -78,14 +73,7 @@ function LoginPage() {
     <main className="login">
       <div className="login__brand">
         <img className="login__logo" src={loginMascot} width="62" height="62" alt="" />
-        {/* Figma 2264:13801 원본 벡터를 모든 로그인 상태에서 함께 사용한다. */}
-        <div className="login__service" role="img" aria-label="왈가왈BOT">
-          <img className="login__wordmarkKorean" src={wordmarkKorean} width="69" height="21" alt="" />
-          <img className="login__wordmarkEnglish" src={wordmarkEnglish} width="54" height="21" alt="" />
-          <span className="login__wordmarkGavel">
-            <img src={wordmarkGavel} width="17.8387" height="18.4959" alt="" />
-          </span>
-        </div>
+        <img className="login__service" src={wgwbLogo} width="134" height="23" alt="왈가왈BOT" />
         <p className="login__tagline">AI와 유저가 심판해주는 고민 판결 커뮤니티</p>
       </div>
 
