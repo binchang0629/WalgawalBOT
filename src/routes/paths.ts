@@ -52,4 +52,5 @@ export const toMyCaseResult = (caseId: string) => `/my/cases/${caseId}`
 export const BACK_FALLBACK: Record<string, string> = {
   cases: PATHS.plaza,
   afterstory: PATHS.afterStory,
+  chatbot: PATHS.home,
 }

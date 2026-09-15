@@ -1,5 +1,11 @@
 # 왈가왈BOT 현재 상태
 
+## 챗봇 뒤로가기 기본 경로 보완 (2026-09-15)
+
+- 09-14 병합 기록에 남아 있던 "챗봇 직접 진입 뒤로가기 기본 경로 누락"을 해결했다. `ChatbotPage.tsx`는 이미 `useWizardBack(BACK_FALLBACK.chatbot)`을 쓰고 있었지만 `routes/paths.ts`의 `BACK_FALLBACK`에 `chatbot` 키 자체가 없어 값이 `undefined`였다.
+- `BACK_FALLBACK.chatbot = PATHS.home`을 추가했다. 앱 내부에서 챗봇으로 들어온 경우(플로팅 버튼·홈 AI 카드 등)는 원래대로 `navigate(-1)`이 실제 이전 화면으로 돌아가고, `/chatbot`으로 직접 진입해 돌아갈 내부 기록이 없는 경우에만 이 기본값(홈)으로 이동한다.
+- `npm run lint`, `npm run typecheck`, `npm run build` 통과. 기존 500kB 초과 청크 경고는 유지된다. 다른 화면의 `useWizardBack` 사용(`cases`, `afterstory`)은 변경하지 않았다.
+
 ## 챗봇 선택지 UI 개편 (2026-09-15)
 
 - 사용자 첨부 디자인 기준으로 챗봇(`/chatbot`) 대화 중 선택지 UI를 일괄 교체했다. 대상은 `ChatOptionButtons`(공용 선택 버튼 컴포넌트) 하나뿐이었다 — `STEP_MAP`의 모든 스텝(`caseIntro`의 2버튼 `actions`, `caseFocused`·`expertCheck`·`consultCheck` 등 여러 스텝의 세로 `chips`)이 같은 컴포넌트를 공유하고 있어 전수 검색으로 확인했다. 대화 시작 전 첫 화면(`ChatEmptyState`)의 추천 질문 칩은 애초에 메시지에 붙어 있던 적이 없는 별개 Figma 화면(`Chatbot/Initial`)이라 이번 범위에서 제외했다.
