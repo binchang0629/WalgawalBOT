@@ -15,7 +15,9 @@ function ChatEmptyState({ options, onSelect, disabled }: ChatEmptyStateProps) {
     <div className="chatbot-empty">
       <div className="chatbot-empty__hero">
         <div className="chatbot-empty__avatar">
-          <img src={botLogo} alt="" width={68} height={68} />
+          <div className="chatbot-empty__avatar-fill">
+            <img src={botLogo} alt="" width={68} height={68} />
+          </div>
         </div>
         <div className="chatbot-empty__text">
           <h1 className="chatbot-empty__title">판멍이가 도와드릴게요!</h1>
