@@ -12,4 +12,3 @@ export type ChatTurn =
       /** 선택 완료 뒤 짧은 오렌지색 표시가 끝나면 true — 이 턴의 선택지 버튼을 더 이상 그리지 않는다. */
       optionsHidden?: boolean
     }
-  | { id: string; role: 'bot-error'; at: number }

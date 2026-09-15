@@ -564,41 +564,6 @@
     }
 }
 
-/* ---------- 오류 + 재시도 ---------- */
-
-.chatbot-error {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 12px 0;
-}
-
-.chatbot-error p {
-    margin: 0;
-    font-family: var(--font-body);
-    font-size: 14px;
-    color: var(--negative);
-}
-
-.chatbot-error__hint {
-    font-size: 12px;
-    color: var(--neutral-600);
-}
-
-.chatbot-error__retry {
-    align-self: flex-start;
-    height: 32px;
-    padding: 0 14px;
-    border: 1px solid var(--negative);
-    border-radius: 16px;
-    background: #fff;
-    font-family: var(--font-body);
-    font-weight: 500;
-    font-size: 13px;
-    color: var(--negative);
-}
-
 /* ---------- 입력창 ---------- */
 
 .chatbot-composer {

@@ -1,5 +1,15 @@
 # 왈가왈BOT 현재 상태
 
+## 챗봇 mock 오류·재시도 기능 삭제 (2026-09-15)
+
+- 챗봇 응답 12% 확률로 "답변을 가져오지 못했어요." + "다시 시도" 버튼을 보여주던 mock 오류 재현 기능을 완전히 제거했다. (기존: `services/chatbotService.ts`의 `MOCK_FAILURE_RATE`)
+- `chatbotService.ts` — `MOCK_FAILURE_RATE` 상수와 확률 실패 `throw` 블록 삭제. `requestChatbotReply`는 이제 지연(500~900ms) 후 항상 정상 응답만 돌려준다.
+- `ChatbotPage.tsx` — `retryRequest` state, `handleRetry`, `bot-error` 턴 렌더링(오류 문구·다시 시도 버튼) 삭제. `runRequest`의 `try/catch`도 더 이상 필요 없어 제거하고 단순 순차 실행으로 정리했다.
+- `pages/Chatbot/types.ts`의 `ChatTurn` 유니언에서 `{ role: 'bot-error' }` 분기를 삭제(`'user' | 'bot'` 두 가지만 남음).
+- `Chatbot.css`의 `.chatbot-error`/`.chatbot-error__hint`/`.chatbot-error__retry` 규칙도 다른 곳에서 쓰지 않는 것을 확인하고 함께 삭제했다.
+- 그 외 대화 플로우(선택 인터랙션, 로딩 표시, 사용자/챗봇 버블 등)는 변경하지 않았다.
+- `npm run lint`, `npm run typecheck`, `npm run build` 통과. 기존 500kB 초과 청크 경고는 유지된다.
+
 ## 마이페이지 섹션 순차 등장 (2026-09-15)
 
 - 로그인 상태의 마이페이지 진입 시 프로필 → 플랜 → 나의 활동 → 설정 → 전문가 정보 → 로그아웃 순서로 섹션이 90ms 간격을 두고 등장한다.
