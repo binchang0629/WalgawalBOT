@@ -67,6 +67,10 @@ export const ALWAYS_DISABLED_OPTION_IDS = new Set([
   'similar-cases',
   'has-messages',
   'not-sure',
+  'help-consult-prep',
+  'prep-questions',
+  'match-expert',
+  'expert-ranking',
 ])
 
 export const RESTART_STEP_ID = 'restart'
@@ -244,6 +248,7 @@ export const STEP_MAP: Record<string, BotStep> = {
     compact: true,
     blocks: [
       p('**그렇다면 상담 전에 아래 자료를 정리해두면 좋아요.**'),
+      p(''),
       list([
         '계약서',
         '계약금·입금 내역',
@@ -251,8 +256,13 @@ export const STEP_MAP: Record<string, BotStep> = {
         '잔금 지급일이 적힌 대화',
         '작업물이 실제 사용되고 있다면 관련 자료',
       ]),
+      p(''),
       p('지금 바로 **전문가를 찾아볼 수도 있고**,'),
       p('먼저 **상담 전에 필요한 내용을 더 정리할 수도 있어요.**'),
+    ],
+    options: [
+      { id: 'check-consult-needed', label: '상담이 필요한지 확인할래', next: 'consultCheck' },
+      { id: 'help-consult-prep', label: '상담 준비를 도와줘', next: 'questionList' },
     ],
     freeTextNext: 'consultCheck',
   },
@@ -262,20 +272,20 @@ export const STEP_MAP: Record<string, BotStep> = {
     id: 'consultCheck',
     blocks: [
       p('현재 확인된 내용만으로'),
-      p('**상담이 꼭 필요하다고 단정할 수는 없어요.**'),
+      p('**지금 당장 상담이 필요하다고 단정하기는 어려워요.**'),
       p(''),
       p('다만 잔금 지급이 지연되고 있고'),
-      p('관련 자료도 남아 있기 때문에,'),
-      p('자료를 정리한 뒤 **전문가 검토를 받을지 선택해볼 수 있는 단계**예요.'),
+      p('관련 자료도 남아 있는 만큼,'),
+      p('필요하다면 **전문가의 의견을 확인해볼 수 있는 단계**예요.'),
       p(''),
-      p('원하면 지금 사건에 맞춰'),
-      p('**상담할 때 물어볼 질문**도 정리해드릴게요.'),
+      p('전문가의 도움이 필요하다면'),
+      p('**상담 준비부터 전문가 찾기까지** 이어서 도와드릴게요.'),
     ],
     optionsLayout: 'chips',
     options: [
-      { id: 'prep-questions', label: '질문 정리해줘', next: 'questionList' },
-      { id: 'match-expert', label: '전문가 매칭해줘', next: 'expertMatchUnavailable' },
-      { id: 'expert-ranking', label: '전문가 랭킹 보여줘', next: 'expertRankingUnavailable' },
+      { id: 'prep-questions', label: '상담 준비하기', next: 'questionList' },
+      { id: 'match-expert', label: '전문가 매칭 받기', next: 'expertMatchUnavailable' },
+      { id: 'expert-ranking', label: '전문가 랭킹 보기', next: 'expertRankingUnavailable' },
     ],
   },
 
