@@ -911,6 +911,8 @@
 /* 열리면 편지지가 올라올 자리까지 카드가 자란다. */
 .letter.is-open {
     height: 362px;
+    /* 열린 편지지의 위쪽 drop-shadow는 카드 밖으로 자연스럽게 보여야 한다. */
+    overflow: visible;
 }
 
 /* 닫을 때 편지지가 봉투 아래로 내려가므로 카드 밖으로 삐져나오지 않게 자른다. */
@@ -1535,7 +1537,7 @@ img.ai-card__mascot {
     height: 191px;
 }
 /*
- * 눈금 두 줄. 끝을 둥글게 마감해야 시안과 같아서 conic-gradient를 버리고 stroke로 그린다.
+ * 눈금 두 줄. 파랑이 끝나는 자리에서 빨강이 이어지되, 바깥 끝은 둥글게 마감한다.
  * 파랑·빨강이 갈리는 각도는 컴포넌트가 실제 비율로 계산해 path에 넣는다.
  */
 .close-card__arc {
@@ -1552,11 +1554,21 @@ img.ai-card__mascot {
     stroke-linecap: round;
     stroke-dasharray: 100;
     stroke-dashoffset: 100;
-    transition: stroke-dashoffset 720ms cubic-bezier(.22, 1, .36, 1);
+    opacity: 0;
 }
-.close-card__arc-left { stroke: var(--blue-700); }
-.close-card__arc-right { stroke: var(--negative); transition-delay: 70ms; }
-.close-section--gauge-visible .close-card__arc path { stroke-dashoffset: 0; }
+.close-section--gauge-visible .close-card__arc-fill {
+    animation: close-gauge-fill 1.9s cubic-bezier(.42, 0, .58, 1) forwards;
+}
+@keyframes close-gauge-fill {
+    from {
+        stroke-dashoffset: 100;
+        opacity: 1;
+    }
+    to {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+}
 /*
  * 바늘은 두 겹이다.
  * 겉(span)은 비율에 따른 실제 각도를 맡고, 속(i)은 계속 흔들리는 몫을 맡는다.
@@ -1575,7 +1587,7 @@ img.ai-card__mascot {
     opacity: 0;
     transition: transform 280ms ease;
 }
-.close-section--gauge-visible .close-card__needle { opacity: 1; transition: opacity 180ms ease 520ms, transform 280ms ease; }
+.close-section--gauge-visible .close-card__needle { opacity: 1; transition: opacity 1ms linear 2s, transform 280ms ease; }
 
 .close-card__needle i {
     display: block;
@@ -1599,7 +1611,7 @@ img.ai-card__mascot {
     border-radius: 50%;
     background: var(--gauge-ink);
     opacity: 0;
-    transition: opacity 180ms ease 520ms;
+    transition: opacity 1ms linear 2s;
 }
 .close-section--gauge-visible .close-card__knob { opacity: 1; }
 
@@ -1666,7 +1678,7 @@ img.ai-card__mascot {
     height: 58px;
     transform: translateX(-50%);
     opacity: 0;
-    transition: opacity 180ms ease 520ms;
+    transition: opacity 1ms linear 2s;
 }
 .close-section--gauge-visible .close-card__mascot { opacity: 1; }
 .close-card__choice {
@@ -1678,10 +1690,11 @@ img.ai-card__mascot {
     gap: 1px;
     width: 56px;
     height: auto;
+    transform: translateY(6px);
     opacity: 0;
-    transition: opacity 180ms ease 520ms;
+    transition: opacity 200ms ease-out 2s, transform 200ms ease-out 2s;
 }
-.close-section--gauge-visible .close-card__choice { opacity: 1; }
+.close-section--gauge-visible .close-card__choice { opacity: 1; transform: translateY(0); }
 .close-card__choice--left { left: 0; }
 .close-card__choice--right { right: 0; }
 .close-card__choice p {
@@ -1723,11 +1736,11 @@ img.ai-card__mascot {
     font-weight: 700;
     line-height: 1;
     text-align: center;
-    transform: translateX(-50%);
+    transform: translate(-50%, 6px);
     opacity: 0;
-    transition: opacity 180ms ease 520ms;
+    transition: opacity 200ms ease-out 2s, transform 200ms ease-out 2s;
 }
-.close-section--gauge-visible .close-card__gap { opacity: 1; }
+.close-section--gauge-visible .close-card__gap { opacity: 1; transform: translate(-50%, 0); }
 .close-card__gap b {
     color: var(--orange-700);
     font-family: var(--font-title);
@@ -1776,8 +1789,9 @@ img.ai-card__mascot {
     .close-card__arc path, .close-card__needle, .close-card__knob,
     .close-card__mascot, .close-card__choice, .close-card__gap,
     .swap-card__bar i { transition: none; }
+    .close-card__arc path { animation: none; }
     .close-card__needle i { animation: none; }
-    .close-card__arc path { stroke-dashoffset: 0; }
+    .close-card__arc path { stroke-dashoffset: 0; opacity: 1; }
     .close-card__needle, .close-card__knob, .close-card__mascot,
     .close-card__choice, .close-card__gap { opacity: 1; }
 }
