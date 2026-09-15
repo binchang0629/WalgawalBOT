@@ -4,29 +4,13 @@
   overflow: hidden;
 }
 
-.case-submit--seoa .case-submit__header {
-  height: 64px;
-  display: grid;
-  grid-template-columns: 64px minmax(0, 1fr) 64px;
-}
-
-.case-submit--seoa .case-submit__temp-save {
-  justify-self: end;
-  color: var(--neutral-600);
-}
-
-.case-submit--seoa .case-submit__progress,
-.case-submit--seoa .case-submit__complete-spacer {
+.case-submit--seoa .case-submit__progress {
   flex: none;
   height: 56px;
 }
 
 .case-submit--seoa .case-submit__step-label {
   line-height: 1.3;
-}
-
-.case-submit--seoa .case-submit__progress-segment {
-  border-radius: 0;
 }
 
 .case-submit--seoa .case-submit__body {
@@ -39,21 +23,7 @@
   min-width: 0;
 }
 
-.case-submit--seoa.case-submit--writing .case-submit__body {
-  gap: 28px;
-}
-
 .case-submit--seoa .case-submit__label {
-  line-height: 1.3;
-}
-
-.case-submit--seoa .case-submit__helper {
-  color: var(--neutral-600);
-}
-
-.case-submit--seoa .case-submit__helper {
-  margin: 0;
-  font-size: 13px;
   line-height: 1.3;
 }
 

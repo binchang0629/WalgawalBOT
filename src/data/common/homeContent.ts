@@ -160,9 +160,9 @@ export const afterStoryQuotes = [
 /** AI 맞춤 추천 */
 export const aiRecommendation = {
   title: '내 고민과 닮은 사건이 있을까?',
-  lead: '관심사에 맞는 사건을',
-  highlight: 'AI챗봇 판멍이가 추천',
-  tail: '해드려요.',
+  lead: '로그인하고',
+  highlight: '관심사에 맞는 사건을 찾아보세요!',
+  tail: '',
 } as const
 
 /** 로그인 후 추천 시안 1473:8571. 9건은 예시 총수이며 아래 3건만 미리 표시한다.

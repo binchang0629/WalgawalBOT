@@ -1,5 +1,11 @@
 import { useState } from 'react'
-import { jurorRanking, rankingPanel, rankingTabs } from '../../../data/common/plazaContent'
+import {
+  jurorRanking,
+  rankingPanel,
+  rankingTabs,
+  voterRanking,
+  voterRankingPanel,
+} from '../../../data/common/plazaContent'
 import rankingArrow from '../../../assets/plaza/ranking-arrow.svg'
 import podium from '../../../assets/plaza/ranking-podium.png'
 import heroMascot from '../../../assets/plaza/ranking-mascot.png'
@@ -9,7 +15,10 @@ import heroTrophy from '../../../assets/plaza/ranking-trophy.png'
 const PODIUM_ORDER = [2, 1, 3] as const
 
 function RankingHeroSection() {
-  const [activeTab, setActiveTab] = useState<string>(rankingTabs[0].key)
+  const [activeTab, setActiveTab] = useState<(typeof rankingTabs)[number]['key']>(rankingTabs[0].key)
+  const currentPanel = activeTab === 'voter' ? voterRankingPanel : rankingPanel
+  const currentRanking = activeTab === 'voter' ? voterRanking : jurorRanking
+  const valueUnit = activeTab === 'voter' ? '표' : 'pt'
 
   return (
     <section className="ranking-hero" aria-labelledby="plaza-title">
@@ -26,7 +35,6 @@ function RankingHeroSection() {
         <img className="ranking-hero__trophy" src={heroTrophy} alt="" />
       </div>
       <div className="ranking-hero__content">
-        {/* 탭별 데이터 시안은 미제공이므로 기존 선택 상태 동작을 유지한다. */}
         <div className="ranking-tabs" role="group" aria-label="랭킹 기준">
           {rankingTabs.map((tab) => (
             <button key={tab.key} type="button" aria-pressed={activeTab === tab.key}
@@ -36,23 +44,24 @@ function RankingHeroSection() {
             </button>
           ))}
         </div>
-        <div className="ranking-panel">
+        {/* key로 탭 패널을 다시 만들어 최초 진입의 시상대·폭죽·반짝임을 그대로 재생한다. */}
+        <div className="ranking-panel" key={activeTab}>
           <div className="ranking-panel__header">
-            <h2 className="ranking-panel__title">{rankingPanel.title}</h2>
-            <p className="ranking-panel__description">{rankingPanel.description}</p>
+            <h2 className="ranking-panel__title">{currentPanel.title}</h2>
+            <p className="ranking-panel__description">{currentPanel.description}</p>
           </div>
           <div className="ranking-podium">
             <img className="ranking-podium__image" src={podium} alt="" />
             <ol className="ranking-list" aria-label="이달의 명판관 순위">
               {PODIUM_ORDER.map((rank) => {
-                const juror = jurorRanking.find((item) => item.rank === rank)
+                const juror = currentRanking.find((item) => item.rank === rank)
                 if (!juror) return null
                 return (
                   <li key={rank} value={rank} className={`ranking-item ranking-item--${rank}`}>
                     <span className="ranking-item__badge">{rank}위</span>
                     <div className="ranking-item__copy">
                       <p className="ranking-item__nickname">{juror.nickname}</p>
-                      <p className="ranking-item__point">{juror.point}<span>pt</span></p>
+                      <p className="ranking-item__point">{juror.point.toLocaleString('ko-KR')}<span>{valueUnit}</span></p>
                     </div>
                   </li>
                 )

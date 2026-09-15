@@ -3,7 +3,7 @@ import { PATHS } from '../../routes/paths'
 import CaseSubmitHeader from './components/CaseSubmitHeader'
 import CaseSubmitFooter from './components/CaseSubmitFooter'
 import useCaseSubmitDraft from './useCaseSubmitDraft'
-import panMungyeeJudge from '../../assets/submit/figma/imgPanMungyeeJudge.png'
+import panMungyeeJudge from '../../assets/submit/panmung-judge-hq.png'
 import './CaseSubmit.css'
 import './CaseSubmitCompletePage.css'
 
@@ -21,20 +21,26 @@ function CaseSubmitCompletePage() {
   }
 
   const handleBack = () => navigate(PATHS.home, { replace: true })
+  const handlePrimaryClick = () => {
+    navigate(personaId === 'A' ? PATHS.myCases : PATHS.home, { replace: true })
+  }
 
   return (
-    <div className={`case-submit${personaId === 'A' ? ' case-submit--seoa' : ''}`}>
+    <div className={`case-submit case-submit--complete${personaId === 'A' ? ' case-submit--seoa' : ''}`}>
       <CaseSubmitHeader onBack={handleBack} title="" showTempSave={false} />
-      {personaId === 'A' && <div className="case-submit__complete-spacer" aria-hidden="true" />}
+      <div className="case-submit__complete-spacer" aria-hidden="true" />
 
       <div className="case-submit__complete-body">
-        <img
-          src={panMungyeeJudge}
-          alt="판사 옷을 입은 판멍이 캐릭터"
-          className="case-submit__complete-art"
-          width={150}
-          height={122}
-        />
+        <div className="case-submit__complete-art-stage">
+          <span className="case-submit__complete-check" aria-hidden="true">✓</span>
+          <img
+            src={panMungyeeJudge}
+            alt="판사 옷을 입은 판멍이 캐릭터"
+            className="case-submit__complete-art"
+            width={150}
+            height={122}
+          />
+        </div>
         <div className="case-submit__complete-message">
           <h2 className="case-submit__heading">사건 접수 완료!</h2>
           <p className="case-submit__description">이제 내 사건에서 내용을 다시 확인할 수 있어요.</p>
@@ -48,7 +54,11 @@ function CaseSubmitCompletePage() {
         <p className="case-submit__complete-reminder">공개 범위는 내 사건에서 변경할 수 있어요.</p>
       </div>
 
-      <CaseSubmitFooter type="button" primaryLabel="홈으로 돌아가기" onPrimaryClick={handleBack} />
+      <CaseSubmitFooter
+        type="button"
+        primaryLabel={personaId === 'A' ? '접수한 내용 확인하기' : '홈으로 돌아가기'}
+        onPrimaryClick={handlePrimaryClick}
+      />
     </div>
   )
 }

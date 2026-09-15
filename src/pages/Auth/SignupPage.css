@@ -233,10 +233,15 @@
  */
 .signUpAgreeOpen:disabled { cursor: default; }
 
-/* 시안의 Footer / Sticky action — 높이 110, 위 12 아래 20. */
+/* 다른 완료 화면의 고정 CTA와 같은 위치: PC 목업은 홈 인디케이터 자리까지 포함한다. */
 .signUpFooter {
     margin-top: auto;
-    padding: 12px 24px 20px;
+    padding: 12px 24px 46px;
+}
+
+/* 실제 모바일에는 목업 홈 인디케이터가 없으므로 안전 영역 기준으로 맞춘다. */
+.showcase--mobile .signUpFooter {
+    padding-bottom: calc(22px + env(safe-area-inset-bottom, 0px));
 }
 
 .signUpSubmit {
@@ -288,6 +293,5 @@
 
     .signUpFooter {
         padding-top: 10px;
-        padding-bottom: 14px;
     }
 }

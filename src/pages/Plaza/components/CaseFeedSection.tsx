@@ -42,7 +42,10 @@ function CaseFeedSection() {
   ))
   const [isViewOpen, setIsViewOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
-  const [searchQuery, setSearchQuery] = useState('')
+  const routeSearchQuery = searchParams.get('q') ?? ''
+  const [searchQuery, setSearchQuery] = useState(routeSearchQuery)
+  const caseFeedRef = useRef<HTMLElement>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const viewRef = useRef<HTMLDivElement>(null)
 
   const { personaId } = useSession()
@@ -76,19 +79,29 @@ function CaseFeedSection() {
   const filteredCases =
     category === '전체' ? viewedCases : viewedCases.filter((item) => item.category === category)
   const normalizedSearchQuery = searchQuery.trim()
+  const exactSearchCategory = caseCategories.find((item) => item === normalizedSearchQuery)
   const searchCases = useMemo(() => {
     if (!normalizedSearchQuery) return []
+
+    if (exactSearchCategory) {
+      return exactSearchCategory === '전체'
+        ? viewedCases
+        : viewedCases.filter((item) => item.category === exactSearchCategory)
+    }
 
     const resultCases = DEMO_SEARCH_RESULT_IDS.map((id) => (
       plazaCases.find((item) => item.id === id)
     )).filter((item): item is (typeof plazaCases)[number] => Boolean(item))
+    if (resultCases.length === 0) return []
+
     const offset = Array.from(normalizedSearchQuery).reduce(
       (sum, character) => sum + (character.codePointAt(0) ?? 0),
       0,
     ) % resultCases.length
 
     return [...resultCases.slice(offset), ...resultCases.slice(0, offset)]
-  }, [normalizedSearchQuery])
+  }, [exactSearchCategory, normalizedSearchQuery, viewedCases])
+  const activeCategory = exactSearchCategory ?? category
   const displayedCases = normalizedSearchQuery ? searchCases : filteredCases
   const totalPages = Math.max(1, Math.ceil(displayedCases.length / CASES_PER_PAGE))
   const pageCases = displayedCases.slice(
@@ -128,8 +141,17 @@ function CaseFeedSection() {
     setCurrentPage(1)
   }
 
+  const handlePageChange = (nextPage: number) => {
+    if (nextPage === currentPage) return
+
+    setCurrentPage(nextPage)
+    requestAnimationFrame(() => {
+      caseFeedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
+
   return (
-    <section className="case-feed">
+    <section className="case-feed" ref={caseFeedRef}>
       <div className="case-feed__header">
         <div>
           <h2 className="case-feed__title">전체 사건</h2>
@@ -175,6 +197,7 @@ function CaseFeedSection() {
       <div className="case-search">
         <img src={searchIcon} alt="" width={24} height={24} />
         <input
+          ref={searchInputRef}
           type="search"
           className="case-search__input"
           placeholder="사연, 사건 키워드 또는 AI 추천 검색..."
@@ -186,6 +209,21 @@ function CaseFeedSection() {
             setCurrentPage(1)
           }}
         />
+        {searchQuery.length > 0 && (
+          <button
+            type="button"
+            className="case-search__clear"
+            aria-label="검색어 지우기"
+            onClick={() => {
+              setSearchQuery('')
+              setCategory('전체')
+              setCurrentPage(1)
+              window.requestAnimationFrame(() => searchInputRef.current?.focus())
+            }}
+          >
+            <span className="search-close-mark" aria-hidden="true" />
+          </button>
+        )}
       </div>
 
       <div className="case-feed__body">
@@ -195,8 +233,8 @@ function CaseFeedSection() {
               <button
                 key={item}
                 type="button"
-                className={category === item ? 'category-chip is-active' : 'category-chip'}
-                aria-pressed={category === item}
+                className={activeCategory === item ? 'category-chip is-active' : 'category-chip'}
+                aria-pressed={activeCategory === item}
                 onClick={() => handleCategoryChange(item)}
               >
                 {item}
@@ -210,7 +248,7 @@ function CaseFeedSection() {
             </p>
           )}
 
-          <ul className="case-list" key={`case-list-${category}`}>
+          <ul className="case-list" key={`case-list-${activeCategory}-${normalizedSearchQuery}`}>
             {pageCases.map((item, index) => {
               const cardContent = (
                 <>
@@ -270,7 +308,7 @@ function CaseFeedSection() {
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
-          onPageChange={setCurrentPage}
+          onPageChange={handlePageChange}
           ariaLabel="사건 목록 페이지"
         />
       </div>

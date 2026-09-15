@@ -96,20 +96,25 @@
 }
 
 .case-submit__progress-track {
-    display: flex;
-    gap: 8px;
-    height: 4px;
-}
-
-.case-submit__progress-segment {
-    flex: 1;
+    position: relative;
+    overflow: hidden;
     height: 4px;
     border-radius: 2px;
     background: var(--neutral-250);
 }
 
-.case-submit__progress-segment--active {
+.case-submit__progress-fill {
+    display: block;
+    width: var(--case-progress-to);
+    height: 100%;
+    border-radius: inherit;
     background: var(--orange);
+    animation: case-submit-progress-fill 440ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes case-submit-progress-fill {
+    from { width: var(--case-progress-from); }
+    to { width: var(--case-progress-to); }
 }
 
 /* ---------- Body ---------- */
@@ -133,6 +138,12 @@
     width: 0;
     height: 0;
     display: none;
+}
+
+/* 단계바를 본문 스크롤의 첫 요소로 두되, 기존 헤더 아래 배치는 그대로 유지한다. */
+.case-submit__body--with-progress > .case-submit__progress {
+    width: calc(100% + var(--content-gutter) + var(--content-gutter));
+    margin: -16px calc(0px - var(--content-gutter)) -8px;
 }
 
 .case-submit__intro {
@@ -187,6 +198,12 @@
 
 .case-submit__required {
     color: var(--blue);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .case-submit__progress-fill {
+        animation: none;
+    }
 }
 
 /* ---------- 삼지선다 답변 (지훈01·02 공통) ---------- */

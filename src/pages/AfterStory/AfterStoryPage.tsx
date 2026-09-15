@@ -3,8 +3,10 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import type { FormEvent } from 'react'
 import useLoginGate from '../../hooks/useLoginGate'
 import { PATHS } from '../../routes/paths'
+import CaseSubmitProgress from '../Submit/components/CaseSubmitProgress'
 import backIcon from '../../assets/my/back.svg'
 import walangJoy from '../../assets/submit/figma/imgCharacterWalangJoy.svg'
+import panMungyeeJudge from '../../assets/submit/panmung-judge-hq.png'
 import { homeImages } from '../Home/homeAssets'
 import scrollBackground from '../../assets/afterstory/figma/scroll-background.png'
 import writePencil from '../../assets/afterstory/figma/write-pencil.png'
@@ -223,8 +225,8 @@ export function WriteAfterStoryPage() {
   return (
     <form className="afterstory-flow" onSubmit={handleSubmit}>
       <AfterStoryHeader title="후일담 작성" onBack={() => navigate(PATHS.afterStoryMine)} />
-      <div className="afterstory-flow__progress"><span>1 / 2</span><i /><i /></div>
-      <div className="afterstory-flow__body">
+      <div className="afterstory-flow__body afterstory-flow__body--with-progress">
+        <CaseSubmitProgress step={1} totalSteps={2} label="후일담 작성" />
         <CaseContextCard />
         <section className="afterstory-flow__intro"><h1>그날 이후, 어떻게 달라졌나요?</h1><p>어떤 행동을 했고, 무엇이 달라졌나요?<br />아직 해결되지 않은 이야기라도 괜찮아요.</p></section>
         <section className="afterstory-field">
@@ -250,8 +252,8 @@ export function PreviewAfterStoryPage() {
   return (
     <main className="afterstory-flow">
       <AfterStoryHeader title="후일담 작성" onBack={() => navigate('/afterstory/write/friend')} />
-      <div className="afterstory-flow__progress"><span>2 / 2</span><i className="is-active" /><i className="is-active" /></div>
-      <div className="afterstory-flow__body">
+      <div className="afterstory-flow__body afterstory-flow__body--with-progress">
+        <CaseSubmitProgress step={2} totalSteps={2} label="게시 확인" />
         <section className="afterstory-preview-intro"><h1>이 이야기로 게시할까요?</h1><p>게시될 내용과 연결된 사건을 확인해주세요.</p></section>
         <CaseContextCard />
         <section className="afterstory-preview-content"><h2>내가 남길 후일담</h2><p>{content || '작성한 후일담이 여기에 표시됩니다.'}</p></section>
@@ -267,14 +269,20 @@ export function CompleteAfterStoryPage() {
   return (
     <main className="afterstory-flow afterstory-complete">
       <AfterStoryHeader title="후일담 작성" onBack={() => navigate(PATHS.afterStory)} />
+      <div className="afterstory-complete__spacer" aria-hidden="true" />
       <div className="afterstory-complete__body">
-        <img src={homeImages.judgeMascot} alt="" />
-        <h1>후일담 작성 완료!</h1>
-        <p>이제 내 사건에서 내용을 다시 확인할 수 있어요.</p>
+        <div className="afterstory-complete__art-stage">
+          <span className="afterstory-complete__check" aria-hidden="true">✓</span>
+          <img src={panMungyeeJudge} alt="판사 옷을 입은 판멍이 캐릭터" />
+        </div>
+        <div className="afterstory-complete__message">
+          <h1>후일담 작성 완료!</h1>
+          <p>이제 내 사건에서 내용을 다시 확인할 수 있어요.</p>
+        </div>
         <section><small>친구 · 내 후일담</small><h2>{CONNECTED_CASE.storyTitle.split('\n').map((line) => <span key={line}>{line}</span>)}</h2><p>{CONNECTED_CASE.context}</p></section>
         <em>공개 범위는 내 사건에서 변경할 수 있어요.</em>
       </div>
-      <footer className="afterstory-flow__footer"><button type="button" onClick={() => navigate(PATHS.afterStory)}>후일담 홈으로</button><small>다른 사람들의 후일담도 둘러보세요.</small></footer>
+      <footer className="afterstory-flow__footer afterstory-complete__footer"><button type="button" onClick={() => navigate(PATHS.home)}>홈으로</button><small>홈에서 다른 사건도 둘러보세요.</small></footer>
     </main>
   )
 }

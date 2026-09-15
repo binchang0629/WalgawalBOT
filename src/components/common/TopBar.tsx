@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 import wgwbLogo from '../../assets/brand/wgwb-logo.svg'
 import searchIcon from '../../assets/icons/search-topbar.svg'
-import notificationIcon from '../../assets/icons/notification.svg'
 import './TopBar.css'
 
 /**
@@ -19,13 +18,28 @@ import './TopBar.css'
 interface TopBarProps {
   /** 화면별 확정 시안에 별도 로고 표기가 있을 때만 지정한다. */
   logo?: ReactNode
-  /** 읽지 않은 알림 표시. 서버가 없어 지금은 화면에서 내려준다. */
-  hasUnreadNotification?: boolean
   /** 페이지 이름만 가운데에 두는 상세형 헤더. */
   title?: string
+  /** 검색창은 각 화면의 콘텐츠 영역에서 열고, 헤더는 트리거만 제공한다. */
+  onSearch?: () => void
+  isSearchOpen?: boolean
+  /** 로그인 상태는 현재 프로필 사진, 비로그인 상태는 기본 사람 아이콘. */
+  accountAvatar?: string
+  accountPersona?: 'A' | 'B'
+  onAccountSwitch?: () => void
+  isAccountSwitchOpen?: boolean
 }
 
-function TopBar({ hasUnreadNotification = false, logo, title }: TopBarProps) {
+function TopBar({
+  logo,
+  title,
+  onSearch,
+  isSearchOpen = false,
+  accountAvatar,
+  accountPersona,
+  onAccountSwitch,
+  isAccountSwitchOpen = false,
+}: TopBarProps) {
   if (title) {
     return (
       <header className="top-bar top-bar--title">
@@ -42,13 +56,28 @@ function TopBar({ hasUnreadNotification = false, logo, title }: TopBarProps) {
         {logo ?? <img src={wgwbLogo} width={100} height={18} alt="왈가왈BOT" />}
       </strong>
       <div className="top-bar__actions">
-        <button type="button" className="top-bar__action" aria-label="검색">
+        <button
+          type="button"
+          className="top-bar__action"
+          aria-label={isSearchOpen ? '검색창 닫기' : '검색창 열기'}
+          aria-expanded={isSearchOpen}
+          aria-controls="home-global-search"
+          onClick={onSearch}
+        >
           <img src={searchIcon} alt="" width={24} height={24} />
         </button>
-        <button type="button" className="top-bar__action" aria-label="알림">
-          <img src={notificationIcon} alt="" width={24} height={24} />
-          {hasUnreadNotification && <i className="top-bar__dot" aria-hidden="true" />}
-        </button>
+        {accountAvatar && onAccountSwitch && (
+          <button
+            type="button"
+            className={`top-bar__action top-bar__action--account${accountPersona ? ` top-bar__action--account-${accountPersona}` : ' top-bar__action--account-guest'}`}
+            aria-label={accountPersona ? '계정 전환' : '로그인하고 프로필 보기'}
+            aria-haspopup={accountPersona ? 'dialog' : undefined}
+            aria-expanded={accountPersona ? isAccountSwitchOpen : undefined}
+            onClick={onAccountSwitch}
+          >
+            <img src={accountAvatar} alt="" />
+          </button>
+        )}
       </div>
     </header>
   )

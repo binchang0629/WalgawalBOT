@@ -573,10 +573,58 @@
     color: var(--orange-700);
 }
 
+.result-comment__more {
+    position: relative;
+    flex: none;
+}
+
 .result-comment__menu {
+    display: grid;
+    place-items: center;
     width: 20px;
     height: 24px;
-    flex: none;
+    padding: 0;
+    border: 0;
+    background: none;
+}
+
+.result-comment__menu img {
+    display: block;
+    width: 20px;
+    height: 24px;
+}
+
+.result-comment__menu-popover {
+    position: absolute;
+    z-index: 6;
+    top: calc(100% + 4px);
+    right: 0;
+    width: 92px;
+    padding: 4px;
+    border: 1px solid var(--neutral-200);
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(37, 37, 37, .14);
+}
+
+.result-comment__menu-popover button {
+    width: 100%;
+    height: 34px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 7px;
+    background: none;
+    color: var(--neutral-800);
+    font: 500 13px/1 var(--font-body);
+    text-align: left;
+}
+
+.result-comment__menu-popover button:hover {
+    background: var(--neutral-050);
+}
+
+.result-comment__menu-popover button.is-delete {
+    color: var(--negative);
 }
 
 .result-comment>p {
@@ -585,6 +633,58 @@
     line-height: 1.3;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+}
+
+.result-comment__edit {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.result-comment__edit textarea {
+    width: 100%;
+    min-height: 72px;
+    padding: 10px 12px;
+    resize: vertical;
+    border: 1px solid var(--blue-300);
+    border-radius: 10px;
+    outline: 0;
+    color: var(--ink);
+    background: #fff;
+    font: 14px/1.45 var(--font-body);
+}
+
+.result-comment__edit textarea:focus {
+    box-shadow: 0 0 0 3px rgba(101, 158, 255, .12);
+}
+
+.result-comment__edit > div {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.result-comment__edit button {
+    min-width: 52px;
+    height: 30px;
+    padding: 0 10px;
+    border: 1px solid var(--neutral-200);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--neutral-700);
+    font: 600 12px/1 var(--font-body);
+}
+
+.result-comment__edit button.is-save {
+    border-color: var(--orange-700);
+    background: var(--orange-700);
+    color: #fff;
+}
+
+.result-comment__edit button.is-save:disabled {
+    border-color: var(--neutral-200);
+    background: var(--neutral-200);
+    color: var(--neutral-500);
 }
 
 .result-comment__actions {

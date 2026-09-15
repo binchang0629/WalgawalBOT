@@ -41,9 +41,10 @@ function CaseSubmitSummaryPage() {
   return (
     <div className={`case-submit${isSeoa ? ' case-submit--seoa' : ''}`}>
       <CaseSubmitHeader onBack={handleBack} />
-      <CaseSubmitProgress step={isSeoa ? 2 : 3} totalSteps={SUBMIT_SCENARIOS[personaId].totalSteps} label="요약 확인" />
 
-      <div className="case-submit__body">
+      <div className="case-submit__body case-submit__body--with-progress">
+        <CaseSubmitProgress step={isSeoa ? 2 : 3} totalSteps={SUBMIT_SCENARIOS[personaId].totalSteps} label="요약 확인" />
+
         <div className="case-submit__intro">
           <h2 className="case-submit__heading">이렇게 정리했어요</h2>
           <p className="case-submit__description">내용이 맞는지 확인하고, 다른 부분은 수정해 주세요.</p>

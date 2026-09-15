@@ -10,6 +10,7 @@ import menuIcon from '../../assets/case/result/menu.svg'
 import quoteDivider from '../../assets/case/result/quote-divider.svg'
 import storyLinkIcon from '../../assets/case/result/story-link.svg'
 import submitIcon from '../../assets/case/result/submit.svg'
+import ConfirmDialog from '../../components/common/ConfirmDialog'
 import Pagination from '../../components/common/Pagination'
 import {
   jihoonSimilarCase,
@@ -158,12 +159,33 @@ function ResultBreakdown() {
   )
 }
 
-function CommentItem({ comment, reaction, onReact }: {
+function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
   comment: JihoonSimilarComment
   reaction: CommentReaction
   onReact: (reaction: Exclude<CommentReaction, null>) => void
+  onEdit?: (body: string) => void
+  onDelete?: () => void
 }) {
   const tone = comment.voteId ? voteDisplay[comment.voteId].tone : null
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editDraft, setEditDraft] = useState(comment.body)
+  const editRef = useRef<HTMLTextAreaElement>(null)
+
+  const beginEdit = () => {
+    setEditDraft(comment.body)
+    setIsMenuOpen(false)
+    setIsEditing(true)
+    requestAnimationFrame(() => editRef.current?.focus())
+  }
+
+  const submitEdit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const body = editDraft.trim()
+    if (!body || !onEdit) return
+    onEdit(body)
+    setIsEditing(false)
+  }
 
   return (
     <article className="result-comment">
@@ -175,9 +197,45 @@ function CommentItem({ comment, reaction, onReact }: {
         {tone && comment.voteLabel && (
           <strong className={'result-comment__badge is-' + tone}>{comment.voteLabel}</strong>
         )}
-        <img className="result-comment__menu" src={menuIcon} alt="" aria-hidden="true" />
+        {onEdit && onDelete && (
+          <div className="result-comment__more">
+            <button
+              type="button"
+              className="result-comment__menu"
+              aria-label="댓글 더보기"
+              aria-haspopup="menu"
+              aria-expanded={isMenuOpen}
+              onClick={() => setIsMenuOpen((open) => !open)}
+            >
+              <img src={menuIcon} alt="" />
+            </button>
+            {isMenuOpen && (
+              <div className="result-comment__menu-popover" role="menu">
+                <button type="button" role="menuitem" onClick={beginEdit}>수정</button>
+                <button type="button" role="menuitem" className="is-delete" onClick={() => {
+                  setIsMenuOpen(false)
+                  onDelete()
+                }}>삭제</button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-      <p>{comment.body}</p>
+      {isEditing ? (
+        <form className="result-comment__edit" onSubmit={submitEdit}>
+          <textarea
+            ref={editRef}
+            value={editDraft}
+            onChange={(event) => setEditDraft(event.target.value)}
+            maxLength={300}
+            aria-label="댓글 수정 내용"
+          />
+          <div>
+            <button type="button" onClick={() => setIsEditing(false)}>취소</button>
+            <button type="submit" className="is-save" disabled={!editDraft.trim()}>저장</button>
+          </div>
+        </form>
+      ) : <p>{comment.body}</p>}
       <div className="result-comment__actions">
         <button
           type="button"
@@ -195,7 +253,6 @@ function CommentItem({ comment, reaction, onReact }: {
         >
           <img src={dislikeIcon} alt="" /> 반대 {comment.dislikes + (reaction === 'dislike' ? 1 : 0)}
         </button>
-        <span>대댓글 달기</span>
       </div>
     </article>
   )
@@ -208,6 +265,7 @@ function ClosedCaseResultPage() {
   const [draft, setDraft] = useState('')
   const [addedComments, setAddedComments] = useState<JihoonSimilarComment[]>([])
   const [currentPage, setCurrentPage] = useState(1)
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const [commentReactions, setCommentReactions] = useState<Record<string, CommentReaction>>({})
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const nextCommentId = useRef(1)
@@ -329,6 +387,12 @@ function ClosedCaseResultPage() {
                   ...previous,
                   [comment.id]: previous[comment.id] === reaction ? null : reaction,
                 }))}
+                onEdit={comment.id.startsWith('new-comment-') ? (body) => {
+                  setAddedComments((comments) => comments.map((item) => (
+                    item.id === comment.id ? { ...item, body, createdAt: '방금 전 · 수정됨' } : item
+                  )))
+                } : undefined}
+                onDelete={comment.id.startsWith('new-comment-') ? () => setPendingDeleteId(comment.id) : undefined}
               />
             ))}
           </div>
@@ -350,6 +414,23 @@ function ClosedCaseResultPage() {
           </article>
         </section>
       </div>
+      {pendingDeleteId && (
+        <ConfirmDialog
+          title="댓글을 삭제하시겠습니까?"
+          confirmLabel="삭제"
+          onClose={() => setPendingDeleteId(null)}
+          onConfirm={() => {
+            const commentId = pendingDeleteId
+            setAddedComments((comments) => comments.filter((item) => item.id !== commentId))
+            setCommentReactions((previous) => {
+              const next = { ...previous }
+              delete next[commentId]
+              return next
+            })
+            setPendingDeleteId(null)
+          }}
+        />
+      )}
     </main>
   )
 }

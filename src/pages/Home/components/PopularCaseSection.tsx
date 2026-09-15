@@ -5,6 +5,10 @@ import SectionTitle from '../../../components/common/SectionTitle'
 import { homeIcons, homeImages } from '../homeAssets'
 import { homeSectionTitles, todayCase } from '../../../data/common/homeContent'
 import { toCaseDetail } from '../../../routes/paths'
+import {
+  getRememberedCaseParticipantCount,
+  rememberCaseParticipantCount,
+} from '../../../utils/caseParticipantCount'
 
 const PARTICIPANT_UPDATE_MIN_DELAY = 1000
 const PARTICIPANT_UPDATE_MAX_DELAY = 2600
@@ -33,9 +37,16 @@ function PopularCaseSection() {
   const [{ current: participantCount, previous: previousParticipantCount }, setParticipantCount] = useState<{
     current: number
     previous: number
-  }>({
-    current: todayCase.participantCount,
-    previous: todayCase.participantCount,
+  }>(() => {
+    const rememberedCount = getRememberedCaseParticipantCount(
+      todayCase.id,
+      todayCase.participantCount,
+    )
+
+    return {
+      current: rememberedCount,
+      previous: rememberedCount,
+    }
   })
   const pad = (value: number) => String(value).padStart(2, '0')
   // `02:41:07` 같은 문자열을 한 글자씩 쪼개 칸으로 그린다. `:`은 구분자 칸이 된다.
@@ -45,7 +56,10 @@ function PopularCaseSection() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     let timerId: number | null = null
-    let currentCount: number = todayCase.participantCount
+    let currentCount = getRememberedCaseParticipantCount(
+      todayCase.id,
+      todayCase.participantCount,
+    )
 
     const scheduleNextUpdate = () => {
       if (document.hidden || currentCount >= PARTICIPANT_TARGET_COUNT) return
@@ -151,7 +165,11 @@ function PopularCaseSection() {
               </p>
             </div>
 
-            <Link className="popular-case__cta" to={toCaseDetail(todayCase.id)}>
+            <Link
+              className="popular-case__cta"
+              to={toCaseDetail(todayCase.id)}
+              onClick={() => rememberCaseParticipantCount(todayCase.id, participantCount)}
+            >
               {todayCase.ctaLabel}
               <img src={homeIcons.btnArrow} alt="" aria-hidden="true" />
             </Link>
