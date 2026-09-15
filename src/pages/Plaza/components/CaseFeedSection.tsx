@@ -19,6 +19,20 @@ import chevronDown from '../../../assets/icons/chevron-down.svg'
 type CategoryFilter = CaseCategory | '전체'
 
 const CASES_PER_PAGE = 4
+const DEMO_SEARCH_RESULT_IDS = [
+  'case-friend-loan',
+  'case-dating-phone',
+  'case-company-874',
+  'case-family-care',
+  'case-school-ai-report',
+  'case-invite-ex',
+  'case-work-new-hire',
+  'case-secret-told',
+  'case-family-moving',
+  'case-group-project-credit',
+  'case-dating-anniversary',
+  'case-work-after-hours',
+] as const
 
 function CaseFeedSection() {
   const [searchParams] = useSearchParams()
@@ -28,6 +42,7 @@ function CaseFeedSection() {
   ))
   const [isViewOpen, setIsViewOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
+  const [searchQuery, setSearchQuery] = useState('')
   const viewRef = useRef<HTMLDivElement>(null)
 
   const { personaId } = useSession()
@@ -60,8 +75,23 @@ function CaseFeedSection() {
 
   const filteredCases =
     category === '전체' ? viewedCases : viewedCases.filter((item) => item.category === category)
-  const totalPages = Math.max(1, Math.ceil(filteredCases.length / CASES_PER_PAGE))
-  const pageCases = filteredCases.slice(
+  const normalizedSearchQuery = searchQuery.trim()
+  const searchCases = useMemo(() => {
+    if (!normalizedSearchQuery) return []
+
+    const resultCases = DEMO_SEARCH_RESULT_IDS.map((id) => (
+      plazaCases.find((item) => item.id === id)
+    )).filter((item): item is (typeof plazaCases)[number] => Boolean(item))
+    const offset = Array.from(normalizedSearchQuery).reduce(
+      (sum, character) => sum + (character.codePointAt(0) ?? 0),
+      0,
+    ) % resultCases.length
+
+    return [...resultCases.slice(offset), ...resultCases.slice(0, offset)]
+  }, [normalizedSearchQuery])
+  const displayedCases = normalizedSearchQuery ? searchCases : filteredCases
+  const totalPages = Math.max(1, Math.ceil(displayedCases.length / CASES_PER_PAGE))
+  const pageCases = displayedCases.slice(
     (currentPage - 1) * CASES_PER_PAGE,
     currentPage * CASES_PER_PAGE,
   )
@@ -86,11 +116,13 @@ function CaseFeedSection() {
   }, [isViewOpen])
 
   const handleCategoryChange = (nextCategory: CategoryFilter) => {
+    setSearchQuery('')
     setCategory(nextCategory)
     setCurrentPage(1)
   }
 
   const handleViewChange = (nextView: PlazaViewKey) => {
+    setSearchQuery('')
     setView(nextView)
     setIsViewOpen(false)
     setCurrentPage(1)
@@ -146,8 +178,13 @@ function CaseFeedSection() {
           type="search"
           className="case-search__input"
           placeholder="사연, 사건 키워드 또는 AI 추천 검색..."
-          disabled
-          title="검색 동작은 시안 확정 후 연결됩니다"
+          value={searchQuery}
+          aria-label="사연 및 사건 키워드 검색"
+          onChange={(event) => {
+            setSearchQuery(event.target.value)
+            setCategory('전체')
+            setCurrentPage(1)
+          }}
         />
       </div>
 
@@ -167,8 +204,14 @@ function CaseFeedSection() {
             ))}
           </div>
 
-          <ul className="case-list">
-            {pageCases.map((item) => {
+          {normalizedSearchQuery && (
+            <p className="case-search__result" aria-live="polite">
+              <b>‘{normalizedSearchQuery}’</b> 관련 사건을 모아봤어요
+            </p>
+          )}
+
+          <ul className="case-list" key={`case-list-${category}`}>
+            {pageCases.map((item, index) => {
               const cardContent = (
                 <>
                   <div className="case-card__meta">
@@ -202,7 +245,11 @@ function CaseFeedSection() {
               )
 
               return (
-                <li className="case-card" key={item.id}>
+                <li
+                  className="case-card"
+                  key={item.id}
+                  style={{ animationDelay: `${index * 90}ms` }}
+                >
                   <Link
                     className="case-card__link"
                     to={PATHS.jihoonCaseDetail}

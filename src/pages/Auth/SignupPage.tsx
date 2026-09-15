@@ -61,6 +61,7 @@ function SignupPage() {
   const [birthYear, setBirthYear] = useState('')
   const [birthMonth, setBirthMonth] = useState('')
   const [birthDay, setBirthDay] = useState('')
+  const [isDemoFilled, setIsDemoFilled] = useState(false)
   const [agree, setAgree] = useState<AgreeState>(DEFAULT_AGREE)
   /*
    * 시트를 연 경로를 기억한다. null 이면 닫힌 상태다.
@@ -83,6 +84,7 @@ function SignupPage() {
     setBirthYear(AUTH_DEMO_ACCOUNT.birthYear)
     setBirthMonth(AUTH_DEMO_ACCOUNT.birthMonth)
     setBirthDay(AUTH_DEMO_ACCOUNT.birthDay)
+    setIsDemoFilled(true)
   }
 
   const handleComplete = () => {
@@ -93,7 +95,7 @@ function SignupPage() {
   }
 
   return (
-    <main className="signUp">
+    <main className={isDemoFilled ? 'signUp signUpDemoValues' : 'signUp'}>
       <div className="signUpFields">
         <button type="button" className="signUpDemoFill" onClick={handleDemoFill}>
           서아 계정으로 채우기
@@ -110,7 +112,10 @@ function SignupPage() {
               type="text"
               value={nickname}
               maxLength={6}
-              onChange={(event) => setNickname(event.target.value)}
+              onChange={(event) => {
+                setIsDemoFilled(false)
+                setNickname(event.target.value)
+              }}
             />
           </div>
           <p className={isNicknameValid ? 'signUpHelp signUpHelpOk' : 'signUpHelp'}>
@@ -130,7 +135,10 @@ function SignupPage() {
                 type="text"
                 autoComplete="username"
                 value={emailId}
-                onChange={(event) => setEmailId(event.target.value)}
+                onChange={(event) => {
+                  setIsDemoFilled(false)
+                  setEmailId(event.target.value)
+                }}
               />
             </div>
             <span className="signUpAt" aria-hidden="true">@</span>
@@ -144,7 +152,10 @@ function SignupPage() {
                   placeholder="직접 입력"
                   value={emailDomain}
                   autoFocus
-                  onChange={(event) => setEmailDomain(event.target.value)}
+                  onChange={(event) => {
+                    setIsDemoFilled(false)
+                    setEmailDomain(event.target.value)
+                  }}
                   onBlur={() => {
                     if (emailDomain.trim() === '') {
                       setIsCustomDomain(false)
@@ -159,6 +170,7 @@ function SignupPage() {
                   ariaLabel="이메일 도메인"
                   closedLabel={emailDomain}
                   onChange={(next) => {
+                    setIsDemoFilled(false)
                     if (next === CUSTOM_DOMAIN) {
                       setIsCustomDomain(true)
                       setEmailDomain('')
@@ -185,7 +197,10 @@ function SignupPage() {
                 type={isPasswordVisible ? 'text' : 'password'}
                 autoComplete="new-password"
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                onChange={(event) => {
+                  setIsDemoFilled(false)
+                  setPassword(event.target.value)
+                }}
               />
               <button
                 type="button"
@@ -198,7 +213,10 @@ function SignupPage() {
               </button>
             </div>
             {password !== '' && (
-              <button type="button" className="signUpClear" onClick={() => setPassword('')} aria-label="비밀번호 지우기">
+              <button type="button" className="signUpClear" onClick={() => {
+                setIsDemoFilled(false)
+                setPassword('')
+              }} aria-label="비밀번호 지우기">
                 <img src={clearIcon} alt="" aria-hidden="true" />
               </button>
             )}
@@ -218,7 +236,10 @@ function SignupPage() {
                 type={isConfirmVisible ? 'text' : 'password'}
                 autoComplete="new-password"
                 value={passwordConfirm}
-                onChange={(event) => setPasswordConfirm(event.target.value)}
+                onChange={(event) => {
+                  setIsDemoFilled(false)
+                  setPasswordConfirm(event.target.value)
+                }}
               />
               <button
                 type="button"
@@ -234,7 +255,10 @@ function SignupPage() {
               <button
                 type="button"
                 className="signUpClear"
-                onClick={() => setPasswordConfirm('')}
+                onClick={() => {
+                  setIsDemoFilled(false)
+                  setPasswordConfirm('')
+                }}
                 aria-label="비밀번호 확인 지우기"
               >
                 <img src={clearIcon} alt="" aria-hidden="true" />
@@ -266,7 +290,10 @@ function SignupPage() {
                 inputMode="numeric"
                 maxLength={4}
                 value={birthYear}
-                onChange={(event) => setBirthYear(event.target.value.replace(/\D/g, ''))}
+                onChange={(event) => {
+                  setIsDemoFilled(false)
+                  setBirthYear(event.target.value.replace(/\D/g, ''))
+                }}
               />
               <span className="signUpUnit">년</span>
             </div>
@@ -278,7 +305,10 @@ function SignupPage() {
                 scrollable
                 closedLabel={<span className="signUpSelectMonth">{birthMonth}</span>}
                 suffix={<span className="signUpUnit">월</span>}
-                onChange={setBirthMonth}
+                onChange={(next) => {
+                  setIsDemoFilled(false)
+                  setBirthMonth(next)
+                }}
               />
             </div>
             <div className="signUpInputBox signUpInputBoxThird">
@@ -290,7 +320,10 @@ function SignupPage() {
                 inputMode="numeric"
                 maxLength={2}
                 value={birthDay}
-                onChange={(event) => setBirthDay(event.target.value.replace(/\D/g, ''))}
+                onChange={(event) => {
+                  setIsDemoFilled(false)
+                  setBirthDay(event.target.value.replace(/\D/g, ''))
+                }}
               />
               <span className="signUpUnit">일</span>
             </div>

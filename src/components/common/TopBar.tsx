@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import wgwbLogo from '../../assets/brand/wgwb-logo.svg'
-import searchIcon from '../../assets/icons/search.svg'
+import searchIcon from '../../assets/icons/search-topbar.svg'
 import notificationIcon from '../../assets/icons/notification.svg'
 import './TopBar.css'
 

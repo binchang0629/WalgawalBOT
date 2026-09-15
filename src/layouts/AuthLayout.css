@@ -25,3 +25,9 @@
     height: 0;
     display: none;
 }
+
+/* 회원가입은 헤더 아래 남은 화면에 고정하고 내부 페이지 스크롤을 만들지 않는다. */
+.auth-layout__scroll:has(.signUp) {
+    overflow-y: hidden;
+    padding-bottom: 0;
+}

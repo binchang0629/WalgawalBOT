@@ -143,7 +143,13 @@ function AccountSwitchSheet({ currentPersona, onClose, onConfirm, onLogout }: Pr
             <h3 id="current-account-label">현재 계정</h3>
             <div className="account-switch-sheet__account">
               <span className={`account-switch-sheet__avatar account-switch-sheet__avatar--${currentPersona}`}><img src={accountPhotos[currentPersona]} alt="" /></span>
-              <span className="account-switch-sheet__identity"><strong>{current.name}</strong><span>{current.email}</span></span>
+              <span className="account-switch-sheet__identity">
+                <span className="account-switch-sheet__name-row">
+                  <strong>{current.name}</strong>
+                  <small>{current.nickname}</small>
+                </span>
+                <span className="account-switch-sheet__email">{current.email}</span>
+              </span>
               <span className="account-switch-sheet__current">현재 사용중</span>
             </div>
           </section>
@@ -151,7 +157,13 @@ function AccountSwitchSheet({ currentPersona, onClose, onConfirm, onLogout }: Pr
             <h3 id="available-account-label">전환 가능한 계정</h3>
             <label className={`account-switch-sheet__account account-switch-sheet__option${selected === otherId ? ' is-selected' : ''}`}>
               <span className={`account-switch-sheet__avatar account-switch-sheet__avatar--${otherId}`}><img src={accountPhotos[otherId]} alt="" /></span>
-              <span className="account-switch-sheet__identity"><strong>{other.name}</strong><span>{other.email}</span></span>
+              <span className="account-switch-sheet__identity">
+                <span className="account-switch-sheet__name-row">
+                  <strong>{other.name}</strong>
+                  <small>{other.nickname}</small>
+                </span>
+                <span className="account-switch-sheet__email">{other.email}</span>
+              </span>
               <span className="account-switch-sheet__radio">
                 <input type="radio" name="switch-account" value={otherId} checked={selected === otherId} onChange={() => setSelected(otherId)} aria-label={`${other.name} 계정 선택`} />
                 <span className="account-switch-sheet__radio-art" aria-hidden="true">

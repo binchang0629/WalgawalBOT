@@ -58,6 +58,11 @@ function RankingHeroSection() {
                 )
               })}
             </ol>
+            <div className="ranking-trophy-shines" aria-hidden="true">
+              <i className="ranking-trophy-shine ranking-trophy-shine--2" />
+              <i className="ranking-trophy-shine ranking-trophy-shine--1" />
+              <i className="ranking-trophy-shine ranking-trophy-shine--3" />
+            </div>
             <div className="ranking-confetti" aria-hidden="true">
               {Array.from({ length: 14 }, (_, index) => <i key={index} />)}
             </div>
