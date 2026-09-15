@@ -108,7 +108,7 @@ function LoginRewardPopUp({ kind, name, startPoint, onSettled, onClose }: Props)
   // 최종 포인트와 하단 안내 바를 충분히 보여준 뒤 자동으로 닫는다.
   useEffect(() => {
     if (stage !== 'settled') return
-    const timer = window.setTimeout(dismiss, 3000)
+    const timer = window.setTimeout(dismiss, 1400)
     return () => window.clearTimeout(timer)
   }, [dismiss, stage])
 

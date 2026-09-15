@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom'
 import DeviceFrame from '../components/device/DeviceFrame'
 import AppViewport from '../components/device/AppViewport'
 import PersonaSwitcher from '../components/demo/PersonaSwitcher'
+import wgwbLogo from '../assets/brand/wgwb-logo.svg'
 import useIsDesktop from '../hooks/useIsDesktop'
 import { DEVICE_FRAME, SERVICE, SHOWCASE_BACKGROUND } from '../config/app'
 import './ShowcaseLayout.css'
@@ -85,10 +86,21 @@ function ShowcaseLayout() {
       */}
       <div className={`showcase__stage ${fitToScreen ? '' : 'showcase__stage--actual'}`}>
         <aside className="showcase__aside showcase__aside--left">
-          <h1 className="showcase__title">{SERVICE.name}</h1>
-          <p className="showcase__tagline">{SERVICE.tagline}</p>
+          <h1 className="showcase__title">
+            <img src={wgwbLogo} width={266} height={45} alt={SERVICE.name} />
+          </h1>
+          <p className="showcase__tagline">
+            <span>내 고민,</span>
+            <span>
+              <strong className="showcase__tagline-ai">AI</strong>와{' '}
+              <strong className="showcase__tagline-jury">배심원이</strong>{' '}
+              함께 판단해드려요
+            </span>
+          </p>
 
-          {!hasScrolled && <p className="showcase__hint">기기 안에서 스크롤해 보세요</p>}
+          <p className={`showcase__hint ${hasScrolled ? 'is-hidden' : ''}`}>
+            기기 안에서 스크롤해 보세요
+          </p>
         </aside>
 
         <DeviceFrame scale={scale}>

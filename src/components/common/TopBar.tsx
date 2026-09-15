@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import wgwbLogo from '../../assets/brand/wgwb-logo.svg'
 import searchIcon from '../../assets/icons/search.svg'
 import notificationIcon from '../../assets/icons/notification.svg'
 import './TopBar.css'
@@ -38,7 +39,7 @@ function TopBar({ hasUnreadNotification = false, logo, title }: TopBarProps) {
   return (
     <header className="top-bar">
       <strong className="top-bar__logo">
-        {logo ?? <>왈가왈<span>BOT</span></>}
+        {logo ?? <img src={wgwbLogo} width={100} height={18} alt="왈가왈BOT" />}
       </strong>
       <div className="top-bar__actions">
         <button type="button" className="top-bar__action" aria-label="검색">

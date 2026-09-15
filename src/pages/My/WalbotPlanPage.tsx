@@ -57,7 +57,7 @@ function WalbotPlanSelectionPage() {
                   <span className="walbot-plan__option-heading">
                     <span className="walbot-plan__identity">
                       <span className="walbot-plan__name">
-                        {selectedPlan === plan.id && <img src={selectedIcon} width={15} height={15} alt="" />}
+                        <img className="walbot-plan__radio" src={selectedIcon} width={15} height={15} alt="" aria-hidden="true" />
                         <strong>{plan.name}</strong>
                       </span>
                       {plan.id === 'annual' && <span className="walbot-plan__recommended">추천</span>}

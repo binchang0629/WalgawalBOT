@@ -38,11 +38,9 @@ function PersonaSwitcher() {
             <button
               key={id}
               type="button"
-              className={
-                isCurrent
-                  ? 'persona-switcher__item persona-switcher__item--current'
-                  : 'persona-switcher__item'
-              }
+              className={`persona-switcher__item persona-switcher__item--${id}${
+                isCurrent ? ' persona-switcher__item--current' : ''
+              }`}
               onClick={() => switchPersona(id)}
               aria-pressed={isCurrent}
             >

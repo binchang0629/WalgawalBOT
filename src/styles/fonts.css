@@ -21,6 +21,14 @@
 /* ---------- 제목: Paperlogy 7 Bold ---------- */
 @font-face {
     font-family: Paperlogy;
+    src: url("../assets/plaza/fonts/Paperlogy-6SemiBold.woff2") format("woff2");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: Paperlogy;
     src: url("../assets/fonts/Paperlogy-7Bold.woff2") format("woff2");
     font-weight: 700;
     font-style: normal;

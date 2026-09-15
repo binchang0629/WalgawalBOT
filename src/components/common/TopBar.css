@@ -18,9 +18,17 @@
 }
 
 .top-bar__logo {
+    display: flex;
+    align-items: center;
     font-size: 19px;
     letter-spacing: -1px;
     color: var(--ink);
+}
+
+.top-bar__logo img {
+    display: block;
+    width: 100px;
+    height: auto;
 }
 
 .top-bar--title {
