@@ -77,7 +77,7 @@ function needleAngle(splitAngle: number) {
 function CloseCallSection({ cta }: CloseCallSectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isGaugeVisible, setIsGaugeVisible] = useState(false)
-  const sectionRef = useRef<HTMLElement>(null)
+  const gaugeCardRef = useRef<HTMLElement>(null)
   const currentCase = closeCallCases[currentIndex]
   const nextCase = closeCallCases[(currentIndex + 1) % closeCallCases.length]
   const gap = Math.abs(currentCase.leftPercent - currentCase.rightPercent)
@@ -97,10 +97,10 @@ function CloseCallSection({ cta }: CloseCallSectionProps) {
     setCurrentIndex((index) => (index + 1) % closeCallCases.length)
   }
 
-  // 카드가 충분히 화면 안에 들어왔을 때 한 번만 채운다.
+  // 첫 게이지 카드가 거의 화면 안에 들어왔을 때 한 번만 채운다.
   useEffect(() => {
-    const section = sectionRef.current
-    if (!section) return
+    const gaugeCard = gaugeCardRef.current
+    if (!gaugeCard) return
 
     if (!('IntersectionObserver' in window)) {
       const frame = requestAnimationFrame(() => setIsGaugeVisible(true))
@@ -111,21 +111,26 @@ function CloseCallSection({ cta }: CloseCallSectionProps) {
       if (!entry.isIntersecting) return
       setIsGaugeVisible(true)
       observer.disconnect()
-    }, { threshold: 1 })
+    }, { threshold: 0.85 })
 
-    observer.observe(section)
+    observer.observe(gaugeCard)
     return () => observer.disconnect()
   }, [])
 
   return (
-    <section ref={sectionRef} className={isGaugeVisible ? 'close-section close-section--gauge-visible' : 'close-section'}>
+    <section className={isGaugeVisible ? 'close-section close-section--gauge-visible' : 'close-section'}>
       <SectionTitle
         title={homeSectionTitles.closeCall.title}
         description={homeSectionTitles.closeCall.description}
-        action={homeSectionTitles.closeCall.action}
+        actionSlot={
+          <button type="button" className="swap-card__change" onClick={handleSwap} aria-label="사건 바꾸기">
+            <i className="swap-card__change-icon" aria-hidden="true">⇅</i>
+            <span>사건 바꾸기</span>
+          </button>
+        }
       />
 
-      <article className="close-card" aria-live="polite">
+      <article ref={gaugeCardRef} className="close-card" aria-live="polite">
         <h3 className="close-card__title">
           {currentCase.titleLines.map((line) => <span key={line}>{line}<br /></span>)}
         </h3>
@@ -159,9 +164,6 @@ function CloseCallSection({ cta }: CloseCallSectionProps) {
       <article className="swap-card" aria-live="polite">
         <div className="swap-card__head">
           <span className="swap-card__tag"><img src={homeIcons.fireIcon} alt="" aria-hidden="true" />치열한 공방 중</span>
-          <button type="button" className="swap-card__change" onClick={handleSwap} aria-label="위아래 사건 바꿔보기">
-            바꿔보기 <img src={homeIcons.chevronsUp} alt="" aria-hidden="true" />
-          </button>
         </div>
         <p className="swap-card__title">{nextCase.titleLines.join(' ')}</p>
         <div className="swap-card__bar"><i style={{ width: String(nextCase.leftPercent) + '%' }} /></div>

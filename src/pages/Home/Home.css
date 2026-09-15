@@ -804,18 +804,32 @@
 .swap-card__change {
     display: flex;
     align-items: center;
-    padding: 0;
-    border: 0;
-    background: none;
-    color: var(--neutral-600);
+    justify-content: center;
+    gap: 5px;
+    min-height: 32px;
+    padding: 5px 9px;
+    border: 1px solid var(--blue-200);
+    border-radius: var(--radius-pill);
+    background: var(--blue-050);
+    color: var(--blue-700);
     font-size: 12px;
-    font-weight: 500;
-    line-height: 20px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
 }
 
 .swap-card__change img {
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
+}
+
+.swap-card__change-icon {
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 1;
 }
 
 .swap-card__title {
@@ -1563,7 +1577,7 @@ img.ai-card__mascot {
     opacity: 0;
 }
 .close-section--gauge-visible .close-card__arc-fill {
-    animation: close-gauge-fill 1.9s cubic-bezier(.42, 0, .58, 1) forwards;
+    animation: close-gauge-fill 1.4s cubic-bezier(.42, 0, .58, 1) forwards;
 }
 @keyframes close-gauge-fill {
     from {
@@ -1593,7 +1607,7 @@ img.ai-card__mascot {
     opacity: 0;
     transition: transform 280ms ease;
 }
-.close-section--gauge-visible .close-card__needle { opacity: 1; transition: opacity 1ms linear 2s, transform 280ms ease; }
+.close-section--gauge-visible .close-card__needle { opacity: 1; transition: opacity 1ms linear 1.5s, transform 280ms ease; }
 
 .close-card__needle i {
     display: block;
@@ -1617,7 +1631,7 @@ img.ai-card__mascot {
     border-radius: 50%;
     background: var(--gauge-ink);
     opacity: 0;
-    transition: opacity 1ms linear 2s;
+    transition: opacity 1ms linear 1.5s;
 }
 .close-section--gauge-visible .close-card__knob { opacity: 1; }
 
@@ -1684,7 +1698,7 @@ img.ai-card__mascot {
     height: 58px;
     transform: translateX(-50%);
     opacity: 0;
-    transition: opacity 1ms linear 2s;
+    transition: opacity 180ms ease-out 120ms;
 }
 .close-section--gauge-visible .close-card__mascot { opacity: 1; }
 .close-card__choice {
@@ -1698,7 +1712,7 @@ img.ai-card__mascot {
     height: auto;
     transform: translateY(6px);
     opacity: 0;
-    transition: opacity 200ms ease-out 2s, transform 200ms ease-out 2s;
+    transition: opacity 200ms ease-out 1.5s, transform 200ms ease-out 1.5s;
 }
 .close-section--gauge-visible .close-card__choice { opacity: 1; transform: translateY(0); }
 .close-card__choice--left { left: 0; }
@@ -1744,7 +1758,7 @@ img.ai-card__mascot {
     text-align: center;
     transform: translate(-50%, 6px);
     opacity: 0;
-    transition: opacity 200ms ease-out 2s, transform 200ms ease-out 2s;
+    transition: opacity 200ms ease-out 1.5s, transform 200ms ease-out 1.5s;
 }
 .close-section--gauge-visible .close-card__gap { opacity: 1; transform: translate(-50%, 0); }
 .close-card__gap b {
@@ -1760,11 +1774,6 @@ img.ai-card__mascot {
     border-color: var(--neutral-200);
     border-radius: var(--radius-lg);
     background: var(--neutral-050);
-}
-.swap-card__change {
-    gap: 0;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
 }
 .swap-card__change:focus-visible {
     outline: 2px solid var(--blue-700);

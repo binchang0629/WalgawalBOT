@@ -91,10 +91,9 @@ function BalanceRound({ questionIndex, onNext }: { questionIndex: number; onNext
     const start = drag.current
     if (!start || start.id !== event.pointerId) return
     const dx = (event.clientX - start.x) / start.scale
-    const dy = (event.clientY - start.y) / start.scale
-    // 세로 스크롤·취소·짧은 탭은 선택으로 처리하지 않는다.
+    // 손을 뗀 세로 위치와 무관하게, 좌우 기준선을 넘겼는지만으로 선택한다.
     const target = dx <= start.min * 0.55 ? 'left' : dx >= start.max * 0.55 ? 'right' : null
-    if (event.type === 'pointerup' && target && Math.abs(dx) > Math.abs(dy)) {
+    if (event.type === 'pointerup' && target) {
       handleChoose(target)
     }
     setHoverChoice(null)
