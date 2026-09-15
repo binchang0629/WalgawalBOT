@@ -53,13 +53,54 @@ export const INITIAL_OPTIONS: ChatOption[] = [
 /** "내 사건에 대해 물어볼게요"·"내 사건으로 확인할게요"는 세션의 최근 사건 보유 여부로 분기한다. */
 export const CASE_ROUTED_OPTION_IDS = new Set(['ask-my-case', 'goCase'])
 
+/** 첫 화면에서 지금 눌러볼 수 있는 유일한 칩. 나머지 4개는 비활성 상태로만 보여준다. */
+export const ENABLED_INITIAL_OPTION_ID = 'ask-my-case'
+
+/**
+ * 대화 중 선택지 중에서 항상 비활성으로 보여주는 것들.
+ * 데모에서 실제로 지원하지 않는 동작(다른 사건 선택)이라, 눌러서 "준비 중" 답을
+ * 받게 하는 대신 처음 화면의 비활성 칩과 같은 방식(gray_400 텍스트)으로 막아 둔다.
+ */
+export const ALWAYS_DISABLED_OPTION_IDS = new Set([
+  'pick-other',
+  'respond-other',
+  'similar-cases',
+  'has-messages',
+  'not-sure',
+  'help-consult-prep',
+  'prep-questions',
+  'match-expert',
+  'expert-ranking',
+])
+
 export const RESTART_STEP_ID = 'restart'
+
+/** 자유 입력이 스크립트에 없을 때 "다른 도움 받기"를 고르면 이동하는 안내 스텝. */
+export const OTHER_HELP_STEP_ID = 'otherHelp'
+
+/**
+ * 로그인 전 상태에서 "내 사건에 대해 물어볼게요" → 사건 없음 안내(`caseIntroEmpty`) →
+ * "다른 질문 할게요"로 들어오는 공통 메뉴. `restart`와 달리 "내 사건에 대해 물어볼게요"를
+ * 다시 보여주지 않는다 — 방금 그 선택지 때문에 이 화면에 왔기 때문이다.
+ */
+export const GUEST_MENU_STEP_ID = 'guestMenu'
 
 export const STEP_MAP: Record<string, BotStep> = {
   restart: {
     id: 'restart',
     blocks: [p('더 궁금한 점이 있으면 골라주세요.')],
     options: INITIAL_OPTIONS,
+  },
+
+  /** 자유 입력 안내(`services/chatbotService.ts`의 clarify 스텝)에서 "다른 도움 받기"를 골랐을 때. */
+  otherHelp: {
+    id: OTHER_HELP_STEP_ID,
+    blocks: [p('어떤 도움이 필요한지 선택해주세요.')],
+    options: [
+      { id: 'prep-questions', label: '상담 준비하기', next: 'questionList' },
+      { id: 'match-expert', label: '전문가 매칭 받기', next: 'expertMatchUnavailable' },
+      { id: 'expert-ranking', label: '전문가 랭킹 보기', next: 'expertRankingUnavailable' },
+    ],
   },
 
   howToUse: {
@@ -120,6 +161,21 @@ export const STEP_MAP: Record<string, BotStep> = {
     options: [
       { id: 'toSubmit', label: '사건 접수하러 갈게요', next: RESTART_STEP_ID },
       { id: 'more', label: '다른 질문 할게요', next: RESTART_STEP_ID },
+    ],
+  },
+
+  /**
+   * 로그인 전 공통 "다른 질문 할게요" 메뉴. `caseIntroEmpty`에서만 쓰인다 —
+   * ChatbotPage.tsx의 resolveNextStepId가 로그인 전일 때만 이 스텝으로 보낸다.
+   */
+  guestMenu: {
+    id: GUEST_MENU_STEP_ID,
+    blocks: [p('좋아요. 어떤 내용이 궁금한가요?'), p('아래에서 궁금한 내용을 골라주세요.')],
+    options: [
+      { id: 'how-to-use', label: '왈가왈봇 이용 방법이 궁금해요', next: 'howToUse' },
+      { id: 'ai-result', label: 'AI 판정·배심원 결과가 궁금해요', next: 'aiResultInfo' },
+      { id: 'need-expert', label: '전문가 상담이 필요한지 궁금해요', next: 'needExpertInfo' },
+      { id: 'trouble', label: '이용 중 문제가 생겼어요', next: 'troubleInfo' },
     ],
   },
 
@@ -228,6 +284,7 @@ export const STEP_MAP: Record<string, BotStep> = {
     compact: true,
     blocks: [
       p('**그렇다면 상담 전에 아래 자료를 정리해두면 좋아요.**'),
+      p(''),
       list([
         '계약서',
         '계약금·입금 내역',
@@ -235,8 +292,13 @@ export const STEP_MAP: Record<string, BotStep> = {
         '잔금 지급일이 적힌 대화',
         '작업물이 실제 사용되고 있다면 관련 자료',
       ]),
+      p(''),
       p('지금 바로 **전문가를 찾아볼 수도 있고**,'),
       p('먼저 **상담 전에 필요한 내용을 더 정리할 수도 있어요.**'),
+    ],
+    options: [
+      { id: 'check-consult-needed', label: '상담이 필요한지 확인할래', next: 'consultCheck' },
+      { id: 'help-consult-prep', label: '상담 준비를 도와줘', next: 'questionList' },
     ],
     freeTextNext: 'consultCheck',
   },
@@ -246,20 +308,20 @@ export const STEP_MAP: Record<string, BotStep> = {
     id: 'consultCheck',
     blocks: [
       p('현재 확인된 내용만으로'),
-      p('**상담이 꼭 필요하다고 단정할 수는 없어요.**'),
+      p('**지금 당장 상담이 필요하다고 단정하기는 어려워요.**'),
       p(''),
       p('다만 잔금 지급이 지연되고 있고'),
-      p('관련 자료도 남아 있기 때문에,'),
-      p('자료를 정리한 뒤 **전문가 검토를 받을지 선택해볼 수 있는 단계**예요.'),
+      p('관련 자료도 남아 있는 만큼,'),
+      p('필요하다면 **전문가의 의견을 확인해볼 수 있는 단계**예요.'),
       p(''),
-      p('원하면 지금 사건에 맞춰'),
-      p('**상담할 때 물어볼 질문**도 정리해드릴게요.'),
+      p('전문가의 도움이 필요하다면'),
+      p('**상담 준비부터 전문가 찾기까지** 이어서 도와드릴게요.'),
     ],
     optionsLayout: 'chips',
     options: [
-      { id: 'prep-questions', label: '질문 정리해줘', next: 'questionList' },
-      { id: 'match-expert', label: '전문가 매칭해줘', next: 'expertMatchUnavailable' },
-      { id: 'expert-ranking', label: '전문가 랭킹 보여줘', next: 'expertRankingUnavailable' },
+      { id: 'prep-questions', label: '상담 준비하기', next: 'questionList' },
+      { id: 'match-expert', label: '전문가 매칭 받기', next: 'expertMatchUnavailable' },
+      { id: 'expert-ranking', label: '전문가 랭킹 보기', next: 'expertRankingUnavailable' },
     ],
   },
 

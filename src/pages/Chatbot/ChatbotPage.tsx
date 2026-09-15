@@ -5,7 +5,7 @@ import useWizardBack from '../../hooks/useWizardBack'
 import { BACK_FALLBACK, PATHS } from '../../routes/paths'
 import { requestChatbotReply } from '../../services/chatbotService'
 import type { ChatOption } from './chatbotScript'
-import { CASE_ROUTED_OPTION_IDS, INITIAL_OPTIONS } from './chatbotScript'
+import { CASE_ROUTED_OPTION_IDS, GUEST_MENU_STEP_ID, INITIAL_OPTIONS } from './chatbotScript'
 import type { ChatTurn } from './types'
 import ChatbotHeader from './components/ChatbotHeader'
 import ChatEmptyState from './components/ChatEmptyState'
@@ -38,10 +38,13 @@ function nextTurnId() {
   return `turn-${turnSeq}`
 }
 
+/** 선택한 버튼이 오렌지색으로 보이는 시간. 이후 선택지 그룹이 사라지고 사용자 메시지가 이어 붙는다. */
+const SELECT_FEEDBACK_MS = 320
+
 function ChatbotPage() {
   const navigate = useNavigate()
   const handleBack = useWizardBack(BACK_FALLBACK.chatbot)
-  const { personaId } = useSession()
+  const { personaId, sessionStatus } = useSession()
 
   const [turns, setTurns] = useState<ChatTurn[]>([])
   const [activeStepId, setActiveStepId] = useState<string | null>(null)
@@ -49,21 +52,45 @@ function ChatbotPage() {
   const [retryRequest, setRetryRequest] = useState<
     { kind: 'option'; option: ChatOption } | { kind: 'text'; text: string } | null
   >(null)
+  /** 선택지를 고른 직후, 오렌지색이 보이는 동안 같은 그룹의 다른 버튼을 막기 위한 표시. */
+  const [pendingSelection, setPendingSelection] = useState<{ turnId: string; optionId: string } | null>(null)
 
   const bodyRef = useRef<HTMLDivElement>(null)
+  const selectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight })
   }, [turns, isPending])
 
+  useEffect(() => {
+    return () => {
+      if (selectTimeoutRef.current) clearTimeout(selectTimeoutRef.current)
+    }
+  }, [])
+
   /**
    * 지금은 곽지훈(B)만 최근에 접수한 사건이 있는 데모 상태다. (PROJECT_SPEC.md §9-1)
    * 실제 서비스에서는 로그인한 사용자의 최근 사건 목록에서 판단해야 한다.
+   *
+   * 로그인 여부를 먼저 보고, 로그인된 경우에만 계정(personaId)으로 나눈다.
+   * 비로그인이면 어떤 계정을 선택해 뒀든 사건 데이터에 접근할 수 없다 — 계정 선택은
+   * 로그인 후에만 의미가 있는 시연 상태이지, 그 자체로 로그인을 대신하지 않는다. (PROJECT_SPEC.md §7-5)
    */
-  const hasRecentCase = personaId === 'B'
+  const hasRecentCase = sessionStatus === 'authenticated' && personaId === 'B'
 
-  const resolveNextStepId = (option: ChatOption) =>
-    CASE_ROUTED_OPTION_IDS.has(option.id) && !hasRecentCase ? 'caseIntroEmpty' : option.next
+  /**
+   * "다른 질문 할게요"(id: 'more')는 여러 스텝에서 공유하는 버튼이라 기본은 그대로 `option.next`
+   * (= restart, 5개 메뉴)를 따른다. 다만 로그인 전 상태에서 `caseIntroEmpty`(사건 없음 안내)
+   * 바로 다음에 눌렀을 때만 "내 사건에 대해 물어볼게요"를 뺀 `guestMenu`로 보낸다 —
+   * 로그인 후 시나리오나 다른 스텝의 "다른 질문 할게요"는 건드리지 않는다.
+   */
+  const resolveNextStepId = (option: ChatOption) => {
+    if (CASE_ROUTED_OPTION_IDS.has(option.id) && !hasRecentCase) return 'caseIntroEmpty'
+    if (option.id === 'more' && activeStepId === 'caseIntroEmpty' && sessionStatus !== 'authenticated') {
+      return GUEST_MENU_STEP_ID
+    }
+    return option.next
+  }
 
   const runRequest = async (
     request: { kind: 'option'; option: ChatOption } | { kind: 'text'; text: string },
@@ -90,8 +117,16 @@ function ChatbotPage() {
     }
   }
 
-  const handleSelectOption = (option: ChatOption) => {
-    if (isPending) return
+  /**
+   * 선택지를 골랐을 때의 동작.
+   *
+   * `turnId`가 있으면(대화 중 챗봇 메시지에 이어지는 선택 영역) 고른 버튼을 잠깐
+   * 오렌지색으로 표시한 뒤, 그 선택지 그룹을 통째로 지우고 고른 문구를 사용자
+   * 메시지로 남긴다. `turnId`가 없으면 대화 시작 전 첫 화면(`ChatEmptyState`)의
+   * 선택이라 보여줄 이전 턴이 없으므로 바로 사용자 메시지를 추가한다.
+   */
+  const handleSelectOption = (option: ChatOption, turnId?: string) => {
+    if (isPending || pendingSelection) return
 
     if (option.id === 'toSubmit') {
       navigate(PATHS.caseSubmit)
@@ -102,14 +137,25 @@ function ChatbotPage() {
       return
     }
 
-    setTurns((prev) => [
-      // 이 선택지를 보여준 마지막 챗봇 턴에 "고른 것"을 표시해 active 색으로 남긴다.
-      ...prev.map((turn, index) =>
-        index === prev.length - 1 && turn.role === 'bot' ? { ...turn, selectedOptionId: option.id } : turn,
-      ),
-      { id: nextTurnId(), role: 'user', text: option.label, at: Date.now() },
-    ])
-    void runRequest({ kind: 'option', option })
+    if (!turnId) {
+      setTurns((prev) => [...prev, { id: nextTurnId(), role: 'user', text: option.label, at: Date.now() }])
+      void runRequest({ kind: 'option', option })
+      return
+    }
+
+    setPendingSelection({ turnId, optionId: option.id })
+    setTurns((prev) =>
+      prev.map((turn) => (turn.id === turnId && turn.role === 'bot' ? { ...turn, selectedOptionId: option.id } : turn)),
+    )
+
+    selectTimeoutRef.current = setTimeout(() => {
+      setTurns((prev) => [
+        ...prev.map((turn) => (turn.id === turnId && turn.role === 'bot' ? { ...turn, optionsHidden: true } : turn)),
+        { id: nextTurnId(), role: 'user', text: option.label, at: Date.now() },
+      ])
+      setPendingSelection(null)
+      void runRequest({ kind: 'option', option })
+    }, SELECT_FEEDBACK_MS)
   }
 
   const handleSend = (text: string) => {
@@ -183,17 +229,17 @@ function ChatbotPage() {
                       </span>
                       <div className="chatbot-bot-content">
                         <BotMessageContent step={step} />
-                        {step.options && step.options.length > 0 && (
-                          <ChatOptionButtons
-                            options={step.options}
-                            layout={step.optionsLayout}
-                            interactive={isLatest && !isPending}
-                            selectedOptionId={turn.selectedOptionId}
-                            onSelect={handleSelectOption}
-                          />
-                        )}
                       </div>
                     </div>
+
+                    {step.options && step.options.length > 0 && !turn.optionsHidden && (
+                      <ChatOptionButtons
+                        options={step.options}
+                        interactive={isLatest && !isPending && !pendingSelection}
+                        selectedOptionId={turn.selectedOptionId}
+                        onSelect={(option) => handleSelectOption(option, turn.id)}
+                      />
+                    )}
                   </div>
                 )
               })}

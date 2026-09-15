@@ -4,9 +4,9 @@
  */
 
 /** 상대와의 관계. `CaseCategory`(사건 주제 분류)와는 다른 개념이라 재사용하지 않는다. */
-export type Relationship = '연인' | '친구' | '가족' | '직장' | '학교' | '기타'
+export type Relationship = '연인' | '친구' | '가족' | '직장' | '학업' | '기타'
 
-export const RELATIONSHIPS: Relationship[] = ['연인', '친구', '가족', '직장', '학교', '기타']
+export const RELATIONSHIPS: Relationship[] = ['연인', '친구', '가족', '직장', '학업', '기타']
 
 /** 지훈02 추가 질문의 3지선다 답변. */
 export type TriAnswer = 'yes' | 'no' | 'unsure'

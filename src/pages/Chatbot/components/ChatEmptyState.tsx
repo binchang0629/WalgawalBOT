@@ -1,4 +1,5 @@
 import botLogo from '../../../assets/chatbot/figma/imgBotLogo.png'
+import { ENABLED_INITIAL_OPTION_ID } from '../chatbotScript'
 import type { ChatOption } from '../chatbotScript'
 import '../Chatbot.css'
 
@@ -32,7 +33,7 @@ function ChatEmptyState({ options, onSelect, disabled }: ChatEmptyStateProps) {
             key={option.id}
             type="button"
             className="chatbot-chip"
-            disabled={disabled}
+            disabled={disabled || option.id !== ENABLED_INITIAL_OPTION_ID}
             onClick={() => onSelect(option)}
           >
             {option.label}

@@ -77,6 +77,47 @@
 - 광장 `사연, 사건 키워드 또는 AI 추천 검색` 입력창의 비활성 상태를 제거하고 입력 즉시 결과가 갱신되는 검색 인터랙션을 연결했다.
 - 어떤 검색어를 입력해도 연인·친구·가족·직장·학업 사건이 섞인 데모 결과가 나타나며, 검색어 문자값에 따라 결과 시작 순서가 달라진다.
 - 검색 중에는 결과 안내 문구를 표시하고 전체 카테고리로 전환한다. 정렬 또는 카테고리 필터를 선택하면 검색어를 비우고 기존 목록 탐색으로 복귀한다.
+## 챗봇 로그인 전 "다른 질문" 메뉴 분리 (2026-09-15)
+
+- 로그인 전 상태에서 `내 사건에 대해 물어볼게요` → `caseIntroEmpty`(사건 없음 안내) → `다른 질문 할게요`로 들어오면, 기존에는 `restart` 스텝(문구 "더 궁금한 점이 있으면 골라주세요." + `내 사건에 대해 물어볼게요`를 포함한 5개 메뉴)이 그대로 다시 나와 방금 겪은 흐름이 반복되는 느낌이 있었다.
+- `chatbotScript.ts`에 새 스텝 `guestMenu`(`GUEST_MENU_STEP_ID`)를 추가했다. 문구는 "좋아요. 어떤 내용이 궁금한가요? / 아래에서 궁금한 내용을 골라주세요."이고, `내 사건에 대해 물어볼게요`를 뺀 4개(이용 방법·AI 판정·전문가 상담·이용 중 문제)만 보여준다. 각 버튼의 `next`는 기존 `howToUse`/`aiResultInfo`/`needExpertInfo`/`troubleInfo`를 그대로 재사용해 이후 응답은 기존 플로우 그대로다.
+- 라우팅은 `ChatbotPage.tsx`의 `resolveNextStepId`에서만 처리했다. `다른 질문 할게요`(id `more`)는 여러 스텝이 공유하는 버튼이라, "직전 스텝이 `caseIntroEmpty`이고 `sessionStatus !== 'authenticated'`일 때만" `guestMenu`로 보내고 그 외에는 기존처럼 `restart`로 간다. 계정(personaId)은 보지 않고 로그인 여부만 본다 — 서아·지훈 로그인 전 모두 동일하게 `guestMenu`로 가고, 로그인 후(예: 서아 인증 상태에서 우연히 caseIntroEmpty에 닿는 경우)는 이번 변경 이전과 똑같이 `restart`(5개 메뉴)로 간다. `caseIntroEmpty` 스텝 데이터 자체와 다른 스텝들의 `다른 질문 할게요`(howToUse, troubleInfo 등)는 손대지 않았다.
+- `ChatOptionButtons`, 선택 인터랙션(오렌지 표시 → 그룹 제거 → 사용자 버블 추가), 버튼 스타일은 변경하지 않았다.
+- `npm run lint`, `npm run typecheck`, `npm run build` 통과. 기존 500kB 초과 청크 경고는 유지된다. 실제 브라우저 클릭 시연은 이번 세션에서 실행하지 않고 `resolveNextStepId` → `requestChatbotReply` → `STEP_MAP` 경로를 코드로 추적해 서아/지훈 로그인 전 두 경우 모두 `guestMenu`로 귀결됨을 확인했다. → 확인 필요(실제 브라우저 검증)
+
+## 챗봇 자유 입력 안내 플로우 변경 (2026-09-15)
+
+- 사용자가 선택 버튼 없이 임의의 텍스트를 입력했을 때(현재 스텝에 `freeTextNext`가 없을 때) 나오던 "음, 지금은 정해진 답변만 드릴 수 있어요. 아래에서 골라볼래요?" + 그 스텝의 기존 선택지 재노출을, "혹시 다른 도움이 필요하신가요? 지금 하던 내용을 이어가거나, 다른 도움을 받을 수 있어요." + `이어서 진행하기`/`다른 도움 받기` 2버튼으로 바꿨다.
+- `services/chatbotService.ts`의 `buildClarifyStep` 하나만 고쳤다. 이 함수가 자유 입력 안내가 나오는 유일한 지점이라(옵션 클릭이나 `freeTextNext`가 있는 스텝의 자유 입력은 그대로 기존 플로우를 탄다), 다른 대화 흐름은 건드리지 않았다.
+- `이어서 진행하기`(`continue-flow`)의 `next`는 자유 입력 직전에 있던 스텝의 id(`resumeStepId`, 없으면 `RESTART_STEP_ID`) 그대로다. `STEP_MAP`에서 같은 키를 다시 찾아오는 것뿐이라 원래 보여주던 문구·선택지가 그대로 복원된다. `reply.kind === 'clarify'`일 때는 기존처럼 `activeStepId`를 바꾸지 않으므로, 이 안내 화면에서 또 자유 입력을 보내도 원래 스텝 기준으로 같은 분기를 다시 탄다.
+- `다른 도움 받기`(`other-help`)는 새 스텝 `otherHelp`(`chatbotScript.ts`, `OTHER_HELP_STEP_ID`)로 이동한다. "어떤 도움이 필요한지 선택해주세요." 안내와 함께 `상담 준비하기`/`전문가 매칭 받기`/`전문가 랭킹 보기` 3개를 보여주는데, 이 세 id(`prep-questions`/`match-expert`/`expert-ranking`)는 이미 `consultCheck`에서 쓰던 것과 같아 `ALWAYS_DISABLED_OPTION_IDS`에 그대로 걸려 버튼만 보이고 클릭은 안 된다 — 기획대로 이 프로젝트에서 이후 화면·기능은 만들지 않는다.
+- `ChatOptionButtons`·선택 인터랙션(오렌지색 표시 → 그룹 사라짐 → 사용자 버블 추가 → 다음 응답)과 사용자/챗봇 메시지 버블 디자인은 전혀 건드리지 않았다. 새 스텝도 기존 `BotStep`/`p()` 형태를 그대로 썼다. `step.optionsLayout`은 기존에도 더 이상 읽지 않는 필드라 새 스텝에 넣지 않았다.
+- `npm run lint`, `npm run typecheck`, `npm run build` 통과. 기존 500kB 초과 청크 경고는 유지된다. 실제 브라우저 클릭 시연은 이번 세션에서 실행하지 않았다. → 확인 필요
+
+## 챗봇 뒤로가기 기본 경로 보완 (2026-09-15)
+
+- 09-14 병합 기록에 남아 있던 "챗봇 직접 진입 뒤로가기 기본 경로 누락"을 해결했다. `ChatbotPage.tsx`는 이미 `useWizardBack(BACK_FALLBACK.chatbot)`을 쓰고 있었지만 `routes/paths.ts`의 `BACK_FALLBACK`에 `chatbot` 키 자체가 없어 값이 `undefined`였다.
+- `BACK_FALLBACK.chatbot = PATHS.home`을 추가했다. 앱 내부에서 챗봇으로 들어온 경우(플로팅 버튼·홈 AI 카드 등)는 원래대로 `navigate(-1)`이 실제 이전 화면으로 돌아가고, `/chatbot`으로 직접 진입해 돌아갈 내부 기록이 없는 경우에만 이 기본값(홈)으로 이동한다.
+- `npm run lint`, `npm run typecheck`, `npm run build` 통과. 기존 500kB 초과 청크 경고는 유지된다. 다른 화면의 `useWizardBack` 사용(`cases`, `afterstory`)은 변경하지 않았다.
+
+## 챗봇 선택지 UI 개편 (2026-09-15)
+
+- 사용자 첨부 디자인 기준으로 챗봇(`/chatbot`) 대화 중 선택지 UI를 일괄 교체했다. 대상은 `ChatOptionButtons`(공용 선택 버튼 컴포넌트) 하나뿐이었다 — `STEP_MAP`의 모든 스텝(`caseIntro`의 2버튼 `actions`, `caseFocused`·`expertCheck`·`consultCheck` 등 여러 스텝의 세로 `chips`)이 같은 컴포넌트를 공유하고 있어 전수 검색으로 확인했다. 대화 시작 전 첫 화면(`ChatEmptyState`)의 추천 질문 칩은 애초에 메시지에 붙어 있던 적이 없는 별개 Figma 화면(`Chatbot/Initial`)이라 이번 범위에서 제외했다.
+- 선택지를 챗봇 말풍선(`chatbot-bot-content`) 안에서 빼내 `chatbot-msg--bot`의 형제 요소로 옮겼다. 부모가 이미 `align-items: center`라 별도 래퍼 없이 대화창 중앙에 놓인다. 기존 `actions`(2버튼 가로) / `chips`(세로 목록) 구분과 그 CSS(`chatbot-action*`, `chatbot-option*`)는 지우고, 모든 선택지가 같은 너비로 한 줄씩 쌓이는 `chatbot-select-group` / `chatbot-select-option` 하나로 통일했다. `step.optionsLayout` 데이터 필드 자체는 스크립트 데이터라 남겨뒀지만 더 이상 읽지 않는다.
+- 버튼은 `min-height`(고정 `height` 아님)로 만들어 문구가 길면 잘리지 않고 높이가 늘어난다. 기본 흰 배경, 고른 선택지만 `--orange-700`(#ff9524, 확정 스타일가이드 Secondary orange) 배경 + 흰 글자로 바뀐다.
+- 동작 흐름: 클릭 즉시 `pendingSelection` 상태로 같은 그룹의 다른 버튼과 재클릭을 막고 고른 버튼에 오렌지색(`selectedOptionId`)을 표시 → 320ms(`SELECT_FEEDBACK_MS`) 뒤 해당 봇 턴에 `optionsHidden: true`를 표시해 선택지 그룹 전체를 화면에서 제거하면서, 동시에 고른 문구를 기존 사용자 말풍선 컴포넌트로 대화 기록에 추가 → 이어서 기존 `runRequest`가 다음 봇 응답을 스크립트대로 가져온다. `ChatTurn`(`bot` variant)에 `optionsHidden?: boolean` 필드를 추가했다. 페이지 이탈 시 지연 타이머는 `useEffect` cleanup으로 정리한다.
+- 과거 턴은 `optionsHidden`이 참이면 `ChatOptionButtons` 자체를 렌더링하지 않아(이전에는 비활성 상태로 계속 남아 있었다) 다시 선택할 수 있는 것처럼 보이지 않는다. `isLatest && !isPending && !pendingSelection` 조건으로 항상 최신·미응답 선택지만 클릭 가능하다.
+- 대화 순서·분기(`STEP_MAP`)·`chatbotService.ts`의 mock 요청 로직·`ALWAYS_DISABLED_OPTION_IDS` 처리(예: "다른 사건 선택할래요")는 변경하지 않았다.
+- 검증: `npm run typecheck`, `npm run lint`, `npm run build` 통과(기존 500kB 청크 경고는 이번 변경과 무관하게 유지). 전체 검색으로 옛 `chatbot-action*`/`chatbot-option-list`/`chatbot-option` 클래스가 이 두 파일(`ChatOptionButtons.tsx`, `Chatbot.css`) 밖에는 없었음을 확인했다. 실제 브라우저 클릭 시연·402px 외 폭에서의 시각 검증은 이번 세션에서 실행하지 않았다. → 확인 필요
+
+### 챗봇 선택지 UI — Figma 디테일 보정 (2026-09-15)
+
+- 사용자 지정 Figma `ChatMessageList`(node `2168:6389`, 개발 페이지)를 `get_design_context` + `get_metadata`로 직접 읽어 위 개편에서 추측했던 값을 실측치로 맞췄다. `chatbot-select-option`·`chatbot-select-group`·`chatbot-msg--bot`(`Chatbot.css`)만 수정했고 컴포넌트 구조·상태 로직(`ChatbotPage.tsx`, `ChatOptionButtons.tsx`)은 건드리지 않았다.
+- 바뀐 값: 버튼 사이 간격 10→8px, 좌우 패딩 20→16px, 그림자 `rgba(0,0,0,.08)`→`.05`(Figma 그대로), 글자 15px/1.4→14px/1.3(Figma `text/txt/14_M`), 정렬 가운데→왼쪽(`text-align:left`, `justify-content:flex-start`), 글자색 `var(--neutral-900)`→`#000`(Figma가 문자 그대로 `text-black`을 쓰고 있어 그대로 반영). 기본 상태에 옅은 파랑 테두리(`1px solid #d9e4ff`)를 추가하고, 선택된 버튼에는 흰색 1px 테두리(`border-color:#fff`)를 더했다 — 둘 다 기존 코드엔 없던 값이다. `min-height`는 47px로 맞췄다(Figma에 같은 문구의 40px짜리 그룹도 섞여 있었지만, `get_metadata` 좌표로 대조해보니 실제 대화 흐름 위치가 아니라 같은 자리에 겹쳐진 사양 참고용 중복 노드였다 — 실제 흐름에 있는 두 인스턴스는 모두 47px).
+- `.chatbot-msg--bot`의 말풍선-선택지 간격을 16→40px로 올렸다. Figma에서 말풍선과 선택지 그룹 사이 간격이 다른 턴 사이 간격(`chatbot-thread`의 40px)과 정확히 같았다.
+- 선택지 그룹 폭은 그대로 `100%`(부모 콘텐츠 폭)를 유지했다. Figma는 328px/282px 같은 고정값을 쓰지만 402px 프레임 전용 값이라 더 좁은 화면(예 360px, 콘텐츠 폭 312px)에서는 그대로 쓰면 넘친다 — 직전 개편에서 정한 반응형 원칙(PROJECT_SPEC.md 3장)을 우선했다.
+- 검증: `npm run typecheck`, `npm run lint`, `npm run build` 통과(기존 500kB 청크 경고 유지). 실제 브라우저 시각 대조는 이번 세션에서 실행하지 않았다. → 확인 필요
+- 후속 사용자 요청으로 선택지 그룹 폭을 `100%`에서 `300px`(고정)로 바꿨다. 다만 콘텐츠 폭이 300px보다 좁은 화면에서 넘치지 않도록 `max-width: 100%`를 함께 둬서, 300px가 확보되면 300px로 고정되고 그보다 좁으면 폭에 맞춰 줄어든다. 부모(`chatbot-msg--bot`)가 `align-items: center`라 줄어든 폭에서도 계속 가운데 정렬된다.
 
 ## 왈가왈후 해결사건 연결 (2026-09-14)
 

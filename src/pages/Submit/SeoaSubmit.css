@@ -43,15 +43,10 @@
   gap: 28px;
 }
 
-.case-submit--seoa .case-submit__field legend {
-  margin-bottom: 8px;
-}
-
 .case-submit--seoa .case-submit__label {
   line-height: 1.3;
 }
 
-.case-submit--seoa .case-submit__attachment-heading .case-submit__label,
 .case-submit--seoa .case-submit__helper {
   color: var(--neutral-600);
 }
