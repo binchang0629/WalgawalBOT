@@ -6,6 +6,7 @@ import useSession from '../../hooks/useSession'
 import { getMyCaseFilters, MY_CASES } from '../../data/personas/myCases'
 import type { MyCase, MyCaseFilter } from '../../data/personas/myCases'
 import './MyCases.css'
+import './MyPageTransitions.css'
 
 function MyCasesContent({ caseInfo }: { caseInfo: MyCase }) {
   const navigate = useNavigate()
@@ -14,7 +15,7 @@ function MyCasesContent({ caseInfo }: { caseInfo: MyCase }) {
   const isPrivate = caseInfo.status === 'private'
 
   return (
-    <main className="my-cases-page">
+    <main className="my-cases-page my-detail-slide-enter">
       <header className="my-sub-header">
         <button type="button" onClick={() => navigate(PATHS.my)} aria-label="마이페이지로 돌아가기">
           <img src={backIcon} alt="" />

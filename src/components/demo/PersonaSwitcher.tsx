@@ -32,7 +32,8 @@ function PersonaSwitcher() {
       <div className="persona-switcher__list">
         {PERSONA_ORDER.map((id) => {
           const persona = PERSONAS[id]
-          const isCurrent = id === personaId
+          // 첫 비로그인 화면에서는 어느 시연 계정도 선택된 것처럼 보이지 않는다.
+          const isCurrent = isAuthenticated && id === personaId
 
           return (
             <button

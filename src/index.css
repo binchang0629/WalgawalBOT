@@ -48,3 +48,30 @@ a {
 img {
     max-width: 100%;
 }
+/* 홈·광장 검색창이 함께 쓰는 중앙 정렬 닫기 표시 */
+.search-close-mark {
+  position: relative;
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
+.search-close-mark::before,
+.search-close-mark::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 11px;
+  height: 1.5px;
+  border-radius: 999px;
+  background: var(--neutral-600);
+  content: '';
+}
+
+.search-close-mark::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.search-close-mark::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}

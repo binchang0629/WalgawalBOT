@@ -84,9 +84,10 @@ function CaseSubmitQuestionsPage() {
   return (
     <form className="case-submit" onSubmit={handleSubmit}>
       <CaseSubmitHeader onBack={handleBack} />
-      <CaseSubmitProgress step={2} label="추가 질문" />
 
-      <div className="case-submit__body">
+      <div className="case-submit__body case-submit__body--with-progress">
+        <CaseSubmitProgress step={2} label="추가 질문" />
+
         <div className="case-submit__intro">
           <h2 className="case-submit__heading">몇 가지만 더 알려주세요</h2>
           <p className="case-submit__description">작성한 내용에서 빠진 정보만 확인해요.</p>

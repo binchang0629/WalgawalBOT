@@ -30,7 +30,7 @@ export default function WalbotPlanManagePage() {
   const { showToast } = useToast()
 
   return (
-    <main className="case-submit walbot-plan-manage">
+    <main className="case-submit walbot-plan-manage my-detail-slide-enter">
       <CaseSubmitHeader title="왈봇 플랜" showTempSave={false} onBack={handleBack} />
 
       <div className="case-submit__body walbot-plan-manage__body">

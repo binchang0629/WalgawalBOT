@@ -14,6 +14,208 @@
     background: #fff;
 }
 
+.home-search {
+    position: sticky;
+    top: var(--device-app-header);
+    z-index: 21;
+    width: 100%;
+    height: 0;
+    pointer-events: none;
+}
+
+.home-search__backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100dvh - var(--device-app-header));
+    padding: 0;
+    border: 0;
+    background: rgb(24 29 43 / 30%);
+    cursor: default;
+    pointer-events: auto;
+    animation: home-search-dim-in 220ms ease-out both;
+}
+
+.home-search__field {
+    position: absolute;
+    top: 20px;
+    right: var(--content-gutter);
+    left: var(--content-gutter);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    height: 54px;
+    padding: 0 12px 0 10px;
+    border: 1px solid var(--blue-200);
+    border-radius: 27px;
+    background: #fff;
+    box-shadow:
+        0 0 0 1px rgb(255 255 255 / 48%),
+        0 14px 34px rgb(15 27 65 / 24%);
+    pointer-events: auto;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+    animation: home-search-drop-in 280ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.home-search__field:focus-within {
+    border-color: var(--blue-200);
+    box-shadow:
+        0 0 0 3px rgb(255 255 255 / 28%),
+        0 0 0 5px rgb(129 183 255 / 18%),
+        0 16px 38px rgb(15 27 65 / 27%);
+}
+
+.home-search__submit,
+.home-search__close {
+    display: grid;
+    flex: none;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.home-search__submit {
+    width: 34px;
+    height: 34px;
+}
+
+.home-search__submit img {
+    display: block;
+    width: 24px;
+    height: 24px;
+}
+
+.home-search__field input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0 7px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--neutral-900);
+    font: 400 15px/1.3 var(--font-body);
+}
+
+.home-search__field input::placeholder {
+    color: var(--neutral-500);
+}
+
+.home-search__field input::-webkit-search-cancel-button {
+    display: none;
+}
+
+.home-search__close {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+.home-search__recent {
+    position: absolute;
+    top: 86px;
+    right: var(--content-gutter);
+    left: var(--content-gutter);
+    z-index: 1;
+    padding: 14px 16px 16px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 12px 30px rgb(15 27 65 / 20%);
+    pointer-events: auto;
+    animation: home-search-recent-in 320ms 60ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.home-search__recent > span {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--neutral-600);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+.home-search__recent > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.home-search__recent-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    border: 1px solid var(--blue-100);
+    border-radius: 999px;
+    background: var(--blue-025);
+    transition: border-color 140ms ease, color 140ms ease, background 140ms ease;
+}
+
+.home-search__recent-chip:hover,
+.home-search__recent-chip:focus-within {
+    border-color: var(--blue-200);
+    color: var(--blue-700);
+    background: var(--blue-050);
+}
+
+.home-search__recent-keyword,
+.home-search__recent-remove {
+    align-self: stretch;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.home-search__recent-keyword {
+    padding: 7px 5px 7px 12px;
+    color: var(--neutral-700);
+    font: 500 13px/1.2 var(--font-body);
+}
+
+.home-search__recent-remove {
+    width: 27px;
+    padding: 0 7px 1px 2px;
+    color: var(--neutral-500);
+    font: 400 17px/1 var(--font-body);
+}
+
+.home-search__recent-keyword:focus-visible,
+.home-search__recent-remove:focus-visible {
+    outline: 2px solid var(--blue-200);
+    outline-offset: -2px;
+    border-radius: 999px;
+}
+
+@keyframes home-search-drop-in {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes home-search-dim-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes home-search-recent-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .home-search__backdrop,
+    .home-search,
+    .home-search__recent {
+        animation: none;
+    }
+
+    .home-search__field {
+        animation: none;
+    }
+}
+
 /* ---------------------------------------------------------------- */
 /* 01 Popular Case — 오늘의 사건                                      */
 /* ---------------------------------------------------------------- */
@@ -204,6 +406,32 @@
     font-size: 16px;
     font-weight: 600;
     line-height: 1;
+    box-shadow: 0 6px 14px rgb(255 149 36 / 18%);
+    animation: popular-case-cta-float 2.4s ease-in-out infinite;
+    will-change: transform, box-shadow;
+}
+
+.popular-case__cta:hover,
+.popular-case__cta:focus-visible {
+    animation-play-state: paused;
+}
+
+@keyframes popular-case-cta-float {
+    0%, 100% {
+        transform: translateY(0);
+        box-shadow: 0 6px 14px rgb(255 149 36 / 18%);
+    }
+
+    50% {
+        transform: translateY(-6px);
+        box-shadow: 0 13px 24px rgb(255 149 36 / 28%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .popular-case__cta {
+        animation: none;
+    }
 }
 
 .popular-case__cta img {
@@ -804,18 +1032,32 @@
 .swap-card__change {
     display: flex;
     align-items: center;
-    padding: 0;
-    border: 0;
-    background: none;
-    color: var(--neutral-600);
+    justify-content: center;
+    gap: 5px;
+    min-height: 32px;
+    padding: 5px 9px;
+    border: 1px solid var(--blue-200);
+    border-radius: var(--radius-pill);
+    background: var(--blue-050);
+    color: var(--blue-700);
     font-size: 12px;
-    font-weight: 500;
-    line-height: 20px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
 }
 
 .swap-card__change img {
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
+}
+
+.swap-card__change-icon {
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 1;
 }
 
 .swap-card__title {
@@ -1289,6 +1531,11 @@ img.ai-card__mascot {
     transform: scaleX(-1);
 }
 
+/* 로그인 전 소형 카드의 캐릭터는 유지하고 텍스트 무게중심만 오른쪽으로 보정한다. */
+.ai-card--button .ai-card__text {
+    transform: translateX(12px);
+}
+
 /* `chat-mascot.png`이 들어오기 전까지 쓰는 자리 표시 */
 .ai-card__mascot--empty {
     display: block;
@@ -1563,7 +1810,7 @@ img.ai-card__mascot {
     opacity: 0;
 }
 .close-section--gauge-visible .close-card__arc-fill {
-    animation: close-gauge-fill 1.9s cubic-bezier(.42, 0, .58, 1) forwards;
+    animation: close-gauge-fill 1.4s cubic-bezier(.42, 0, .58, 1) forwards;
 }
 @keyframes close-gauge-fill {
     from {
@@ -1593,7 +1840,7 @@ img.ai-card__mascot {
     opacity: 0;
     transition: transform 280ms ease;
 }
-.close-section--gauge-visible .close-card__needle { opacity: 1; transition: opacity 1ms linear 2s, transform 280ms ease; }
+.close-section--gauge-visible .close-card__needle { opacity: 1; transition: opacity 1ms linear 1.5s, transform 280ms ease; }
 
 .close-card__needle i {
     display: block;
@@ -1617,7 +1864,7 @@ img.ai-card__mascot {
     border-radius: 50%;
     background: var(--gauge-ink);
     opacity: 0;
-    transition: opacity 1ms linear 2s;
+    transition: opacity 1ms linear 1.5s;
 }
 .close-section--gauge-visible .close-card__knob { opacity: 1; }
 
@@ -1684,7 +1931,7 @@ img.ai-card__mascot {
     height: 58px;
     transform: translateX(-50%);
     opacity: 0;
-    transition: opacity 1ms linear 2s;
+    transition: opacity 180ms ease-out 120ms;
 }
 .close-section--gauge-visible .close-card__mascot { opacity: 1; }
 .close-card__choice {
@@ -1698,7 +1945,7 @@ img.ai-card__mascot {
     height: auto;
     transform: translateY(6px);
     opacity: 0;
-    transition: opacity 200ms ease-out 2s, transform 200ms ease-out 2s;
+    transition: opacity 200ms ease-out 1.5s, transform 200ms ease-out 1.5s;
 }
 .close-section--gauge-visible .close-card__choice { opacity: 1; transform: translateY(0); }
 .close-card__choice--left { left: 0; }
@@ -1744,7 +1991,7 @@ img.ai-card__mascot {
     text-align: center;
     transform: translate(-50%, 6px);
     opacity: 0;
-    transition: opacity 200ms ease-out 2s, transform 200ms ease-out 2s;
+    transition: opacity 200ms ease-out 1.5s, transform 200ms ease-out 1.5s;
 }
 .close-section--gauge-visible .close-card__gap { opacity: 1; transform: translate(-50%, 0); }
 .close-card__gap b {
@@ -1760,11 +2007,6 @@ img.ai-card__mascot {
     border-color: var(--neutral-200);
     border-radius: var(--radius-lg);
     background: var(--neutral-050);
-}
-.swap-card__change {
-    gap: 0;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
 }
 .swap-card__change:focus-visible {
     outline: 2px solid var(--blue-700);

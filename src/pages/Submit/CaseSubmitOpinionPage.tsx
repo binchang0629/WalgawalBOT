@@ -54,9 +54,10 @@ function CaseSubmitOpinionPage() {
   return (
     <div className={`case-submit${isSeoa ? ' case-submit--seoa' : ''}`}>
       <CaseSubmitHeader onBack={handleBack} />
-      <CaseSubmitProgress step={isSeoa ? 3 : 4} totalSteps={scenario.totalSteps} label="접수" />
 
-      <div className="case-submit__body">
+      <div className="case-submit__body case-submit__body--with-progress">
+        <CaseSubmitProgress step={isSeoa ? 3 : 4} totalSteps={scenario.totalSteps} label="접수" />
+
         <div className="case-submit__intro">
           <h2 className="case-submit__heading">접수 전 마지막 확인</h2>
           <p className="case-submit__description">판멍이의 1심과 공개 범위를 확인해 주세요.</p>

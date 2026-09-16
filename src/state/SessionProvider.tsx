@@ -10,7 +10,8 @@ import type { SessionUser } from './sessionContext'
  * 시연 세션 상태를 한곳에서 관리한다.
  *
  * 저장·복원 로직은 이 파일 안에만 둔다.
- * 컴포넌트가 localStorage를 직접 읽고 쓰지 않는다. (PROJECT_SPEC.md §7-8)
+ * 인증 상태는 새 브라우저 세션마다 비로그인으로 시작하도록 sessionStorage에 두고,
+ * 계정별 활동 기록만 localStorage에 유지한다. (PROJECT_SPEC.md §7-8)
  * 저장소를 못 쓰거나 값이 깨져 있어도 서아의 기본 데모 세션으로 시작한다.
  *
  * 복원은 첫 렌더의 초기값에서 동기로 끝낸다.
@@ -21,6 +22,7 @@ import type { SessionUser } from './sessionContext'
 const STORAGE_KEY = `${DEMO.storagePrefix}:session`
 // 서아 시안의 첫 배심 참여 1건/10pt를 재현하는 데모 보상이다.
 const DEMO_JURY_VOTE_POINTS = 10
+const MAX_SUBMITTED_CASES = 1
 
 interface ActivityRecord {
   submittedCaseIds: string[]
@@ -29,7 +31,8 @@ interface ActivityRecord {
 
 type ActivityRecords = Record<PersonaId, ActivityRecord>
 
-const activityStorageKey = (personaId: PersonaId) => `${DEMO.storagePrefix}:${personaId}:activity`
+// 두 계정 모두 0건에서 시작하는 새 집계 규칙. 이전 시연 기록과 섞이지 않게 버전을 분리한다.
+const activityStorageKey = (personaId: PersonaId) => `${DEMO.storagePrefix}:${personaId}:activity:v2`
 
 function emptyActivity(): ActivityRecord {
   return { submittedCaseIds: [], votedCaseIds: [] }
@@ -48,7 +51,7 @@ function readActivity(personaId: PersonaId): ActivityRecord {
     const value = parsed as Partial<ActivityRecord>
     if (!isIdList(value.submittedCaseIds) || !isIdList(value.votedCaseIds)) return emptyActivity()
     return {
-      submittedCaseIds: [...new Set(value.submittedCaseIds)],
+      submittedCaseIds: [...new Set(value.submittedCaseIds)].slice(0, MAX_SUBMITTED_CASES),
       votedCaseIds: [...new Set(value.votedCaseIds)],
     }
   } catch {
@@ -76,7 +79,7 @@ interface SessionState {
 
 function readStored(): StoredSession | null {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
+    const raw = window.sessionStorage.getItem(STORAGE_KEY)
     if (!raw) return null
 
     const parsed: unknown = JSON.parse(raw)
@@ -97,7 +100,7 @@ function readStored(): StoredSession | null {
 
 function writeStored(value: StoredSession) {
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(value))
+    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(value))
   } catch {
     // 저장에 실패해도 화면 동작은 계속된다.
   }
@@ -178,12 +181,15 @@ function SessionProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const recordActivity = useCallback((field: keyof ActivityRecord, id: string) => {
-    // 이번 시안의 신규 활동은 서아에게만 적용한다. 지훈의 기존 시연 집계는 유지한다.
-    if (session.personaId !== 'A' || session.sessionStatus !== 'authenticated' || !id.trim()) return
+    // 서버 연결 전 데모 집계. 로그인한 현재 계정에만 기록하고 같은 사건은 중복 집계하지 않는다.
+    if (session.sessionStatus !== 'authenticated' || !id.trim()) return
     const personaId = session.personaId
     setActivityRecords((current) => {
       const activity = current[personaId]
       if (activity[field].includes(id)) return current
+      if (field === 'submittedCaseIds' && activity.submittedCaseIds.length >= MAX_SUBMITTED_CASES) {
+        return current
+      }
       return {
         ...current,
         [personaId]: { ...activity, [field]: [...activity[field], id] },
@@ -205,7 +211,7 @@ function SessionProvider({ children }: { children: ReactNode }) {
     const account = DEMO_ACCOUNTS[personaId]
     const activity = activityRecords[personaId]
     const earnedPoints = account.points
-      + (personaId === 'A' ? activity.votedCaseIds.length * DEMO_JURY_VOTE_POINTS : 0)
+      + activity.votedCaseIds.length * DEMO_JURY_VOTE_POINTS
 
     // 현재 합계와 목표 합계의 차이만 보관해 이후 배심 포인트도 계속 누적되게 한다.
     setRewardPointAdjustments((current) => ({
@@ -217,10 +223,13 @@ function SessionProvider({ children }: { children: ReactNode }) {
   const activityStats = useMemo(() => {
     const account = DEMO_ACCOUNTS[session.personaId]
     const activity = activityRecords[session.personaId]
-    const submittedCases = session.personaId === 'A' ? activity.submittedCaseIds.length : 0
-    const juryParticipations = session.personaId === 'A' ? activity.votedCaseIds.length : 0
+    const submittedCases = activity.submittedCaseIds.length
+    const juryParticipations = activity.votedCaseIds.length
     return {
-      submittedCases: account.submittedCases + submittedCases,
+      submittedCases: Math.min(
+        MAX_SUBMITTED_CASES,
+        account.submittedCases + submittedCases,
+      ),
       juryParticipations: account.juryParticipations + juryParticipations,
       points: account.points
         + juryParticipations * DEMO_JURY_VOTE_POINTS

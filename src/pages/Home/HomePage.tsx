@@ -1,7 +1,15 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import TopBar from '../../components/common/TopBar'
 import useSession from '../../hooks/useSession'
+import useLoginGate from '../../hooks/useLoginGate'
+import useToast from '../../hooks/useToast'
+import { DEMO_ACCOUNTS } from '../../data/personas'
 import { PATHS } from '../../routes/paths'
+import seoaProfileImage from '../../assets/my/profile.png'
+import jihunProfileImage from '../../assets/my/account-jihun.png'
+import guestProfileIcon from '../../assets/icons/profile-topbar-guest.svg'
+import AccountSwitchSheet from '../My/components/AccountSwitchSheet'
 import PopularCaseSection from './components/PopularCaseSection'
 import RecentCasesSection from './components/RecentCasesSection'
 import AdBanner from './components/AdBanner'
@@ -10,6 +18,7 @@ import CloseCallSection from './components/CloseCallSection'
 import AfterStorySection from './components/AfterStorySection'
 import AiRecommendSection from './components/AiRecommendSection'
 import CompactAiRecommendCard from './components/CompactAiRecommendCard'
+import HomeSearchPanel from './components/HomeSearchPanel'
 import './Home.css'
 import './components/BalanceGame.css'
 
@@ -24,8 +33,12 @@ import './components/BalanceGame.css'
  * 로그인 전후에 같은 홈을 재사용하고, 로그인 후에만 AI 맞춤 추천 섹션을 추가한다.
  */
 function HomePage() {
-  const { sessionStatus, personaId } = useSession()
+  const { sessionStatus, personaId, signIn, signOut } = useSession()
+  const { requireLogin } = useLoginGate()
+  const { showToast } = useToast()
   const isAuthenticated = sessionStatus === 'authenticated'
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [isAccountSwitchOpen, setIsAccountSwitchOpen] = useState(false)
 
   /*
     시연 흐름상 가입 진입점은 사건 상세의 `로그인하고 나도 투표하기`다.
@@ -49,7 +62,22 @@ function HomePage() {
 
   return (
     <main className="home-screen">
-      <TopBar />
+      <TopBar
+        isSearchOpen={isSearchOpen}
+        onSearch={() => setIsSearchOpen((isOpen) => !isOpen)}
+        accountAvatar={isAuthenticated ? (personaId === 'A' ? seoaProfileImage : jihunProfileImage) : guestProfileIcon}
+        accountPersona={isAuthenticated ? personaId : undefined}
+        isAccountSwitchOpen={isAccountSwitchOpen}
+        onAccountSwitch={() => {
+          setIsSearchOpen(false)
+          if (isAuthenticated) {
+            setIsAccountSwitchOpen(true)
+            return
+          }
+          requireLogin('my', PATHS.my)
+        }}
+      />
+      {isSearchOpen && <HomeSearchPanel onClose={() => setIsSearchOpen(false)} />}
       <PopularCaseSection />
       {isAuthenticated && <RecentCasesSection />}
       <AdBanner />
@@ -58,6 +86,23 @@ function HomePage() {
       <BalanceGameSection key={personaId} />
       <CloseCallSection cta={cta} />
       <AfterStorySection />
+      {isAccountSwitchOpen && (
+        <AccountSwitchSheet
+          key={personaId}
+          currentPersona={personaId}
+          onClose={() => setIsAccountSwitchOpen(false)}
+          onConfirm={(nextPersona) => {
+            signIn(nextPersona)
+            setIsAccountSwitchOpen(false)
+            showToast(`${DEMO_ACCOUNTS[nextPersona].name} 프로필로 전환되었습니다`)
+          }}
+          onLogout={() => {
+            signOut()
+            setIsAccountSwitchOpen(false)
+            showToast('로그아웃 되었습니다')
+          }}
+        />
+      )}
     </main>
   )
 }

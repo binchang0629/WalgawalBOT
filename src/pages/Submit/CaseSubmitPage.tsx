@@ -1,4 +1,4 @@
-import { useId, useRef } from 'react'
+import { useId, useLayoutEffect, useRef } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BACK_FALLBACK, PATHS } from '../../routes/paths'
@@ -9,7 +9,6 @@ import useCaseSubmitDraft from './useCaseSubmitDraft'
 import useWizardBack from '../../hooks/useWizardBack'
 import { RELATIONSHIPS } from './types'
 import { JIHUN_CONTENT, SEOA_CONTENT, SUBMIT_SCENARIOS } from './caseSubmitContent'
-import checkMark from '../../assets/submit/figma/imgCheck.svg'
 import walangJoy from '../../assets/submit/figma/imgCharacterWalangJoy.svg'
 import './CaseSubmit.css'
 import './CaseSubmitPage.css'
@@ -28,6 +27,11 @@ const CONTENT_PLACEHOLDER = `언제, 누구와 어떤 일이 있었나요?
 예) 의뢰인에게 작업물을 전달했는데
 약속한 날짜가 지나도 잔금을 받지 못했어요.`
 
+const SEOA_CONTENT_PLACEHOLDER = `언제, 누구와 어떤 일이 있었나요?
+
+예) 동아리 축제 준비 중 팀원이 약속한 시간까지
+홍보물을 올리지 않아 제가 대신 작업했어요.`
+
 function CaseSubmitPage() {
   const {
     personaId,
@@ -44,13 +48,23 @@ function CaseSubmitPage() {
 
   const photoInputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const contentInputRef = useRef<HTMLTextAreaElement>(null)
   const contentFieldId = useId()
 
   const navigate = useNavigate()
   const handleBack = useWizardBack(BACK_FALLBACK.cases)
 
-  const canProceed = content.trim().length > 0
+  const canProceed = relationship !== null && content.trim().length > 0
   const hasAttachments = photoNames.length > 0 || fileNames.length > 0
+
+  // 긴 시연 문구도 textarea 안에서 따로 스크롤하지 않고 내용 높이만큼 펼쳐 보인다.
+  useLayoutEffect(() => {
+    const field = contentInputRef.current
+    if (!field) return
+
+    field.style.height = 'auto'
+    field.style.height = `${field.scrollHeight}px`
+  }, [content])
 
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? [])
@@ -76,8 +90,8 @@ function CaseSubmitPage() {
   const handleDemoFill = () => {
     setContent(isSeoa ? SEOA_CONTENT : JIHUN_CONTENT)
     window.requestAnimationFrame(() => {
-      const field = document.getElementById(contentFieldId)
-      if (field instanceof HTMLTextAreaElement) {
+      const field = contentInputRef.current
+      if (field) {
         field.focus()
         field.setSelectionRange(field.value.length, field.value.length)
         field.scrollTop = 0
@@ -92,18 +106,21 @@ function CaseSubmitPage() {
   }
 
   return (
-    <form className={`case-submit${isSeoa ? ' case-submit--seoa case-submit--writing' : ''}`} onSubmit={handleSubmit}>
+    <form className="case-submit" onSubmit={handleSubmit}>
       <CaseSubmitHeader onBack={handleBack} />
-      <CaseSubmitProgress step={1} totalSteps={SUBMIT_SCENARIOS[personaId].totalSteps} label="사건 작성" />
 
-      <div className="case-submit__body">
+      <div className="case-submit__body case-submit__body--with-progress">
+        <CaseSubmitProgress step={1} totalSteps={SUBMIT_SCENARIOS[personaId].totalSteps} label="사건 작성" />
+
         <div className="case-submit__intro">
           <h2 className="case-submit__heading">무슨 일이 있었나요?</h2>
           <p className="case-submit__description">편하게 적어주세요. 정리는 판멍이가 도와줄게요.</p>
         </div>
 
-        <fieldset className="case-submit__field">
-          <legend className="case-submit__label">상대와의 관계</legend>
+        <fieldset className="case-submit__field" aria-required="true">
+          <legend className="case-submit__label">
+            상대와의 관계 <span className="case-submit__required" aria-hidden="true">*</span>
+          </legend>
           <div className="case-submit__chip-grid">
             {RELATIONSHIPS.map((option) => {
               const isSelected = relationship === option
@@ -116,9 +133,6 @@ function CaseSubmitPage() {
                   onClick={() => setRelationship(option)}
                 >
                   {option}
-                  {isSelected && (
-                    <img src={checkMark} alt="" className="case-submit__choice-check" width={9.5} height={7} />
-                  )}
                 </button>
               )
             })}
@@ -127,8 +141,7 @@ function CaseSubmitPage() {
 
         <div className="case-submit__field">
           <div className="case-submit__attachment-heading">
-            <span className="case-submit__label">사진·파일 첨부{isSeoa ? '(선택)' : ''}</span>
-            {!isSeoa && <span className="case-submit__optional">선택</span>}
+            <span className="case-submit__label">사진·파일 첨부(선택)</span>
           </div>
           <div className="case-submit__attachment-actions">
             <button
@@ -178,9 +191,10 @@ function CaseSubmitPage() {
           </div>
           <div className={`case-submit__textarea-box${content ? ' has-content' : ''}`}>
             <textarea
+              ref={contentInputRef}
               id={contentFieldId}
               className="case-submit__textarea"
-              placeholder={isSeoa ? '언제, 누구와 어떤 일이 있었나요?' : CONTENT_PLACEHOLDER}
+              placeholder={isSeoa ? SEOA_CONTENT_PLACEHOLDER : CONTENT_PLACEHOLDER}
               maxLength={CONTENT_MAX_LENGTH}
               value={content}
               onChange={(event) => setContent(event.target.value)}

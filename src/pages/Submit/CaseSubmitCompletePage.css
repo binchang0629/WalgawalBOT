@@ -1,5 +1,10 @@
 /* 사건 접수 5단계(지훈05) 전용 스타일. */
 
+.case-submit__complete-spacer {
+    flex: none;
+    height: 56px;
+}
+
 .case-submit__complete-body {
     flex: 1;
     min-height: 0;
@@ -21,9 +26,51 @@
     display: none;
 }
 
-.case-submit__complete-art {
+.case-submit__complete-art-stage {
+    position: relative;
     flex: none;
+    width: 150px;
+    height: 122px;
+    animation: case-complete-character 560ms cubic-bezier(.22, 1, .36, 1) 80ms both;
+}
+
+.case-submit__complete-art-stage::before {
+    position: absolute;
+    z-index: 0;
+    inset: 9px 18px 2px;
+    border: 2px solid rgb(255 149 36 / 42%);
+    border-radius: 50%;
+    content: '';
+    animation: case-complete-ring 680ms cubic-bezier(.22, 1, .36, 1) 120ms both;
+}
+
+.case-submit__complete-art {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 150px;
+    height: 122px;
     object-fit: cover;
+}
+
+.case-submit__complete-check {
+    position: absolute;
+    z-index: 2;
+    top: -7px;
+    right: -3px;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    color: #fff;
+    background: var(--orange);
+    box-shadow: 0 5px 12px rgb(255 149 36 / 28%);
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1;
+    animation: case-complete-check 420ms cubic-bezier(.34, 1.56, .64, 1) 390ms both;
 }
 
 .case-submit__complete-message {
@@ -33,6 +80,7 @@
     gap: 8px;
     text-align: center;
     width: 100%;
+    animation: case-complete-rise 420ms cubic-bezier(.22, 1, .36, 1) 300ms both;
 }
 
 .case-submit__complete-message .case-submit__heading,
@@ -48,6 +96,7 @@
     padding: 20px;
     border-radius: 8px;
     background: var(--blue-050);
+    animation: case-complete-rise 460ms cubic-bezier(.22, 1, .36, 1) 430ms both;
 }
 
 .case-submit__receipt-title {
@@ -75,4 +124,48 @@
     font-size: 12px;
     font-weight: 500;
     color: var(--neutral-600);
+    animation: case-complete-rise 400ms cubic-bezier(.22, 1, .36, 1) 560ms both;
+}
+
+.case-submit--complete .case-submit__footer {
+    animation: case-complete-footer 440ms cubic-bezier(.22, 1, .36, 1) 580ms both;
+}
+
+@keyframes case-complete-character {
+    0% { opacity: 0; transform: translateY(18px) scale(.76) rotate(-3deg); }
+    68% { opacity: 1; transform: translateY(-3px) scale(1.04) rotate(1deg); }
+    100% { opacity: 1; transform: none; }
+}
+
+@keyframes case-complete-ring {
+    0% { opacity: 0; transform: scale(.55); }
+    45% { opacity: .9; }
+    100% { opacity: 0; transform: scale(1.45); }
+}
+
+@keyframes case-complete-check {
+    0% { opacity: 0; transform: scale(.3) rotate(-18deg); }
+    100% { opacity: 1; transform: none; }
+}
+
+@keyframes case-complete-rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+}
+
+@keyframes case-complete-footer {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .case-submit__complete-art-stage,
+    .case-submit__complete-art-stage::before,
+    .case-submit__complete-check,
+    .case-submit__complete-message,
+    .case-submit__receipt,
+    .case-submit__complete-reminder,
+    .case-submit--complete .case-submit__footer {
+        animation: none;
+    }
 }

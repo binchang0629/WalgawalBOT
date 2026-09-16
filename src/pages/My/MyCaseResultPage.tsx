@@ -5,6 +5,7 @@ import backIcon from '../../assets/my/back.svg'
 import detectiveImage from '../../assets/my-case/panmung-curiosity.png'
 import verdictDifferenceImage from '../../assets/my-case/verdict-difference.png'
 import './MyCases.css'
+import './MyPageTransitions.css'
 
 const verdicts = [
   { label: '글쓴이 입장이 더 타당함', value: 46, highlight: true },
@@ -27,7 +28,7 @@ function MyCaseResultPage() {
   // 이전 공유 URL도 유지하되, 표시하는 사건번호는 최신 목록 시안과 통일한다.
   if (caseId !== MY_CASES.A.id && caseId !== 'CASE-SEOA-01') {
     return (
-      <main className="my-case-result-page my-case-result-page--empty">
+      <main className="my-case-result-page my-case-result-page--empty my-detail-slide-enter">
         <p>해당 사건 결과를 찾을 수 없습니다.</p>
         <button type="button" onClick={() => navigate(PATHS.myCases)}>내 사건으로 돌아가기</button>
       </main>
@@ -35,9 +36,9 @@ function MyCaseResultPage() {
   }
 
   return (
-    <main className="my-case-result-page">
+    <main className="my-case-result-page my-detail-slide-enter">
       <header className="my-sub-header">
-        <button type="button" onClick={() => navigate(PATHS.myCases)} aria-label="내 사건 목록으로 돌아가기">
+        <button type="button" onClick={() => navigate(PATHS.home)} aria-label="홈으로 이동">
           <img src={backIcon} alt="" />
         </button>
         <h1>결과 확인하기</h1>
@@ -86,7 +87,7 @@ function MyCaseResultPage() {
         <section className="followup-card">
           <h3>사건을 해결했나요?</h3>
           <p>AI 판결과 배심원 의견을 참고해 실제로 어떻게 행동했는지 기록해보세요.</p>
-          <button type="button" disabled>후일담 작성하기</button>
+          <button type="button" onClick={() => navigate(PATHS.afterStoryMine)}>후일담 작성하기</button>
         </section>
 
         <p className="my-result-footer">배심원 댓글과 공감 반응은 별도 화면에서 확인</p>

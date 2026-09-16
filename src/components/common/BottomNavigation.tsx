@@ -102,7 +102,15 @@ function BottomNavigation() {
               // 비로그인이면 이동을 막고 안내 팝업만 띄운다. 보던 화면은 그대로 남는다.
               if (item.gate && !requireLogin(item.gate, item.to)) {
                 event.preventDefault()
+                return
               }
+
+              // MainLayout은 라우트가 바뀌어도 같은 내부 스크롤 영역을 재사용한다.
+              // 네비로 이동할 때와 현재 메뉴를 다시 눌렀을 때 모두 화면 맨 위에서 시작한다.
+              event.currentTarget
+                .closest<HTMLElement>('.main-layout')
+                ?.querySelector<HTMLElement>('.main-layout__scroll')
+                ?.scrollTo({ top: 0, left: 0, behavior: 'auto' })
             }}
           >
             <NavIcon src={item.icon} isCta={item.isCta} />

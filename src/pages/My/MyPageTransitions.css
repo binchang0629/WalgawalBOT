@@ -1,0 +1,16 @@
+.my-detail-slide-enter {
+    animation: my-detail-slide-in 340ms cubic-bezier(.22, 1, .36, 1) both;
+    will-change: transform;
+}
+
+@keyframes my-detail-slide-in {
+    from { transform: translate3d(100%, 0, 0); }
+    to { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .my-detail-slide-enter {
+        animation: none;
+        will-change: auto;
+    }
+}

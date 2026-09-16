@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { DEMO_ACCOUNTS } from '../../data/personas'
+import { weddingGiftCase } from '../../data/common/caseDetailContent'
 import { Link, useNavigate } from 'react-router-dom'
 import useSession from '../../hooks/useSession'
-import { PATHS } from '../../routes/paths'
+import { PATHS, toCaseResult } from '../../routes/paths'
 import profileImage from '../../assets/my/profile.png'
 import jihunProfileImage from '../../assets/my/account-jihun.png'
 import guestMascotImage from '../../assets/auth/loginPopUpMy.webp'
@@ -70,7 +71,7 @@ function MenuRow({ label, icon, iconSize, disabled = false, onClick }: MenuItem)
 function MyPage() {
   const navigate = useNavigate()
   const { showToast } = useToast()
-  const { personaId, currentUser, activityStats, switchPersona, signOut } = useSession()
+  const { personaId, currentUser, activityStats, signIn, signOut } = useSession()
   const isSeoa = personaId === 'A'
   const [activityOpen, setActivityOpen] = useState(true)
   const [settingsOpen, setSettingsOpen] = useState(true)
@@ -157,11 +158,32 @@ function MyPage() {
               계정 전환 <img src={isSeoa ? seoaSwitchIcon : switchIcon} alt="" />
             </button>
           </div>
-          <dl className="profile-card__stats">
-            <div><dt>접수한 사건</dt><dd><strong>{activityStats.submittedCases}</strong>건</dd></div>
-            <div><dt>배심 참여</dt><dd><strong>{activityStats.juryParticipations}</strong>건</dd></div>
-            <div><dt>포인트</dt><dd className="profile-card__points"><strong ref={pointValueRef}>{activityStats.points}</strong><span>pt</span></dd></div>
-          </dl>
+          <div className="profile-card__stats" aria-label="나의 활동 요약">
+            <button
+              type="button"
+              className={`profile-card__stat profile-card__stat--action${activityStats.submittedCases === 0 ? ' is-empty' : ''}`}
+              disabled={activityStats.submittedCases === 0}
+              onClick={() => navigate(PATHS.myCases)}
+              aria-label={`접수한 사건 ${activityStats.submittedCases}건${activityStats.submittedCases > 0 ? ', 내 사건으로 이동' : ''}`}
+            >
+              <span className="profile-card__stat-label">접수한 사건</span>
+              <span className="profile-card__stat-value"><strong>{activityStats.submittedCases}</strong>건</span>
+            </button>
+            <button
+              type="button"
+              className={`profile-card__stat profile-card__stat--action${activityStats.juryParticipations === 0 ? ' is-empty' : ''}`}
+              disabled={activityStats.juryParticipations === 0}
+              onClick={() => navigate(toCaseResult(weddingGiftCase.id))}
+              aria-label={`배심 참여 ${activityStats.juryParticipations}건${activityStats.juryParticipations > 0 ? ', 참여한 사건 결과로 이동' : ''}`}
+            >
+              <span className="profile-card__stat-label">배심 참여</span>
+              <span className="profile-card__stat-value"><strong>{activityStats.juryParticipations}</strong>건</span>
+            </button>
+            <div className="profile-card__stat">
+              <span className="profile-card__stat-label">포인트</span>
+              <span className="profile-card__stat-value profile-card__points"><strong ref={pointValueRef}>{activityStats.points}</strong><span>pt</span></span>
+            </div>
+          </div>
         </section>
 
         {isSeoa ? (
@@ -251,7 +273,7 @@ function MyPage() {
           currentPersona={personaId}
           onClose={closeAccountSheet}
           onConfirm={(nextPersona) => {
-            switchPersona(nextPersona)
+            signIn(nextPersona)
             closeAccountSheet()
             showToast(`${DEMO_ACCOUNTS[nextPersona].name} 프로필로 전환되었습니다`)
           }}

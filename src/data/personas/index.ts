@@ -49,7 +49,7 @@ export interface DemoAccount {
   name: string
   email: string
   nickname: string
-  /** MY의 초기 활동 수치. 이후 서아의 접수·투표는 공유 데모 상태에서 더한다. */
+  /** MY의 초기 활동 수치. 이후 각 계정의 접수·투표는 계정별 데모 상태에서 더한다. */
   submittedCases: number
   juryParticipations: number
   /** 초기 데모 포인트. 실제 결제·리워드 시스템과 연결하지 않는다. */
@@ -77,8 +77,8 @@ export const DEMO_ACCOUNTS: Record<PersonaId, DemoAccount> = {
     name: '곽지훈',
     email: 'kwak_isfree@wgwb.com',
     nickname: '익명의 왈랑이',
-    submittedCases: 4,
-    juryParticipations: 24,
+    submittedCases: 0,
+    juryParticipations: 0,
     points: 0,
     anonymousAvatarUrl: jihunAnonymousAvatar,
     passwordPlaceholder: 'jihun1234!',

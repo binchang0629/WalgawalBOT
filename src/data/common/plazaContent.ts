@@ -16,6 +16,17 @@ export const jurorRanking: JurorRank[] = [
   { rank: 3, nickname: '증거 수집가', point: 756 },
 ]
 
+export const voterRankingPanel = {
+  title: '이달의 최다 투표자',
+  description: '가장 많은 사건에 소중한 한 표를 보냈어요',
+} as const
+
+export const voterRanking: JurorRank[] = [
+  { rank: 1, nickname: '오늘도 소신', point: 1428 },
+  { rank: 2, nickname: '한표의 용기', point: 1286 },
+  { rank: 3, nickname: '투표하는 토끼', point: 1137 },
+]
+
 export const caseCategories: (CaseCategory | '전체')[] = [
   '전체',
   '연인',

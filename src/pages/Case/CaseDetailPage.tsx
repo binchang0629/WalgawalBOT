@@ -8,6 +8,7 @@ import CaseHeader from './components/CaseHeader'
 import CaseVoteSection from './components/CaseVoteSection'
 import useToast from '../../hooks/useToast'
 import useDemoCountdown from './components/useDemoCountdown'
+import { getRememberedCaseParticipantCount } from '../../utils/caseParticipantCount'
 import './CaseDetailPage.css'
 
 /**
@@ -42,6 +43,10 @@ function CaseDetailPage() {
   const { sessionStatus, recordJuryVote } = useSession()
   const { showToast } = useToast()
   const [selectedVote, setSelectedVote] = useState<WeddingGiftVoteId | null>(null)
+  const [participantCount] = useState(() => getRememberedCaseParticipantCount(
+    weddingGiftCase.id,
+    weddingGiftCase.participantCount,
+  ))
 
   if (caseId !== weddingGiftCase.id) return <MissingCase />
 
@@ -88,7 +93,7 @@ function CaseDetailPage() {
           <h2 id="case-title" className="case-overview__title">{weddingGiftCase.title}</h2>
           <p className="case-overview__meta">
             사건 번호 · {weddingGiftCase.caseNumber} · {weddingGiftCase.age} · 배심원{' '}
-            {weddingGiftCase.participantCount}명 참여
+            {participantCount.toLocaleString()}명 참여
           </p>
         </section>
 

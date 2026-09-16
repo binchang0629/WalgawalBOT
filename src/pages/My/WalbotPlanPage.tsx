@@ -11,6 +11,7 @@ import adFreeIcon from '../../assets/my/plan/benefit-ad-free.svg'
 import unlimitedIcon from '../../assets/my/plan/benefit-unlimited.svg'
 import reportIcon from '../../assets/my/plan/benefit-report.svg'
 import './WalbotPlanPage.css'
+import './MyPageTransitions.css'
 
 const plans = [
   { id: 'annual', name: '연간', price: '￦39,000', accessiblePrice: '39,000원', billing: '7일 무료 체험 / 1년마다 결제', originalPrice: '￦49,000' },
@@ -30,7 +31,7 @@ function WalbotPlanSelectionPage() {
   const [selectedPlan, setSelectedPlan] = useState<typeof plans[number]['id']>('annual')
 
   return (
-    <main className="case-submit walbot-plan">
+    <main className="case-submit walbot-plan my-detail-slide-enter">
       <CaseSubmitHeader title="왈봇 플랜" showTempSave={false} onBack={handleBack} />
 
       <form className="walbot-plan__form" onSubmit={(event) => { event.preventDefault(); showToast('무료체험 신청 기능은 준비 중이에요.') }}>

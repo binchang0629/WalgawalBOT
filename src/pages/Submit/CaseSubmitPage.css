@@ -11,6 +11,11 @@
     gap: 8px;
 }
 
+/* 서아 시안과 동일하게 관계 라벨과 선택 버튼 사이를 16px로 맞춘다. */
+.case-submit__field legend {
+    margin-bottom: 8px;
+}
+
 /* ---------- 사진·파일 첨부 ---------- */
 
 .case-submit__attachment-heading {
@@ -19,16 +24,20 @@
     justify-content: space-between;
 }
 
-.case-submit__optional {
-    font-family: var(--font-body);
-    font-size: 13px;
-    font-weight: 400;
-    color: var(--blue-300);
-}
-
 .case-submit__attachment-actions {
     display: flex;
     gap: 12px;
+}
+
+.case-submit__attachment-heading .case-submit__label,
+.case-submit__helper {
+    color: var(--neutral-600);
+}
+
+.case-submit__helper {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.3;
 }
 
 .case-submit__attachment-btn {
@@ -92,7 +101,7 @@
     flex-direction: column;
     justify-content: space-between;
     gap: 8px;
-    height: 200px;
+    min-height: 200px;
     padding: 16px;
     border: 1px solid var(--neutral-250);
     border-radius: 12px;
@@ -100,8 +109,9 @@
 }
 
 .case-submit__textarea {
-    flex: 1;
-    min-height: 0;
+    flex: none;
+    min-height: 130px;
+    overflow-y: hidden;
     resize: none;
     border: 0;
     padding: 0;
