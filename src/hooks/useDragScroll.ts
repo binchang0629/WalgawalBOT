@@ -27,14 +27,17 @@ function useDragScroll<T extends HTMLElement>() {
       draggedRef.current = false
       startX = event.clientX
       startScrollLeft = element.scrollLeft
-      element.setPointerCapture(event.pointerId)
-      element.classList.add('is-dragging')
     }
 
     const onPointerMove = (event: PointerEvent) => {
       if (!dragging) return
       const moved = event.clientX - startX
-      if (Math.abs(moved) > 4) draggedRef.current = true
+      if (!draggedRef.current && Math.abs(moved) <= 4) return
+      if (!draggedRef.current) {
+        draggedRef.current = true
+        element.setPointerCapture(event.pointerId)
+        element.classList.add('is-dragging')
+      }
       element.scrollLeft = startScrollLeft - moved
       event.preventDefault()
     }

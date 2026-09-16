@@ -8,9 +8,12 @@ import { PATHS, toAfterStoryDetail } from '../../routes/paths'
 import CaseSubmitProgress from '../Submit/components/CaseSubmitProgress'
 import backIcon from '../../assets/my/back.svg'
 import walgadakEmpathy from '../../assets/case/stickers/walgadak-empathy.png'
+import loanStoryAvatar from '../../assets/case/result/comment-avatar-2.png'
+import creditStoryAvatar from '../../assets/case/result/comment-avatar-3.png'
 import panMungyeeJudge from '../../assets/submit/panmung-judge-hq.png'
 import CommentThread from '../../components/common/CommentThread'
 import { afterStoryAuthor, afterStoryComments, afterStoryLetter } from '../../data/common/afterStoryDetailContent'
+import { afterStoryCardComments } from '../../data/common/afterStoryCardComments'
 import scrollBackground from '../../assets/afterstory/figma/scroll-background.png'
 import letterPaper from '../../assets/afterstory/figma/letter-paper.png'
 import detailBackground from '../../assets/afterstory/figma/detail-background.png'
@@ -37,6 +40,39 @@ const DEMO_STORY = [
   '',
   '그날 이후 먼저 연락해서 사과했고, 지금은 서로의 의견을 묻는 방식으로 조별 과제를 하고 있어요.',
 ].map((paragraph) => paragraph.trimStart()).join('\n')
+
+const AFTER_STORY_DETAILS = {
+  'afterstory-friend-loan': {
+    author: { ...afterStoryAuthor, titleLines: ['직접 대화해보니,', '서로 오해를 풀었어요.'], lead: '돈 이야기를 피하지 않고 꺼내니 관계가 조금 달라졌어요.', name: '달력에동그라미', avatarUrl: loanStoryAvatar },
+    lines: [
+      '친구에게 300만 원을 빌려준 뒤 6개월 동안',
+      '돌려받지 못했어요. 돈 이야기가 불편해서',
+      '서로 연락을 피하다가 직접 만나기로 했어요.',
+      '돈을 재촉하면 친구 사이마저 멀어질까 겁났어요.',
+      '친구는 당장 갚기 어려운 사정이 있었다며',
+      '말하지 않고 미뤄서 미안하다고 했어요.',
+      '언제 얼마씩 갚을지 메시지로 남겼고,',
+      '대화를 마친 뒤에는 서로의 상황을 먼저 말하자고 약속했어요.',
+      '아직 다 해결된 건 아니지만 이제는',
+      '피하지 않고 이야기할 수 있게 됐어요.',
+    ],
+  },
+  'afterstory-idea-credit-card': {
+    author: { ...afterStoryAuthor, titleLines: ['이메일 증거를 제출한 뒤,', '공동 기여를 인정받았어요.'], lead: '아이디어를 어떻게 만들었는지 차분히 설명했어요.', meta: '직장 · 후일담', name: '메일함탐정', avatarUrl: creditStoryAvatar },
+    lines: [
+      '회의에서 제가 준비한 아이디어를 직속 사수가',
+      '자신의 제안처럼 발표해 당황했어요.',
+      '제안 초안과 수정 기록, 팀에 보낸 이메일을',
+      '날짜순으로 모아 팀장에게 면담을 요청했어요.',
+      '면담 전에 누가 어떤 작업을 맡았는지 표로 정리해 두었어요.',
+      '누가 옳은지 따지기보다 제가 만든 부분을',
+      '차분히 설명했고, 기록도 함께 보여줬어요.',
+      '팀장도 자료를 보니 제 기여가 분명하다고 말해줬어요.',
+      '최종 보고서에 두 사람의 이름이 들어가',
+      '공동 기여를 인정받을 수 있었습니다.',
+    ],
+  },
+} as const
 
 /**
  * `내 이야기 남기기` 화면에 올라오는 내 사건 목록. Figma 왈가왈후 시안 기준.
@@ -247,15 +283,20 @@ export function MyPublishedAfterStoryPage() {
  *
  * 기준 시안: Figma `AS06 / 공개 후일담 상세 · 편지형` (노드 `2778:15991`)
  * 히어로(제목·작성자·편지지) 아래에 공용 댓글 스레드가 이어진다.
- *
- * 지금은 홈과 `내가 쓴 후일담`에 올라와 있는 편지 한 건만 연결한다.
+ * 홈의 두 카드도 같은 화면을 사용하고, 사건별 본문만 바꿔 보여준다.
  */
 export function AfterStoryDetailPage() {
   const { storyId } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
+  const variant = storyId ? AFTER_STORY_DETAILS[storyId as keyof typeof AFTER_STORY_DETAILS] : undefined
+  const author = variant?.author ?? afterStoryAuthor
+  const lines = variant?.lines ?? afterStoryLetter.lines
+  const comments = storyId && storyId in afterStoryCardComments
+    ? afterStoryCardComments[storyId as keyof typeof afterStoryCardComments]
+    : afterStoryComments
 
-  if (storyId !== 'friend') return <Navigate to={PATHS.afterStory} replace />
+  if (storyId !== 'friend' && !variant) return <Navigate to={PATHS.afterStory} replace />
 
   /*
    * 어느 화면에서 들어왔는지는 넘겨받은 state로만 판단한다.
@@ -271,19 +312,19 @@ export function AfterStoryDetailPage() {
           className="afterstory-detail__hero"
           style={{ backgroundImage: `url(${detailBackground})` }}
         >
-          <p className="afterstory-detail__eyebrow">{afterStoryAuthor.eyebrow}</p>
+          <p className="afterstory-detail__eyebrow">{author.eyebrow}</p>
           <h1>
-            {afterStoryAuthor.titleLines.map((line, index) => (
+            {author.titleLines.map((line, index) => (
               <Fragment key={line}>{index > 0 ? <br /> : null}{line}</Fragment>
             ))}
           </h1>
-          <p className="afterstory-detail__lead">{afterStoryAuthor.lead}</p>
+          <p className="afterstory-detail__lead">{author.lead}</p>
 
           <div className="afterstory-detail__author">
-            <img src={walgadakEmpathy} alt="" />
+            <img src={author.avatarUrl} alt="" />
             <div>
-              <strong>{afterStoryAuthor.name}</strong>
-              <span>{afterStoryAuthor.meta}</span>
+              <strong>{author.name}</strong>
+              <span>{author.meta}</span>
             </div>
           </div>
 
@@ -293,15 +334,15 @@ export function AfterStoryDetailPage() {
               <img src={letterPaper} alt="" />
             </div>
             <h2>{afterStoryLetter.heading}</h2>
-            <div className="afterstory-detail__letter-lines">
-              {afterStoryLetter.lines.map((line) => <p key={line}>{line}</p>)}
+            <div className={`afterstory-detail__letter-lines${variant ? ' afterstory-detail__letter-lines--flow' : ''}`}>
+              {variant ? <p>{lines.join(' ')}</p> : lines.map((line) => <p key={line}>{line}</p>)}
             </div>
           </article>
         </section>
 
         <div className="afterstory-detail__comments">
           <CommentThread
-            comments={afterStoryComments}
+            comments={comments}
             showReply
             headingId="afterstory-comments-title"
           />

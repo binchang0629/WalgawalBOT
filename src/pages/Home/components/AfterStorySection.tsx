@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import useDragScroll from '../../../hooks/useDragScroll'
 import SectionTitle from '../../../components/common/SectionTitle'
+import { PATHS, toAfterStoryDetail } from '../../../routes/paths'
 import { homeIcons, homeImages } from '../homeAssets'
 import {
   afterStoryQuotes,
@@ -92,7 +94,13 @@ function AfterStorySection() {
 
       <div className="story-scroll" ref={storyScrollRef} onDragStart={preventStoryDragStart}>
         {afterStoryQuotes.map((story) => (
-          <article className="quote-card" key={story.id}>
+          <Link
+            className="quote-card"
+            key={story.id}
+            to={toAfterStoryDetail(story.id)}
+            state={{ from: PATHS.home }}
+            aria-label={`${story.caseTitleLines.join(' ')} 후일담 읽기`}
+          >
             <div className="quote-card__body">
               <span className="quote-card__mark">“</span>
               <p>
@@ -116,7 +124,7 @@ function AfterStorySection() {
               </p>
               <img src={homeIcons.quoteGo} alt="" aria-hidden="true" />
             </footer>
-          </article>
+          </Link>
         ))}
       </div>
     </section>
