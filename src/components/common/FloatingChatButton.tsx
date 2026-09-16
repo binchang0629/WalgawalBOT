@@ -24,7 +24,18 @@ function FloatingChatButton() {
     return null
   }
 
-  const sitsAboveNavigation = [PATHS.home, PATHS.plaza, PATHS.afterStory, PATHS.afterStoryMine, PATHS.my].some((route) => route === pathname)
+  /*
+   * 하단 내비게이션이 있는 화면에서는 버튼을 내비 위로 올린다.
+   * 빠뜨리면 버튼이 내비 위에 걸쳐 `MY` 같은 메뉴를 가린다. (`내가 쓴 후일담`에서 그랬다)
+   */
+  const sitsAboveNavigation = [
+    PATHS.home,
+    PATHS.plaza,
+    PATHS.afterStory,
+    PATHS.afterStoryMine,
+    PATHS.afterStoryMineStories,
+    PATHS.my,
+  ].some((route) => route === pathname)
     || /^\/cases\/[^/]+(?:\/result)?$/.test(pathname)
 
   return (

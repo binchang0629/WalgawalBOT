@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import type { FormEvent } from 'react'
 import useLoginGate from '../../hooks/useLoginGate'
@@ -9,8 +9,11 @@ import CaseSubmitProgress from '../Submit/components/CaseSubmitProgress'
 import backIcon from '../../assets/my/back.svg'
 import walgadakEmpathy from '../../assets/case/stickers/walgadak-empathy.png'
 import panMungyeeJudge from '../../assets/submit/panmung-judge-hq.png'
-import { homeImages } from '../Home/homeAssets'
+import CommentThread from '../../components/common/CommentThread'
+import { afterStoryAuthor, afterStoryComments, afterStoryLetter } from '../../data/common/afterStoryDetailContent'
 import scrollBackground from '../../assets/afterstory/figma/scroll-background.png'
+import letterPaper from '../../assets/afterstory/figma/letter-paper.png'
+import detailBackground from '../../assets/afterstory/figma/detail-background.png'
 import writePencil from '../../assets/afterstory/figma/write-pencil.png'
 import readBook from '../../assets/afterstory/figma/read-book.png'
 import walgadakFace from '../../assets/home/figma/close-call-mascot.svg'
@@ -76,7 +79,7 @@ const COMMUNITY_AFTER_STORIES = [
     title: '친구에게 빌려준 300만 원, 6개월째 미변제', summary: '직접 대화한 뒤 서로 오해를 풀었어요.', reactions: 3,
   },
 ] as const
-interface AfterStoryLocationState { content?: string }
+interface AfterStoryLocationState { content?: string; from?: string }
 
 /**
  * 왈가왈후 공통 헤더.
@@ -155,21 +158,6 @@ export function AfterStoryHomePage() {
           </Link>
         </section>
 
-        <section className="afterstory-latest" id="latest-story">
-          <header><h2>방금 도착한 후일담</h2><a href="#community-stories">모두 보기 <span aria-hidden="true">›</span></a></header>
-          <Link className="afterstory-envelope" to={toAfterStoryDetail('friend')} aria-label="먼저 사과한 뒤 서로의 의견을 묻게 된 후일담 전문 읽기">
-            <img className="afterstory-envelope__back" src={homeImages.envelopeBack} alt="" />
-            <img className="afterstory-envelope__paper" src={homeImages.letterPaper} alt="" />
-            <div className="afterstory-envelope__paper-copy">
-              <em>NEW</em>
-              <blockquote>“<span>먼저 사과한 뒤,<br />서로의 의견을 묻게 됐어요.</span>”</blockquote>
-              <p>조별 과제에서 친구를<br />공개적으로 지적한 사건</p>
-            </div>
-            <img className="afterstory-envelope__front" src={homeImages.envelopeFront} alt="" />
-            <b className="afterstory-envelope__cta">후일담 읽어보기 +</b>
-          </Link>
-        </section>
-
         <section className="afterstory-community afterstory-community--board" id="community-stories" aria-labelledby="community-story-title">
           <header className="afterstory-community__header">
             <div>
@@ -213,60 +201,92 @@ export function MyPublishedAfterStoryPage() {
 
         <section className="afterstory-my-stories__list" aria-label="내가 쓴 후일담 목록">
           <p className="afterstory-my-stories__count">작성한 후일담 <b>1</b>개</p>
-          <article className="afterstory-my-stories__item">
+          {/*
+            메모지를 누르면 공개된 후일담 전문(AS06)으로 들어간다.
+            돌아올 화면을 state로 같이 넘겨서, 상세의 뒤로가기가 여기로 되돌아오게 한다.
+          */}
+          <Link
+            className="afterstory-my-stories__item"
+            to={toAfterStoryDetail('friend')}
+            state={{ from: PATHS.afterStoryMineStories }}
+            aria-label={CONNECTED_CASE.context + ' 후일담 전문 읽기'}
+          >
             <span className="afterstory-my-stories__tape" aria-hidden="true" />
             <header><span>친구 · 내 후일담</span><time>방금 전</time></header>
             <h3>{CONNECTED_CASE.context}</h3>
             <p>{CONNECTED_CASE.storyTitle.replace('\n', ' ')}</p>
             <small>공개 범위 · 전체 공개</small>
-          </article>
+          </Link>
         </section>
-
-        <Link className="afterstory-my-stories__write" to={PATHS.afterStoryMine}>
-          다른 사건의 후일담 남기기 <span aria-hidden="true">›</span>
-        </Link>
       </div>
     </main>
   )
 }
 
-/** 공개 후일담 전문 시연 화면. 지금은 홈의 대표 편지 한 건만 연결한다. */
+/**
+ * 공개 후일담 전문 화면 (AS06).
+ *
+ * 기준 시안: Figma `AS06 / 공개 후일담 상세 · 편지형` (노드 `2778:15991`)
+ * 히어로(제목·작성자·편지지) 아래에 공용 댓글 스레드가 이어진다.
+ *
+ * 지금은 홈과 `내가 쓴 후일담`에 올라와 있는 편지 한 건만 연결한다.
+ */
 export function AfterStoryDetailPage() {
   const { storyId } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
 
   if (storyId !== 'friend') return <Navigate to={PATHS.afterStory} replace />
 
-  const paragraphs = DEMO_STORY.split('\n\n')
+  /*
+   * 어느 화면에서 들어왔는지는 넘겨받은 state로만 판단한다.
+   * history.length만 보고 앱 안에 이전 화면이 있다고 가정하지 않는다. (PROJECT_SPEC.md §7-7)
+   */
+  const backTo = (location.state as AfterStoryLocationState | null)?.from ?? PATHS.afterStory
 
   return (
     <main className="afterstory-detail">
-      <AfterStoryHeader title="이어진 이야기" onBack={() => navigate(PATHS.afterStory)} />
+      <AfterStoryHeader title="왈가왈후~" onBack={() => navigate(backTo)} />
       <div className="afterstory-detail__scroll">
-        <div className="afterstory-detail__topline" aria-hidden="true"><span /><span /><span /></div>
-        <section className="afterstory-detail__hero">
-          <div className="afterstory-detail__eyebrow"><span>왈가왈후~</span><i />판결 이후의 이야기</div>
-          <h1>{CONNECTED_CASE.storyTitle}</h1>
-          <p>다툼이 끝난 뒤에도, 관계는 계속되니까요.</p>
+        <section
+          className="afterstory-detail__hero"
+          style={{ backgroundImage: `url(${detailBackground})` }}
+        >
+          <p className="afterstory-detail__eyebrow">{afterStoryAuthor.eyebrow}</p>
+          <h1>
+            {afterStoryAuthor.titleLines.map((line, index) => (
+              <Fragment key={line}>{index > 0 ? <br /> : null}{line}</Fragment>
+            ))}
+          </h1>
+          <p className="afterstory-detail__lead">{afterStoryAuthor.lead}</p>
+
           <div className="afterstory-detail__author">
             <img src={walgadakEmpathy} alt="" />
-            <span>익명의 왈가닥 <small>친구 · 후일담</small></span>
+            <div>
+              <strong>{afterStoryAuthor.name}</strong>
+              <span>{afterStoryAuthor.meta}</span>
+            </div>
           </div>
+
+          <article className="afterstory-detail__letter" aria-label="후일담 전문">
+            {/* 편지지는 배경 그림이라 읽을 내용이 없다. 글은 그 위에 따로 얹는다. */}
+            <div className="afterstory-detail__letter-paper" aria-hidden="true">
+              <img src={letterPaper} alt="" />
+            </div>
+            <h2>{afterStoryLetter.heading}</h2>
+            <div className="afterstory-detail__letter-lines">
+              {afterStoryLetter.lines.map((line) => <p key={line}>{line}</p>)}
+            </div>
+          </article>
         </section>
 
-        <article className="afterstory-detail__letter" aria-label="후일담 전문">
-          <div className="afterstory-detail__letter-heading"><span>그날 이후</span><span aria-hidden="true">✦</span></div>
-          {paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-          <div className="afterstory-detail__letter-end" aria-hidden="true">✳</div>
-        </article>
-
-        <section className="afterstory-detail__case">
-          <span>이 이야기의 시작</span>
-          <h2>{CONNECTED_CASE.title}</h2>
-          <p>사건 이후 어떤 선택을 했는지 담은 후일담이에요.</p>
-        </section>
-
-        <Link className="afterstory-detail__back" to={PATHS.afterStory}>다른 이야기 둘러보기 <span aria-hidden="true">→</span></Link>
+        <div className="afterstory-detail__comments">
+          <CommentThread
+            comments={afterStoryComments}
+            showReply
+            headingId="afterstory-comments-title"
+          />
+        </div>
       </div>
     </main>
   )

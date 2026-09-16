@@ -423,9 +423,27 @@
   margin-bottom: 32px;
 }
 /* 내가 쓴 후일담: 내 이야기만 한눈에 확인하는 전용 목록 */
+/*
+ * 내가 쓴 후일담 — 배경을 한 색으로 채운다.
+ *
+ * 전에는 왈가왈후 홈과 같은 두루마리 이미지를 배경으로 썼는데, 스크롤 영역이 내용 높이까지만
+ * 자라서(카드 한 장이라 500px 남짓) 그 아래로 흰 바닥이 드러나 색이 중간에 끊겨 보였다.
+ * 이 화면은 이미지 아래쪽의 파란 물결이 어차피 보이지 않으므로,
+ * 이미지 윗부분 색(#fefff2)을 평면으로 깔아 화면 바닥까지 이어지게 한다.
+ *
+ * 배경 이미지가 인라인 style로 들어와서 덮으려면 !important가 필요하다.
+ * 이 파일 위쪽 `.afterstory-home:not(...)` 규칙도 같은 이유로 같은 방식을 쓴다.
+ */
+.afterstory-my-stories,
+.main-layout:has(.afterstory-my-stories) .main-layout__scroll {
+  background: #fefff2;
+}
+
 .afterstory-my-stories .afterstory-home__scroll {
   min-height: calc(100% - 64px);
   padding-bottom: 154px;
+  background-color: #fefff2;
+  background-image: none !important;
 }
 
 .afterstory-my-stories__intro h2 {
@@ -456,11 +474,20 @@
   color: var(--blue);
 }
 
+/* 메모지 카드. 누르면 후일담 전문으로 들어가므로 링크지만 생김새는 그대로 둔다. */
 .afterstory-my-stories__item {
   position: relative;
+  display: block;
   padding: 26px 20px 19px;
   background: #fffdf8;
   box-shadow: 0 6px 14px rgb(97 77 40 / 0.14);
+  color: inherit;
+  text-decoration: none;
+}
+
+.afterstory-my-stories__item:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
 }
 
 .afterstory-my-stories__tape {
@@ -491,6 +518,12 @@
   margin: 12px 0 9px;
   font-size: 18px;
   line-height: 1.35;
+  /*
+   * 한국어는 어절 단위로 끊는다. 이게 없으면 `...지적한 사` / `건`처럼 낱글자가 갈라진다.
+   * 지금 제목은 18px에서 폭이 316px로 카드 안쪽(314px)을 살짝 넘겨 두 줄이 되는데,
+   * keep-all 덕분에 `사건`이 단어째로 다음 줄에 내려간다.
+   */
+  word-break: keep-all;
 }
 
 .afterstory-my-stories__item > p {
@@ -499,6 +532,7 @@
   font-family: var(--font-serif);
   font-size: 17px;
   line-height: 1.42;
+  word-break: keep-all;
 }
 
 .afterstory-my-stories__item small {
