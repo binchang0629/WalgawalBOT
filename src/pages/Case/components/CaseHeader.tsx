@@ -1,7 +1,8 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import backIcon from '../../../assets/case/back.svg'
 import { PATHS } from '../../../routes/paths'
+import { markPlazaReturnReady } from '../../../utils/plazaReturnState'
 import './CaseHeader.css'
 
 /** 사건 상세 계열 화면에서 공통으로 쓰는 상단 헤더. */
@@ -13,6 +14,14 @@ function CaseHeader({ title = '오늘의 사건', backTo }: { title?: string; ba
   useLayoutEffect(() => {
     headerRef.current?.closest('.main-layout__scroll')?.scrollTo({ top: 0 })
   }, [location.pathname])
+
+  useEffect(() => {
+    if (!(location.state as { fromPlaza?: boolean } | null)?.fromPlaza) return
+
+    const handleBrowserBack = () => markPlazaReturnReady()
+    window.addEventListener('popstate', handleBrowserBack)
+    return () => window.removeEventListener('popstate', handleBrowserBack)
+  }, [location.state])
 
   const handleBack = () => {
     if (backTo) {
@@ -26,6 +35,9 @@ function CaseHeader({ title = '오늘의 사건', backTo }: { title?: string; ba
     }
 
     if (location.key !== 'default') {
+      if ((location.state as { fromPlaza?: boolean } | null)?.fromPlaza) {
+        markPlazaReturnReady()
+      }
       navigate(-1)
       return
     }

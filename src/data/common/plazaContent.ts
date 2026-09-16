@@ -1,4 +1,5 @@
 import type { CaseCategory, CaseSummary, JurorRank } from '../../types'
+import { jihoonSimilarCase, jihoonSimilarResult } from './jihoonSimilarCaseContent'
 
 export const rankingTabs = [
   { key: 'juror', label: '명판관 배심원' },
@@ -96,10 +97,10 @@ export const plazaCases: PlazaCase[] = [
     id: 'case-company-874',
     category: '직장',
     tag: '직장',
-    title: '잔금과 원본 파일을 문제 삼는 의뢰인 때문에\n골치가 아픕니다.',
-    summary: '카페 홍보영상 제작을 180만원에 맡아 수정 2회 후 최종본을 전달했어요. 의뢰인은 영상을 SNS 광고에 게시했지만, 색감이 생각과 다르다며 추가 수정과 편집 원본 파일을 요구했습니다.',
+    title: jihoonSimilarCase.detailTitle,
+    summary: jihoonSimilarCase.cardSummary,
     viewCount: 465,
-    commentCount: 46,
+    commentCount: jihoonSimilarResult.commentCount,
     // 상세 결과: AI는 글쓴이, 배심원 다수는 상대방 입장 → 의견 불일치.
     isVerdictAligned: false,
     status: 'closed',

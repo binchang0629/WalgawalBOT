@@ -1494,6 +1494,32 @@
     filter: drop-shadow(0 4px 14px rgba(78, 62, 39, 0.09));
 }
 
+.ai-card--button {
+    --ai-card-stroke-angle: 0deg;
+    border: 1.5px solid transparent;
+    background:
+        linear-gradient(#fff, #fff) padding-box,
+        conic-gradient(
+            from var(--ai-card-stroke-angle),
+            var(--blue-100) 0deg 220deg,
+            var(--blue-200) 260deg,
+            var(--blue-400) 300deg,
+            var(--blue-200) 338deg,
+            var(--blue-100) 360deg
+        ) border-box;
+    animation: ai-card-stroke-orbit 3.2s linear infinite;
+}
+
+@property --ai-card-stroke-angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+}
+
+@keyframes ai-card-stroke-orbit {
+    to { --ai-card-stroke-angle: 360deg; }
+}
+
 /* 시안은 판멍이를 좌우로 뒤집어 넣었다. */
 .ai-card__mascot {
     flex: none;
@@ -1537,6 +1563,13 @@ img.ai-card__mascot {
 .ai-card__text p b {
     color: var(--blue-600);
     font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ai-card--button {
+        --ai-card-stroke-angle: 300deg;
+        animation: none;
+    }
 }
 
 /* 밸런스 게임: 터치 시 세로 스크롤 유지, PC 목업 안에서도 동일한 조작. */

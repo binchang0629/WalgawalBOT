@@ -3,6 +3,7 @@ import voteWriter from '../../assets/case/vote-writer-updated.svg'
 import voteOther from '../../assets/case/vote-other-updated.svg'
 import voteBoth from '../../assets/case/vote-both-updated.svg'
 import voteNeither from '../../assets/case/vote-neither-updated.svg'
+import { demoTimeline } from './demoTimeline'
 
 /**
  * 축의금 사건 상세의 화면 데이터.
@@ -14,13 +15,13 @@ export const weddingGiftCase = {
   category: '친구',
   author: {
     nickname: '익명의 햄스터',
-    createdAt: '26/09/08 · 00:08:34',
+    createdAt: demoTimeline.weddingGift.createdAt,
     avatarUrl: authorWalang,
   },
   title: '10년 지기 친구 결혼식에 축의금 10만 원을 냈는데, 적은 건가요?',
   caseNumber: '#CASE-FRIEND-87',
-  age: '7시간 전',
-  participantCount: 611,
+  age: demoTimeline.weddingGift.age,
+  participantCount: 1245,
   /**
    * 투표 마감까지 남은 시간 `hh:mm:ss`.
    * 이 사건의 마감 시각은 여기 한 곳에만 둔다. 결과 화면(`caseResultContent.ts`)도 이 값을 쓴다.

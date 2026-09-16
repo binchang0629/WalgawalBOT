@@ -1,5 +1,6 @@
 import type { CaseSummary } from '../../types'
 import { weddingGiftCase } from './caseDetailContent'
+import { jihoonSimilarCase } from './jihoonSimilarCaseContent'
 
 /**
  * 홈 화면 정적 데이터.
@@ -31,7 +32,7 @@ export const todayCase = {
    */
   deadline: weddingGiftCase.deadline,
   countdownLabel: '투표 마감까지',
-  participantCount: 1245,
+  participantCount: weddingGiftCase.participantCount,
   ctaLabel: '투표하러 가기',
   contextTip: {
     lead: '10년 지기 친구의 결혼식',
@@ -186,7 +187,7 @@ export const personalizedRecommendation = {
     total: 3,
     cases: [
       { id: 'recommend-work-balance', categoryKey: 'work', category: '직장', agrees: false,
-        title: '잔금 지급을 미루면서 원본 파일까지 문제 삼는\n의뢰인 때문에 골치가 아픕니다.' },
+        title: jihoonSimilarCase.detailTitle },
       { id: 'recommend-work-credit', categoryKey: 'work', category: '직장', agrees: true,
         title: '직장 상사가 제 아이디어를 자신의 공로인 것처럼\n발표했어요.' },
       { id: 'recommend-work-after-hours', categoryKey: 'work', category: '직장', agrees: false,

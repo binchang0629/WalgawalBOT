@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import {
   caseCategories,
@@ -13,6 +13,10 @@ import useSession from '../../../hooks/useSession'
 import { MY_CASES } from '../../../data/personas/myCases'
 import Pagination from '../../../components/common/Pagination'
 import { PATHS } from '../../../routes/paths'
+import {
+  savePlazaReturnState,
+  type PlazaReturnState,
+} from '../../../utils/plazaReturnState'
 import searchIcon from '../../../assets/plaza/search-field.svg'
 import chevronDown from '../../../assets/icons/chevron-down.svg'
 
@@ -34,16 +38,16 @@ const DEMO_SEARCH_RESULT_IDS = [
   'case-work-after-hours',
 ] as const
 
-function CaseFeedSection() {
+function CaseFeedSection({ restoreState }: { restoreState?: PlazaReturnState | null }) {
   const [searchParams] = useSearchParams()
-  const [category, setCategory] = useState<CategoryFilter>('전체')
+  const [category, setCategory] = useState<CategoryFilter>(restoreState?.category ?? '전체')
   const [view, setView] = useState<PlazaViewKey>(() => (
-    searchParams.get('view') === 'closed' ? 'closed' : 'latest'
+    restoreState?.view ?? (searchParams.get('view') === 'closed' ? 'closed' : 'latest')
   ))
   const [isViewOpen, setIsViewOpen] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(restoreState?.currentPage ?? 1)
   const routeSearchQuery = searchParams.get('q') ?? ''
-  const [searchQuery, setSearchQuery] = useState(routeSearchQuery)
+  const [searchQuery, setSearchQuery] = useState(restoreState?.searchQuery ?? routeSearchQuery)
   const caseFeedRef = useRef<HTMLElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const viewRef = useRef<HTMLDivElement>(null)
@@ -108,6 +112,29 @@ function CaseFeedSection() {
     (currentPage - 1) * CASES_PER_PAGE,
     currentPage * CASES_PER_PAGE,
   )
+
+  useLayoutEffect(() => {
+    if (!restoreState) return
+
+    let secondFrame = 0
+    const firstFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        const scrollContainer = caseFeedRef.current?.closest<HTMLElement>('.main-layout__scroll')
+        const clickedCard = caseFeedRef.current?.querySelector<HTMLElement>(
+          `[data-case-id="${restoreState.cardId}"]`,
+        )
+
+        if (scrollContainer && clickedCard) {
+          scrollContainer.scrollTo({ top: restoreState.scrollTop, behavior: 'auto' })
+        }
+      })
+    })
+
+    return () => {
+      window.cancelAnimationFrame(firstFrame)
+      window.cancelAnimationFrame(secondFrame)
+    }
+  }, [restoreState])
 
   // 바깥을 누르거나 Esc를 누르면 메뉴를 닫는다. 열려 있을 때만 듣는다.
   useEffect(() => {
@@ -286,12 +313,34 @@ function CaseFeedSection() {
                 <li
                   className="case-card"
                   key={item.id}
+                  data-case-id={item.id}
                   style={{ animationDelay: `${index * 90}ms` }}
                 >
                   <Link
                     className="case-card__link"
                     to={PATHS.jihoonCaseDetail}
+                    state={{ fromPlaza: true }}
                     aria-label={item.title.replace('\n', ' ') + ' 지난 사건 상세 보기'}
+                    onClick={(event) => {
+                      if (
+                        event.button !== 0
+                        || event.metaKey
+                        || event.ctrlKey
+                        || event.shiftKey
+                        || event.altKey
+                      ) return
+
+                      const scrollContainer = caseFeedRef.current
+                        ?.closest<HTMLElement>('.main-layout__scroll')
+                      savePlazaReturnState({
+                        cardId: item.id,
+                        category,
+                        currentPage,
+                        searchQuery,
+                        scrollTop: scrollContainer?.scrollTop ?? 0,
+                        view,
+                      })
+                    }}
                   >
                     {cardContent}
                   </Link>

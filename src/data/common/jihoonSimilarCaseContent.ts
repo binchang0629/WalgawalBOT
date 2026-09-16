@@ -6,6 +6,7 @@ import commentAvatar5 from '../../assets/case/disagreement/comment-5.png'
 import authorAvatar from '../../assets/case/jihoon/author.png'
 import verdictArtwork from '../../assets/case/jihoon/verdict-artwork.png'
 import type { CommentStickerId } from './commentStickers'
+import { demoTimeline } from './demoTimeline'
 
 export type JihoonSimilarVoteId = 'other' | 'writer' | 'both' | 'neither'
 
@@ -27,17 +28,18 @@ export const jihoonSimilarCase = {
   category: '직장',
   author: {
     nickname: '원본은영업비밀',
-    createdAt: '26/09/05 · 21:13',
+    createdAt: demoTimeline.company.createdAt,
     avatarUrl: authorAvatar,
   },
   title: '수정 2회를 마쳤는데, 의뢰인이 잔금 지급을 미루고 있어요.',
   detailTitle: '수정 2회를 마쳤는데, 의뢰인이\n잔금 지급을 미루고 있어요.',
   resultTitle: '수정 2회를 마쳤는데,\n의뢰인이 잔금 지급을 미루고 있어요.',
+  cardSummary: '카페 홍보영상을 180만 원에 제작했습니다. 수정 2회를 마쳤지만 의뢰인은 요청한 색감이 반영되지 않았다며 추가 수정과 원본 파일을 요구하고 있어요.',
   caseNumber: 'CASE-COMPANY-874',
-  age: '3일 전',
+  age: demoTimeline.company.age,
   participantCount: 450,
   paragraphs: [
-    '카페 홍보영상을 180만 원에 제작했습니다.\n계약에는 수정 2회와 원본 파일 제공이 포함됐고,\n 최종 승인 후 잔금 90만 원을 받기로 했어요.',
+    '카페 홍보영상을 180만 원에 제작했습니다.\n계약에는 수정 2회와 원본 파일 제공이 포함됐고,\n최종 승인 후 잔금 90만 원을 받기로 했어요.',
     '의뢰인은 처음부터 밝고 따뜻한 색감을 요청했지만, 저는 차분한 색감이 카페와 더 잘 어울린다고 판단해 두 번의 수정에서도 밝기만 조금 조절했습니다.',
     '의뢰인은 요청한 색감이 반영되지 않았다며 추가 수정과 원본 파일을 요구하고 있어요. 영상은 광고 일정 때문에 먼저 게시했을 뿐, 최종 승인한 것은 아니라고 합니다.',
     '저는 약속한 수정 횟수를 모두 채웠는데도 다시 수정해야 할까요?',
@@ -94,18 +96,19 @@ export const jihoonSimilarResult = {
     summary: '약속한 수정은 완료했고,\n결과물도 사용하고 있다는 점',
     comparisonReasons: [
       '계약서에 명시된 수정 2회를 완료했고, 의뢰인이 영상을 실제 광고에 사용하고 있다는 점을 고려했어요.',
-      '계약 범위를 벗어난 추가 수정과 원본 파일 제공을 잔금 지급 조건으로 새롭게 요구하는 것은 타당하지 않다고 판단했어요.',
+      '약속한 수정 횟수를 마친 결과물을 사용하면서 잔금 전액을 보류하는 대응은 과하다고 판단했어요.',
     ],
     title: 'AI 판멍이는 글쓴이의 손을 들어줬어요.',
     reasons: [
       '계약서에 명시된 수정 2회를 모두 완료했고, 의뢰인이 영상을 실제 광고에 사용하고 있다는 점을 고려했어요.',
-      '계약 범위를 벗어난 추가 수정과 원본 파일 제공을 잔금 지급 조건으로 새롭게 요구하는 것은 타당하지 않다고 판단했어요.',
-      '다만 원본 파일 제공 범위와 결과물의 완성 기준은 계약 내용에 따라 달라질 수 있어, 계약서와 작업 기록을 바탕으로 당사자 간 확인이 필요해요.',
+      '약속한 수정 횟수를 마친 결과물을 사용하면서 잔금 전액을 보류하는 대응은 과하다고 판단했어요.',
+      '다만 원본 파일은 계약 범위에 포함되어 있고 요청한 색감의 반영 여부도 쟁점이므로, 작업 기록을 바탕으로 남은 이행 범위를 다시 확인할 필요가 있어요.',
     ],
     confidence: 73,
     comparison: '판멍이는 글쓴이의 손을 들어줬지만,\n배심원 다수는 상대방의 입장이 더 타당하다고 판단했어요.',
   },
-  commentCount: 46,
+  /** 결과 댓글은 5개씩 5페이지를 제공하므로 전체 시연 데이터도 25개로 맞춘다. */
+  commentCount: 25,
   comments: [
     {
       id: 'jihoon-comment-1',

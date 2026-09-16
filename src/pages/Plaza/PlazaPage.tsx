@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import RankingHeroSection from './components/RankingHeroSection'
 import CaseFeedSection from './components/CaseFeedSection'
 import TopBar from '../../components/common/TopBar'
+import { consumePlazaReturnState } from '../../utils/plazaReturnState'
 import './Plaza.css'
 
 /**
@@ -15,19 +16,20 @@ import './Plaza.css'
 function PlazaPage() {
   const [searchParams] = useSearchParams()
   const pageRef = useRef<HTMLElement>(null)
+  const [returnState] = useState(consumePlazaReturnState)
   const isCaseOnly = searchParams.get('section') === 'cases'
 
   // 왈가왈후 CTA처럼 목록 전용으로 진입했을 땐, 직전 화면의 스크롤 위치를 이어받지 않는다.
   useEffect(() => {
-    if (!isCaseOnly) return
+    if (!isCaseOnly || returnState) return
     pageRef.current?.closest<HTMLElement>('.main-layout__scroll')?.scrollTo({ top: 0 })
-  }, [isCaseOnly])
+  }, [isCaseOnly, returnState])
 
   return (
     <main className={isCaseOnly ? 'plaza-screen plaza-screen--case-only' : 'plaza-screen'} ref={pageRef}>
       <TopBar title="배심원 광장" />
       {!isCaseOnly && <RankingHeroSection />}
-      <CaseFeedSection />
+      <CaseFeedSection restoreState={returnState} />
     </main>
   )
 }

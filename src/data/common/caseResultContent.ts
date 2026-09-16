@@ -47,8 +47,9 @@ export const weddingGiftResult = {
     '오래 알고 지냈다는 이유만으로 더 큰 금액을 기대하거나, 축의금 액수로 우정을 판단하는 것은 상대방에게 부담을\n줄 수 있어요.',
   ],
   confidence: 68,
-  comparison: '판멍이와 배심원 다수 모두\n상대방의 입장이 더 타당하다고 판단했어요.',
-  commentCount: 124,
+  comparison: '판멍이와 배심원 다수 모두\n글쓴이의 입장이 더 타당하다고 판단했어요.',
+  /** 결과 댓글은 5개씩 5페이지를 제공하므로 전체 시연 데이터도 25개로 맞춘다. */
+  commentCount: 25,
   comments: [
     {
       id: 'comment-1',
