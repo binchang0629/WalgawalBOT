@@ -8,7 +8,7 @@ import './AiRecommendSection.css'
 
 /** 개발 > 홈/로그인 후 > Section (1473:8571). 실제 추천 API가 아닌 시안용 데이터. */
 function AiRecommendSection() {
-  const { personaId } = useSession()
+  const { personaId, currentUser } = useSession()
   const recommendation = personalizedRecommendation[personaId]
 
   return (
@@ -20,7 +20,7 @@ function AiRecommendSection() {
       <div className="ai-recommendation__intro">
         <div className="ai-recommendation__summary">
           <p>
-            {recommendation.displayName}님에게 맞는<br />
+            {currentUser?.isCustomProfile ? currentUser.name : recommendation.displayName}님에게 맞는<br />
             <strong>{recommendation.topic} </strong>
             <em>{recommendation.total}건</em>을 찾았어요!
           </p>

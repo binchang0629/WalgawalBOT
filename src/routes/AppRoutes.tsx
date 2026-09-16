@@ -60,6 +60,7 @@ function DemoEntry() {
 }
 
 function AppRoutes() {
+  const { sessionStatus } = useSession()
   return (
     <Routes>
       {/*
@@ -76,7 +77,7 @@ function AppRoutes() {
 
         {/* 앱 헤더와 하단 내비게이션을 쓰는 주요 메뉴 화면 */}
         <Route element={<MainLayout />}>
-          <Route path={PATHS.home} element={<HomePage />} />
+          <Route path={PATHS.home} element={<HomePage key={sessionStatus} />} />
           <Route path={PATHS.plaza} element={<PlazaPage />} />
           <Route path={PATHS.jihoonCaseDetail} element={<ClosedCaseDetailPage />} />
           <Route path={PATHS.jihoonCaseResult} element={<ClosedCaseResultPage />} />

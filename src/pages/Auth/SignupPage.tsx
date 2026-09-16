@@ -22,7 +22,7 @@ import './SignupPage.css'
  * 동의 시트는 `2264:13125` · `2264:13294`.
  *
  * 닉네임·이메일·비밀번호·비밀번호 확인이 필수이고 생년월일은 선택이다.
- * 필수 네 칸이 채워지고 비밀번호 두 칸이 같아야 동의 시트를 열 수 있다.
+ * 필수 네 칸이 유효하고 비밀번호 두 칸이 같아야 동의 시트를 열 수 있다.
  * 동의 시트에서 필수 두 항목에 동의하면 가입이 끝나고 환영 화면으로 간다.
  *
  * 실제 백엔드가 없는 데모 동작이다.
@@ -48,9 +48,30 @@ const MONTH_OPTIONS: AuthSelectOption[] = Array.from({ length: 12 }, (_, index) 
 
 /** 닉네임은 한글·영문·숫자만 허용한다. 한글 입력 중의 자모도 오류로 처리하지 않는다. */
 const NICKNAME_ALLOWED_PATTERN = /^[가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9]*$/
+const PASSWORD_SPECIAL_CHARACTER_PATTERN = /[\p{P}\p{Sm}\p{Sc}]/u
+
+function validateBirthDate(year: string, month: string, day: string): string | null {
+  if (!year && !month && !day) return null
+  if (!year || !month || !day) return '생년월일을 모두 입력하거나 비워주세요.'
+
+  const today = new Date()
+  const yearNumber = Number(year)
+  const monthNumber = Number(month)
+  const dayNumber = Number(day)
+  if (year.length !== 4 || yearNumber < 1900 || yearNumber > today.getFullYear()) {
+    return `출생 연도는 1900년부터 ${today.getFullYear()}년까지 입력해주세요.`
+  }
+  if (monthNumber < 1 || monthNumber > 12 || dayNumber < 1 || dayNumber > new Date(yearNumber, monthNumber, 0).getDate()) {
+    return '실제 날짜에 맞는 생년월일을 입력해주세요.'
+  }
+  if (new Date(yearNumber, monthNumber - 1, dayNumber) > today) {
+    return '미래 날짜는 생년월일로 입력할 수 없어요.'
+  }
+  return null
+}
 
 function SignupPage() {
-  const { personaId, signIn } = useSession()
+  const { signIn } = useSession()
   const navigate = useNavigate()
 
   const [nickname, setNickname] = useState('')
@@ -65,6 +86,7 @@ function SignupPage() {
   const [birthMonth, setBirthMonth] = useState('')
   const [birthDay, setBirthDay] = useState('')
   const [isDemoFilled, setIsDemoFilled] = useState(false)
+  const [hasUsedDemoFill, setHasUsedDemoFill] = useState(false)
   const [agree, setAgree] = useState<AgreeState>(DEFAULT_AGREE)
   /*
    * 시트를 연 경로를 기억한다. null 이면 닫힌 상태다.
@@ -74,8 +96,11 @@ function SignupPage() {
 
   const hasNicknameSpecialCharacter = !NICKNAME_ALLOWED_PATTERN.test(nickname)
   const isNicknameValid = nickname.length >= 2 && nickname.length <= 6 && !hasNicknameSpecialCharacter
+  const isPasswordValid = password.length >= 8 && PASSWORD_SPECIAL_CHARACTER_PATTERN.test(password)
   const isPasswordMatched = password !== '' && password === passwordConfirm
-  const canOpenAgree = isNicknameValid && emailId.trim() !== '' && isPasswordMatched
+  const birthDateError = validateBirthDate(birthYear, birthMonth, birthDay)
+  const canOpenAgree = isNicknameValid && emailId.trim() !== '' && emailDomain.trim() !== ''
+    && isPasswordValid && isPasswordMatched && !birthDateError
 
   /** 발표에서 타이핑 없이 넘어가기 위한 한 번에 채우기. 시안의 값과 같다. */
   const handleDemoFill = () => {
@@ -89,11 +114,21 @@ function SignupPage() {
     setBirthMonth(AUTH_DEMO_ACCOUNT.birthMonth)
     setBirthDay(AUTH_DEMO_ACCOUNT.birthDay)
     setIsDemoFilled(true)
+    setHasUsedDemoFill(true)
   }
 
   const handleComplete = () => {
+    if (!canOpenAgree) return
     setAgreeOpenReason(null)
-    signIn(personaId)
+    const useDemoProfile = hasUsedDemoFill
+      && nickname === AUTH_DEMO_ACCOUNT.nickname
+      && emailId === AUTH_DEMO_ACCOUNT.emailId
+      && emailDomain === AUTH_DEMO_ACCOUNT.emailDomain
+    // 직접 입력한 가입만 표시용 프로필을 만든다. 비밀번호는 세션에도 저장하지 않는다.
+    signIn('A', useDemoProfile ? undefined : {
+      nickname: nickname.trim(),
+      email: `${emailId.trim()}@${emailDomain.trim()}`,
+    })
     // 가입 완료 흐름은 이전 진입 경로와 무관하게 환영 화면을 거쳐 홈으로 이어진다.
     navigate(PATHS.signupComplete, { replace: true })
   }
@@ -210,6 +245,8 @@ function SignupPage() {
                 type={isPasswordVisible ? 'text' : 'password'}
                 autoComplete="new-password"
                 value={password}
+                aria-invalid={password !== '' && !isPasswordValid}
+                aria-describedby="signUpPasswordHelp"
                 onChange={(event) => {
                   setIsDemoFilled(false)
                   setPassword(event.target.value)
@@ -234,7 +271,12 @@ function SignupPage() {
               </button>
             )}
           </div>
-          <p className="signUpHelp signUpHelpHidden" aria-hidden="true">&nbsp;</p>
+          <p
+            id="signUpPasswordHelp"
+            className={`signUpHelp${password === '' ? ' signUpHelpHidden' : isPasswordValid ? ' signUpHelpOk' : ' signUpHelpError'}`}
+          >
+            {password === '' ? '\u00a0' : isPasswordValid ? '사용 가능한 비밀번호예요.' : '특수문자를 포함해 8자 이상 입력해주세요.'}
+          </p>
         </div>
 
         {/* 비밀번호 확인 */}
@@ -303,6 +345,8 @@ function SignupPage() {
                 inputMode="numeric"
                 maxLength={4}
                 value={birthYear}
+                aria-invalid={Boolean(birthDateError)}
+                aria-describedby="signUpBirthHelp"
                 onChange={(event) => {
                   setIsDemoFilled(false)
                   setBirthYear(event.target.value.replace(/\D/g, ''))
@@ -333,6 +377,8 @@ function SignupPage() {
                 inputMode="numeric"
                 maxLength={2}
                 value={birthDay}
+                aria-invalid={Boolean(birthDateError)}
+                aria-describedby="signUpBirthHelp"
                 onChange={(event) => {
                   setIsDemoFilled(false)
                   setBirthDay(event.target.value.replace(/\D/g, ''))
@@ -341,8 +387,8 @@ function SignupPage() {
               <span className="signUpUnit">일</span>
             </div>
           </div>
-          <p className="signUpHelp signUpHelpBirth">
-            생년월일 입력시 생일 때 <b>AI 판결 추가 이용권</b>을 지급해드려요.
+          <p id="signUpBirthHelp" className={`signUpHelp ${birthDateError ? 'signUpHelpError' : 'signUpHelpBirth'}`}>
+            {birthDateError ?? <>생년월일 입력시 생일 때 <b>AI 판결 추가 이용권</b>을 지급해드려요.</>}
           </p>
         </div>
       </div>

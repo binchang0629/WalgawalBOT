@@ -22,7 +22,7 @@ function LoginRewardHost() {
 
   // 시안은 성을 뗀 이름으로 부른다. 로그인 상태가 아직 없으면 시안 기본값을 쓴다.
   const fullName = currentUser?.name ?? DEMO_ACCOUNTS.A.name
-  const name = fullName.length > 2 ? fullName.slice(1) : fullName
+  const name = currentUser?.isCustomProfile ? fullName : fullName.length > 2 ? fullName.slice(1) : fullName
 
   return (
     <LoginRewardPopUp

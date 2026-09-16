@@ -2,6 +2,11 @@ import { useEffect, useState } from 'react'
 
 const demoDeadlines = new Map<string, number>()
 
+/** 로그아웃 시 브라우저 저장값과 함께 실행 중인 데모 마감 시간도 비운다. */
+export function clearDemoDeadlines() {
+  demoDeadlines.clear()
+}
+
 export interface Countdown {
   hours: number
   minutes: number

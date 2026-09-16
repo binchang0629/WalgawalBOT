@@ -4,7 +4,10 @@ import type { PersonaId, SessionStatus } from '../types'
 import { DEMO_ACCOUNTS, PERSONAS } from '../data/personas'
 import { DEMO } from '../config/app'
 import { SessionContext } from './sessionContext'
-import type { SessionUser } from './sessionContext'
+import type { SessionUser, SignupProfile } from './sessionContext'
+import customProfileAvatar from '../assets/case/result/comment-avatar-2.png'
+import { clearDemoDeadlines } from '../hooks/useCountdown'
+import { clearLoginReward } from './loginRewardSignal'
 
 /**
  * 시연 세션 상태를 한곳에서 관리한다.
@@ -21,6 +24,7 @@ import type { SessionUser } from './sessionContext'
  */
 
 const STORAGE_KEY = `${DEMO.storagePrefix}:session`
+const CUSTOM_ACTIVITY_KEY = `${DEMO.storagePrefix}:custom:activity:v1`
 // 서아 시안의 첫 배심 참여 1건/10pt를 재현하는 데모 보상이다.
 const DEMO_JURY_VOTE_POINTS = 10
 const MAX_SUBMITTED_CASES = 1
@@ -48,6 +52,14 @@ function isIdList(value: unknown): value is string[] {
 function readActivity(personaId: PersonaId): ActivityRecord {
   try {
     const raw = window.localStorage.getItem(activityStorageKey(personaId))
+    return parseActivity(raw)
+  } catch {
+    return emptyActivity()
+  }
+}
+
+function parseActivity(raw: string | null): ActivityRecord {
+  try {
     if (!raw) return emptyActivity()
     const parsed: unknown = JSON.parse(raw)
     if (typeof parsed !== 'object' || parsed === null) return emptyActivity()
@@ -69,10 +81,37 @@ function readActivity(personaId: PersonaId): ActivityRecord {
   }
 }
 
+function readCustomActivity(): ActivityRecord {
+  const stored = readStored()
+  if (!stored?.isAuthenticated || !stored.signupProfile) return emptyActivity()
+  try {
+    return parseActivity(window.sessionStorage.getItem(CUSTOM_ACTIVITY_KEY))
+  } catch {
+    return emptyActivity()
+  }
+}
+
 function createInitialActivityRecords(): ActivityRecords {
   // sessionStorage가 비어 있으면 새 시연이다. 이전 브라우저 세션의 활동은 복원하지 않는다.
-  if (!readStored()) return { A: emptyActivity(), B: emptyActivity() }
+  if (!readStored()?.isAuthenticated) return { A: emptyActivity(), B: emptyActivity() }
   return { A: readActivity('A'), B: readActivity('B') }
+}
+
+function clearStoredAppData() {
+  // 이 앱의 키만 지운다. 같은 출처의 다른 서비스 데이터는 건드리지 않는다.
+  const clearMatchingKeys = (storage: Storage) => {
+    const keys: string[] = []
+    for (let index = 0; index < storage.length; index += 1) {
+      const key = storage.key(index)
+      if (key && (key.startsWith('walgawalbot:')
+        || key.startsWith('wgwb:case-participant-count:v1:')
+        || key === 'wgwb:jihoon-recent-searches')) keys.push(key)
+    }
+    keys.forEach((key) => storage.removeItem(key))
+  }
+
+  try { clearMatchingKeys(window.localStorage) } catch { /* 저장소 접근이 막혀도 메모리 상태는 비운다. */ }
+  try { clearMatchingKeys(window.sessionStorage) } catch { /* 저장소 접근이 막혀도 메모리 상태는 비운다. */ }
 }
 
 function writeActivity(personaId: PersonaId, activity: ActivityRecord) {
@@ -86,11 +125,23 @@ function writeActivity(personaId: PersonaId, activity: ActivityRecord) {
 interface StoredSession {
   personaId: PersonaId
   isAuthenticated: boolean
+  signupProfile?: SignupProfile | null
 }
 
 interface SessionState {
   personaId: PersonaId
   sessionStatus: SessionStatus
+  signupProfile: SignupProfile | null
+}
+
+function isSignupProfile(value: unknown): value is SignupProfile {
+  if (typeof value !== 'object' || value === null) return false
+  const profile = value as Partial<SignupProfile>
+  return typeof profile.nickname === 'string'
+    && profile.nickname.length >= 2
+    && profile.nickname.length <= 6
+    && typeof profile.email === 'string'
+    && profile.email.includes('@')
 }
 
 function readStored(): StoredSession | null {
@@ -107,6 +158,9 @@ function readStored(): StoredSession | null {
     return {
       personaId: value.personaId,
       isAuthenticated: value.isAuthenticated === true,
+      signupProfile: value.personaId === 'A' && value.isAuthenticated && isSignupProfile(value.signupProfile)
+        ? value.signupProfile
+        : null,
     }
   } catch {
     // 저장소를 못 쓰거나 값이 깨진 경우. 안전한 초기 상태로 넘어간다.
@@ -130,11 +184,12 @@ function createInitialState(): SessionState {
     return {
       personaId: stored.personaId,
       sessionStatus: stored.isAuthenticated ? 'authenticated' : 'anonymous',
+      signupProfile: stored.signupProfile ?? null,
     }
   }
 
   // 처음 들어오면 서아의 시작 상태, 즉 비로그인이다.
-  return { personaId: 'A', sessionStatus: startStatusOf('A') }
+  return { personaId: 'A', sessionStatus: startStatusOf('A'), signupProfile: null }
 }
 
 /**
@@ -147,41 +202,84 @@ function startStatusOf(personaId: PersonaId): SessionStatus {
   return PERSONAS[personaId].kind === 'new' ? 'anonymous' : 'authenticated'
 }
 
-function toUser(personaId: PersonaId): SessionUser {
+function toUser(personaId: PersonaId, signupProfile: SignupProfile | null): SessionUser {
   const account = DEMO_ACCOUNTS[personaId]
+  if (personaId === 'A' && signupProfile) {
+    return {
+      personaId,
+      name: signupProfile.nickname,
+      email: signupProfile.email,
+      nickname: signupProfile.nickname,
+      anonymousAvatarUrl: customProfileAvatar,
+      isCustomProfile: true,
+    }
+  }
   return {
     personaId,
     name: account.name,
     email: account.email,
     nickname: account.nickname,
     anonymousAvatarUrl: account.anonymousAvatarUrl,
+    isCustomProfile: false,
   }
 }
 
 function SessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<SessionState>(createInitialState)
   const [rewardPointAdjustments, setRewardPointAdjustments] = useState<Partial<Record<PersonaId, number>>>({})
+  const [customRewardPointAdjustment, setCustomRewardPointAdjustment] = useState(0)
   const [activityRecords, setActivityRecords] = useState<ActivityRecords>(createInitialActivityRecords)
+  const [customActivity, setCustomActivity] = useState<ActivityRecord>(readCustomActivity)
 
   // 상태를 외부 시스템(localStorage)에 반영한다. effect의 본래 용도다.
   useEffect(() => {
+    if (session.sessionStatus === 'anonymous') {
+      try { window.sessionStorage.removeItem(STORAGE_KEY) } catch { /* 저장소 접근 불가 */ }
+      return
+    }
     writeStored({
       personaId: session.personaId,
       isAuthenticated: session.sessionStatus === 'authenticated',
+      signupProfile: session.sessionStatus === 'authenticated' ? session.signupProfile : null,
     })
   }, [session])
 
   useEffect(() => {
+    if (session.sessionStatus !== 'authenticated') return
     writeActivity('A', activityRecords.A)
     writeActivity('B', activityRecords.B)
-  }, [activityRecords])
+  }, [activityRecords, session.sessionStatus])
 
-  const signIn = useCallback((personaId: PersonaId) => {
-    setSession({ personaId, sessionStatus: 'authenticated' })
+  useEffect(() => {
+    try {
+      if (session.sessionStatus === 'authenticated' && session.signupProfile) {
+        window.sessionStorage.setItem(CUSTOM_ACTIVITY_KEY, JSON.stringify(customActivity))
+      } else {
+        window.sessionStorage.removeItem(CUSTOM_ACTIVITY_KEY)
+      }
+    } catch {
+      // 저장소를 사용할 수 없어도 현재 화면의 활동 기록은 메모리에서 유지한다.
+    }
+  }, [session.sessionStatus, session.signupProfile, customActivity])
+
+  const signIn = useCallback((personaId: PersonaId, signupProfile?: SignupProfile) => {
+    if (signupProfile) {
+      // 직접 가입은 매번 새 시연 계정이다. 서아의 활동 기록은 그대로 둔다.
+      setCustomActivity(emptyActivity())
+      setCustomRewardPointAdjustment(0)
+    }
+    setSession({ personaId, sessionStatus: 'authenticated', signupProfile: personaId === 'A' ? signupProfile ?? null : null })
   }, [])
 
   const signOut = useCallback(() => {
-    setSession((current) => ({ ...current, sessionStatus: 'anonymous' }))
+    clearStoredAppData()
+    clearDemoDeadlines()
+    clearLoginReward()
+    setActivityRecords({ A: emptyActivity(), B: emptyActivity() })
+    setCustomActivity(emptyActivity())
+    setRewardPointAdjustments({})
+    setCustomRewardPointAdjustment(0)
+    setSession({ personaId: 'A', sessionStatus: 'anonymous', signupProfile: null })
   }, [])
 
   /*
@@ -190,12 +288,20 @@ function SessionProvider({ children }: { children: ReactNode }) {
    * 서아로 돌아왔는데 앞선 시연에서 로그인한 상태가 남아 있으면 가입 흐름을 다시 못 보여준다.
    */
   const switchPersona = useCallback((personaId: PersonaId) => {
-    setSession({ personaId, sessionStatus: startStatusOf(personaId) })
+    setSession({ personaId, sessionStatus: startStatusOf(personaId), signupProfile: null })
   }, [])
 
   const recordActivity = useCallback((field: keyof ActivityRecord, id: string) => {
     // 서버 연결 전 데모 집계. 로그인한 현재 계정에만 기록하고 같은 사건은 중복 집계하지 않는다.
     if (session.sessionStatus !== 'authenticated' || !id.trim()) return
+    if (session.signupProfile) {
+      setCustomActivity((current) => {
+        if (current[field].includes(id)) return current
+        if (field === 'submittedCaseIds' && current.submittedCaseIds.length >= MAX_SUBMITTED_CASES) return current
+        return { ...current, [field]: [...current[field], id] }
+      })
+      return
+    }
     const personaId = session.personaId
     setActivityRecords((current) => {
       const activity = current[personaId]
@@ -208,7 +314,7 @@ function SessionProvider({ children }: { children: ReactNode }) {
         [personaId]: { ...activity, [field]: [...activity[field], id] },
       }
     })
-  }, [session.personaId, session.sessionStatus])
+  }, [session.personaId, session.sessionStatus, session.signupProfile])
 
   const recordCaseSubmission = useCallback((submissionId: string) => {
     recordActivity('submittedCaseIds', submissionId)
@@ -224,6 +330,10 @@ function SessionProvider({ children }: { children: ReactNode }) {
 
   const syncRewardPointTotal = useCallback((totalPoints: number) => {
     if (!Number.isFinite(totalPoints) || totalPoints < 0) return
+    if (session.signupProfile) {
+      setCustomRewardPointAdjustment(totalPoints - customActivity.votedCaseIds.length * DEMO_JURY_VOTE_POINTS)
+      return
+    }
     const personaId = session.personaId
     const account = DEMO_ACCOUNTS[personaId]
     const activity = activityRecords[personaId]
@@ -235,9 +345,16 @@ function SessionProvider({ children }: { children: ReactNode }) {
       ...current,
       [personaId]: totalPoints - earnedPoints,
     }))
-  }, [session.personaId, activityRecords])
+  }, [session.personaId, session.signupProfile, activityRecords, customActivity])
 
   const activityStats = useMemo(() => {
+    if (session.signupProfile) {
+      return {
+        submittedCases: customActivity.submittedCaseIds.length,
+        juryParticipations: customActivity.votedCaseIds.length,
+        points: customActivity.votedCaseIds.length * DEMO_JURY_VOTE_POINTS + customRewardPointAdjustment,
+      }
+    }
     const account = DEMO_ACCOUNTS[session.personaId]
     const activity = activityRecords[session.personaId]
     const submittedCases = activity.submittedCaseIds.length
@@ -252,16 +369,18 @@ function SessionProvider({ children }: { children: ReactNode }) {
         + juryParticipations * DEMO_JURY_VOTE_POINTS
         + (rewardPointAdjustments[session.personaId] ?? 0),
     }
-  }, [session.personaId, activityRecords, rewardPointAdjustments])
+  }, [session.personaId, session.signupProfile, activityRecords, customActivity, customRewardPointAdjustment, rewardPointAdjustments])
 
   const value = useMemo(
     () => ({
       personaId: session.personaId,
       sessionStatus: session.sessionStatus,
       currentUser:
-        session.sessionStatus === 'authenticated' ? toUser(session.personaId) : null,
+        session.sessionStatus === 'authenticated' ? toUser(session.personaId, session.signupProfile) : null,
       activityStats,
-      publishedAfterStoryIds: activityRecords[session.personaId].publishedAfterStoryIds,
+      publishedAfterStoryIds: session.signupProfile
+        ? customActivity.publishedAfterStoryIds
+        : activityRecords[session.personaId].publishedAfterStoryIds,
       recordCaseSubmission,
       recordJuryVote,
       recordAfterStory,
@@ -270,7 +389,7 @@ function SessionProvider({ children }: { children: ReactNode }) {
       signOut,
       switchPersona,
     }),
-    [session, activityStats, activityRecords, recordCaseSubmission, recordJuryVote, recordAfterStory, syncRewardPointTotal, signIn, signOut, switchPersona],
+    [session, activityStats, activityRecords, customActivity, recordCaseSubmission, recordJuryVote, recordAfterStory, syncRewardPointTotal, signIn, signOut, switchPersona],
   )
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>

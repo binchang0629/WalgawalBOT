@@ -33,7 +33,7 @@ import './components/BalanceGame.css'
  * 로그인 전후에 같은 홈을 재사용하고, 로그인 후에만 AI 맞춤 추천 섹션을 추가한다.
  */
 function HomePage() {
-  const { sessionStatus, personaId, signIn, signOut } = useSession()
+  const { sessionStatus, personaId, currentUser, signIn, signOut } = useSession()
   const { requireLogin } = useLoginGate()
   const { showToast } = useToast()
   const isAuthenticated = sessionStatus === 'authenticated'
@@ -65,8 +65,8 @@ function HomePage() {
       <TopBar
         isSearchOpen={isSearchOpen}
         onSearch={() => setIsSearchOpen((isOpen) => !isOpen)}
-        accountAvatar={isAuthenticated ? (personaId === 'A' ? seoaProfileImage : jihunProfileImage) : guestProfileIcon}
-        accountPersona={isAuthenticated ? personaId : undefined}
+        accountAvatar={currentUser?.isCustomProfile ? currentUser.anonymousAvatarUrl : isAuthenticated ? (personaId === 'A' ? seoaProfileImage : jihunProfileImage) : guestProfileIcon}
+        accountPersona={currentUser?.isCustomProfile ? 'custom' : isAuthenticated ? personaId : undefined}
         isAccountSwitchOpen={isAccountSwitchOpen}
         onAccountSwitch={() => {
           setIsSearchOpen(false)
@@ -86,10 +86,11 @@ function HomePage() {
       <BalanceGameSection key={personaId} />
       <CloseCallSection cta={cta} />
       <AfterStorySection />
-      {isAccountSwitchOpen && (
+      {isAccountSwitchOpen && currentUser && (
         <AccountSwitchSheet
           key={personaId}
           currentPersona={personaId}
+          currentUser={currentUser}
           onClose={() => setIsAccountSwitchOpen(false)}
           onConfirm={(nextPersona) => {
             signIn(nextPersona)
