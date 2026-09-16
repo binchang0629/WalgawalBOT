@@ -1,7 +1,9 @@
+import { Link } from 'react-router-dom'
 import SectionTitle from '../../../components/common/SectionTitle'
 import useSession from '../../../hooks/useSession'
 import mascot from '../../../assets/home/figma/chat-mascot.png'
 import { personalizedRecommendation, homeSectionTitles } from '../../../data/common/homeContent'
+import { PATHS } from '../../../routes/paths'
 import './AiRecommendSection.css'
 
 /** 개발 > 홈/로그인 후 > Section (1473:8571). 실제 추천 API가 아닌 시안용 데이터. */
@@ -29,8 +31,8 @@ function AiRecommendSection() {
       </div>
       <div className="ai-recommendation__card">
         <ul className="ai-recommendation__list">
-          {recommendation.cases.map((item) => (
-            <li key={item.id} className="ai-recommendation__item">
+          {recommendation.cases.map((item) => {
+            const caseContent = (
               <article className="ai-recommendation__case">
                 <div className="ai-recommendation__meta">
                   <span className={`ai-recommendation__category ai-recommendation__category--${item.categoryKey}`}>
@@ -42,8 +44,22 @@ function AiRecommendSection() {
                 </div>
                 <h4>{item.title}</h4>
               </article>
-            </li>
-          ))}
+            )
+
+            return (
+              <li key={item.id} className="ai-recommendation__item">
+                {item.id === 'recommend-work-balance' ? (
+                  <Link
+                    className="ai-recommendation__case-link"
+                    to={PATHS.jihoonCaseDetail}
+                    aria-label={`${item.title.replace('\n', ' ')} 상세 보기`}
+                  >
+                    {caseContent}
+                  </Link>
+                ) : caseContent}
+              </li>
+            )
+          })}
         </ul>
       </div>
     </section>

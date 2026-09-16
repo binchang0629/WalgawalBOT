@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import type { FormEvent } from 'react'
 import useLoginGate from '../../hooks/useLoginGate'
-import { PATHS } from '../../routes/paths'
+import { PATHS, toAfterStoryDetail } from '../../routes/paths'
 import CaseSubmitProgress from '../Submit/components/CaseSubmitProgress'
 import backIcon from '../../assets/my/back.svg'
-import walangJoy from '../../assets/submit/figma/imgCharacterWalangJoy.svg'
+import walgadakEmpathy from '../../assets/case/stickers/walgadak-empathy.png'
 import panMungyeeJudge from '../../assets/submit/panmung-judge-hq.png'
 import { homeImages } from '../Home/homeAssets'
 import scrollBackground from '../../assets/afterstory/figma/scroll-background.png'
@@ -13,6 +13,7 @@ import writePencil from '../../assets/afterstory/figma/write-pencil.png'
 import readBook from '../../assets/afterstory/figma/read-book.png'
 import walgadakFace from '../../assets/home/figma/close-call-mascot.svg'
 import './AfterStoryPage.css'
+import './AfterStoryDetailPage.css'
 
 const CONNECTED_CASE = {
   category: '친구 · 투표 종료',
@@ -27,10 +28,10 @@ const CONNECTED_CASE = {
  * 무대에서 타이핑할 시간이 없어서 넣은 장치다.
  */
 const DEMO_STORY = [
-  ' 처음에는 제가 사과하면 모든 잘못을 인정하는 것처럼 느껴졌어요. 그런데 친구의 이야기를 차분히 듣고 보니, 저도 모르게 사람들 앞에서 친구를 곤란하게 했더라고요.',
+  '처음에는 제가 사과하면 모든 잘못을 인정하는 것처럼 느껴졌어요. 그런데 친구의 이야기를 차분히 듣고 보니, 저도 모르게 사람들 앞에서 친구를 곤란하게 했더라고요.',
   '',
-  ' 그날 이후 먼저 연락해서 사과했고, 지금은 서로의 의견을 묻는 방식으로 조별 과제를 하고 있어요.',
-].join('\n')
+  '그날 이후 먼저 연락해서 사과했고, 지금은 서로의 의견을 묻는 방식으로 조별 과제를 하고 있어요.',
+].map((paragraph) => paragraph.trimStart()).join('\n')
 
 /**
  * `내 이야기 남기기` 화면에 올라오는 내 사건 목록. Figma 왈가왈후 시안 기준.
@@ -152,11 +153,26 @@ export function AfterStoryHomePage() {
           </Link>
         </section>
 
+        <section className="afterstory-latest" id="latest-story">
+          <header><h2>방금 도착한 후일담</h2><a href="#community-stories">모두 보기 <span aria-hidden="true">›</span></a></header>
+          <Link className="afterstory-envelope" to={toAfterStoryDetail('friend')} aria-label="먼저 사과한 뒤 서로의 의견을 묻게 된 후일담 전문 읽기">
+            <img className="afterstory-envelope__back" src={homeImages.envelopeBack} alt="" />
+            <img className="afterstory-envelope__paper" src={homeImages.letterPaper} alt="" />
+            <div className="afterstory-envelope__paper-copy">
+              <em>NEW</em>
+              <blockquote>“<span>먼저 사과한 뒤,<br />서로의 의견을 묻게 됐어요.</span>”</blockquote>
+              <p>조별 과제에서 친구를<br />공개적으로 지적한 사건</p>
+            </div>
+            <img className="afterstory-envelope__front" src={homeImages.envelopeFront} alt="" />
+            <b className="afterstory-envelope__cta">후일담 읽어보기 +</b>
+          </Link>
+        </section>
+
         <section className="afterstory-community afterstory-community--board" id="community-stories" aria-labelledby="community-story-title">
           <header className="afterstory-community__header">
             <div>
               <p>판결 이후</p>
-              <h2 id="community-story-title">방금 도착한 후일담</h2>
+              <h2 id="community-story-title">다른 후일담</h2>
             </div>
           </header>
           <p className="afterstory-community__intro">방금 작성된 이야기를 확인해보세요.</p>
@@ -211,6 +227,49 @@ export function MyPublishedAfterStoryPage() {
     </main>
   )
 }
+
+/** 공개 후일담 전문 시연 화면. 지금은 홈의 대표 편지 한 건만 연결한다. */
+export function AfterStoryDetailPage() {
+  const { storyId } = useParams()
+  const navigate = useNavigate()
+
+  if (storyId !== 'friend') return <Navigate to={PATHS.afterStory} replace />
+
+  const paragraphs = DEMO_STORY.split('\n\n')
+
+  return (
+    <main className="afterstory-detail">
+      <AfterStoryHeader title="이어진 이야기" onBack={() => navigate(PATHS.afterStory)} />
+      <div className="afterstory-detail__scroll">
+        <div className="afterstory-detail__topline" aria-hidden="true"><span /><span /><span /></div>
+        <section className="afterstory-detail__hero">
+          <div className="afterstory-detail__eyebrow"><span>왈가왈후~</span><i />판결 이후의 이야기</div>
+          <h1>{CONNECTED_CASE.storyTitle}</h1>
+          <p>다툼이 끝난 뒤에도, 관계는 계속되니까요.</p>
+          <div className="afterstory-detail__author">
+            <img src={walgadakEmpathy} alt="" />
+            <span>익명의 왈가닥 <small>친구 · 후일담</small></span>
+          </div>
+        </section>
+
+        <article className="afterstory-detail__letter" aria-label="후일담 전문">
+          <div className="afterstory-detail__letter-heading"><span>그날 이후</span><span aria-hidden="true">✦</span></div>
+          {paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+          <div className="afterstory-detail__letter-end" aria-hidden="true">✳</div>
+        </article>
+
+        <section className="afterstory-detail__case">
+          <span>이 이야기의 시작</span>
+          <h2>{CONNECTED_CASE.title}</h2>
+          <p>사건 이후 어떤 선택을 했는지 담은 후일담이에요.</p>
+        </section>
+
+        <Link className="afterstory-detail__back" to={PATHS.afterStory}>다른 이야기 둘러보기 <span aria-hidden="true">→</span></Link>
+      </div>
+    </main>
+  )
+}
+
 /**
  * 내 이야기 남기기 — 판결이 끝난 내 사건을 골라 후일담 작성으로 들어가는 화면.
  * 왈가왈후 홈의 `내 이야기 남기기` 카드가 여기로 들어온다.
@@ -248,7 +307,7 @@ export function MyAfterStoryPage() {
               <h4>{item.titleLines.join(' ')}</h4>
               <p>사건의 결말을 확인한 뒤, 그 이후의 변화와<br />당신의 선택을 들려주세요.</p>
               <small>의견 {item.opinionCount} · 댓글 {item.commentCount}</small>
-              <button type="button" onClick={() => navigate('/afterstory/write/' + item.id)}>후일담 작성하기</button>
+              <button type="button" disabled={item.id === 'company'} onClick={() => navigate('/afterstory/write/' + item.id)}>후일담 작성하기</button>
             </article>
           ))}
         </section>
@@ -296,7 +355,7 @@ export function WriteAfterStoryPage() {
           </div>
           <div className="afterstory-field__box"><textarea id="afterstory-content" value={content} maxLength={1000} placeholder={'예) 요청 내용을 정리해 보낸 뒤,\n일주일 안에 잔금을 받았어요.\n\n내가 해 본 행동과 그 후의 변화를 적어주세요.'} onChange={(event) => setContent(event.target.value)} /><small>{content.length.toLocaleString()} / 1,000</small></div>
         </section>
-        <aside className="afterstory-privacy"><img src={walangJoy} alt="" />이름·연락처 같은 개인정보는 빼주세요.</aside>
+        <aside className="afterstory-privacy"><img src={walgadakEmpathy} alt="" />이름·연락처 같은 개인정보는 빼주세요.</aside>
       </div>
       <footer className="afterstory-flow__footer"><button type="submit" disabled={!canPreview}>미리보기</button><small>게시 전, 내용과 개인정보를 다시 확인해요.</small></footer>
     </form>
@@ -316,7 +375,7 @@ export function PreviewAfterStoryPage() {
         <section className="afterstory-preview-intro"><h1>이 이야기로 게시할까요?</h1><p>게시될 내용과 연결된 사건을 확인해주세요.</p></section>
         <CaseContextCard />
         <section className="afterstory-preview-content"><h2>내가 남길 후일담</h2><p>{content || '작성한 후일담이 여기에 표시됩니다.'}</p></section>
-        <aside className="afterstory-publish-notice"><img src={homeImages.botFace} alt="" />게시하면 다른 사용자에게 공개돼요.<br />이름·연락처 등 개인정보를 다시 확인해주세요.</aside>
+        <aside className="afterstory-publish-notice"><img src={walgadakEmpathy} alt="" />게시하면 다른 사용자에게 공개돼요.<br />이름·연락처 등 개인정보를 다시 확인해주세요.</aside>
       </div>
       <footer className="afterstory-flow__footer"><button type="button" onClick={() => navigate(PATHS.afterStoryComplete, { state: { content } satisfies AfterStoryLocationState })}>후일담 게시하기</button><small>게시 후에도 MY에서 공개 범위를 바꿀 수 있어요.</small></footer>
     </main>

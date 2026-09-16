@@ -1,4 +1,7 @@
 import type { PersonaId } from '../../types'
+import { demoTimeline } from '../common/demoTimeline'
+
+const demoReceivedAt = demoTimeline.now.slice(0, 10).replaceAll('-', '.')
 
 export type MyCaseFilter = 'all' | 'progress' | 'complete' | 'private'
 
@@ -19,7 +22,7 @@ export const MY_CASES: Record<PersonaId, MyCase> = {
     id: 'CASE-FRIEND-01',
     category: '친구',
     titleLines: ['조별 과제에서 친구를 공개적으로 지적한', '제가 너무 예민했던 걸까요?'],
-    receivedAt: '2026.09.02',
+    receivedAt: demoReceivedAt,
     visibility: 'AI 1심 · 배심원 2심',
     participation: '배심원 611명',
     status: 'complete',
@@ -29,12 +32,11 @@ export const MY_CASES: Record<PersonaId, MyCase> = {
     id: 'CASE-COMPANY-01',
     category: '직장',
     titleLines: ['작업물을 사용하면서', '잔금 지급을 미루는 의뢰인'],
-    receivedAt: '2026.09.02',
+    receivedAt: demoReceivedAt,
     visibility: 'AI 1심(나만 보기)',
     participation: '없음',
     status: 'private',
-    // 목록 시안만 제공됨. 다른 사람의 결과 화면으로 연결하지 않는다.
-    resultAvailable: false,
+    resultAvailable: true,
   },
 }
 

@@ -187,7 +187,7 @@ export const personalizedRecommendation = {
     total: 3,
     cases: [
       { id: 'recommend-work-balance', categoryKey: 'work', category: '직장', agrees: false,
-        title: jihoonSimilarCase.detailTitle },
+        title: jihoonSimilarCase.recommendationTitle },
       { id: 'recommend-work-credit', categoryKey: 'work', category: '직장', agrees: true,
         title: '직장 상사가 제 아이디어를 자신의 공로인 것처럼\n발표했어요.' },
       { id: 'recommend-work-after-hours', categoryKey: 'work', category: '직장', agrees: false,

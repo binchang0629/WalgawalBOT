@@ -67,8 +67,11 @@ function MyCasesContent({ caseInfo }: { caseInfo: MyCase }) {
         )}
 
         <aside className="my-cases-page__notice">
-          💡 접수한 사건의 실시간 배심원 투표율 및 AI 종합 판결문은<br />
-          <strong>결과 페이지</strong>에서 확인 가능합니다.
+          {isPrivate ? (
+            <>💡 나만 보기로 접수한 사건의 <strong>AI 1심 의견</strong>은 <br />결과 페이지에서 확인할 수 있어요.</>
+          ) : (
+            <>💡 접수한 사건의 실시간 배심원 투표율 및 AI 종합 판결문은<br /><strong>결과 페이지</strong>에서 확인 가능합니다.</>
+          )}
         </aside>
       </div>
     </main>

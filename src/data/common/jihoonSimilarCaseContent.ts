@@ -33,6 +33,7 @@ export const jihoonSimilarCase = {
   },
   title: '수정 2회를 마쳤는데, 의뢰인이 잔금 지급을 미루고 있어요.',
   detailTitle: '수정 2회를 마쳤는데, 의뢰인이\n잔금 지급을 미루고 있어요.',
+  recommendationTitle: '수정 2회를 마쳤는데, 의뢰인이 잔금 지급을\n미루고 있어요.',
   resultTitle: '수정 2회를 마쳤는데,\n의뢰인이 잔금 지급을 미루고 있어요.',
   cardSummary: '카페 홍보영상을 180만 원에 제작했습니다. 수정 2회를 마쳤지만 의뢰인은 요청한 색감이 반영되지 않았다며 추가 수정과 원본 파일을 요구하고 있어요.',
   caseNumber: 'CASE-COMPANY-874',

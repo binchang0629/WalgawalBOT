@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { jihoonSimilarCase } from '../../data/common/jihoonSimilarCaseContent'
 import { toCaseResult } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
+import AiSummary from './components/AiSummary'
 import './CaseDetailPage.css'
 
 function ClosedCaseDetailPage() {
@@ -39,20 +40,7 @@ function ClosedCaseDetailPage() {
           {jihoonSimilarCase.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
         </section>
 
-        <section className="ai-summary" aria-labelledby="ai-summary-title">
-          <h2 id="ai-summary-title">AI 핵심요약</h2>
-          <ol>
-            {jihoonSimilarCase.summary.map((item, index) => (
-              <li key={item.title}>
-                <span>{index + 1}</span>
-                <div>
-                  <strong>{item.title}</strong>
-                  <p>{item.body}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
+        <AiSummary items={jihoonSimilarCase.summary} />
 
         <Link className="closed-case-result-link" to={toCaseResult(jihoonSimilarCase.id)}>
           투표 결과보기
