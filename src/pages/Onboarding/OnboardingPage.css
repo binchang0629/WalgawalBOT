@@ -149,13 +149,19 @@
   height: 40px;
 }
 
+/*
+ * 아이콘 크기는 Figma 벡터 실제 치수를 그대로 쓴다.
+ * 40px 칸에 꽉 채우면(width/height 40 + contain) 시안보다 커진다.
+ * 세 아이콘은 가로세로 비율이 서로 달라서 한 값으로 묶을 수 없다.
+ */
 .onboarding-note__icon img {
   display: block;
-  width: 40px;
-  height: 40px;
   max-width: none;
   object-fit: contain;
 }
+.onboarding-note--fact .onboarding-note__icon img { width: 26.7px; height: 33.3px; }
+.onboarding-note--emotion .onboarding-note__icon img { width: 33.3px; height: 30.6px; }
+.onboarding-note--private .onboarding-note__icon img { width: 30px; height: 33.3px; }
 .onboarding-note b { align-self: center; }
 .onboarding-note i {
   grid-column: 1 / -1;
@@ -175,25 +181,36 @@
 .onboarding-note--emotion i:last-of-type,
 .onboarding-note--private i:first-of-type { width: 80px; }
 
+/*
+ * 메모 세 장의 자리는 Figma 온보딩페이지1(2568:10984)에서 그대로 옮겼다.
+ *
+ * Figma는 노드의 왼쪽 위를 중심으로 회전하고, CSS는 요소의 한가운데를 중심으로 돈다.
+ * 그래서 Figma의 좌표를 top/left에 그냥 적으면 기울어진 만큼 어긋난다.
+ * 아래 값은 회전 후 결과가 시안과 겹치도록 그 차이를 미리 반영한 것이다.
+ * (검산: 회전 후 바깥 사각형이 Figma의 145~316 / 424~557 등과 0.1px 안에서 일치한다.)
+ *
+ * 세 장 모두 150 × 100이고 좌표는 main(헤더 아래) 기준이다.
+ * Figma 회전값은 반시계가 양수라 CSS에서는 부호가 뒤집힌다.
+ */
 .onboarding-note--fact {
-  top: 175px;
-  left: 153px;
+  top: 188.6px;
+  left: 155.9px;
   background: #efffd7;
   transform: rotate(-14deg);
 }
 
 .onboarding-note--emotion {
-  top: 236px;
-  left: 234px;
+  top: 234.1px;
+  left: 234.5px;
   background: #fff6dc;
-  transform: rotate(-1deg);
+  transform: rotate(-1.2deg);
 }
 
 .onboarding-note--private {
-  top: 318px;
-  left: 236px;
+  top: 328.8px;
+  left: 245.9px;
   background: #eaf6ff;
-  transform: rotate(14deg);
+  transform: rotate(14.1deg);
 }
 
 .onboarding-page__sofa-bot {
@@ -218,6 +235,18 @@
   height: 912px;
   object-fit: cover;
 }
+
+/*
+ * 참고: 실제 기기에서 이 영상 아래에 검은 선이 한 줄 보일 때가 있다.
+ *
+ * 영상 파일 문제는 아니다. 125프레임 전부 맨 아랫줄이 크림색(253, 244, 217)이다.
+ * 브라우저가 영상을 별도 레이어로 합성하면서 가장자리 한 줄이 투명(검정) 배경과
+ * 섞여 생기는 것으로 보인다. 화면을 움직이면 보였다 안 보였다 하고, 같은 자리에
+ * 캡처 이미지를 넣으면 안 보이는 것도 그래서다.
+ *
+ * 같은 색 띠로 경계를 덮어 봤지만 증상이 그대로여서 되돌렸다. 다시 손대야 한다면
+ * 이 방법은 이미 안 되는 것으로 확인됐으니 다른 쪽을 보는 편이 좋다.
+ */
 
 .onboarding-page--step-2 .onboarding-page__copy {
   display: flex;
