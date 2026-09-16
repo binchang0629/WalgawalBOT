@@ -4,6 +4,7 @@ import avatar3 from '../../assets/case/result/comment-avatar-3.png'
 import avatar4 from '../../assets/case/result/comment-avatar-4.png'
 import avatar5 from '../../assets/case/result/comment-avatar-5.png'
 import type { ThreadComment } from '../../components/common/CommentThread'
+import { DEMO_ACCOUNTS } from '../personas'
 
 /**
  * 공개 후일담 상세(AS06) 화면의 고정 데이터.
@@ -21,6 +22,7 @@ export const afterStoryAuthor = {
   lead: '다툼이 끝난 뒤에도, 관계는 계속되니까요.',
   name: '익명의 왈가닥',
   meta: '친구 · 후일담',
+  avatarUrl: DEMO_ACCOUNTS.A.anonymousAvatarUrl,
 } as const
 
 /**

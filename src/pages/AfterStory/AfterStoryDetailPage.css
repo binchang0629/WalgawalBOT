@@ -181,6 +181,20 @@
   word-break: keep-all;
 }
 
+/* 홈 카드의 편지는 브라우저가 자연스럽게 줄바꿈하고, 종이의 줄만 반복한다. */
+.afterstory-detail__letter-lines--flow {
+  display: block;
+}
+
+.afterstory-detail__letter-lines--flow p {
+  height: auto;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: repeating-linear-gradient(to bottom, transparent 0 23px, var(--neutral-200) 23px 24px, transparent 24px 33px);
+  line-height: 33px;
+}
+
 
 /* ---------------- 댓글 (노드 2778:16027) ---------------- */
 
