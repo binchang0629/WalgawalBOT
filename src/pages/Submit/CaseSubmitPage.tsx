@@ -9,7 +9,7 @@ import useCaseSubmitDraft from './useCaseSubmitDraft'
 import useWizardBack from '../../hooks/useWizardBack'
 import { RELATIONSHIPS } from './types'
 import { JIHUN_CONTENT, SEOA_CONTENT, SUBMIT_SCENARIOS } from './caseSubmitContent'
-import walangJoy from '../../assets/submit/figma/imgCharacterWalangJoy.svg'
+import walgadakEmpathy from '../../assets/case/stickers/walgadak-empathy.png'
 import './CaseSubmit.css'
 import './CaseSubmitPage.css'
 
@@ -207,7 +207,7 @@ function CaseSubmitPage() {
         </div>
 
         <div className="case-submit__panmung">
-          <img src={walangJoy} alt="" className="case-submit__panmung-art" width={40} height={40} />
+          <img src={walgadakEmpathy} alt="" className="case-submit__panmung-art" width={40} height={40} />
           <p>이름·연락처 같은 개인정보는 빼주세요.</p>
         </div>
       </div>

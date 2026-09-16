@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import useSession from '../../hooks/useSession'
 import { weddingGiftCase } from '../../data/common/caseDetailContent'
@@ -6,6 +6,7 @@ import type { WeddingGiftVoteId } from '../../data/common/caseDetailContent'
 import { PATHS, toCaseResult } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
 import CaseVoteSection from './components/CaseVoteSection'
+import AiSummary from './components/AiSummary'
 import useToast from '../../hooks/useToast'
 import useDemoCountdown from './components/useDemoCountdown'
 import { getRememberedCaseParticipantCount } from '../../utils/caseParticipantCount'
@@ -43,36 +44,10 @@ function CaseDetailPage() {
   const { sessionStatus, recordJuryVote } = useSession()
   const { showToast } = useToast()
   const [selectedVote, setSelectedVote] = useState<WeddingGiftVoteId | null>(null)
-  const [isSummaryVisible, setIsSummaryVisible] = useState(
-    () => !('IntersectionObserver' in window),
-  )
-  const summaryRef = useRef<HTMLElement>(null)
   const [participantCount] = useState(() => getRememberedCaseParticipantCount(
     weddingGiftCase.id,
     weddingGiftCase.participantCount,
   ))
-
-  useEffect(() => {
-    const summary = summaryRef.current
-    if (!summary) return
-
-    if (!('IntersectionObserver' in window)) return
-
-    const appViewport = summary.closest('.app-viewport')
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return
-      setIsSummaryVisible(true)
-      observer.disconnect()
-    }, {
-      root: appViewport,
-      /* 박스가 기기 내부 화면의 가운데 16% 영역을 통과할 때 재생한다. */
-      rootMargin: '-42% 0px -42% 0px',
-      threshold: 0.01,
-    })
-
-    observer.observe(summary)
-    return () => observer.disconnect()
-  }, [])
 
   if (caseId !== weddingGiftCase.id) return <MissingCase />
 
@@ -130,24 +105,7 @@ function CaseDetailPage() {
           {weddingGiftCase.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
         </section>
 
-        <section
-          ref={summaryRef}
-          className={`ai-summary ai-summary--reveal${isSummaryVisible ? ' is-visible' : ''}`}
-          aria-labelledby="ai-summary-title"
-        >
-          <h2 id="ai-summary-title">AI 핵심요약</h2>
-          <ol>
-            {weddingGiftCase.summary.map((item, index) => (
-              <li key={item.title}>
-                <span>{index + 1}</span>
-                <div>
-                  <strong>{item.title}</strong>
-                  <p>{item.body}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
+        <AiSummary items={weddingGiftCase.summary} />
 
         <CaseVoteSection
           isAuthenticated={isAuthenticated}

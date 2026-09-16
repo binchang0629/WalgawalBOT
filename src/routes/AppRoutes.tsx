@@ -25,7 +25,7 @@ import CaseSubmitCompletePage from '../pages/Submit/CaseSubmitCompletePage'
 import ChatbotPage from '../pages/Chatbot/ChatbotPage'
 import OnboardingPage from '../pages/Onboarding/OnboardingPage'
 import NotFoundPage from '../pages/Error/NotFoundPage'
-import { AfterStoryHomePage, CompleteAfterStoryPage, MyAfterStoryPage, MyPublishedAfterStoryPage, PreviewAfterStoryPage, WriteAfterStoryPage } from '../pages/AfterStory/AfterStoryPage'
+import { AfterStoryDetailPage, AfterStoryHomePage, CompleteAfterStoryPage, MyAfterStoryPage, MyPublishedAfterStoryPage, PreviewAfterStoryPage, WriteAfterStoryPage } from '../pages/AfterStory/AfterStoryPage'
 import { PATHS } from './paths'
 
 /**
@@ -85,6 +85,7 @@ function AppRoutes() {
         <Route element={<DetailLayout />}>
           <Route path={PATHS.myPlan} element={<WalbotPlanPage />} />
           <Route path={PATHS.afterStoryCommunity} element={<Navigate to={PATHS.afterStory} replace />} />
+          <Route path={PATHS.afterStoryDetail} element={<AfterStoryDetailPage />} />
           <Route path={PATHS.afterStoryWrite} element={<WriteAfterStoryPage />} />
           <Route path={PATHS.afterStoryPreview} element={<PreviewAfterStoryPage />} />
           <Route path={PATHS.afterStoryComplete} element={<CompleteAfterStoryPage />} />

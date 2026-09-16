@@ -145,10 +145,31 @@
 }
 
 .ai-summary {
+    --ai-summary-stroke-angle: 0deg;
     padding: 24px 20px;
-    border: 1px solid var(--neutral-250);
+    border: 1.5px solid transparent;
     border-radius: 12px;
-    background: #fff;
+    background:
+        linear-gradient(#fff, #fff) padding-box,
+        conic-gradient(
+            from var(--ai-summary-stroke-angle),
+            var(--blue-100) 0deg 220deg,
+            var(--blue-200) 260deg,
+            var(--blue-400) 300deg,
+            var(--blue-200) 338deg,
+            var(--blue-100) 360deg
+        ) border-box;
+    animation: ai-summary-stroke-orbit 3.2s linear infinite;
+}
+
+@property --ai-summary-stroke-angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+}
+
+@keyframes ai-summary-stroke-orbit {
+    to { --ai-summary-stroke-angle: 360deg; }
 }
 
 .ai-summary h2 {
@@ -201,7 +222,7 @@
     gap: 12px;
 }
 
-/* 오늘의 사건에서 요약 박스가 화면 중앙을 지나면 숫자와 내용이 1 → 2 → 3 순서로 등장한다. */
+/* 두 사건 상세의 요약 박스가 화면 중앙을 지나면 숫자와 내용이 1 → 2 → 3 순서로 등장한다. */
 .ai-summary--reveal li::before,
 .ai-summary--reveal li::after {
     content: '';
@@ -246,6 +267,11 @@
 .ai-summary--reveal.is-visible li:nth-child(3) > div { transition-delay: 1.39s; }
 
 @media (prefers-reduced-motion: reduce) {
+    .ai-summary {
+        --ai-summary-stroke-angle: 305deg;
+        animation: none;
+    }
+
     .ai-summary--reveal li::before,
     .ai-summary--reveal li::after {
         transform: translateX(-50%) scaleY(1);

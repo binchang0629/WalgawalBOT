@@ -7,7 +7,7 @@ import CaseSubmitFooter from './components/CaseSubmitFooter'
 import useCaseSubmitDraft from './useCaseSubmitDraft'
 import useWizardBack from '../../hooks/useWizardBack'
 import type { TriAnswer } from './types'
-import walangJoy from '../../assets/submit/figma/imgCharacterWalangJoy.svg'
+import walgadakEmpathy from '../../assets/case/stickers/walgadak-empathy.png'
 import './CaseSubmit.css'
 import './CaseSubmitQuestionsPage.css'
 
@@ -94,7 +94,7 @@ function CaseSubmitQuestionsPage() {
         </div>
 
         <div className="case-submit__field">
-          <p className="case-submit__label">최종 파일을 전달한 기록이 있나요?</p>
+          <p className="case-submit__label">최종 파일을 전달한 기록이 있나요? <span className="case-submit__required" aria-hidden="true">*</span></p>
           <TriAnswerRow
             value={answers.deliveryRecord}
             options={YES_NO_UNSURE}
@@ -116,7 +116,7 @@ function CaseSubmitQuestionsPage() {
         </div>
 
         <div className="case-submit__field">
-          <p className="case-submit__label">잔금 지급일이 계약서에 적혀 있나요?</p>
+          <p className="case-submit__label">잔금 지급일이 계약서에 적혀 있나요? <span className="case-submit__required" aria-hidden="true">*</span></p>
           <TriAnswerRow
             value={answers.contractTerms}
             options={YES_NO_UNSURE}
@@ -125,7 +125,7 @@ function CaseSubmitQuestionsPage() {
         </div>
 
         <div className="case-submit__field">
-          <p className="case-submit__label">수정 횟수나 범위를 정해두었나요?</p>
+          <p className="case-submit__label">수정 횟수나 범위를 정해두었나요? <span className="case-submit__required" aria-hidden="true">*</span></p>
           <TriAnswerRow
             value={answers.revisionScope}
             options={DECIDED_UNSURE}
@@ -134,7 +134,7 @@ function CaseSubmitQuestionsPage() {
         </div>
 
         <div className="case-submit__panmung">
-          <img src={walangJoy} alt="" className="case-submit__panmung-art" width={40} height={40} />
+          <img src={walgadakEmpathy} alt="" className="case-submit__panmung-art" width={40} height={40} />
           <p>기억나지 않는 내용은 &lsquo;모르겠어요&rsquo;를 골라도 돼요.</p>
         </div>
       </div>
