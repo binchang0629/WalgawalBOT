@@ -99,6 +99,8 @@
     object-fit: contain;
 }
 
+.top-bar__action--account-custom { background: transparent; }
+
 .top-bar__action--account-guest {
     overflow: visible;
     border-radius: 0;

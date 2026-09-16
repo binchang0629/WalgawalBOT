@@ -75,7 +75,9 @@ function SignUpCompletePage() {
   const prefersReducedMotion = useSyncExternalStore(subscribeReducedMotion, getReducedMotion, () => true)
 
   // 가입 직후라 이름이 있다. 복원 중이면 시안 문구의 기본값을 쓴다.
-  const name = currentUser?.name.replace(/^윤/, '') ?? '서아'
+  const name = currentUser?.isCustomProfile
+    ? currentUser.name
+    : currentUser?.name.replace(/^윤/, '') ?? '서아'
 
   return (
     <main className="signUpComplete">

@@ -98,7 +98,7 @@ function MyPage() {
   const closeAccountSheet = useCallback(() => setAccountSheetOpen(false), [])
   const closeLogoutDialog = useCallback(() => setLogoutDialogOpen(false), [])
   const displayName = currentUser?.name ?? (personaId === 'A' ? '윤서아' : '곽지훈')
-  const displayNickname = currentUser?.nickname ?? DEMO_ACCOUNTS[personaId].nickname
+  const displayNickname = currentUser?.isCustomProfile ? null : currentUser?.nickname ?? DEMO_ACCOUNTS[personaId].nickname
 
   const handleSwitchAccount = () => {
     setAccountSheetOpen(true)
@@ -145,11 +145,11 @@ function MyPage() {
         <section className="profile-card" aria-label="프로필">
           <div className="profile-card__top">
             <div className="profile-card__user">
-              <span className={`profile-card__avatar${personaId === 'B' ? ' profile-card__avatar--jihun' : ''}`}><img src={personaId === 'A' ? profileImage : jihunProfileImage} alt="" /></span>
+              <span className={`profile-card__avatar${currentUser.isCustomProfile ? ' profile-card__avatar--custom' : personaId === 'B' ? ' profile-card__avatar--jihun' : ''}`}><img src={currentUser.isCustomProfile ? currentUser.anonymousAvatarUrl : personaId === 'A' ? profileImage : jihunProfileImage} alt="" /></span>
               <span>
                 <span className="profile-card__name-row">
                   <strong>{displayName}</strong>
-                  <span className="profile-card__nickname">{displayNickname}</span>
+                  {displayNickname && <span className="profile-card__nickname">{displayNickname}</span>}
                 </span>
                 <small>AI 배심원단 활동 중 · 611명 소통</small>
               </span>
@@ -271,6 +271,7 @@ function MyPage() {
         <AccountSwitchSheet
           key={personaId}
           currentPersona={personaId}
+          currentUser={currentUser}
           onClose={closeAccountSheet}
           onConfirm={(nextPersona) => {
             signIn(nextPersona)

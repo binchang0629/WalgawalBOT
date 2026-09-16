@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { DEMO_ACCOUNTS } from '../../../data/personas'
 import type { PersonaId } from '../../../types'
+import type { SessionUser } from '../../../state/sessionContext'
 import InfoNotice from '../../../components/common/InfoNotice'
 import seoaPhoto from '../../../assets/my/account-seoa.png'
 import jihunPhoto from '../../../assets/my/account-jihun.png'
@@ -14,20 +15,22 @@ const accountPhotos = { A: seoaPhoto, B: jihunPhoto }
 
 interface Props {
   currentPersona: PersonaId
+  currentUser: SessionUser
   onClose: () => void
   onConfirm: (persona: PersonaId) => void
   onLogout: () => void
 }
 
 /** Selection stays local until the user confirms the account change. */
-function AccountSwitchSheet({ currentPersona, onClose, onConfirm, onLogout }: Props) {
+function AccountSwitchSheet({ currentPersona, currentUser, onClose, onConfirm, onLogout }: Props) {
   const [selected, setSelected] = useState<PersonaId | null>(null)
   const [confirming, setConfirming] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
   const closingRef = useRef(false)
   const exitAnimations = useRef<Animation[]>([])
   const dialogRef = useRef<HTMLDivElement>(null)
-  const current = DEMO_ACCOUNTS[currentPersona]
+  const current = currentUser.isCustomProfile ? currentUser : DEMO_ACCOUNTS[currentPersona]
+  const currentPhoto = currentUser.isCustomProfile ? currentUser.anonymousAvatarUrl : accountPhotos[currentPersona]
   const otherId = currentPersona === 'A' ? 'B' : 'A'
   const other = DEMO_ACCOUNTS[otherId]
   const portalRoot = document.getElementById('app-overlay-root')
@@ -142,11 +145,11 @@ function AccountSwitchSheet({ currentPersona, onClose, onConfirm, onLogout }: Pr
           <section aria-labelledby="current-account-label">
             <h3 id="current-account-label">현재 계정</h3>
             <div className="account-switch-sheet__account">
-              <span className={`account-switch-sheet__avatar account-switch-sheet__avatar--${currentPersona}`}><img src={accountPhotos[currentPersona]} alt="" /></span>
+              <span className={`account-switch-sheet__avatar account-switch-sheet__avatar--${currentUser.isCustomProfile ? 'custom' : currentPersona}`}><img src={currentPhoto} alt="" /></span>
               <span className="account-switch-sheet__identity">
                 <span className="account-switch-sheet__name-row">
                   <strong>{current.name}</strong>
-                  <small>{current.nickname}</small>
+                  <small>{currentUser.isCustomProfile ? '직접 가입' : current.nickname}</small>
                 </span>
                 <span className="account-switch-sheet__email">{current.email}</span>
               </span>

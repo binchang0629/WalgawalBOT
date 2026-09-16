@@ -14,6 +14,13 @@ export interface SessionUser {
   email: string
   nickname: string
   anonymousAvatarUrl: string
+  /** 직접 입력한 가입 정보로 표시하는 시연용 프로필. 별도 인증 계정은 아니다. */
+  isCustomProfile: boolean
+}
+
+export interface SignupProfile {
+  nickname: string
+  email: string
 }
 
 export interface ActivityStats {
@@ -39,8 +46,8 @@ export interface SessionValue {
   recordAfterStory: (storyId: string) => void
   /** 리워드 팝업의 최종 숫자와 MY의 포인트 합계를 같은 시점에 맞춘다. */
   syncRewardPointTotal: (totalPoints: number) => void
-  /** 가입·로그인 완료. 해당 퍼소나의 데모 계정으로 로그인 상태가 된다. */
-  signIn: (personaId: PersonaId) => void
+  /** 가입·로그인 완료. 직접 가입한 프로필은 서아 시나리오를 쓰되 활동 기록은 별도로 시작한다. */
+  signIn: (personaId: PersonaId, signupProfile?: SignupProfile) => void
   signOut: () => void
   /** 계정 전환. 발표에서 서아 → 지훈으로 넘어갈 때 쓴다. */
   switchPersona: (personaId: PersonaId) => void

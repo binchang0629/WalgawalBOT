@@ -25,7 +25,7 @@ interface TopBarProps {
   isSearchOpen?: boolean
   /** 로그인 상태는 현재 프로필 사진, 비로그인 상태는 기본 사람 아이콘. */
   accountAvatar?: string
-  accountPersona?: 'A' | 'B'
+  accountPersona?: 'A' | 'B' | 'custom'
   onAccountSwitch?: () => void
   isAccountSwitchOpen?: boolean
 }
