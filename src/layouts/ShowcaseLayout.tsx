@@ -4,6 +4,7 @@ import DeviceFrame from '../components/device/DeviceFrame'
 import AppViewport from '../components/device/AppViewport'
 import PersonaSwitcher from '../components/demo/PersonaSwitcher'
 import wgwbLogo from '../assets/brand/wgwb-logo.svg'
+import onboardingQr from '../assets/brand/onboarding-qr.svg'
 import useIsDesktop from '../hooks/useIsDesktop'
 import { DEVICE_FRAME, SERVICE, SHOWCASE_BACKGROUND } from '../config/app'
 import './ShowcaseLayout.css'
@@ -101,6 +102,10 @@ function ShowcaseLayout() {
           <p className={`showcase__hint ${hasScrolled ? 'is-hidden' : ''}`}>
             기기 안에서 스크롤해 보세요
           </p>
+          <div className="showcase__qr">
+            <img src={onboardingQr} width={120} height={120} alt="왈가왈BOT 온보딩 페이지 QR 코드" />
+            <p>QR을 스캔하면 왈가왈BOT으로 이동해요</p>
+          </div>
         </aside>
 
         <DeviceFrame scale={scale}>
