@@ -107,24 +107,27 @@
 
 .afterstory-detail__letter {
   position: relative;
-  /* 시안은 354x382 고정이다. 글줄이 늘어나도 깨지지 않도록 최소 높이로 둔다. */
+  /* Figma AS06 `편지지` 레이어: 354 × 382px. */
+  box-sizing: border-box;
+  height: 382px;
   min-height: 382px;
   margin-top: 14px;
-  padding: 25px 24px 50px;
+  padding: 0;
 }
 
 /*
- * 편지지 이미지는 정사각 원본의 가운데를 잘라 쓴다.
- * 비율(133.57% / 106.01%)과 위치는 시안 값 그대로다. 그림자도 위로만 퍼진다.
+ * Figma AS06 `편지지`의 위치·크롭·그림자 값.
+ * 종이 아래는 히어로의 파란 배경에 바로 닿고, 그림자는 윗면에만 원본대로 남긴다.
  */
 .afterstory-detail__letter-paper {
   position: absolute;
   top: -4px;
-  right: 0;
-  bottom: 4px;
   left: 0;
+  width: 100%;
+  height: 382px;
   overflow: hidden;
-  box-shadow: 0 -3px 18px rgb(65 66 95 / 14%);
+  /* 투명한 편지지 윤곽을 따라가는 새 그림자라 사각 테두리가 생기지 않는다. */
+  filter: drop-shadow(2px 4px 8px rgb(65 66 95 / 14%));
 }
 
 .afterstory-detail__letter-paper img {
@@ -137,8 +140,11 @@
 }
 
 .afterstory-detail__letter h2 {
-  position: relative;
-  margin: 0 0 34px;
+  position: absolute;
+  z-index: 2;
+  top: 25px;
+  left: 24px;
+  margin: 0;
   color: var(--orange-700);
   font-size: 14px;
   font-weight: 600;
@@ -150,7 +156,11 @@
  * 칸 사이가 9px 떨어져 시안의 33px 간격이 된다.
  */
 .afterstory-detail__letter-lines {
-  position: relative;
+  position: absolute;
+  z-index: 2;
+  top: 77px;
+  right: 24px;
+  left: 24px;
   display: flex;
   flex-direction: column;
   gap: 9px;

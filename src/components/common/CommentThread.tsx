@@ -64,10 +64,11 @@ function elapsedLabel(minutesAgo: number) {
   return `${Math.floor(minutesAgo / 1440)}일 전`
 }
 
-function CommentRow({ comment, reaction, showReply, onReact, onEdit, onDelete }: {
+function CommentRow({ comment, reaction, showReply, showVoteBadge, onReact, onEdit, onDelete }: {
   comment: ThreadComment
   reaction: CommentReaction
   showReply: boolean
+  showVoteBadge: boolean
   onReact: (reaction: Exclude<CommentReaction, null>) => void
   onEdit?: (body: string) => void
   onDelete?: () => void
@@ -101,7 +102,7 @@ function CommentRow({ comment, reaction, showReply, onReact, onEdit, onDelete }:
           <img src={comment.avatarUrl} alt="" />
         </div>
         <span>{comment.nickname} · {comment.createdAtLabel ?? elapsedLabel(comment.minutesAgo)}</span>
-        {tone && comment.voteLabel && (
+        {showVoteBadge && tone && comment.voteLabel && (
           <strong className={'result-comment__badge is-' + tone}>{comment.voteLabel}</strong>
         )}
         {onDelete && (
@@ -191,6 +192,8 @@ interface CommentThreadProps {
   perPage?: number
   /** AS06 시안에만 있는 `대댓글 달기` 문구를 표시할지. */
   showReply?: boolean
+  /** 원래 사건의 투표 선택 배지를 댓글 머리말에 표시할지. */
+  showVoteBadge?: boolean
   /** 스티커 창에서 처음 보여줄 캐릭터를 정할 때 쓰는 제목 id. */
   headingId?: string
 }
@@ -205,7 +208,7 @@ interface CommentThreadProps {
  * 서버가 없으므로 새로고침하면 사라진다. 실제로 저장되는 것처럼 보이게 하지 않는다.
  * (PROJECT_SPEC.md — mock 응답을 실제인 것처럼 표시하지 않는다)
  */
-function CommentThread({ comments, perPage = 5, showReply = false, headingId = 'comment-thread-title' }: CommentThreadProps) {
+function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge = true, headingId = 'comment-thread-title' }: CommentThreadProps) {
   const { currentUser, sessionStatus, personaId } = useSession()
   const { requireLogin } = useLoginGate()
   const location = useLocation()
@@ -361,6 +364,7 @@ function CommentThread({ comments, perPage = 5, showReply = false, headingId = '
             key={comment.id}
             comment={comment}
             showReply={showReply}
+            showVoteBadge={showVoteBadge}
             reaction={reactions[comment.id] ?? null}
             onReact={(reaction) => setReactions((previous) => ({
               ...previous,

@@ -288,7 +288,7 @@ export function AfterStoryDetailPage() {
           </div>
 
           <article className="afterstory-detail__letter" aria-label="후일담 전문">
-            {/* 편지지는 배경 그림이라 읽을 내용이 없다. 글은 그 위에 따로 얹는다. */}
+            {/* Figma AS06의 편지지 원본 레이어. */}
             <div className="afterstory-detail__letter-paper" aria-hidden="true">
               <img src={letterPaper} alt="" />
             </div>
@@ -302,7 +302,7 @@ export function AfterStoryDetailPage() {
         <div className="afterstory-detail__comments">
           <CommentThread
             comments={afterStoryComments}
-            showReply
+            showVoteBadge={false}
             headingId="afterstory-comments-title"
           />
         </div>
