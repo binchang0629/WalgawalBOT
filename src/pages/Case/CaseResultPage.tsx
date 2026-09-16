@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { Fragment, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import juryStatusCharacter from '../../assets/case/vote-other-updated.svg'
@@ -11,9 +11,11 @@ import storyLinkIcon from '../../assets/case/result/story-link.svg'
 import submitIcon from '../../assets/case/result/submit.svg'
 import ConfirmDialog from '../../components/common/ConfirmDialog'
 import Pagination from '../../components/common/Pagination'
+import { commentStickerById, type CommentStickerId } from '../../data/common/commentStickers'
 import { weddingGiftCase } from '../../data/common/caseDetailContent'
 import type { WeddingGiftVoteId } from '../../data/common/caseDetailContent'
 import {
+  createWeddingGiftSeedComment,
   voteDisplayById,
   weddingGiftResult,
 } from '../../data/common/caseResultContent'
@@ -21,6 +23,7 @@ import type { CaseResultComment } from '../../data/common/caseResultContent'
 import useSession from '../../hooks/useSession'
 import { PATHS } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
+import CommentStickerPicker from './components/CommentStickerPicker'
 import useDemoCountdown from './components/useDemoCountdown'
 import './CaseResultPage.css'
 import './WeddingGiftResultPage.css'
@@ -30,6 +33,8 @@ interface ResultRouteState {
 }
 
 const COMMENTS_PER_PAGE = 5
+const MAX_COMMENT_PAGES = 5
+const MAX_PAGINATED_COMMENTS = COMMENTS_PER_PAGE * MAX_COMMENT_PAGES
 type CommentReaction = 'like' | 'dislike' | null
 
 function isVoteId(value: unknown): value is WeddingGiftVoteId {
@@ -54,6 +59,7 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
   onDelete?: () => void
 }) {
   const badge = voteDisplayById[comment.voteId]
+  const sticker = comment.stickerId ? commentStickerById[comment.stickerId] : null
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editDraft, setEditDraft] = useState(comment.body)
@@ -82,7 +88,7 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
         </div>
         <span>{comment.nickname} · {comment.createdAt}</span>
         <strong className={`result-comment__badge is-${badge.tone}`}>{comment.voteLabel}</strong>
-        {onEdit && onDelete && (
+        {onDelete && (
           <div className="result-comment__more">
             <button
               type="button"
@@ -96,7 +102,7 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
             </button>
             {isMenuOpen && (
               <div className="result-comment__menu-popover" role="menu">
-                <button type="button" role="menuitem" onClick={beginEdit}>수정</button>
+                {onEdit && <button type="button" role="menuitem" onClick={beginEdit}>수정</button>}
                 <button type="button" role="menuitem" className="is-delete" onClick={() => {
                   setIsMenuOpen(false)
                   onDelete()
@@ -120,7 +126,18 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
             <button type="submit" className="is-save" disabled={!editDraft.trim()}>저장</button>
           </div>
         </form>
-      ) : <p>{comment.body}</p>}
+      ) : (
+        <>
+          {comment.body && <p>{comment.body}</p>}
+          {sticker && (
+            <img
+              className="result-comment__sticker"
+              src={sticker.imageUrl}
+              alt={`${sticker.characterLabel} ${sticker.expressionLabel} 스티커`}
+            />
+          )}
+        </>
+      )}
       <div className="result-comment__actions">
         <button
           type="button"
@@ -146,14 +163,17 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
 function CaseResultPage() {
   const { caseId } = useParams()
   const location = useLocation()
-  const { sessionStatus, currentUser } = useSession()
+  const { sessionStatus, currentUser, personaId } = useSession()
   const [draft, setDraft] = useState('')
+  const [selectedStickerId, setSelectedStickerId] = useState<CommentStickerId | null>(null)
+  const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false)
   const [addedComments, setAddedComments] = useState<CaseResultComment[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   // 페이지가 바뀌어 댓글이 언마운트되어도 공감/반대 선택을 유지한다.
   const [commentReactions, setCommentReactions] = useState<Record<string, CommentReaction>>({})
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const commentSectionRef = useRef<HTMLElement>(null)
   const nextCommentId = useRef(1)
   const countdown = useDemoCountdown(weddingGiftResult.deadline, weddingGiftCase.id)
 
@@ -164,20 +184,21 @@ function CaseResultPage() {
 
   const routeState = location.state as ResultRouteState | null
   const selectedVote = isVoteId(routeState?.selectedVote) ? routeState.selectedVote : 'writer'
-  const seededComments = Array.from({ length: weddingGiftResult.commentCount }, (_, index) => {
-    const comment = weddingGiftResult.comments[index % weddingGiftResult.comments.length]
-    return index < weddingGiftResult.comments.length
-      ? comment
-      : { ...comment, id: comment.id + '-page-' + index }
-  })
+  const seededComments = Array.from(
+    { length: Math.min(weddingGiftResult.commentCount, MAX_PAGINATED_COMMENTS) },
+    (_, index) => createWeddingGiftSeedComment(index),
+  )
   const allComments = [...addedComments, ...seededComments]
-  const totalPages = Math.max(1, Math.ceil(allComments.length / COMMENTS_PER_PAGE))
+  const totalPages = Math.min(
+    MAX_COMMENT_PAGES,
+    Math.max(1, Math.ceil(allComments.length / COMMENTS_PER_PAGE)),
+  )
   const visibleComments = allComments.slice((currentPage - 1) * COMMENTS_PER_PAGE, currentPage * COMMENTS_PER_PAGE)
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const body = draft.trim()
-    if (!body || !currentUser) return
+    if ((!body && !selectedStickerId) || !currentUser) return
 
     const voteDisplay = voteDisplayById[selectedVote]
     setAddedComments((comments) => [
@@ -189,23 +210,34 @@ function CaseResultPage() {
         voteId: selectedVote,
         voteLabel: voteDisplay.label,
         body,
+        stickerId: selectedStickerId ?? undefined,
         likes: 0,
         dislikes: 0,
       },
       ...comments,
     ])
     setDraft('')
+    setSelectedStickerId(null)
+    setIsStickerPickerOpen(false)
     setCurrentPage(1)
   }
 
   const handleEmoji = () => {
-    setDraft((value) => `${value}🙂`)
-    textareaRef.current?.focus()
+    setIsStickerPickerOpen((open) => !open)
+  }
+
+  const handleCommentPageChange = (nextPage: number) => {
+    if (nextPage === currentPage) return
+
+    setCurrentPage(nextPage)
+    window.requestAnimationFrame(() => {
+      commentSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
   }
 
   return (
     <main className="case-result case-result--wedding">
-      <CaseHeader />
+      <CaseHeader backTo={PATHS.home} />
 
       <div className="case-result__body">
         <section className="result-overview" aria-labelledby="result-case-title">
@@ -243,7 +275,16 @@ function CaseResultPage() {
           <div className="ai-verdict__card">
             <h3>{weddingGiftResult.aiVerdictTitle}</h3>
             <div>
-              {weddingGiftResult.aiReasons.map((reason) => <p key={reason}>{reason}</p>)}
+              {weddingGiftResult.aiReasons.map((reason) => (
+                <p key={reason}>
+                  {reason.split('\n').map((line, index) => (
+                    <Fragment key={`${line}-${index}`}>
+                      {index > 0 && <br />}
+                      {line}
+                    </Fragment>
+                  ))}
+                </p>
+              ))}
             </div>
           </div>
         </section>
@@ -260,7 +301,7 @@ function CaseResultPage() {
 
         <div className="case-result__section-divider case-result__section-divider--wedding" />
 
-        <section className="comment-section" aria-labelledby="comments-title">
+        <section ref={commentSectionRef} className="comment-section" aria-labelledby="comments-title">
           <div className="comment-section__heading">
             <h2 id="comments-title">댓글 ({allComments.length})</h2>
             <span>등록순 <i /> 최신순</span>
@@ -275,14 +316,42 @@ function CaseResultPage() {
               aria-label="댓글 내용"
               maxLength={300}
             />
-            <div>
-              <button type="button" className="comment-composer__emoji" onClick={handleEmoji} aria-label="이모지 추가">
+            {selectedStickerId && (
+              <div className="comment-composer__sticker-preview">
+                <img
+                  src={commentStickerById[selectedStickerId].imageUrl}
+                  alt={`${commentStickerById[selectedStickerId].characterLabel} ${commentStickerById[selectedStickerId].expressionLabel} 스티커 선택됨`}
+                />
+                <button type="button" onClick={() => setSelectedStickerId(null)} aria-label="선택한 스티커 삭제">×</button>
+              </div>
+            )}
+            <div className="comment-composer__controls">
+              <button
+                type="button"
+                className="comment-composer__emoji"
+                onClick={handleEmoji}
+                aria-label="캐릭터 스티커 선택"
+                aria-haspopup="dialog"
+                aria-expanded={isStickerPickerOpen}
+              >
                 <img src={emojiIcon} alt="" />
               </button>
-              <button type="submit" className="comment-composer__submit" disabled={!draft.trim()}>
+              <button type="submit" className="comment-composer__submit" disabled={!draft.trim() && !selectedStickerId}>
                 <img src={submitIcon} alt="" /> 등록
               </button>
             </div>
+            {isStickerPickerOpen && (
+              <CommentStickerPicker
+                defaultCharacter={personaId === 'A' ? 'walgadak' : 'wallang'}
+                selectedStickerId={selectedStickerId}
+                onClose={() => setIsStickerPickerOpen(false)}
+                onSelect={(stickerId) => {
+                  setSelectedStickerId(stickerId)
+                  setIsStickerPickerOpen(false)
+                  textareaRef.current?.focus()
+                }}
+              />
+            )}
           </form>
 
           <div className="comment-list" aria-live="polite">
@@ -306,7 +375,7 @@ function CaseResultPage() {
           </div>
 
           <div className="comment-pagination">
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} ariaLabel="댓글 페이지" />
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handleCommentPageChange} ariaLabel="댓글 페이지" />
           </div>
         </section>
 

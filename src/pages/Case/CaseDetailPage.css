@@ -5,6 +5,23 @@
     color: var(--ink);
 }
 
+.case-detail--slide-forward {
+    animation: case-detail-slide-forward 340ms cubic-bezier(.22, 1, .36, 1) both;
+    will-change: transform;
+}
+
+@keyframes case-detail-slide-forward {
+    from { transform: translate3d(100%, 0, 0); }
+    to { transform: translate3d(0, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .case-detail--slide-forward {
+        animation: none;
+        will-change: auto;
+    }
+}
+
 .case-detail__body {
     padding: 24px var(--content-gutter) 32px;
     display: flex;
@@ -184,6 +201,65 @@
     gap: 12px;
 }
 
+/* 오늘의 사건에서 요약 박스가 화면 중앙을 지나면 숫자와 내용이 1 → 2 → 3 순서로 등장한다. */
+.ai-summary--reveal li::before,
+.ai-summary--reveal li::after {
+    content: '';
+    transform: translateX(-50%) scaleY(0);
+    transform-origin: top;
+    transition: transform 300ms linear;
+}
+
+.ai-summary--reveal li:first-child::before,
+.ai-summary--reveal li:last-child::after { content: none; }
+
+.ai-summary--reveal li > span,
+.ai-summary--reveal li > div {
+    opacity: 0;
+    transition: opacity 420ms ease, transform 520ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.ai-summary--reveal li > span { transform: scale(.78); }
+.ai-summary--reveal li > div { transform: translateY(10px); }
+
+.ai-summary--reveal.is-visible li::before,
+.ai-summary--reveal.is-visible li::after {
+    transform: translateX(-50%) scaleY(1);
+}
+
+/* 1→2, 2→3 연결선을 실제 행 높이별로 나눠 그려 양 끝 아이콘 밖으로 넘치지 않게 한다. */
+.ai-summary--reveal.is-visible li:nth-child(1)::after { transition-delay: 80ms; }
+.ai-summary--reveal.is-visible li:nth-child(2)::before { transition-delay: 350ms; }
+.ai-summary--reveal.is-visible li:nth-child(2)::after { transition-delay: 740ms; }
+.ai-summary--reveal.is-visible li:nth-child(3)::before { transition-delay: 1.01s; }
+
+.ai-summary--reveal.is-visible li > span,
+.ai-summary--reveal.is-visible li > div {
+    opacity: 1;
+    transform: none;
+}
+
+.ai-summary--reveal.is-visible li:nth-child(1) > div { transition-delay: 90ms; }
+.ai-summary--reveal.is-visible li:nth-child(2) > span { transition-delay: 650ms; }
+.ai-summary--reveal.is-visible li:nth-child(2) > div { transition-delay: 740ms; }
+.ai-summary--reveal.is-visible li:nth-child(3) > span { transition-delay: 1.3s; }
+.ai-summary--reveal.is-visible li:nth-child(3) > div { transition-delay: 1.39s; }
+
+@media (prefers-reduced-motion: reduce) {
+    .ai-summary--reveal li::before,
+    .ai-summary--reveal li::after {
+        transform: translateX(-50%) scaleY(1);
+        transition: none;
+    }
+
+    .ai-summary--reveal li > span,
+    .ai-summary--reveal li > div {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
+
 .ai-summary li>span {
     z-index: 1;
     width: 24px;
@@ -245,6 +321,8 @@
 }
 
 .vote-choice {
+    position: relative;
+    overflow: hidden;
     height: 146px;
     padding: 16px;
     display: flex;
@@ -260,6 +338,57 @@
     font-weight: 500;
     line-height: 1.3;
     text-align: center;
+    cursor: pointer;
+    transform: translateZ(0);
+    transition:
+        border-color 260ms ease,
+        background-color 260ms ease,
+        box-shadow 260ms ease,
+        transform 180ms ease;
+}
+
+.vote-choice::after {
+    content: '';
+    position: absolute;
+    top: 44px;
+    left: 50%;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgb(255 149 36 / 18%);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) scale(.35);
+}
+
+.vote-choice:active:not(:disabled) {
+    transform: scale(.965);
+    transition-duration: 80ms;
+}
+
+.vote-choice:focus-visible {
+    outline: 3px solid var(--blue-700);
+    outline-offset: 3px;
+}
+
+.vote-choice__check {
+    position: absolute;
+    z-index: 2;
+    top: 10px;
+    right: 10px;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--orange-700);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1;
+    opacity: 0;
+    transform: scale(.45) rotate(-20deg);
+    transition: opacity 180ms ease, transform 300ms cubic-bezier(.22, 1.4, .36, 1);
 }
 
 .vote-choice__artwork {
@@ -302,10 +431,65 @@
 .vote-choice.is-selected {
     border-color: var(--orange-700);
     background: var(--orange-050);
+    box-shadow: 0 8px 20px rgb(255 149 36 / 16%);
+    animation: vote-choice-select 480ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.vote-choice.is-selected::after {
+    animation: vote-choice-ripple 560ms ease-out both;
+}
+
+.vote-choice.is-selected .vote-choice__check {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+}
+
+.vote-choice.is-selected .vote-choice__artwork {
+    animation: vote-choice-artwork-pop 520ms cubic-bezier(.22, 1.35, .36, 1);
+}
+
+.vote-choice.is-selected .vote-choice__label {
+    animation: vote-choice-label-rise 420ms 70ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes vote-choice-select {
+    0% { transform: scale(.965); }
+    55% { transform: scale(1.025); }
+    100% { transform: scale(1); }
+}
+
+@keyframes vote-choice-ripple {
+    0% { opacity: .9; transform: translateX(-50%) scale(.35); }
+    100% { opacity: 0; transform: translateX(-50%) scale(3.8); }
+}
+
+@keyframes vote-choice-artwork-pop {
+    0% { transform: translateY(3px) scale(.94); }
+    58% { transform: translateY(-5px) scale(1.08); }
+    100% { transform: none; }
+}
+
+@keyframes vote-choice-label-rise {
+    0% { opacity: .65; transform: translateY(4px); }
+    100% { opacity: 1; transform: none; }
 }
 
 .vote-choice:disabled {
     cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vote-choice,
+    .vote-choice__check {
+        transition: none;
+    }
+
+    .vote-choice.is-selected,
+    .vote-choice.is-selected::after,
+    .vote-choice.is-selected .vote-choice__artwork,
+    .vote-choice.is-selected .vote-choice__label {
+        animation: none;
+    }
 }
 
 .case-vote__login {

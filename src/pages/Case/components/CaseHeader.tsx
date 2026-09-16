@@ -5,7 +5,7 @@ import { PATHS } from '../../../routes/paths'
 import './CaseHeader.css'
 
 /** 사건 상세 계열 화면에서 공통으로 쓰는 상단 헤더. */
-function CaseHeader({ title = '오늘의 사건' }: { title?: string }) {
+function CaseHeader({ title = '오늘의 사건', backTo }: { title?: string; backTo?: string }) {
   const navigate = useNavigate()
   const location = useLocation()
   const headerRef = useRef<HTMLElement>(null)
@@ -15,6 +15,16 @@ function CaseHeader({ title = '오늘의 사건' }: { title?: string }) {
   }, [location.pathname])
 
   const handleBack = () => {
+    if (backTo) {
+      if (backTo === PATHS.home) {
+        headerRef.current
+          ?.closest<HTMLElement>('.main-layout__scroll')
+          ?.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+      }
+      navigate(backTo)
+      return
+    }
+
     if (location.key !== 'default') {
       navigate(-1)
       return
@@ -26,7 +36,12 @@ function CaseHeader({ title = '오늘의 사건' }: { title?: string }) {
   return (
     <header ref={headerRef} className="case-detail-header">
       <div className="case-detail-header__slot">
-        <button type="button" className="case-detail-header__back" onClick={handleBack} aria-label="뒤로 가기">
+        <button
+          type="button"
+          className="case-detail-header__back"
+          onClick={handleBack}
+          aria-label={backTo === PATHS.home ? '홈으로 이동' : '뒤로 가기'}
+        >
           <img src={backIcon} alt="" width={24} height={24} />
         </button>
       </div>

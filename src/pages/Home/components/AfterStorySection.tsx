@@ -32,7 +32,7 @@ function AfterStorySection() {
   function handleLetterToggle() {
     if (isAnimating || isLetterOpen) return
     setLetterState('opening')
-    transitionTimer.current = window.setTimeout(() => setLetterState('open'), 960)
+    transitionTimer.current = window.setTimeout(() => setLetterState('open'), 1200)
   }
 
   return (

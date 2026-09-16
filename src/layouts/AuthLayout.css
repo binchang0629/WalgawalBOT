@@ -31,3 +31,12 @@
     overflow-y: hidden;
     padding-bottom: 0;
 }
+
+/*
+ * 로그인은 앱의 100dvh 화면에서 헤더를 제외한 나머지 높이를 그대로 쓴다.
+ * 본문에 다시 100vh를 주면 64px 헤더만큼 넘치므로 스크롤 컨테이너를 고정한다.
+ */
+.auth-layout__scroll:has(.login) {
+    overflow-y: hidden;
+    padding-bottom: 0;
+}

@@ -5,6 +5,7 @@ import commentAvatar4 from '../../assets/case/disagreement/comment-4.png'
 import commentAvatar5 from '../../assets/case/disagreement/comment-5.png'
 import authorAvatar from '../../assets/case/jihoon/author.png'
 import verdictArtwork from '../../assets/case/jihoon/verdict-artwork.png'
+import type { CommentStickerId } from './commentStickers'
 
 export type JihoonSimilarVoteId = 'other' | 'writer' | 'both' | 'neither'
 
@@ -15,6 +16,7 @@ export interface JihoonSimilarComment {
   voteId: JihoonSimilarVoteId | null
   voteLabel: string | null
   body: string
+  stickerId?: CommentStickerId
   likes: number
   dislikes: number
   avatarUrl?: string
@@ -124,6 +126,7 @@ export const jihoonSimilarResult = {
       voteId: 'other',
       voteLabel: '투표 · 상대방 입장',
       body: '의뢰인이 처음부터 같은 부분을 이야기했다면 추가 수정이라기보다 기존 요청의 보완에 가까워 보여요.',
+      stickerId: 'wallang-listen',
       likes: 3,
       dislikes: 1,
     },
@@ -145,7 +148,8 @@ export const jihoonSimilarResult = {
       createdAt: '11분 전',
       voteId: 'other',
       voteLabel: '투표 · 상대방 입장',
-      body: '제작자의 해석과 의뢰인의 요구가 다를 수 있지만, 최종본은 합의된 방향에 맞아야 하지 않을까요?',
+      body: '',
+      stickerId: 'walgadak-joy',
       likes: 3,
       dislikes: 1,
     },
@@ -166,3 +170,69 @@ export const jihoonSimilarResult = {
     title: '카페 홍보영상 제작\n수정 범위와 잔금 갈등',
   },
 } as const
+
+const companyCommentOpenings: Array<{
+  voteId: JihoonSimilarVoteId
+  voteLabel: string
+  text: string
+}> = [
+  { voteId: 'other', voteLabel: '투표 · 상대방 입장', text: '수정 횟수보다 처음 합의한 밝고 따뜻한 색감이 실제로 반영됐는지가 더 중요해 보여요.' },
+  { voteId: 'other', voteLabel: '투표 · 상대방 입장', text: '같은 요청을 두 번 했는데 작업자 판단으로 다르게 작업했다면 완료라고 보기 어려워요.' },
+  { voteId: 'writer', voteLabel: '투표 · 글쓴이 입장', text: '계약서에 수정 2회가 명확하다면 추가 작업은 별도 비용을 협의하는 것이 맞다고 봅니다.' },
+  { voteId: 'both', voteLabel: '투표 · 양쪽 모두', text: '작업자는 횟수를 지켰고 의뢰인은 원하는 결과를 못 받았으니 완료 기준부터 다시 맞춰야겠어요.' },
+  { voteId: 'other', voteLabel: '투표 · 상대방 입장', text: '광고 일정 때문에 먼저 게시한 것을 최종 승인으로 해석하는 건 무리가 있어 보여요.' },
+  { voteId: 'other', voteLabel: '투표 · 상대방 입장', text: '전문가 의견도 중요하지만 의뢰인이 명확히 요청한 방향을 임의로 바꾼 점은 아쉽습니다.' },
+  { voteId: 'writer', voteLabel: '투표 · 글쓴이 입장', text: '이미 결과물을 사용하고 있다면 잔금 전체를 보류하는 대응 역시 과하다고 생각해요.' },
+  { voteId: 'both', voteLabel: '투표 · 양쪽 모두', text: '잔금 일부를 지급하고 색감 보완 범위를 새로 합의했으면 가장 현실적이었을 것 같아요.' },
+  { voteId: 'other', voteLabel: '투표 · 상대방 입장', text: '원본 파일 제공도 계약에 포함됐다면 결과물과 함께 약속대로 전달해야 해요.' },
+  { voteId: 'other', voteLabel: '투표 · 상대방 입장', text: '두 번의 수정이 모두 핵심 요청을 비껴갔다면 횟수만 채웠다고 말하기는 어렵습니다.' },
+  { voteId: 'writer', voteLabel: '투표 · 글쓴이 입장', text: '추가 요구가 최초 계약 범위를 넘는 부분인지 작업 기록을 먼저 확인해야 할 것 같아요.' },
+  { voteId: 'neither', voteLabel: '투표 · 양쪽 모두 아님', text: '요청과 승인 과정을 문서로 남기지 않은 채 서로 유리한 기준만 주장한 점이 가장 큰 문제 같아요.' },
+]
+
+const companyCommentConclusions = [
+  '메신저 기록과 계약서를 기준으로 남은 작업을 구체적으로 정리해보면 좋겠습니다.',
+  '감정적으로 대응하기보다 수정 범위와 잔금 지급 시점을 문서로 다시 합의해야 해요.',
+  '다음 작업부터는 시안 승인 단계와 최종 완료 조건을 계약서에 더 자세히 적는 게 좋겠네요.',
+  '사용 여부와 최종 승인 여부를 분리해서 판단해야 서로 억울하지 않을 것 같습니다.',
+] as const
+
+const companyCommentNicknames = [
+  '계약서필수', '수정은두번', '프리랜서일기', '클라이언트입장', '영상쟁이', '잔금주세요',
+  '기록이살길', '회의록요정', '색감중요해', '납기지킴이', '현실조언', '작업범위체크',
+  '광고회사막내', '오늘도야근', '차분한배심원', '원본은별도',
+] as const
+
+const companyStickerIds = [
+  'wallang-listen', 'walgadak-joy', 'wallang-thinking', 'walgadak-curious',
+] as const satisfies readonly CommentStickerId[]
+
+function formatCommentElapsedTime(totalMinutes: number) {
+  if (totalMinutes <= 59) return `${totalMinutes}분 전`
+  return `${Math.max(1, Math.floor(totalMinutes / 60))}시간 전`
+}
+
+/** 지난 사건 댓글도 페이지마다 서로 다른 내용이 보이도록 안정적으로 생성한다. */
+export function createJihoonSimilarSeedComment(index: number): JihoonSimilarComment {
+  const originalComment = jihoonSimilarResult.comments[index]
+  if (originalComment) return originalComment
+
+  const opening = companyCommentOpenings[index % companyCommentOpenings.length]
+  const conclusion = companyCommentConclusions[Math.floor(index / companyCommentOpenings.length) % companyCommentConclusions.length]
+  const stickerId = index % 9 === 0
+    ? companyStickerIds[Math.floor(index / 9) % companyStickerIds.length]
+    : undefined
+
+  return {
+    id: `company-seed-comment-${index + 1}`,
+    avatarUrl: [commentAvatar1, commentAvatar2, commentAvatar3, commentAvatar4, commentAvatar5][index % 5],
+    nickname: companyCommentNicknames[index % companyCommentNicknames.length],
+    createdAt: formatCommentElapsedTime(index * 10 - 25),
+    voteId: opening.voteId,
+    voteLabel: opening.voteLabel,
+    body: `${opening.text} ${conclusion}`,
+    ...(stickerId ? { stickerId } : {}),
+    likes: (index * 5) % 31,
+    dislikes: (index * 2) % 5,
+  }
+}

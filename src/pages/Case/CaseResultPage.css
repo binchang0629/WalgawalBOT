@@ -56,14 +56,12 @@
 
 .vote-result__heading {
     width: 100%;
-    height: 30px;
-    display: flex;
-    align-items: center;
     margin-top: 16px;
 }
 
 .vote-result__heading h2, .ai-verdict>h2 {
     margin: 0;
+    padding-inline: 8px;
     font-size: 16px;
     font-weight: 700;
     line-height: 1.3;
@@ -267,12 +265,12 @@
 
 
 /* AI 판결 */
-.ai-verdict>h2 {
-    padding-left: 8px;
+.vote-result__artwork,
+.ai-verdict__card {
+    margin-top: 10px;
 }
 
 .ai-verdict__card {
-    margin-top: 10px;
     padding: 18px;
     border-radius: 12px;
     background: var(--blue-050);
@@ -291,6 +289,7 @@
     font-size: 18px;
     font-weight: 700;
     line-height: 1.2;
+    white-space: pre-line;
 }
 
 .ai-verdict__card>div {
@@ -304,6 +303,7 @@
     font-size: 14px;
     font-weight: 400;
     line-height: 1.3;
+    white-space: pre-line;
 }
 
 .ai-verdict__card footer {
@@ -400,6 +400,10 @@
 
 
 /* 댓글 입력과 목록 */
+.comment-section {
+    scroll-margin-top: 16px;
+}
+
 .comment-section__heading {
     display: flex;
     align-items: center;
@@ -429,6 +433,7 @@
 }
 
 .comment-composer {
+    position: relative;
     min-height: 84px;
     margin-top: 20px;
     padding: 10px;
@@ -463,7 +468,7 @@
     color: var(--neutral-400);
 }
 
-.comment-composer>div {
+.comment-composer > .comment-composer__controls {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -507,6 +512,123 @@
 
 .comment-composer__submit:disabled {
     cursor: not-allowed;
+}
+
+.comment-composer__sticker-preview {
+    position: relative;
+    align-self: flex-start;
+    width: 58px;
+    height: 58px;
+    padding: 3px;
+    border-radius: 12px;
+    background: var(--neutral-050);
+}
+
+.comment-composer__sticker-preview > img {
+    display: block;
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+}
+
+.comment-composer__sticker-preview > button {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border-radius: 50%;
+    background: var(--neutral-600);
+    color: #fff;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.comment-sticker-picker {
+    position: absolute;
+    z-index: 8;
+    right: 8px;
+    bottom: 44px;
+    left: 8px;
+    padding: 10px;
+    border: 1px solid var(--neutral-200);
+    border-radius: 14px;
+    background: rgb(255 255 255 / 98%);
+    box-shadow: 0 12px 30px rgb(37 37 37 / 16%);
+    animation: comment-sticker-picker-in 220ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.comment-sticker-picker__tabs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+    padding: 3px;
+    border-radius: 9px;
+    background: var(--neutral-100);
+}
+
+.comment-sticker-picker__tabs button {
+    height: 28px;
+    padding: 0 8px;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--neutral-600);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.comment-sticker-picker__tabs button.is-selected {
+    background: #fff;
+    color: var(--blue-700);
+    box-shadow: 0 2px 6px rgb(37 37 37 / 8%);
+}
+
+.comment-sticker-picker__grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 3px;
+    margin-top: 8px;
+}
+
+.comment-sticker-picker__grid button {
+    min-width: 0;
+    padding: 3px 1px 2px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--neutral-600);
+}
+
+.comment-sticker-picker__grid button.is-selected {
+    border-color: var(--orange-700);
+    background: var(--orange-050);
+}
+
+.comment-sticker-picker__grid img {
+    display: block;
+    width: 38px;
+    max-width: 100%;
+    height: 38px;
+    margin: 0 auto;
+    object-fit: contain;
+}
+
+.comment-sticker-picker__grid span {
+    display: block;
+    margin-top: 1px;
+    overflow: hidden;
+    font-size: 9px;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@keyframes comment-sticker-picker-in {
+    from { opacity: 0; transform: translateY(8px) scale(.98); }
+    to { opacity: 1; transform: none; }
 }
 
 .comment-list {
@@ -633,6 +755,17 @@
     line-height: 1.3;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+}
+
+.result-comment__sticker {
+    display: block;
+    width: 76px;
+    height: 76px;
+    object-fit: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .comment-sticker-picker { animation: none; }
 }
 
 .result-comment__edit {

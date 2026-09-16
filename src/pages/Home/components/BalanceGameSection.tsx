@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent } from 'react'
 import SectionTitle from '../../../components/common/SectionTitle'
 import { homeIcons } from '../homeAssets'
+import CompactSwitchButton from './CompactSwitchButton'
 import perillaLeaf from '../../../assets/home/figma/perilla-leaf.png'
 import perillaChopsticks from '../../../assets/home/figma/perilla-chopsticks.png'
 import perillaChopsticksFull from '../../../assets/home/figma/perilla-chopsticks-full.png'
@@ -107,16 +108,15 @@ function BalanceRound({ questionIndex, onNext }: { questionIndex: number; onNext
   return (
     <section className={'balance-section balance-section--' + phase + (isMint ? ' balance-section--mint' : '') + (choice ? ' balance-section--' + choice : '') + (hoverChoice ? ' balance-section--hover-' + hoverChoice : '')} aria-label="밸런스 게임">
       <SectionTitle title={homeSectionTitles.balance.title}
-        titleSuffix={
-          <button type="button" className="balance-section__refresh" aria-label={gameName + ' 게임 다시하기'} onClick={handleReset}>
-            <img src={homeIcons.refreshIcon} alt="" aria-hidden="true" />
-          </button>
+        actionSlot={
+          <CompactSwitchButton
+            current={questionIndex + 1}
+            total={playableQuestions.length}
+            label="다른 게임"
+            ariaLabel={'다른 밸런스 게임으로 전환: ' + (isMint ? '깻잎' : '민트초코')}
+            onClick={onNext}
+          />
         }
-        actionSlot={<div className="balance-section__navigation">
-          <p className="balance-section__pager" aria-live="polite"><b>{questionIndex + 1}</b>/{playableQuestions.length}</p>
-          <button type="button" className="balance-section__next" onClick={onNext}
-            aria-label={'다음 밸런스 게임: ' + (isMint ? '깻잎' : '민트초코')}>다음 ›</button>
-        </div>}
       />
       <p className="balance-question" id="balance-question"><b>{question.order}</b> {phase === 'result' ? <>{isMint ? '민트초코' : '깻잎 논쟁'}, 나의 선택은 <span className="balance-answer">{choice === 'left' ? question.leftLabel : question.rightLabel}.</span></> : question.title}</p>
       <div className="balance-board" role="group" aria-labelledby="balance-question">
@@ -168,6 +168,11 @@ function BalanceRound({ questionIndex, onNext }: { questionIndex: number; onNext
             </button>
           </div>
         ))}
+        {phase === 'result' && (
+          <button type="button" className="balance-section__refresh" aria-label={gameName + ' 게임 다시 하기'} onClick={handleReset}>
+            <img src={homeIcons.refreshIcon} alt="" aria-hidden="true" />
+          </button>
+        )}
         <p className="balance-board__guide" role="status" aria-live="polite">
           <img src={homeIcons.dragHand} alt="" aria-hidden="true" />
           {choice ? (choice === 'left' ? question.leftLabel : question.rightLabel) + ' 선택!' : question.guide}

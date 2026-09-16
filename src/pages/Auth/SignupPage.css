@@ -65,7 +65,7 @@
     line-height: 1.3;
 }
 
-.signUpLabel b { color: var(--orange-700); font-weight: 400; }
+.signUpLabel b { color: var(--blue-700); font-weight: 400; }
 .signUpLabel em { color: var(--neutral-700); font-size: 11px; font-style: normal; }
 .signUpLabelOptional { padding-left: 3px; }
 
@@ -183,6 +183,7 @@
 }
 
 .signUpHelpOk { color: var(--blue-700); }
+.signUpHelpError { color: var(--negative); }
 .signUpHelpHidden { visibility: hidden; }
 .signUpHelpBirth { color: var(--blue-600); }
 .signUpHelpBirth b { font-weight: 700; }
@@ -224,7 +225,7 @@
     line-height: 1;
 }
 
-.signUpAgreeOpen b { color: var(--orange-700); font-size: 14px; font-weight: 400; }
+.signUpAgreeOpen b { color: var(--blue-700); font-size: 14px; font-weight: 400; }
 .signUpAgreeOpen img { display: block; width: 20px; height: 20px; }
 /*
  * 아직 누를 수 없을 때도 흐리게 만들지 않는다.

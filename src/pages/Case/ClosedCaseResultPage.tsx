@@ -12,7 +12,9 @@ import storyLinkIcon from '../../assets/case/result/story-link.svg'
 import submitIcon from '../../assets/case/result/submit.svg'
 import ConfirmDialog from '../../components/common/ConfirmDialog'
 import Pagination from '../../components/common/Pagination'
+import { commentStickerById, type CommentStickerId } from '../../data/common/commentStickers'
 import {
+  createJihoonSimilarSeedComment,
   jihoonSimilarCase,
   jihoonSimilarReasonComparison,
   jihoonSimilarResult,
@@ -24,12 +26,15 @@ import type {
 import useSession from '../../hooks/useSession'
 import useLoginGate from '../../hooks/useLoginGate'
 import CaseHeader from './components/CaseHeader'
+import CommentStickerPicker from './components/CommentStickerPicker'
 import VerdictDisagreementHero from './components/VerdictDisagreementHero'
 import VerdictReasonComparison from './components/VerdictReasonComparison'
 import './CaseResultPage.css'
 import './ClosedCaseResultPage.css'
 
 const COMMENTS_PER_PAGE = 5
+const MAX_COMMENT_PAGES = 5
+const MAX_PAGINATED_COMMENTS = COMMENTS_PER_PAGE * MAX_COMMENT_PAGES
 type CommentReaction = 'like' | 'dislike' | null
 
 const voteDisplay: Record<JihoonSimilarVoteId, { tone: 'blue' | 'orange' | 'solid-orange' }> = {
@@ -167,6 +172,7 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
   onDelete?: () => void
 }) {
   const tone = comment.voteId ? voteDisplay[comment.voteId].tone : null
+  const sticker = comment.stickerId ? commentStickerById[comment.stickerId] : null
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editDraft, setEditDraft] = useState(comment.body)
@@ -197,7 +203,7 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
         {tone && comment.voteLabel && (
           <strong className={'result-comment__badge is-' + tone}>{comment.voteLabel}</strong>
         )}
-        {onEdit && onDelete && (
+        {onDelete && (
           <div className="result-comment__more">
             <button
               type="button"
@@ -211,7 +217,7 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
             </button>
             {isMenuOpen && (
               <div className="result-comment__menu-popover" role="menu">
-                <button type="button" role="menuitem" onClick={beginEdit}>수정</button>
+                {onEdit && <button type="button" role="menuitem" onClick={beginEdit}>수정</button>}
                 <button type="button" role="menuitem" className="is-delete" onClick={() => {
                   setIsMenuOpen(false)
                   onDelete()
@@ -235,7 +241,18 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
             <button type="submit" className="is-save" disabled={!editDraft.trim()}>저장</button>
           </div>
         </form>
-      ) : <p>{comment.body}</p>}
+      ) : (
+        <>
+          {comment.body && <p>{comment.body}</p>}
+          {sticker && (
+            <img
+              className="result-comment__sticker"
+              src={sticker.imageUrl}
+              alt={`${sticker.characterLabel} ${sticker.expressionLabel} 스티커`}
+            />
+          )}
+        </>
+      )}
       <div className="result-comment__actions">
         <button
           type="button"
@@ -259,15 +276,18 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
 }
 
 function ClosedCaseResultPage() {
-  const { currentUser, sessionStatus } = useSession()
+  const { currentUser, sessionStatus, personaId } = useSession()
   const { requireLogin } = useLoginGate()
   const location = useLocation()
   const [draft, setDraft] = useState('')
+  const [selectedStickerId, setSelectedStickerId] = useState<CommentStickerId | null>(null)
+  const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false)
   const [addedComments, setAddedComments] = useState<JihoonSimilarComment[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const [commentReactions, setCommentReactions] = useState<Record<string, CommentReaction>>({})
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const commentSectionRef = useRef<HTMLElement>(null)
   const nextCommentId = useRef(1)
   const isAuthenticated = sessionStatus === 'authenticated'
 
@@ -279,21 +299,22 @@ function ClosedCaseResultPage() {
   }
 
 
-  const seededComments = Array.from({ length: jihoonSimilarResult.commentCount }, (_, index) => {
-    const comment = jihoonSimilarResult.comments[index % jihoonSimilarResult.comments.length]
-    return index < jihoonSimilarResult.comments.length
-      ? comment
-      : { ...comment, id: comment.id + '-page-' + index }
-  })
+  const seededComments = Array.from(
+    { length: Math.min(jihoonSimilarResult.commentCount, MAX_PAGINATED_COMMENTS) },
+    (_, index) => createJihoonSimilarSeedComment(index),
+  )
   const allComments = [...addedComments, ...seededComments]
-  const totalPages = Math.max(1, Math.ceil(allComments.length / COMMENTS_PER_PAGE))
+  const totalPages = Math.min(
+    MAX_COMMENT_PAGES,
+    Math.max(1, Math.ceil(allComments.length / COMMENTS_PER_PAGE)),
+  )
   const visibleComments = allComments.slice((currentPage - 1) * COMMENTS_PER_PAGE, currentPage * COMMENTS_PER_PAGE)
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!requestCommentLogin()) return
     const body = draft.trim()
-    if (!body) return
+    if (!body && !selectedStickerId) return
 
     setAddedComments((comments) => [
       {
@@ -304,19 +325,30 @@ function ClosedCaseResultPage() {
         voteId: null,
         voteLabel: null,
         body,
+        stickerId: selectedStickerId ?? undefined,
         likes: 0,
         dislikes: 0,
       },
       ...comments,
     ])
     setDraft('')
+    setSelectedStickerId(null)
+    setIsStickerPickerOpen(false)
     setCurrentPage(1)
   }
 
   const handleEmoji = () => {
     if (!requestCommentLogin()) return
-    setDraft((value) => value + '🙂')
-    textareaRef.current?.focus()
+    setIsStickerPickerOpen((open) => !open)
+  }
+
+  const handleCommentPageChange = (nextPage: number) => {
+    if (nextPage === currentPage) return
+
+    setCurrentPage(nextPage)
+    window.requestAnimationFrame(() => {
+      commentSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
   }
 
   return (
@@ -345,7 +377,7 @@ function ClosedCaseResultPage() {
 
         <div className="case-result__section-divider case-result__section-divider--closed" />
 
-        <section className="comment-section" aria-labelledby="comments-title">
+        <section ref={commentSectionRef} className="comment-section" aria-labelledby="comments-title">
           <div className="comment-section__heading">
             <h2 id="comments-title">댓글 ({allComments.length})</h2>
             <span>등록순 <i /> 최신순</span>
@@ -362,19 +394,47 @@ function ClosedCaseResultPage() {
               readOnly={!isAuthenticated}
               maxLength={300}
             />
-            <div>
-              <button type="button" className="comment-composer__emoji" onClick={handleEmoji} aria-label="이모지 추가">
+            {selectedStickerId && (
+              <div className="comment-composer__sticker-preview">
+                <img
+                  src={commentStickerById[selectedStickerId].imageUrl}
+                  alt={`${commentStickerById[selectedStickerId].characterLabel} ${commentStickerById[selectedStickerId].expressionLabel} 스티커 선택됨`}
+                />
+                <button type="button" onClick={() => setSelectedStickerId(null)} aria-label="선택한 스티커 삭제">×</button>
+              </div>
+            )}
+            <div className="comment-composer__controls">
+              <button
+                type="button"
+                className="comment-composer__emoji"
+                onClick={handleEmoji}
+                aria-label="캐릭터 스티커 선택"
+                aria-haspopup="dialog"
+                aria-expanded={isStickerPickerOpen}
+              >
                 <img src={emojiIcon} alt="" />
               </button>
               <button
                 type="submit"
                 className="comment-composer__submit"
-                disabled={isAuthenticated && !draft.trim()}
+                disabled={isAuthenticated && !draft.trim() && !selectedStickerId}
                 aria-label={isAuthenticated ? '댓글 등록' : '로그인하고 댓글 쓰기'}
               >
                 <img src={submitIcon} alt="" /> 등록
               </button>
             </div>
+            {isStickerPickerOpen && (
+              <CommentStickerPicker
+                defaultCharacter={personaId === 'A' ? 'walgadak' : 'wallang'}
+                selectedStickerId={selectedStickerId}
+                onClose={() => setIsStickerPickerOpen(false)}
+                onSelect={(stickerId) => {
+                  setSelectedStickerId(stickerId)
+                  setIsStickerPickerOpen(false)
+                  textareaRef.current?.focus()
+                }}
+              />
+            )}
           </form>
 
           <div className="comment-list" aria-live="polite">
@@ -398,7 +458,7 @@ function ClosedCaseResultPage() {
           </div>
 
           <div className="comment-pagination">
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} ariaLabel="댓글 페이지" />
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handleCommentPageChange} ariaLabel="댓글 페이지" />
           </div>
         </section>
 

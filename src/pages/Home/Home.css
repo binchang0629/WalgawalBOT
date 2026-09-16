@@ -359,7 +359,7 @@
 }
 
 .participant-count__digit.is-changing .participant-count__track {
-    animation: participant-digit-roll 480ms cubic-bezier(.22, 1, .36, 1) forwards;
+    animation: participant-digit-roll var(--participant-roll-duration, 680ms) cubic-bezier(.16, .76, .22, 1) forwards;
 }
 
 .participant-count__comma {
@@ -370,23 +370,22 @@
 
 @keyframes participant-digit-roll {
     0% {
-        opacity: .55;
-        transform: translateY(0) rotateX(0deg);
+        filter: blur(0);
+        transform: translateY(0);
     }
-    55% {
-        opacity: 1;
-        transform: translateY(-.78em) rotateX(-18deg);
+    45% {
+        filter: blur(.35px);
     }
     100% {
-        opacity: 1;
-        transform: translateY(-1.3em) rotateX(0deg);
+        filter: blur(0);
+        transform: translateY(calc(var(--participant-roll-steps, 1) * -1.3em));
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .participant-count__digit.is-changing .participant-count__track {
         animation: none;
-        transform: translateY(-1.3em);
+        transform: translateY(calc(var(--participant-roll-steps, 1) * -1.3em));
     }
 }
 
@@ -719,27 +718,29 @@
 }
 
 .balance-section__refresh {
+    position: absolute;
+    z-index: 5;
+    top: 279px;
+    left: calc(50% - 22px);
     display: flex;
-    padding: 0;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 9px;
     border: 0;
     background: none;
+    animation: balance-refresh-enter 280ms cubic-bezier(.2, .8, .2, 1) both;
 }
 
 .balance-section__refresh img {
-    width: 26px;
-    height: 26px;
+    width: 30px;
+    height: 30px;
 }
 
-.balance-section__pager {
-    margin: 0;
-    font-size: 13px;
-    line-height: 1.3;
-    color: var(--neutral-600);
-}
-
-.balance-section__pager b {
-    color: var(--neutral-900);
-    font-weight: 400;
+@keyframes balance-refresh-enter {
+    from { opacity: 0; transform: translateY(3px) scale(.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .balance-question {
@@ -766,7 +767,12 @@
     width: 354px;
     height: 280px;
     margin-top: 2px;
+    transition: height 240ms ease;
 }
+
+.balance-section--result .balance-board { height: 332px; }
+.balance-section--mint.balance-section--result .balance-board { height: 364px; }
+.balance-section--mint .balance-section__refresh { top: 311px; }
 
 .balance-board__draggable {
     position: absolute;
@@ -1027,37 +1033,6 @@
 .swap-card__tag img {
     width: 10px;
     height: 12px;
-}
-
-.swap-card__change {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    min-height: 32px;
-    padding: 5px 9px;
-    border: 1px solid var(--blue-200);
-    border-radius: var(--radius-pill);
-    background: var(--blue-050);
-    color: var(--blue-700);
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1;
-    white-space: nowrap;
-    cursor: pointer;
-}
-
-.swap-card__change img {
-    width: 16px;
-    height: 16px;
-}
-
-.swap-card__change-icon {
-    font-family: Arial, sans-serif;
-    font-size: 18px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 1;
 }
 
 .swap-card__title {
@@ -1668,6 +1643,8 @@ img.ai-card__mascot {
 .balance-question { min-height: 37px; padding-inline: 8px; }
 @media (prefers-reduced-motion: reduce) {
     .balance-board__draggable, .balance-board__plate, .balance-choice, .balance-board__pile { transition: none; }
+    .balance-section__refresh { animation: none; }
+    .balance-board { transition: none; }
 }
 
 /* 결과에서도 젓가락이 집은 깻잎을 더미 위에 남겨 참조 시안과 연결한다. */
@@ -2008,10 +1985,6 @@ img.ai-card__mascot {
     border-radius: var(--radius-lg);
     background: var(--neutral-050);
 }
-.swap-card__change:focus-visible {
-    outline: 2px solid var(--blue-700);
-    outline-offset: 3px;
-}
 .swap-card__title {
     overflow: hidden;
     width: 100%;
@@ -2147,15 +2120,15 @@ img.ai-card__mascot {
 
 /* 후일담 편지는 봉투 → 편지지 → 내용 순으로 열린다. */
 .letter {
-    transition: height 760ms cubic-bezier(.22, 1, .36, 1);
+    transition: height 900ms cubic-bezier(.22, 1, .36, 1);
 }
 .letter.is-open {
-    transition-delay: 120ms;
+    transition-delay: 140ms;
 }
 .letter .letter__closed {
     opacity: 1;
     transform: translateY(0) scale(1);
-    transition: opacity 200ms ease 360ms, transform 200ms ease 360ms;
+    transition: opacity 240ms ease 420ms, transform 240ms ease 420ms;
 }
 .letter.is-open .letter__closed {
     opacity: 0;
@@ -2165,32 +2138,32 @@ img.ai-card__mascot {
 .letter .letter__back {
     opacity: 0;
     transform: translateX(-50%) translateY(8px);
-    transition: opacity 160ms ease, transform 220ms cubic-bezier(.22, 1, .36, 1);
+    transition: opacity 200ms ease, transform 280ms cubic-bezier(.22, 1, .36, 1);
 }
 .letter .letter__front {
     opacity: 0;
     transform: translateY(8px);
-    transition: opacity 160ms ease, transform 220ms cubic-bezier(.22, 1, .36, 1);
+    transition: opacity 200ms ease, transform 280ms cubic-bezier(.22, 1, .36, 1);
 }
 .letter.is-open .letter__back {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
-    transition-delay: 120ms;
+    transition-delay: 160ms;
 }
 .letter.is-open .letter__front {
     opacity: 1;
     transform: translateY(0);
-    transition-delay: 140ms;
+    transition-delay: 190ms;
 }
 .letter .letter__paper {
     opacity: .96;
     transform: translateX(-50%) translateY(175px) scale(.96);
-    transition: transform 560ms cubic-bezier(.22, 1, .36, 1), opacity 220ms ease;
+    transition: transform 680ms cubic-bezier(.22, 1, .36, 1), opacity 260ms ease;
 }
 .letter.is-open .letter__paper {
     opacity: 1;
     transform: translateX(-50%) translateY(0) scale(1);
-    transition-delay: 160ms;
+    transition-delay: 210ms;
     /* 위쪽 그림자는 남기되, 봉투 아래로 빠지는 종이 하단은 가린다. */
     clip-path: inset(-24px 0 39px);
 }
@@ -2204,10 +2177,10 @@ img.ai-card__mascot {
     opacity: 1;
     visibility: visible;
     transform: translateY(0) scale(1);
-    transition: transform 420ms cubic-bezier(.22, 1, .36, 1) 470ms, opacity 300ms ease 470ms, visibility 0s linear 470ms;
+    transition: transform 480ms cubic-bezier(.22, 1, .36, 1) 620ms, opacity 340ms ease 620ms, visibility 0s linear 620ms;
 }
 .letter.is-open .letter__cta {
-    animation: letter-cta-appear 240ms ease 600ms both;
+    animation: letter-cta-appear 280ms ease 840ms both;
 }
 @keyframes letter-cta-appear {
     from { opacity: 0; transform: translateX(-50%) translateY(6px); }

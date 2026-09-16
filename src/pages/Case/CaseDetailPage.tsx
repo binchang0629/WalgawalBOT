@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import useSession from '../../hooks/useSession'
 import { weddingGiftCase } from '../../data/common/caseDetailContent'
@@ -43,15 +43,42 @@ function CaseDetailPage() {
   const { sessionStatus, recordJuryVote } = useSession()
   const { showToast } = useToast()
   const [selectedVote, setSelectedVote] = useState<WeddingGiftVoteId | null>(null)
+  const [isSummaryVisible, setIsSummaryVisible] = useState(
+    () => !('IntersectionObserver' in window),
+  )
+  const summaryRef = useRef<HTMLElement>(null)
   const [participantCount] = useState(() => getRememberedCaseParticipantCount(
     weddingGiftCase.id,
     weddingGiftCase.participantCount,
   ))
 
+  useEffect(() => {
+    const summary = summaryRef.current
+    if (!summary) return
+
+    if (!('IntersectionObserver' in window)) return
+
+    const appViewport = summary.closest('.app-viewport')
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      setIsSummaryVisible(true)
+      observer.disconnect()
+    }, {
+      root: appViewport,
+      /* 박스가 기기 내부 화면의 가운데 16% 영역을 통과할 때 재생한다. */
+      rootMargin: '-42% 0px -42% 0px',
+      threshold: 0.01,
+    })
+
+    observer.observe(summary)
+    return () => observer.disconnect()
+  }, [])
+
   if (caseId !== weddingGiftCase.id) return <MissingCase />
 
   const isAuthenticated = sessionStatus === 'authenticated'
   const loginPath = `${PATHS.login}?from=${encodeURIComponent(location.pathname)}`
+  const shouldSlideIn = (location.state as { entryMotion?: string } | null)?.entryMotion === 'slide-forward'
 
   const handleVoteChoice = (choiceId: WeddingGiftVoteId) => {
     setSelectedVote(choiceId)
@@ -68,7 +95,7 @@ function CaseDetailPage() {
   }
 
   return (
-    <main className="case-detail">
+    <main className={`case-detail${shouldSlideIn ? ' case-detail--slide-forward' : ''}`}>
       <CaseHeader />
 
       <div className="case-detail__body">
@@ -103,7 +130,11 @@ function CaseDetailPage() {
           {weddingGiftCase.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
         </section>
 
-        <section className="ai-summary" aria-labelledby="ai-summary-title">
+        <section
+          ref={summaryRef}
+          className={`ai-summary ai-summary--reveal${isSummaryVisible ? ' is-visible' : ''}`}
+          aria-labelledby="ai-summary-title"
+        >
           <h2 id="ai-summary-title">AI 핵심요약</h2>
           <ol>
             {weddingGiftCase.summary.map((item, index) => (

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import useCountdown from '../../../hooks/useCountdown'
 import SectionTitle from '../../../components/common/SectionTitle'
@@ -24,6 +25,28 @@ function getRandomParticipantIncrement() {
   return PARTICIPANT_INCREMENTS[Math.floor(Math.random() * PARTICIPANT_INCREMENTS.length)]
 }
 
+function getInitialParticipantCount() {
+  const rememberedCount = getRememberedCaseParticipantCount(
+    todayCase.id,
+    todayCase.participantCount,
+  )
+
+  // 데모가 상한에 도달한 뒤 홈에 다시 들어오면 실시간 집계 모션을 다시 볼 수 있게 한다.
+  return rememberedCount >= PARTICIPANT_TARGET_COUNT
+    ? todayCase.participantCount
+    : rememberedCount
+}
+
+function getRollingDigitSequence(previousDigit: string, currentDigit: string) {
+  const start = Number(previousDigit)
+  const end = Number(currentDigit)
+
+  if (!Number.isInteger(start) || !Number.isInteger(end) || start === end) return [currentDigit]
+
+  const steps = ((end - start + 10) % 10) || 10
+  return Array.from({ length: steps + 1 }, (_, index) => String((start + index) % 10))
+}
+
 /**
  * 01 Popular Case — 오늘의 사건. Figma `1402:7105`
  *
@@ -38,10 +61,7 @@ function PopularCaseSection() {
     current: number
     previous: number
   }>(() => {
-    const rememberedCount = getRememberedCaseParticipantCount(
-      todayCase.id,
-      todayCase.participantCount,
-    )
+    const rememberedCount = getInitialParticipantCount()
 
     return {
       current: rememberedCount,
@@ -53,13 +73,8 @@ function PopularCaseSection() {
   const countdownSlots = `${pad(countdown.hours)}:${pad(countdown.minutes)}:${pad(countdown.seconds)}`.split('')
 
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-
     let timerId: number | null = null
-    let currentCount = getRememberedCaseParticipantCount(
-      todayCase.id,
-      todayCase.participantCount,
-    )
+    let currentCount = getInitialParticipantCount()
 
     const scheduleNextUpdate = () => {
       if (document.hidden || currentCount >= PARTICIPANT_TARGET_COUNT) return
@@ -146,16 +161,23 @@ function PopularCaseSection() {
                     }
 
                     const previousCharacter = previousParticipantCharacters[index] ?? character
-                    const isChanging = previousCharacter !== character
+                    const rollingDigits = getRollingDigitSequence(previousCharacter, character)
+                    const rollSteps = rollingDigits.length - 1
+                    const isChanging = rollSteps > 0
+                    const rollStyle = {
+                      '--participant-roll-steps': rollSteps,
+                      '--participant-roll-duration': `${Math.min(980, 420 + rollSteps * 70)}ms`,
+                    } as CSSProperties
 
                     return (
                       <span
                         className={`participant-count__digit${isChanging ? ' is-changing' : ''}`}
                         key={`${participantCount}-${index}`}
                       >
-                        <span className="participant-count__track">
-                          {isChanging && <span>{previousCharacter}</span>}
-                          <span>{character}</span>
+                        <span className="participant-count__track" style={rollStyle}>
+                          {rollingDigits.map((digit, digitIndex) => (
+                            <span key={`${digit}-${digitIndex}`}>{digit}</span>
+                          ))}
                         </span>
                       </span>
                     )
@@ -168,6 +190,7 @@ function PopularCaseSection() {
             <Link
               className="popular-case__cta"
               to={toCaseDetail(todayCase.id)}
+              state={{ entryMotion: 'slide-forward' }}
               onClick={() => rememberCaseParticipantCount(todayCase.id, participantCount)}
             >
               {todayCase.ctaLabel}

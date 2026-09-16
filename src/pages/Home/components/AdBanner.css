@@ -6,9 +6,9 @@
 }
 .school-ad-banner img {
     display: block;
-    width: calc(100% + 12px);
+    width: calc(100% + 25px);
     max-width: none;
     height: auto;
     min-height: 100%;
-    transform: translateX(-12px);
+    transform: translateX(-25px);
 }

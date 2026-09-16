@@ -9,7 +9,6 @@ import eyeOffIcon from '../../assets/auth/loginEyeOff.svg'
 import googleIcon from '../../assets/auth/loginSocialGoogle.png'
 import naverIcon from '../../assets/auth/loginSocialNaver.svg'
 import kakaoIcon from '../../assets/auth/loginSocialKakao.svg'
-import loginMascot from '../../assets/auth/brand/loginMascot.png'
 import wgwbLogo from '../../assets/brand/wgwb-logo.svg'
 import './LoginPage.css'
 
@@ -72,7 +71,7 @@ function LoginPage() {
   return (
     <main className="login">
       <div className="login__brand">
-        <img className="login__logo" src={loginMascot} width="62" height="62" alt="" />
+        <img className="login__logo" src="/favicon/favicon.svg" width="62" height="62" alt="" />
         <img className="login__service" src={wgwbLogo} width="134" height="23" alt="왈가왈BOT" />
         <p className="login__tagline">AI와 유저가 심판해주는 고민 판결 커뮤니티</p>
       </div>

@@ -100,7 +100,8 @@ export const plazaCases: PlazaCase[] = [
     summary: '카페 홍보영상 제작을 180만원에 맡아 수정 2회 후 최종본을 전달했어요. 의뢰인은 영상을 SNS 광고에 게시했지만, 색감이 생각과 다르다며 추가 수정과 편집 원본 파일을 요구했습니다.',
     viewCount: 465,
     commentCount: 46,
-    isVerdictAligned: true,
+    // 상세 결과: AI는 글쓴이, 배심원 다수는 상대방 입장 → 의견 불일치.
+    isVerdictAligned: false,
     status: 'closed',
     verdictTone: 'orange',
   },

@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react'
+import { useEffect, useRef } from 'react'
+import type { MouseEvent, PointerEvent, ReactNode } from 'react'
 import FloatingChatButton from '../common/FloatingChatButton'
 import ClickSpark from '../common/ClickSpark'
 import './AppViewport.css'
@@ -15,8 +16,95 @@ interface AppViewportProps {
  * 스크롤은 이 안의 콘텐츠 컨테이너가 담당한다. window를 스크롤하지 않는다.
  */
 function AppViewport({ children }: AppViewportProps) {
+  const pendingActionsRef = useRef(new WeakSet<HTMLElement>())
+  const replayingActionsRef = useRef(new WeakSet<HTMLElement>())
+  const timersRef = useRef(new Set<number>())
+
+  useEffect(() => {
+    const timers = timersRef.current
+    return () => {
+      timers.forEach((timer) => window.clearTimeout(timer))
+      timers.clear()
+    }
+  }, [])
+
+  const getOrangePrimaryAction = (target: EventTarget | null) => {
+    if (!(target instanceof Element)) return null
+
+    const action = target.closest<HTMLElement>('button, a')
+    if (!action) return null
+    if (action instanceof HTMLButtonElement && action.disabled) return null
+    if (action.getAttribute('aria-disabled') === 'true') return null
+
+    const bounds = action.getBoundingClientRect()
+    const background = window.getComputedStyle(action).backgroundColor
+    const isPrimaryOrange = background === 'rgb(255, 149, 36)'
+
+    /* 작은 페이지 번호·태그는 제외하고, 화면의 주요 CTA 크기만 공통화한다. */
+    if (!isPrimaryOrange || bounds.width < 160 || bounds.height < 38 || bounds.height > 72) {
+      return null
+    }
+
+    return action
+  }
+
+  const handlePrimaryPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return
+    const action = getOrangePrimaryAction(event.target)
+    if (!action) return
+
+    action.classList.add('app-primary-action', 'is-pressing')
+  }
+
+  const clearPrimaryPress = (event: PointerEvent<HTMLDivElement>) => {
+    getOrangePrimaryAction(event.target)?.classList.remove('is-pressing')
+  }
+
+  const handlePrimaryClick = (event: MouseEvent<HTMLDivElement>) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+
+    const action = getOrangePrimaryAction(event.target)
+    if (!action) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    if (replayingActionsRef.current.has(action)) {
+      replayingActionsRef.current.delete(action)
+      return
+    }
+
+    event.preventDefault()
+    event.stopPropagation()
+
+    if (pendingActionsRef.current.has(action)) return
+    pendingActionsRef.current.add(action)
+
+    action.classList.remove('is-pressing', 'is-activating')
+    /* 같은 버튼을 연속 실행해도 애니메이션이 처음부터 재생되게 한다. */
+    void action.offsetWidth
+    action.classList.add('app-primary-action', 'is-activating')
+
+    const timer = window.setTimeout(() => {
+      timersRef.current.delete(timer)
+      action.classList.remove('is-activating')
+      pendingActionsRef.current.delete(action)
+
+      if (!action.isConnected) return
+      replayingActionsRef.current.add(action)
+      action.click()
+    }, 280)
+
+    timersRef.current.add(timer)
+  }
+
   return (
-    <div className="app-viewport" id="app-viewport">
+    <div
+      className="app-viewport"
+      id="app-viewport"
+      onPointerDownCapture={handlePrimaryPointerDown}
+      onPointerUpCapture={clearPrimaryPress}
+      onPointerCancelCapture={clearPrimaryPress}
+      onClickCapture={handlePrimaryClick}
+    >
       <ClickSpark>{children}</ClickSpark>
       <FloatingChatButton />
       {/* 모달·바텀시트 portal 대상. 스크롤 콘텐츠 바깥이면서 기기 내부에 있다. */}

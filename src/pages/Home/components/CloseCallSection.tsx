@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import SectionTitle from '../../../components/common/SectionTitle'
 import { homeIcons } from '../homeAssets'
+import CompactSwitchButton from './CompactSwitchButton'
 import mascot from '../../../assets/home/figma/close-call-mascot.svg'
 import { closeCallCases, homeSectionTitles } from '../../../data/common/homeContent'
 
@@ -123,10 +124,13 @@ function CloseCallSection({ cta }: CloseCallSectionProps) {
         title={homeSectionTitles.closeCall.title}
         description={homeSectionTitles.closeCall.description}
         actionSlot={
-          <button type="button" className="swap-card__change" onClick={handleSwap} aria-label="사건 바꾸기">
-            <i className="swap-card__change-icon" aria-hidden="true">⇅</i>
-            <span>사건 바꾸기</span>
-          </button>
+          <CompactSwitchButton
+            current={currentIndex + 1}
+            total={closeCallCases.length}
+            label="다른 사건"
+            ariaLabel="다른 막상막하 사건으로 전환"
+            onClick={handleSwap}
+          />
         }
       />
 

@@ -35,6 +35,50 @@
     pointer-events: none;
 }
 
+/* 넓은 주황색 주요 CTA 공통 클릭 피드백. 호버 상태는 만들지 않는다. */
+.app-primary-action {
+    transform-origin: center;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.app-primary-action.is-pressing {
+    transform: scale(.97);
+    filter: brightness(.98);
+    transition: transform 90ms ease-out, filter 90ms ease-out;
+}
+
+.app-primary-action.is-activating {
+    animation: app-primary-action-confirm 280ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes app-primary-action-confirm {
+    0% {
+        transform: scale(.97);
+        filter: brightness(.98);
+        box-shadow: 0 0 0 0 rgb(255 149 36 / 28%);
+    }
+    55% {
+        transform: scale(1.018);
+        filter: brightness(1.06);
+        box-shadow: 0 0 0 6px rgb(255 149 36 / 12%);
+    }
+    100% {
+        transform: scale(1);
+        filter: none;
+        box-shadow: 0 0 0 10px rgb(255 149 36 / 0%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app-primary-action.is-pressing,
+    .app-primary-action.is-activating {
+        transform: none;
+        filter: none;
+        transition: none;
+        animation: none;
+    }
+}
+
 /* 모달·바텀시트 portal 대상. 기기 내부이면서 스크롤 콘텐츠 바깥이다. */
 #app-overlay-root {
     position: absolute;

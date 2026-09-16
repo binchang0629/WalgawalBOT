@@ -30,10 +30,11 @@ function VoteChoices({
           disabled={disabled}
           aria-pressed={selectedVote === choice.id}
         >
+          <span className="vote-choice__check" aria-hidden="true">✓</span>
           <span className={`vote-choice__artwork vote-choice__artwork--${choice.id}`}>
             <img src={choice.imageUrl} alt="" width={62} height={62} />
           </span>
-          <span>{choice.label[0]}<br />{choice.label[1]}</span>
+          <span className="vote-choice__label">{choice.label[0]}<br />{choice.label[1]}</span>
         </button>
       ))}
     </div>

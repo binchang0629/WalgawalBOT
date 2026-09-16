@@ -1,10 +1,4 @@
 /* 민트초코 전용 소재 비율. 깻잎의 기존 좌표·애니메이션에는 적용하지 않는다. */
-.balance-section__navigation { display: flex; align-items: center; gap: 8px; }
-.balance-section__next {
-  min-width: 44px; min-height: 44px; padding: 0; border: 0;
-  background: none; color: var(--blue-600); font: inherit; font-size: 13px; cursor: pointer;
-}
-.balance-section__next:focus-visible { outline: 2px solid var(--blue-600); outline-offset: 3px; border-radius: 4px; }
 .balance-section--mint .balance-board { height: 320px; }
 .balance-section--mint .balance-board__draggable { height: 117px; filter: none; z-index: 2; }
 .balance-section--mint .balance-board__plate { height: 105px; top: 108px; }

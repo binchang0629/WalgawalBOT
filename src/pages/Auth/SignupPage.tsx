@@ -46,6 +46,9 @@ const MONTH_OPTIONS: AuthSelectOption[] = Array.from({ length: 12 }, (_, index) 
   return { value: month, label: `${index + 1}월` }
 })
 
+/** 닉네임은 한글·영문·숫자만 허용한다. 한글 입력 중의 자모도 오류로 처리하지 않는다. */
+const NICKNAME_ALLOWED_PATTERN = /^[가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9]*$/
+
 function SignupPage() {
   const { personaId, signIn } = useSession()
   const navigate = useNavigate()
@@ -69,7 +72,8 @@ function SignupPage() {
    */
   const [agreeOpenReason, setAgreeOpenReason] = useState<AgreeOpenReason | null>(null)
 
-  const isNicknameValid = nickname.length >= 2 && nickname.length <= 6
+  const hasNicknameSpecialCharacter = !NICKNAME_ALLOWED_PATTERN.test(nickname)
+  const isNicknameValid = nickname.length >= 2 && nickname.length <= 6 && !hasNicknameSpecialCharacter
   const isPasswordMatched = password !== '' && password === passwordConfirm
   const canOpenAgree = isNicknameValid && emailId.trim() !== '' && isPasswordMatched
 
@@ -112,14 +116,23 @@ function SignupPage() {
               type="text"
               value={nickname}
               maxLength={6}
+              aria-invalid={hasNicknameSpecialCharacter}
+              aria-describedby="signUpNicknameHelp"
               onChange={(event) => {
                 setIsDemoFilled(false)
                 setNickname(event.target.value)
               }}
             />
           </div>
-          <p className={isNicknameValid ? 'signUpHelp signUpHelpOk' : 'signUpHelp'}>
-            {isNicknameValid ? '사용 가능한 닉네임이에요.' : '특수기호 없이 적어주세요'}
+          <p
+            id="signUpNicknameHelp"
+            className={hasNicknameSpecialCharacter
+              ? 'signUpHelp signUpHelpError'
+              : isNicknameValid ? 'signUpHelp signUpHelpOk' : 'signUpHelp'}
+          >
+            {hasNicknameSpecialCharacter
+              ? '특수기호 없이 적어주세요.'
+              : isNicknameValid ? '사용 가능한 닉네임이에요.' : '특수기호(!, @, # 등) 없이 적어주세요.'}
           </p>
         </div>
 

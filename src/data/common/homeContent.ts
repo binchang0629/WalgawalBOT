@@ -165,24 +165,34 @@ export const aiRecommendation = {
   tail: '',
 } as const
 
-/** 로그인 후 추천 시안 1473:8571. 9건은 예시 총수이며 아래 3건만 미리 표시한다.
- * 개인화 API가 없으므로 두 데모 계정은 같은 시안용 목록을 공유한다. */
+/** 로그인 후 추천 시안 1473:8571. 개인화 API 대신 데모 계정별 관심 분야를 구분한다. */
 export const personalizedRecommendation = {
-  title: '내 고민과 닮은 사건을 찾았어요!',
-  lead: '관심사에 맞는 사건을',
-  highlight: 'AI챗봇 판멍이가 추천',
-  tail: '해드려요.',
-  displayNames: { A: '서아', B: '지훈' },
-  topic: '관계 갈등 사건',
-  total: 9,
-  cases: [
-    { id: 'recommend-friend-secret', categoryKey: 'friend', category: '친구', agrees: false,
-      title: '친한 친구가 학교에서 저의 비밀을 다른 친구에게 말했어요' },
-    { id: 'recommend-study-presentation', categoryKey: 'study', category: '학업', agrees: true,
-      title: '조별 과제에서 제 의견은 무시하고 팀원이\n발표 자료를 바꿨어요' },
-    { id: 'recommend-friend-mistake', categoryKey: 'friend', category: '친구', agrees: false,
-      title: '오랜 친구가 다른 친구들이 있는 자리에서\n제 실수를 계속 이야기해요' },
-  ],
+  A: {
+    displayName: '서아',
+    topic: '관계 갈등 사건',
+    total: 3,
+    cases: [
+      { id: 'recommend-friend-secret', categoryKey: 'friend', category: '친구', agrees: false,
+        title: '친한 친구가 학교에서 저의 비밀을 다른 친구에게 말했어요' },
+      { id: 'recommend-study-presentation', categoryKey: 'study', category: '학업', agrees: true,
+        title: '조별 과제에서 제 의견은 무시하고 팀원이\n발표 자료를 바꿨어요' },
+      { id: 'recommend-friend-mistake', categoryKey: 'friend', category: '친구', agrees: false,
+        title: '오랜 친구가 다른 친구들이 있는 자리에서\n제 실수를 계속 이야기해요' },
+    ],
+  },
+  B: {
+    displayName: '지훈',
+    topic: '직장 갈등 사건',
+    total: 3,
+    cases: [
+      { id: 'recommend-work-balance', categoryKey: 'work', category: '직장', agrees: false,
+        title: '잔금 지급을 미루면서 원본 파일까지 문제 삼는\n의뢰인 때문에 골치가 아픕니다.' },
+      { id: 'recommend-work-credit', categoryKey: 'work', category: '직장', agrees: true,
+        title: '직장 상사가 제 아이디어를 자신의 공로인 것처럼\n발표했어요.' },
+      { id: 'recommend-work-after-hours', categoryKey: 'work', category: '직장', agrees: false,
+        title: '퇴근 뒤 단체 대화방으로 온 업무 지시에 답하지 않았어요. 제가 잘못한 건가요?' },
+    ],
+  },
 } as const
 
 /** 섹션 제목 — 시안의 `SectionTitle` 인스턴스 값 */
