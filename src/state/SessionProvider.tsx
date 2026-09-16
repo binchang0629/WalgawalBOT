@@ -28,6 +28,8 @@ const MAX_SUBMITTED_CASES = 1
 interface ActivityRecord {
   submittedCaseIds: string[]
   votedCaseIds: string[]
+  /** 후일담을 게시한 사건 id. 게시 전에는 비어 있어서 `내가 쓴 후일담`이 빈 화면으로 나온다. */
+  publishedAfterStoryIds: string[]
 }
 
 type ActivityRecords = Record<PersonaId, ActivityRecord>
@@ -36,7 +38,7 @@ type ActivityRecords = Record<PersonaId, ActivityRecord>
 const activityStorageKey = (personaId: PersonaId) => `${DEMO.storagePrefix}:${personaId}:activity:v3`
 
 function emptyActivity(): ActivityRecord {
-  return { submittedCaseIds: [], votedCaseIds: [] }
+  return { submittedCaseIds: [], votedCaseIds: [], publishedAfterStoryIds: [] }
 }
 
 function isIdList(value: unknown): value is string[] {
@@ -54,6 +56,13 @@ function readActivity(personaId: PersonaId): ActivityRecord {
     return {
       submittedCaseIds: [...new Set(value.submittedCaseIds)].slice(0, MAX_SUBMITTED_CASES),
       votedCaseIds: [...new Set(value.votedCaseIds)],
+      /*
+       * 후일담 기록은 나중에 추가한 항목이다. 예전에 저장된 값에는 없으므로
+       * 없으면 빈 목록으로 본다. 이것 때문에 앞의 두 기록까지 버리지는 않는다.
+       */
+      publishedAfterStoryIds: isIdList(value.publishedAfterStoryIds)
+        ? [...new Set(value.publishedAfterStoryIds)]
+        : [],
     }
   } catch {
     return emptyActivity()
@@ -209,6 +218,10 @@ function SessionProvider({ children }: { children: ReactNode }) {
     recordActivity('votedCaseIds', caseId)
   }, [recordActivity])
 
+  const recordAfterStory = useCallback((storyId: string) => {
+    recordActivity('publishedAfterStoryIds', storyId)
+  }, [recordActivity])
+
   const syncRewardPointTotal = useCallback((totalPoints: number) => {
     if (!Number.isFinite(totalPoints) || totalPoints < 0) return
     const personaId = session.personaId
@@ -248,14 +261,16 @@ function SessionProvider({ children }: { children: ReactNode }) {
       currentUser:
         session.sessionStatus === 'authenticated' ? toUser(session.personaId) : null,
       activityStats,
+      publishedAfterStoryIds: activityRecords[session.personaId].publishedAfterStoryIds,
       recordCaseSubmission,
       recordJuryVote,
+      recordAfterStory,
       syncRewardPointTotal,
       signIn,
       signOut,
       switchPersona,
     }),
-    [session, activityStats, recordCaseSubmission, recordJuryVote, syncRewardPointTotal, signIn, signOut, switchPersona],
+    [session, activityStats, activityRecords, recordCaseSubmission, recordJuryVote, recordAfterStory, syncRewardPointTotal, signIn, signOut, switchPersona],
   )
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>

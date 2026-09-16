@@ -446,6 +446,21 @@
   background-image: none !important;
 }
 
+/* 아직 쓴 후일담이 없을 때. 안내 그림이 남은 높이를 채우도록 세로로 편다. */
+.afterstory-my-stories--empty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.afterstory-my-stories--empty .afterstory-home__scroll {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0;
+}
+
 .afterstory-my-stories__intro h2 {
   margin: 0;
   font-size: 26px;

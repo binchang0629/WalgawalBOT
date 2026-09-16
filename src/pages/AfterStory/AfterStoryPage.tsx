@@ -186,38 +186,57 @@ export function AfterStoryHomePage() {
   )
 }
 
-/** 내가 직접 게시한 후일담만 모아 보는 목록 화면. */
+/**
+ * 내가 직접 게시한 후일담만 모아 보는 목록 화면.
+ *
+ * 목록은 `내 이야기 남기기`에서 실제로 게시한 글만 담는다.
+ * 아무것도 쓰지 않았는데 글이 한 건 있는 것처럼 보이면 시연 흐름이 앞뒤가 맞지 않는다.
+ * 게시 기록은 세션이 들고 있다. (`publishedAfterStoryIds`)
+ */
 export function MyPublishedAfterStoryPage() {
   const navigate = useNavigate()
+  const { publishedAfterStoryIds } = useSession()
+  const storyCount = publishedAfterStoryIds.length
+  const hasStory = storyCount > 0
 
   return (
-    <main className="afterstory-home afterstory-my-stories">
+    <main className={`afterstory-home afterstory-my-stories${hasStory ? '' : ' afterstory-my-stories--empty'}`}>
       <AfterStoryHeader title="내가 쓴 후일담" onBack={() => navigate(PATHS.afterStory)} />
-      <div className="afterstory-home__scroll" style={{ backgroundImage: `url(${scrollBackground})` }}>
+      <div className="afterstory-home__scroll">
         <section className="afterstory-my-stories__intro">
           <h2>내가 쓴 후일담</h2>
           <p>사건이 끝난 뒤 내가 남긴 이야기를 모아봐요.</p>
         </section>
 
-        <section className="afterstory-my-stories__list" aria-label="내가 쓴 후일담 목록">
-          <p className="afterstory-my-stories__count">작성한 후일담 <b>1</b>개</p>
-          {/*
-            메모지를 누르면 공개된 후일담 전문(AS06)으로 들어간다.
-            돌아올 화면을 state로 같이 넘겨서, 상세의 뒤로가기가 여기로 되돌아오게 한다.
-          */}
-          <Link
-            className="afterstory-my-stories__item"
-            to={toAfterStoryDetail('friend')}
-            state={{ from: PATHS.afterStoryMineStories }}
-            aria-label={CONNECTED_CASE.context + ' 후일담 전문 읽기'}
-          >
-            <span className="afterstory-my-stories__tape" aria-hidden="true" />
-            <header><span>친구 · 내 후일담</span><time>방금 전</time></header>
-            <h3>{CONNECTED_CASE.context}</h3>
-            <p>{CONNECTED_CASE.storyTitle.replace('\n', ' ')}</p>
-            <small>공개 범위 · 전체 공개</small>
-          </Link>
-        </section>
+        {hasStory ? (
+          <section className="afterstory-my-stories__list" aria-label="내가 쓴 후일담 목록">
+            <p className="afterstory-my-stories__count">작성한 후일담 <b>{storyCount}</b>개</p>
+            {/*
+              메모지를 누르면 공개된 후일담 전문(AS06)으로 들어간다.
+              돌아올 화면을 state로 같이 넘겨서, 상세의 뒤로가기가 여기로 되돌아오게 한다.
+            */}
+            <Link
+              className="afterstory-my-stories__item"
+              to={toAfterStoryDetail('friend')}
+              state={{ from: PATHS.afterStoryMineStories }}
+              aria-label={CONNECTED_CASE.context + ' 후일담 전문 읽기'}
+            >
+              <span className="afterstory-my-stories__tape" aria-hidden="true" />
+              <header><span>친구 · 내 후일담</span><time>방금 전</time></header>
+              <h3>{CONNECTED_CASE.context}</h3>
+              <p>{CONNECTED_CASE.storyTitle.replace('\n', ' ')}</p>
+              <small>공개 범위 · 전체 공개</small>
+            </Link>
+          </section>
+        ) : (
+          <EmptyCaseState
+            titleId="afterstory-my-stories-empty-title"
+            title="아직 쓴 후일담이 없어요"
+            description="판결이 끝난 사건에 후일담을 남기면 여기에 모여요."
+            actionLabel="내 이야기 남기기"
+            actionTo={PATHS.afterStoryMine}
+          />
+        )}
       </div>
     </main>
   )
@@ -398,7 +417,18 @@ export function WriteAfterStoryPage() {
 export function PreviewAfterStoryPage() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { recordAfterStory } = useSession()
   const content = (location.state as AfterStoryLocationState | null)?.content ?? ''
+
+  /*
+   * 게시가 실제로 일어나는 지점은 여기다. 기록해 둬야 `내가 쓴 후일담`에 글이 생긴다.
+   * 완료 화면이 아니라 이 버튼에서 기록하는 이유는, 완료 화면은 새로고침이나
+   * 뒤로가기로도 다시 열릴 수 있어서 게시 행위와 1:1로 맞지 않기 때문이다.
+   */
+  function handlePublish() {
+    recordAfterStory('friend')
+    navigate(PATHS.afterStoryComplete, { state: { content } satisfies AfterStoryLocationState })
+  }
 
   return (
     <main className="afterstory-flow">
@@ -410,7 +440,7 @@ export function PreviewAfterStoryPage() {
         <section className="afterstory-preview-content"><h2>내가 남길 후일담</h2><p>{content || '작성한 후일담이 여기에 표시됩니다.'}</p></section>
         <aside className="afterstory-publish-notice"><img src={walgadakEmpathy} alt="" />게시하면 다른 사용자에게 공개돼요.<br />이름·연락처 등 개인정보를 다시 확인해주세요.</aside>
       </div>
-      <footer className="afterstory-flow__footer"><button type="button" onClick={() => navigate(PATHS.afterStoryComplete, { state: { content } satisfies AfterStoryLocationState })}>후일담 게시하기</button><small>게시 후에도 MY에서 공개 범위를 바꿀 수 있어요.</small></footer>
+      <footer className="afterstory-flow__footer"><button type="button" onClick={handlePublish}>후일담 게시하기</button><small>게시 후에도 MY에서 공개 범위를 바꿀 수 있어요.</small></footer>
     </main>
   )
 }
@@ -433,7 +463,11 @@ export function CompleteAfterStoryPage() {
         <section><small>친구 · 내 후일담</small><h2>{CONNECTED_CASE.storyTitle.split('\n').map((line) => <span key={line}>{line}</span>)}</h2><p>{CONNECTED_CASE.context}</p></section>
         <em>공개 범위는 내 사건에서 변경할 수 있어요.</em>
       </div>
-      <footer className="afterstory-flow__footer afterstory-complete__footer"><button type="button" onClick={() => navigate(PATHS.home)}>홈으로</button><small>홈에서 다른 사건도 둘러보세요.</small></footer>
+      {/*
+        방금 남긴 글을 바로 보여주는 쪽이 자연스러워서 홈 대신 `내가 쓴 후일담`으로 보낸다.
+        replace를 써서 뒤로가기가 작성 완료 화면으로 되돌아오지 않게 한다. (PROJECT_SPEC.md §7-6)
+      */}
+      <footer className="afterstory-flow__footer afterstory-complete__footer"><button type="button" onClick={() => navigate(PATHS.afterStoryMineStories, { replace: true })}>내가 쓴 후일담 보기</button><small>방금 남긴 이야기를 바로 확인할 수 있어요.</small></footer>
     </main>
   )
 }

@@ -6,15 +6,25 @@ import './EmptyCaseState.css'
 type EmptyCaseStateProps = {
   description: string
   titleId: string
+  /** 제목과 버튼은 사건 접수 안내가 기본이다. 다른 화면은 그 화면에 맞는 값을 넘긴다. */
+  title?: string
+  actionLabel?: string
+  actionTo?: string
 }
 
-function EmptyCaseState({ description, titleId }: EmptyCaseStateProps) {
+function EmptyCaseState({
+  description,
+  titleId,
+  title = '아직 접수한 사건이 없어요',
+  actionLabel = '사건 접수하기',
+  actionTo = PATHS.caseSubmit,
+}: EmptyCaseStateProps) {
   return (
     <section className="empty-case-state" aria-labelledby={titleId}>
       <img src={panmungEmptyCases} alt="" width={168} height={168} />
-      <h3 id={titleId}>아직 접수한 사건이 없어요</h3>
+      <h3 id={titleId}>{title}</h3>
       <p>{description}</p>
-      <Link to={PATHS.caseSubmit}>사건 접수하기</Link>
+      <Link to={actionTo}>{actionLabel}</Link>
     </section>
   )
 }

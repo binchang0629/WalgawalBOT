@@ -30,6 +30,13 @@ export interface SessionValue {
   activityStats: ActivityStats
   recordCaseSubmission: (submissionId: string) => void
   recordJuryVote: (caseId: string) => void
+  /**
+   * 후일담을 게시한 사건의 id 목록. 아직 쓰지 않았으면 빈 배열이다.
+   * `내가 쓴 후일담` 화면은 이 목록으로 보여줄 글이 있는지 판단한다.
+   */
+  publishedAfterStoryIds: string[]
+  /** 후일담 게시 완료. 미리보기에서 `후일담 게시하기`를 누른 시점에 기록한다. */
+  recordAfterStory: (storyId: string) => void
   /** 리워드 팝업의 최종 숫자와 MY의 포인트 합계를 같은 시점에 맞춘다. */
   syncRewardPointTotal: (totalPoints: number) => void
   /** 가입·로그인 완료. 해당 퍼소나의 데모 계정으로 로그인 상태가 된다. */
