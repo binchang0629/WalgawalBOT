@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import type { FormEvent } from 'react'
 import useLoginGate from '../../hooks/useLoginGate'
+import useSession from '../../hooks/useSession'
+import EmptyCaseState from '../../components/common/EmptyCaseState'
 import { PATHS, toAfterStoryDetail } from '../../routes/paths'
 import CaseSubmitProgress from '../Submit/components/CaseSubmitProgress'
 import backIcon from '../../assets/my/back.svg'
@@ -276,41 +278,52 @@ export function AfterStoryDetailPage() {
  */
 export function MyAfterStoryPage() {
   const navigate = useNavigate()
-  const closedCount = MY_CLOSED_CASES.length
+  const { currentUser, activityStats } = useSession()
+  const isSeoa = currentUser?.personaId === 'A'
+  const closedCases = activityStats.submittedCases > 0
+    ? MY_CLOSED_CASES.filter((item) => item.id === (isSeoa ? 'friend' : 'company'))
+    : []
+  const closedCount = closedCases.length
 
   return (
-    <main className="afterstory-home afterstory-mine">
+    <main className={`afterstory-home afterstory-mine${closedCount === 0 ? ' afterstory-mine--empty' : ''}`}>
       <AfterStoryHeader title="왈가왈후~" onBack={() => navigate(PATHS.afterStory)} />
-      <div className="afterstory-home__scroll" style={{ backgroundImage: `url(${scrollBackground})` }}>
+      <div className="afterstory-home__scroll" style={closedCount > 0 ? { backgroundImage: `url(${scrollBackground})` } : undefined}>
         <section className="afterstory-mine__intro">
           <h2>내 이야기 남기기</h2>
           <p>판결 이후, 어떤 변화가 있었나요?</p>
         </section>
 
-        <aside className="afterstory-mine__notice">
-          <img src={walgadakFace} alt="" />
-          <p>판결이 끝난 사건 <b>{closedCount}건</b>이 있어요.<br />당신의 다음 이야기를 써볼까요?</p>
-        </aside>
+        {closedCount === 0 ? (
+          <EmptyCaseState titleId="afterstory-mine-empty-title" description="사건을 먼저 접수하면 판결 이후 이야기를 남길 수 있어요." />
+        ) : (
+          <>
+            <aside className="afterstory-mine__notice">
+              <img src={walgadakFace} alt="" />
+              <p>판결이 끝난 사건 <b>{closedCount}건</b>이 있어요.<br />당신의 다음 이야기를 써볼까요?</p>
+            </aside>
 
-        <section className="afterstory-mine__list">
-          <header>
-            <h3>내가 올린 사건</h3>
-            <span>{closedCount}건</span>
-          </header>
+            <section className="afterstory-mine__list">
+              <header>
+                <h3>내가 올린 사건</h3>
+                <span>{closedCount}건</span>
+              </header>
 
-          {MY_CLOSED_CASES.map((item) => (
-            <article className="afterstory-mine__card" key={item.id}>
-              <div className="afterstory-mine__tags">
-                <em className={'afterstory-mine__category afterstory-mine__category--' + item.tone}>{item.category}</em>
-                <span className="afterstory-mine__badge">판결 완료</span>
-              </div>
-              <h4>{item.titleLines.join(' ')}</h4>
-              <p>사건의 결말을 확인한 뒤, 그 이후의 변화와<br />당신의 선택을 들려주세요.</p>
-              <small>의견 {item.opinionCount} · 댓글 {item.commentCount}</small>
-              <button type="button" disabled={item.id === 'company'} onClick={() => navigate('/afterstory/write/' + item.id)}>후일담 작성하기</button>
-            </article>
-          ))}
-        </section>
+              {closedCases.map((item) => (
+                <article className="afterstory-mine__card" key={item.id}>
+                  <div className="afterstory-mine__tags">
+                    <em className={'afterstory-mine__category afterstory-mine__category--' + item.tone}>{item.category}</em>
+                    <span className="afterstory-mine__badge">판결 완료</span>
+                  </div>
+                  <h4>{item.titleLines.join(' ')}</h4>
+                  <p>사건의 결말을 확인한 뒤, 그 이후의 변화와<br />당신의 선택을 들려주세요.</p>
+                  <small>의견 {item.opinionCount} · 댓글 {item.commentCount}</small>
+                  <button type="button" disabled={item.id === 'company'} onClick={() => navigate('/afterstory/write/' + item.id)}>후일담 작성하기</button>
+                </article>
+              ))}
+            </section>
+          </>
+        )}
       </div>
     </main>
   )

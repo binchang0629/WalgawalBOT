@@ -2,13 +2,14 @@ import { Fragment, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { PATHS, toMyCaseResult } from '../../routes/paths'
 import backIcon from '../../assets/my/back.svg'
+import EmptyCaseState from '../../components/common/EmptyCaseState'
 import useSession from '../../hooks/useSession'
 import { getMyCaseFilters, MY_CASES } from '../../data/personas/myCases'
 import type { MyCase, MyCaseFilter } from '../../data/personas/myCases'
 import './MyCases.css'
 import './MyPageTransitions.css'
 
-function MyCasesContent({ caseInfo }: { caseInfo: MyCase }) {
+function MyCasesContent({ caseInfo, hasSubmittedCase }: { caseInfo: MyCase; hasSubmittedCase: boolean }) {
   const navigate = useNavigate()
   const [filter, setFilter] = useState<MyCaseFilter>('all')
   const showCase = filter === 'all' || filter === caseInfo.status
@@ -24,10 +25,14 @@ function MyCasesContent({ caseInfo }: { caseInfo: MyCase }) {
         <span aria-hidden="true" />
       </header>
 
-      <div className="my-cases-page__content" role="region" aria-label="내 사건 목록" tabIndex={0}>
+      <div className={`my-cases-page__content${hasSubmittedCase ? '' : ' my-cases-page__content--empty'}`} role="region" aria-label="내 사건 목록" tabIndex={0}>
         <p className="my-cases-page__breadcrumb">MY <span aria-hidden="true">&gt;</span><span>나의 활동</span></p>
         <h2>내 사건</h2>
 
+        {!hasSubmittedCase ? (
+          <EmptyCaseState titleId="my-cases-empty-title" description="사건을 접수하면 여기에서 내용을 확인할 수 있어요." />
+        ) : (
+          <>
         <div className="my-case-filters" role="group" aria-label="사건 상태 필터">
           {getMyCaseFilters(caseInfo).map(({ value, label, enabled }) => (
             <button
@@ -73,15 +78,17 @@ function MyCasesContent({ caseInfo }: { caseInfo: MyCase }) {
             <>💡 접수한 사건의 실시간 배심원 투표율 및 AI 종합 판결문은<br /><strong>결과 페이지</strong>에서 확인 가능합니다.</>
           )}
         </aside>
+          </>
+        )}
       </div>
     </main>
   )
 }
 
 function MyCasesPage() {
-  const { personaId } = useSession()
+  const { personaId, activityStats } = useSession()
   // 목록을 연 채 계정이 전환되어도 이전 계정의 필터를 남기지 않는다.
-  return <MyCasesContent key={personaId} caseInfo={MY_CASES[personaId]} />
+  return <MyCasesContent key={personaId} caseInfo={MY_CASES[personaId]} hasSubmittedCase={activityStats.submittedCases > 0} />
 }
 
 export default MyCasesPage

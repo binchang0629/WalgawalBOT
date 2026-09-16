@@ -19,6 +19,7 @@
 .my-cases-page__breadcrumb { display: flex; align-items: center; gap: 4px; margin: 0 0 10px; color: var(--neutral-500); font-size: 11px; line-height: 18px; }
 .my-cases-page__breadcrumb > span:last-child { color: var(--neutral-400); }
 .my-cases-page__content > h2 { margin: 0 0 22px; font-size: 26px; line-height: 1.2; }
+.my-cases-page__content--empty { display: flex; flex-direction: column; }
 .my-case-filters { display: flex; gap: 8px; margin: 0 0 22px; overflow-x: auto; scrollbar-width: none; }
 .my-case-filters::-webkit-scrollbar { display: none; }
 .my-case-filters button { flex: none; padding: 8px 14px; border: 1px solid var(--neutral-250); border-radius: 50px; color: var(--neutral-700); background: #fff; font-size: 12px; font-weight: 500; line-height: 1.3; white-space: nowrap; }
@@ -60,11 +61,27 @@
 .my-case-result-page__content:focus-visible { outline: 2px solid var(--blue-700); outline-offset: -2px; }
 .showcase--mobile .my-case-result-page__content { padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
 .my-result-summary > span { display: inline-block; padding: 6px 12px; border-radius: 50px; color: var(--blue-700); background: var(--blue-050); font-size: 12px; font-weight: 500; line-height: 1; }
-.my-result-summary > span.is-private { color: var(--neutral-700); background: var(--neutral-100); }
 .my-result-summary h2 { margin: 18px 0; font-size: 20px; line-height: 1.2; }
 .my-result-summary p { margin: 0; color: var(--neutral-500); font-size: 13px; line-height: 1.5; }
 
-.ai-verdict-card { position: relative; padding: 19px; border: 1px solid var(--blue-500); border-radius: 12px; background: var(--blue-050); box-shadow: 0 2px 4px rgba(0,0,0,.04); }
+.ai-verdict-card {
+    --my-ai-stroke-angle: 0deg;
+    position: relative;
+    padding: 19px;
+    border: 1.5px solid transparent;
+    border-radius: 12px;
+    background:
+        linear-gradient(var(--blue-050), var(--blue-050)) padding-box,
+        conic-gradient(from var(--my-ai-stroke-angle), var(--blue-100) 0deg 220deg, var(--blue-200) 260deg, var(--blue-400) 300deg, var(--blue-200) 338deg, var(--blue-100) 360deg) border-box;
+    box-shadow: 0 2px 4px rgba(0,0,0,.04);
+    animation: my-ai-stroke-orbit 3.2s linear infinite;
+}
+@property --my-ai-stroke-angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+}
+@keyframes my-ai-stroke-orbit { to { --my-ai-stroke-angle: 360deg; } }
 .ai-verdict-card > img { position: absolute; top: 25px; right: 24px; width: 80px; height: 68px; object-fit: cover; }
 .ai-verdict-card h3 { margin: 0 0 12px; font-size: 14px; font-weight: 600; line-height: 1.3; }
 .ai-verdict-card > strong { display: block; padding-right: 90px; color: var(--blue-700); font-size: 20px; line-height: 1.2; white-space: pre-line; }
@@ -114,6 +131,10 @@
 .my-result-footer { margin: 0; padding-top: 4px; color: var(--neutral-500); font-size: 12px; font-weight: 500; line-height: 1.3; text-align: center; }
 .my-case-result-page--empty { display: grid; place-items: center; align-content: center; gap: 16px; color: var(--neutral-700); }
 .my-case-result-page--empty button { padding: 12px 18px; border: 0; border-radius: 12px; color: #fff; background: var(--blue-700); }
+
+@media (prefers-reduced-motion: reduce) {
+    .ai-verdict-card { animation: none; }
+}
 
 @media (max-width: 370px) {
     .my-cases-page__content,

@@ -11,7 +11,8 @@ import type { SessionUser } from './sessionContext'
  *
  * 저장·복원 로직은 이 파일 안에만 둔다.
  * 인증 상태는 새 브라우저 세션마다 비로그인으로 시작하도록 sessionStorage에 두고,
- * 계정별 활동 기록만 localStorage에 유지한다. (PROJECT_SPEC.md §7-8)
+ * 계정별 활동 기록은 같은 시연 세션에서 새로고침해도 유지한다. (PROJECT_SPEC.md §7-8)
+ * 새 브라우저 세션에서는 이전 시연의 접수·투표 기록을 이어받지 않는다.
  * 저장소를 못 쓰거나 값이 깨져 있어도 서아의 기본 데모 세션으로 시작한다.
  *
  * 복원은 첫 렌더의 초기값에서 동기로 끝낸다.
@@ -31,8 +32,8 @@ interface ActivityRecord {
 
 type ActivityRecords = Record<PersonaId, ActivityRecord>
 
-// 두 계정 모두 0건에서 시작하는 새 집계 규칙. 이전 시연 기록과 섞이지 않게 버전을 분리한다.
-const activityStorageKey = (personaId: PersonaId) => `${DEMO.storagePrefix}:${personaId}:activity:v2`
+// 이전 버전의 시연 기록이 첫 로그인에 1건씩 보이지 않도록 저장 키를 분리한다.
+const activityStorageKey = (personaId: PersonaId) => `${DEMO.storagePrefix}:${personaId}:activity:v3`
 
 function emptyActivity(): ActivityRecord {
   return { submittedCaseIds: [], votedCaseIds: [] }
@@ -57,6 +58,12 @@ function readActivity(personaId: PersonaId): ActivityRecord {
   } catch {
     return emptyActivity()
   }
+}
+
+function createInitialActivityRecords(): ActivityRecords {
+  // sessionStorage가 비어 있으면 새 시연이다. 이전 브라우저 세션의 활동은 복원하지 않는다.
+  if (!readStored()) return { A: emptyActivity(), B: emptyActivity() }
+  return { A: readActivity('A'), B: readActivity('B') }
 }
 
 function writeActivity(personaId: PersonaId, activity: ActivityRecord) {
@@ -145,10 +152,7 @@ function toUser(personaId: PersonaId): SessionUser {
 function SessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<SessionState>(createInitialState)
   const [rewardPointAdjustments, setRewardPointAdjustments] = useState<Partial<Record<PersonaId, number>>>({})
-  const [activityRecords, setActivityRecords] = useState<ActivityRecords>(() => ({
-    A: readActivity('A'),
-    B: readActivity('B'),
-  }))
+  const [activityRecords, setActivityRecords] = useState<ActivityRecords>(createInitialActivityRecords)
 
   // 상태를 외부 시스템(localStorage)에 반영한다. effect의 본래 용도다.
   useEffect(() => {

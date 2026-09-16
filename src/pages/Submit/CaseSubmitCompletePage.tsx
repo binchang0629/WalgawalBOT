@@ -22,7 +22,7 @@ function CaseSubmitCompletePage() {
 
   const handleBack = () => navigate(PATHS.home, { replace: true })
   const handlePrimaryClick = () => {
-    navigate(personaId === 'A' ? PATHS.myCases : PATHS.home, { replace: true })
+    navigate(PATHS.myCases, { replace: true })
   }
 
   return (
@@ -56,7 +56,7 @@ function CaseSubmitCompletePage() {
 
       <CaseSubmitFooter
         type="button"
-        primaryLabel={personaId === 'A' ? '접수한 내용 확인하기' : '홈으로 돌아가기'}
+        primaryLabel="접수한 내용 확인하기"
         onPrimaryClick={handlePrimaryClick}
       />
     </div>
