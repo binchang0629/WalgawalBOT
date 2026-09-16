@@ -1,5 +1,8 @@
+import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import useSession from '../../hooks/useSession'
 import { PERSONAS, PERSONA_ORDER } from '../../data/personas'
+import { PATHS } from '../../routes/paths'
 import seoaProfileImage from '../../assets/my/account-seoa.png'
 import jihunProfileImage from '../../assets/my/account-jihun.png'
 import './PersonaSwitcher.css'
@@ -20,10 +23,25 @@ const PROFILE_IMAGES = {
  */
 function PersonaSwitcher() {
   const { personaId, sessionStatus, switchPersona, signIn, signOut } = useSession()
+  const location = useLocation()
+
+  // 사건 접수는 로그인 완료 후에만 들어오는 흐름이라, 그 안에서는 로그인 전 토글을 막는다.
+  const isCaseSubmitFlow =
+    location.pathname === PATHS.caseSubmit || location.pathname.startsWith(`${PATHS.caseSubmit}/`)
+
+  // 진입 시점에 비로그인 상태였다면 시연 상태를 로그인 후로 맞춰 둔다.
+  // 비로그인 사용자가 CTA를 눌러 들어오는 기존 로그인 유도 흐름과는 별개다 — 그 흐름은
+  // 애초에 이 라우트에 도달하기 전에 바텀시트에서 멈춘다. (PROJECT_SPEC.md §7-5)
+  useEffect(() => {
+    if (isCaseSubmitFlow && sessionStatus === 'anonymous') {
+      signIn(personaId)
+    }
+  }, [isCaseSubmitFlow, sessionStatus, personaId, signIn])
 
   if (sessionStatus === 'restoring') return null
 
   const isAuthenticated = sessionStatus === 'authenticated'
+  const isSignOutLocked = isCaseSubmitFlow
 
   return (
     <section className="persona-switcher" aria-label="시연 계정 전환">
@@ -71,9 +89,14 @@ function PersonaSwitcher() {
       <div className="persona-switcher__auth" role="group" aria-label="로그인 상태 전환">
         <button
           type="button"
-          className={isAuthenticated ? 'persona-switcher__auth-item' : 'persona-switcher__auth-item persona-switcher__auth-item--current'}
+          className={`persona-switcher__auth-item${
+            isAuthenticated ? '' : ' persona-switcher__auth-item--current'
+          }${isSignOutLocked ? ' persona-switcher__auth-item--disabled' : ''}`}
           onClick={signOut}
+          disabled={isSignOutLocked}
           aria-pressed={!isAuthenticated}
+          aria-disabled={isSignOutLocked}
+          title={isSignOutLocked ? '사건 접수는 로그인 후에만 볼 수 있어요' : undefined}
         >
           로그인 전
         </button>
@@ -91,6 +114,7 @@ function PersonaSwitcher() {
         {isAuthenticated
           ? `${PERSONAS[personaId].name} 계정으로 보는 중`
           : '아직 로그인하지 않은 상태'}
+        {isSignOutLocked ? ' · 사건 접수 중에는 로그인 상태가 고정돼요' : ''}
       </p>
     </section>
   )

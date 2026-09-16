@@ -86,13 +86,18 @@ function CaseSubmitPage() {
    * 발표 시연용 예시 채우기.
    * 예전에는 본문 칸을 누르면 저절로 채워졌는데, 직접 써 보려고 눌렀을 때도 글이 들어차
    * 손댈 수가 없었다. 그래서 버튼으로 떼어내 누를 때만 채운다.
+   *
+   * focus()는 기본적으로 포커스된 요소가 보이도록 가장 가까운 스크롤 조상
+   * (.case-submit__body)을 브라우저가 알아서 스크롤한다. 지훈 예시 글이 서아보다 훨씬 길어
+   * textarea가 뷰포트 밖으로 크게 자라는데, 그 상태에서 이 기본 동작이 발생하면 화면이 맨
+   * 아래까지 밀린다. `preventScroll: true`로 그 자동 스크롤 자체를 끈다.
    */
   const handleDemoFill = () => {
     setContent(isSeoa ? SEOA_CONTENT : JIHUN_CONTENT)
     window.requestAnimationFrame(() => {
       const field = contentInputRef.current
       if (field) {
-        field.focus()
+        field.focus({ preventScroll: true })
         field.setSelectionRange(field.value.length, field.value.length)
         field.scrollTop = 0
       }
