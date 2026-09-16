@@ -186,8 +186,8 @@ function CaseSubmitPage() {
             <label className="case-submit__label" htmlFor={contentFieldId}>
               사건 내용 <span className="case-submit__required">*</span>
             </label>
-            {/* 발표 시연용. 누르면 예시 사건이 본문 칸에 바로 들어간다. */}
-            <button type="button" className="case-submit__demo" onClick={handleDemoFill}>내용 작성하기</button>
+            {/* 발표 시연용. 누르면 예시 사건이 본문 칸에 바로 들어간다. Figma(1446:9899)의 `더미 텍스트 입력` 문구를 그대로 쓴다. */}
+            <button type="button" className="case-submit__demo" onClick={handleDemoFill}>더미 텍스트 입력</button>
           </div>
           <div className={`case-submit__textarea-box${content ? ' has-content' : ''}`}>
             <textarea
