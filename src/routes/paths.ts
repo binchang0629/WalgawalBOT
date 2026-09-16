@@ -6,6 +6,7 @@
 export const PATHS = {
   root: '/',
   demo: '/demo',
+  onboarding: '/onboarding',
   /** 로그인 시안 확정 전 임시 연결 화면. */
   login: '/login',
   /** 회원가입 (데모). 컨펌 시안 없이 팀 결정으로 추가한 화면이다. (PROJECT_SPEC.md §9-2) */
@@ -26,6 +27,7 @@ export const PATHS = {
   caseSubmitComplete: '/cases/new/complete',
   afterStory: '/afterstory',
   afterStoryMine: '/afterstory/mine',
+  afterStoryMineStories: '/afterstory/mine/stories',
   afterStoryCommunity: '/afterstory/community',
   afterStoryWrite: '/afterstory/write/:caseId',
   afterStoryPreview: '/afterstory/preview',

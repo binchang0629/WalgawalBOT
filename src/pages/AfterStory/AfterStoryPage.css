@@ -72,3 +72,477 @@
 .afterstory-mine__card small { display: block; margin-top: 12px; color: var(--neutral-500); font-size: 12px; }
 .afterstory-mine__card button { width: 100%; height: 48px; margin-top: 16px; border: 0; border-radius: 8px; color: #fff; background: var(--orange); font-size: 15px; font-weight: 700; cursor: pointer; }
 .afterstory-mine__card button:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+
+/* 홈의 대표 봉투와 중복하지 않도록, 왈가왈후에서는 여러 사람의 변화만 카드로 읽는다. */
+.afterstory-community {
+  margin: 38px -24px 0;
+  padding: 28px 24px 148px;
+  color: var(--ink);
+}
+
+.afterstory-community__header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.afterstory-community__header p {
+  margin: 0 0 5px;
+  color: var(--neutral-600);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.afterstory-community__header h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.afterstory-community__header a {
+  flex: none;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.afterstory-community__header a span {
+  font-size: 18px;
+  vertical-align: -1px;
+}
+
+.afterstory-community__intro {
+  margin: 10px 0 18px;
+  color: var(--neutral-600);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.afterstory-community__list {
+  display: grid;
+  gap: 12px;
+}
+
+.afterstory-community-card {
+  padding: 17px 18px 15px;
+  border: 1px solid rgba(255, 255, 255, .56);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 8px 18px rgba(28, 48, 153, .18);
+  color: var(--ink);
+}
+
+.afterstory-community-card > header,
+.afterstory-community-card footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--neutral-600);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.afterstory-community-card__category {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--blue);
+  font-weight: 700;
+}
+
+.afterstory-community-card__category::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  content: '';
+}
+
+.afterstory-community-card--company .afterstory-community-card__category {
+  color: var(--orange);
+}
+
+.afterstory-community-card h3 {
+  margin: 11px 0 9px;
+  font-size: 16px;
+  line-height: 1.4;
+  word-break: keep-all;
+}
+
+.afterstory-community-card blockquote {
+  display: grid;
+  grid-template-columns: 14px 1fr 14px;
+  gap: 2px;
+  margin: 0;
+  color: var(--dark-brown);
+}
+
+.afterstory-community-card blockquote > span {
+  color: var(--orange-300);
+  font-family: var(--font-quote);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.afterstory-community-card blockquote > span:last-child {
+  align-self: end;
+  text-align: right;
+}
+
+.afterstory-community-card blockquote p {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
+.afterstory-community-card footer {
+  margin-top: 13px;
+  padding-top: 11px;
+  border-top: 1px solid var(--neutral-100);
+}
+
+.afterstory-community-card footer span:last-child {
+  color: var(--blue);
+  font-weight: 600;
+}
+
+@media (max-width: 370px) {
+  .afterstory-community { margin-inline: -18px; padding-inline: 18px; }
+  .afterstory-community-card { padding-inline: 15px; }
+}
+/* 후일담은 카드가 아니라 한 사람씩 읽히는 편집형 목록으로 둔다. */
+.afterstory-community {
+  padding-bottom: 164px;
+  background: #fffdf8;
+}
+
+.afterstory-community__list {
+  display: block;
+  border-top: 1px solid rgba(37, 37, 37, .16);
+}
+
+.afterstory-community-card {
+  padding: 19px 0 22px;
+  border: 0;
+  border-bottom: 1px solid rgba(37, 37, 37, .16);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink);
+}
+
+.afterstory-community-card > header,
+.afterstory-community-card footer {
+  color: var(--neutral-600);
+  font-size: 11px;
+}
+
+.afterstory-community-card h3 {
+  margin: 10px 0 8px;
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+.afterstory-community-card blockquote {
+  grid-template-columns: 12px 1fr 12px;
+  gap: 3px;
+  color: var(--dark-brown);
+}
+
+.afterstory-community-card blockquote p {
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.afterstory-community-card footer {
+  margin-top: 12px;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.afterstory-community-card__category {
+  color: var(--blue);
+}
+
+.afterstory-community-card--company .afterstory-community-card__category {
+  color: var(--orange);
+}
+
+.afterstory-community-card blockquote > span {
+  color: var(--orange-300);
+}
+
+.afterstory-community-card footer span:last-child {
+  color: var(--blue);
+}
+/* 다른 사람의 후일담: 문장 하나만 빠르게 읽는 여백형 목록 */
+.afterstory-community {
+  padding-bottom: 156px;
+  background: #fffdf8;
+}
+
+.afterstory-community__intro {
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+
+.afterstory-community__list {
+  border-top: 1px solid var(--neutral-200);
+}
+
+.afterstory-community-card {
+  padding: 16px 0 18px;
+}
+
+.afterstory-community-card header {
+  margin-bottom: 7px;
+  font-size: 12px;
+}
+
+.afterstory-community-card h3 {
+  display: block;
+  overflow: hidden;
+  margin: 0;
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.afterstory-community-card__outcome {
+  margin: 6px 0 0;
+  color: var(--dark-brown);
+  font-family: var(--font-serif);
+  font-size: 16px;
+  line-height: 1.4;
+}
+/* 다른 사람의 후일담: 테이프로 붙인 메모가 모인 작은 게시판 */
+.afterstory-community--board {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin: 34px -24px 0;
+  padding: 28px 24px 154px;
+  background:
+    radial-gradient(circle at 18% 12%, rgb(255 255 255 / 0.38) 0 1px, transparent 1.5px) 0 0 / 11px 11px,
+    linear-gradient(135deg, rgb(255 255 255 / 0.38), transparent 48%),
+    #fff6dc;
+}
+
+.afterstory-community--board::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-top: 1px solid #ffeabd;
+  border-bottom: 1px solid #ffeabd;
+  content: '';
+  pointer-events: none;
+}
+
+.afterstory-community--board .afterstory-community__intro {
+  margin-bottom: 20px;
+  color: var(--brown);
+}
+
+.afterstory-community--board .afterstory-community__list {
+  display: grid;
+  gap: 14px;
+  border: 0;
+}
+
+.afterstory-community--board .afterstory-community-card {
+  position: relative;
+  padding: 22px 18px 18px;
+  border: 0;
+  border-radius: 2px;
+  background: #fffdf8;
+  box-shadow: 0 5px 12px rgb(97 77 40 / 0.14);
+  transform: rotate(-0.65deg);
+}
+
+.afterstory-community--board .afterstory-community-card:nth-child(2) {
+  margin-left: 13px;
+  background: #eaf6ff;
+  transform: rotate(0.7deg);
+}
+
+.afterstory-community--board .afterstory-community-card:nth-child(3) {
+  margin-right: 11px;
+  background: #fff;
+  transform: rotate(-0.32deg);
+}
+
+.afterstory-community-card__tape {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  width: 66px;
+  height: 18px;
+  border: 1px solid rgb(255 255 255 / 0.35);
+  background: rgb(255 211 150 / 0.8);
+  opacity: 0.92;
+  transform: translateX(-50%) rotate(-2deg);
+}
+
+.afterstory-community--board .afterstory-community-card:nth-child(2) .afterstory-community-card__tape {
+  background: rgb(180 215 255 / 0.78);
+  transform: translateX(-50%) rotate(1.6deg);
+}
+
+.afterstory-community--board .afterstory-community-card h3 {
+  font-size: 16px;
+}
+
+.afterstory-community--board .afterstory-community-card__outcome {
+  color: var(--dark-brown);
+  font-size: 15px;
+}
+/* 방금 도착한 메모가 서로 닿지 않도록 간격을 둔다. */
+.afterstory-community--board .afterstory-community__list {
+  gap: 20px;
+}
+/* 새 메모가 하나씩 붙어 있는 리듬을 더 분명하게 만든다. */
+.afterstory-community--board .afterstory-community__list {
+  gap: 28px;
+}
+/* 섹션 안내와 첫 메모 사이에 숨 쉴 여백을 둔다. */
+.afterstory-community--board .afterstory-community__intro {
+  margin-bottom: 32px;
+}
+/* 내가 쓴 후일담: 내 이야기만 한눈에 확인하는 전용 목록 */
+.afterstory-my-stories .afterstory-home__scroll {
+  min-height: calc(100% - 64px);
+  padding-bottom: 154px;
+}
+
+.afterstory-my-stories__intro h2 {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.2;
+}
+
+.afterstory-my-stories__intro p {
+  margin: 8px 0 0;
+  color: var(--neutral-600);
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.afterstory-my-stories__list {
+  margin-top: 34px;
+}
+
+.afterstory-my-stories__count {
+  margin: 0 0 17px;
+  color: var(--neutral-700);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.afterstory-my-stories__count b {
+  color: var(--blue);
+}
+
+.afterstory-my-stories__item {
+  position: relative;
+  padding: 26px 20px 19px;
+  background: #fffdf8;
+  box-shadow: 0 6px 14px rgb(97 77 40 / 0.14);
+}
+
+.afterstory-my-stories__tape {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 70px;
+  height: 19px;
+  background: rgb(180 215 255 / 0.82);
+  transform: translateX(-50%) rotate(-1.5deg);
+}
+
+.afterstory-my-stories__item header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.afterstory-my-stories__item time {
+  color: var(--neutral-600);
+  font-weight: 400;
+}
+
+.afterstory-my-stories__item h3 {
+  margin: 12px 0 9px;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.afterstory-my-stories__item > p {
+  margin: 0;
+  color: var(--dark-brown);
+  font-family: var(--font-serif);
+  font-size: 17px;
+  line-height: 1.42;
+}
+
+.afterstory-my-stories__item small {
+  display: block;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--neutral-200);
+  color: var(--neutral-600);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.afterstory-my-stories__write {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: 48px;
+  margin-top: 28px;
+  border: 1px solid var(--blue);
+  border-radius: 8px;
+  color: var(--blue);
+  background: rgb(255 255 255 / 0.7);
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.afterstory-my-stories__write span {
+  font-size: 21px;
+  line-height: 1;
+}
+/* 왈가왈후 홈은 소개 영역과 게시판 영역의 배경을 명확히 나눈다. */
+.afterstory-home:not(.afterstory-mine):not(.afterstory-my-stories) .afterstory-home__scroll {
+  background-color: #fff;
+  background-image: none !important;
+}
+
+.afterstory-home:not(.afterstory-mine):not(.afterstory-my-stories) .afterstory-community--board {
+  margin-top: 38px;
+}
+/* 소개 영역에 쓰던 원래의 아주 옅은 아이보리 톤을 게시판에도 사용한다. */
+.afterstory-community--board {
+  background: #fefbef;
+}
+
+.afterstory-community--board::before {
+  border-color: #fff6dc;
+}

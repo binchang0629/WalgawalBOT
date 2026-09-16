@@ -125,3 +125,21 @@
     font-size: 12px;
     color: var(--neutral-600);
 }
+
+/* 스플래시부터 온보딩을 다시 볼 수 있는 시연용 진입점. */
+.persona-switcher__onboarding {
+    width: 100%;
+    margin-top: 18px;
+    padding: 10px 12px;
+    border: 1px solid var(--orange-600);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .9);
+    color: var(--orange-800);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.persona-switcher__onboarding:hover {
+    background: var(--orange-050);
+}

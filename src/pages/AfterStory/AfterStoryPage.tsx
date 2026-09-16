@@ -55,6 +55,24 @@ const MY_CLOSED_CASES = [
   },
 ] as const
 
+/**
+ * 다른 사용자가 공개한 후일담. 이미 광장과 홈에 있는 시연 사건만 연결해,
+ * 화면을 채우기 위해 새로운 갈등 사례를 만들어내지 않는다.
+ */
+const COMMUNITY_AFTER_STORIES = [
+  {
+    id: 'birthday-gift', category: '친구', tone: 'friend', updatedAt: '5분 전',
+    title: '친한 친구의 생일 선물 때문에 생긴 오해', summary: '늦게라도 마음을 전하고 화해했어요.', reactions: 4,
+  },
+  {
+    id: 'video-payment', category: '직장', tone: 'company', updatedAt: '12분 전',
+    title: '카페 홍보영상 제작, 수정 범위와 잔금 갈등', summary: '최종본을 전달한 뒤 잔금도 무사히 받았어요.', reactions: 7,
+  },
+  {
+    id: 'friend-loan', category: '친구', tone: 'friend', updatedAt: '19분 전',
+    title: '친구에게 빌려준 300만 원, 6개월째 미변제', summary: '직접 대화한 뒤 서로 오해를 풀었어요.', reactions: 3,
+  },
+] as const
 interface AfterStoryLocationState { content?: string }
 
 /**
@@ -119,39 +137,80 @@ export function AfterStoryHomePage() {
             <strong>내 이야기<br />남기기</strong>
             <small>내 사건의 그 후를 기록해요</small>
           </Link>
-          <a className="afterstory-entry-card afterstory-entry-card--read" href="#latest-story">
+          <Link
+            className="afterstory-entry-card afterstory-entry-card--read"
+            to={PATHS.afterStoryMineStories}
+            onClick={(event) => {
+              if (!requireLogin('default', PATHS.afterStoryMineStories)) {
+                event.preventDefault()
+              }
+            }}
+          >
             <img className="afterstory-entry-card__art" src={readBook} alt="" />
-            <strong>다른 이야기<br />읽어보기</strong>
-            <small>다른 사람의 후일담을 읽어요</small>
-          </a>
-        </section>
-
-        <section className="afterstory-latest" id="latest-story">
-          <header><h2>방금 도착한 후일담</h2><a href="#latest-story">모두 보기 <span aria-hidden="true">›</span></a></header>
-          <article className="afterstory-envelope">
-            <img className="afterstory-envelope__back" src={homeImages.envelopeBack} alt="" />
-            <img className="afterstory-envelope__paper" src={homeImages.letterPaper} alt="" />
-            <div className="afterstory-envelope__paper-copy">
-              <em>NEW</em>
-              <blockquote>“<span>먼저 사과한 뒤,<br />서로의 의견을 묻게 됐어요.</span>”</blockquote>
-              <p>조별 과제에서 친구를<br />공개적으로 지적한 사건</p>
-            </div>
-            <img className="afterstory-envelope__front" src={homeImages.envelopeFront} alt="" />
-            <b className="afterstory-envelope__cta">사건 상세보기 +</b>
-          </article>
-        </section>
-
-        <section className="afterstory-story-summary">
-          <p>다른 사람들의 변화도<br />함께 살펴보세요.</p>
-          <Link className="afterstory-story-summary__link" to={`${PATHS.plaza}?view=closed&section=cases`}>
-            다른 후일담 보러가기 <span aria-hidden="true">→</span>
+            <strong>내가 쓴 후일담<br />보러가기</strong>
+            <small>내가 남긴 이야기만 모아봐요</small>
           </Link>
+        </section>
+
+        <section className="afterstory-community afterstory-community--board" id="community-stories" aria-labelledby="community-story-title">
+          <header className="afterstory-community__header">
+            <div>
+              <p>판결 이후</p>
+              <h2 id="community-story-title">방금 도착한 후일담</h2>
+            </div>
+          </header>
+          <p className="afterstory-community__intro">방금 작성된 이야기를 확인해보세요.</p>
+
+          <div className="afterstory-community__list">
+            {COMMUNITY_AFTER_STORIES.map((story) => (
+              <article className={'afterstory-community-card afterstory-community-card--' + story.tone} key={story.id}>
+                <span className="afterstory-community-card__tape" aria-hidden="true" />
+                <header>
+                  <span className="afterstory-community-card__category">{story.category}</span>
+                  <span>{story.updatedAt} · 공감 {story.reactions}</span>
+                </header>
+                <h3 title={story.title}>{story.title}</h3>
+                <p className="afterstory-community-card__outcome">{story.summary}</p>
+              </article>
+            ))}
+          </div>
         </section>
       </div>
     </main>
   )
 }
 
+/** 내가 직접 게시한 후일담만 모아 보는 목록 화면. */
+export function MyPublishedAfterStoryPage() {
+  const navigate = useNavigate()
+
+  return (
+    <main className="afterstory-home afterstory-my-stories">
+      <AfterStoryHeader title="내가 쓴 후일담" onBack={() => navigate(PATHS.afterStory)} />
+      <div className="afterstory-home__scroll" style={{ backgroundImage: `url(${scrollBackground})` }}>
+        <section className="afterstory-my-stories__intro">
+          <h2>내가 쓴 후일담</h2>
+          <p>사건이 끝난 뒤 내가 남긴 이야기를 모아봐요.</p>
+        </section>
+
+        <section className="afterstory-my-stories__list" aria-label="내가 쓴 후일담 목록">
+          <p className="afterstory-my-stories__count">작성한 후일담 <b>1</b>개</p>
+          <article className="afterstory-my-stories__item">
+            <span className="afterstory-my-stories__tape" aria-hidden="true" />
+            <header><span>친구 · 내 후일담</span><time>방금 전</time></header>
+            <h3>{CONNECTED_CASE.context}</h3>
+            <p>{CONNECTED_CASE.storyTitle.replace('\n', ' ')}</p>
+            <small>공개 범위 · 전체 공개</small>
+          </article>
+        </section>
+
+        <Link className="afterstory-my-stories__write" to={PATHS.afterStoryMine}>
+          다른 사건의 후일담 남기기 <span aria-hidden="true">›</span>
+        </Link>
+      </div>
+    </main>
+  )
+}
 /**
  * 내 이야기 남기기 — 판결이 끝난 내 사건을 골라 후일담 작성으로 들어가는 화면.
  * 왈가왈후 홈의 `내 이야기 남기기` 카드가 여기로 들어온다.

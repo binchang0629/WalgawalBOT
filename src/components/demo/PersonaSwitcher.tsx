@@ -1,7 +1,9 @@
+import { useNavigate } from 'react-router-dom'
 import useSession from '../../hooks/useSession'
 import { PERSONAS, PERSONA_ORDER } from '../../data/personas'
 import seoaProfileImage from '../../assets/my/account-seoa.png'
 import jihunProfileImage from '../../assets/my/account-jihun.png'
+import { PATHS } from '../../routes/paths'
 import './PersonaSwitcher.css'
 
 const PROFILE_IMAGES = {
@@ -19,6 +21,7 @@ const PROFILE_IMAGES = {
  * 퍼소나는 시나리오 선택 기준일 뿐 인증 수단이 아니다. (PROJECT_SPEC.md §7-5)
  */
 function PersonaSwitcher() {
+  const navigate = useNavigate()
   const { personaId, sessionStatus, switchPersona, signIn, signOut } = useSession()
 
   if (sessionStatus === 'restoring') return null
@@ -92,6 +95,14 @@ function PersonaSwitcher() {
           ? `${PERSONAS[personaId].name} 계정으로 보는 중`
           : '아직 로그인하지 않은 상태'}
       </p>
+
+      <button
+        type="button"
+        className="persona-switcher__onboarding"
+        onClick={() => navigate(PATHS.onboarding)}
+      >
+        온보딩 다시 보기
+      </button>
     </section>
   )
 }

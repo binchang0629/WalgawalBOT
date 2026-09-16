@@ -23,8 +23,9 @@ import CaseSubmitSummaryPage from '../pages/Submit/CaseSubmitSummaryPage'
 import CaseSubmitOpinionPage from '../pages/Submit/CaseSubmitOpinionPage'
 import CaseSubmitCompletePage from '../pages/Submit/CaseSubmitCompletePage'
 import ChatbotPage from '../pages/Chatbot/ChatbotPage'
+import OnboardingPage from '../pages/Onboarding/OnboardingPage'
 import NotFoundPage from '../pages/Error/NotFoundPage'
-import { AfterStoryHomePage, CompleteAfterStoryPage, MyAfterStoryPage, PreviewAfterStoryPage, WriteAfterStoryPage } from '../pages/AfterStory/AfterStoryPage'
+import { AfterStoryHomePage, CompleteAfterStoryPage, MyAfterStoryPage, MyPublishedAfterStoryPage, PreviewAfterStoryPage, WriteAfterStoryPage } from '../pages/AfterStory/AfterStoryPage'
 import { PATHS } from './paths'
 
 /**
@@ -49,6 +50,7 @@ function AppRoutes() {
           replace를 써서 뒤로가기에 분기 처리가 남지 않게 한다. (PROJECT_SPEC.md §7-6)
         */}
         <Route path={PATHS.root} element={<Navigate to={PATHS.home} replace />} />
+        <Route path={PATHS.onboarding} element={<OnboardingPage />} />
 
         {/* 앱 헤더와 하단 내비게이션을 쓰는 주요 메뉴 화면 */}
         <Route element={<MainLayout />}>
@@ -62,6 +64,7 @@ function AppRoutes() {
           <Route path={PATHS.afterStory} element={<AfterStoryHomePage />} />
           {/* 내 이야기 남기기. 시안에 하단 내비게이션이 있어 MainLayout 아래에 둔다. */}
           <Route path={PATHS.afterStoryMine} element={<MyAfterStoryPage />} />
+          <Route path={PATHS.afterStoryMineStories} element={<MyPublishedAfterStoryPage />} />
 
         </Route>
 

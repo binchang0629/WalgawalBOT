@@ -64,8 +64,8 @@ export const SHOWCASE_BACKGROUND = {
  * 데모 모드.
  *
  * 퍼소나는 A(윤서아, 신규 가입) · B(곽지훈, 기존 사용자) 두 개로 확정됐다.
- * 다만 A의 시작점인 온보딩·가입 화면 시안이 아직 없어 시연 진입 화면을 켜지 않는다.
- * 가입 화면이 확정되면(PROJECT_SPEC.md §9-2) true로 바꾸고 /demo 라우트를 연결한다.
+ * 온보딩은 /onboarding에서 확인할 수 있다. 서비스의 기본 진입점은 홈으로 유지한다.
+ * 가입 화면은 최종 시안이 확정되면(PROJECT_SPEC.md §9-2) 데모 진입 경로와 함께 다시 연결한다.
  */
 export const DEMO = {
   enabled: false,
