@@ -36,6 +36,8 @@ function FloatingChatButton() {
     PATHS.afterStoryMineStories,
     PATHS.my,
   ].some((route) => route === pathname)
+    // 공개 후일담 상세도 MainLayout의 하단 내비게이션을 사용한다.
+    || /^\/afterstory\/[^/]+$/.test(pathname)
     || /^\/cases\/[^/]+(?:\/result)?$/.test(pathname)
 
   return (

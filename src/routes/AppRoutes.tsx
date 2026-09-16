@@ -87,6 +87,8 @@ function AppRoutes() {
           {/* 내 이야기 남기기. 시안에 하단 내비게이션이 있어 MainLayout 아래에 둔다. */}
           <Route path={PATHS.afterStoryMine} element={<MyAfterStoryPage />} />
           <Route path={PATHS.afterStoryMineStories} element={<MyPublishedAfterStoryPage />} />
+          {/* 내가 쓴 후일담 상세도 왈가왈후 메뉴 흐름이므로 하단 내비게이션을 유지한다. */}
+          <Route path={PATHS.afterStoryDetail} element={<AfterStoryDetailPage />} />
 
         </Route>
 
@@ -107,7 +109,6 @@ function AppRoutes() {
         <Route element={<DetailLayout />}>
           <Route path={PATHS.myPlan} element={<WalbotPlanPage />} />
           <Route path={PATHS.afterStoryCommunity} element={<Navigate to={PATHS.afterStory} replace />} />
-          <Route path={PATHS.afterStoryDetail} element={<AfterStoryDetailPage />} />
           <Route path={PATHS.afterStoryWrite} element={<WriteAfterStoryPage />} />
           <Route path={PATHS.afterStoryPreview} element={<PreviewAfterStoryPage />} />
           <Route path={PATHS.afterStoryComplete} element={<CompleteAfterStoryPage />} />
