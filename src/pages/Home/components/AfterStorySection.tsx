@@ -22,7 +22,9 @@ import {
 function AfterStorySection() {
   const navigate = useNavigate()
   const [letterState, setLetterState] = useState<'closed' | 'opening' | 'open'>('closed')
+  const [isLeavingDetail, setIsLeavingDetail] = useState(false)
   const transitionTimer = useRef<number | null>(null)
+  const detailTimer = useRef<number | null>(null)
   // 후일담 카드 줄은 마우스로도 끌어서 넘길 수 있어야 한다.
   const [storyScrollRef, preventStoryDragStart] = useDragScroll<HTMLDivElement>()
   const isLetterOpen = letterState === 'opening' || letterState === 'open'
@@ -30,12 +32,27 @@ function AfterStorySection() {
 
   useEffect(() => () => {
     if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current)
+    if (detailTimer.current !== null) window.clearTimeout(detailTimer.current)
   }, [])
 
   function handleLetterToggle() {
     if (isAnimating || isLetterOpen) return
     setLetterState('opening')
     transitionTimer.current = window.setTimeout(() => setLetterState('open'), 1200)
+  }
+
+  function openStoryDetail() {
+    if (isLeavingDetail) return
+
+    const destination = toAfterStoryDetail(featuredAfterStory.id)
+    const state = { from: PATHS.home }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      navigate(destination, { state })
+      return
+    }
+
+    setIsLeavingDetail(true)
+    detailTimer.current = window.setTimeout(() => navigate(destination, { state }), 360)
   }
 
   return (
@@ -47,7 +64,7 @@ function AfterStorySection() {
         onActionClick={() => navigate(PATHS.afterStory)}
       />
 
-      <article className={'letter letter--' + letterState + (isLetterOpen ? ' is-open' : '')}>
+      <article className={'letter letter--' + letterState + (isLetterOpen ? ' is-open' : '') + (isLeavingDetail ? ' is-leaving-detail' : '')}>
         <img className="letter__back" src={homeImages.envelopeBack} alt="" aria-hidden="true" />
 
         <img className="letter__paper" src={homeImages.letterPaper} alt="" aria-hidden="true" />
@@ -80,6 +97,11 @@ function AfterStorySection() {
             to={toAfterStoryDetail(featuredAfterStory.id)}
             state={{ from: PATHS.home }}
             aria-label="직속 사수와의 면담 후일담 자세히 보기"
+            onClick={(event) => {
+              if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+              event.preventDefault()
+              openStoryDetail()
+            }}
           >
             {featuredAfterStory.envelopeCta}
           </Link>
