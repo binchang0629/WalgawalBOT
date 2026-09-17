@@ -1938,7 +1938,15 @@ img.ai-card__mascot {
     opacity: 0;
     transition: opacity 180ms ease-out 120ms;
 }
-.close-section--gauge-visible .close-card__mascot { opacity: 1; }
+/* 말풍선이 나오는 순간 판멍이도 한 번 들썩여, 저 말이 누구 입에서 나왔는지 분명해진다. */
+.close-section--gauge-visible .close-card__mascot {
+    opacity: 1;
+    animation: close-mascot-speak 420ms cubic-bezier(.34, 1.56, .64, 1) 1.86s both;
+}
+@keyframes close-mascot-speak {
+    0%, 100% { transform: translateX(-50%) scale(1) translateY(0); }
+    45%      { transform: translateX(-50%) scale(1.09) translateY(-2px); }
+}
 .close-card__choice {
     position: absolute;
     z-index: 3;
@@ -1981,34 +1989,65 @@ img.ai-card__mascot {
 .close-card__choice--right strong { color: var(--negative); }
 .close-card__gap {
     position: absolute;
+    z-index: 3;
     bottom: 0;
     left: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    width: 134px;
-    height: 40px;
+    gap: 3px;
+    width: 128px;
+    height: 38px;
     margin: 0;
     padding: 0;
-    border: 2px solid #fff;
-    border-radius: 20px;
-    background: var(--orange-700);
-    box-shadow: 0 5px 12px rgb(245 114 0 / 28%);
-    color: #fff;
+    border: 2px solid var(--blue-700);
+    border-radius: 13px;
+    background: #fff;
+    box-shadow: 0 4px 10px rgb(55 75 255 / 16%);
+    color: var(--blue-700);
     font-size: 13px;
     font-weight: 700;
     line-height: 1;
     text-align: center;
-    transform: translate(-50%, 6px);
+    /*
+     * 말풍선은 꼬리 끝에서 자라난다. 기준점을 꼬리(left 22 + 폭 절반)에 두면
+     * 가운데가 아니라 판멍이 쪽에서 밀려나오는 것처럼 보인다.
+     */
+    transform-origin: 29px -2px;
+    transform: translate(-50%, 0) scale(.55);
     opacity: 0;
-    transition: opacity 200ms ease-out 1.5s, transform 200ms ease-out 1.5s;
 }
-.close-section--gauge-visible .close-card__gap { opacity: 1; transform: translate(-50%, 0); }
+/*
+ * 순서: 눈금이 차고(0~1.4s) → 좌우 퍼센트가 뜨고(1.5~1.7s) → 판멍이가 말한다(1.9s).
+ * 퍼센트와 같이 뜨면 "결과 숫자"의 일부로 읽혀서, 한 박자 뒤에 나오게 한다.
+ */
+.close-section--gauge-visible .close-card__gap {
+    animation: close-gap-speak 420ms cubic-bezier(.34, 1.56, .64, 1) 1.9s both;
+}
+@keyframes close-gap-speak {
+    0%   { opacity: 0; transform: translate(-50%, 4px) scale(.55); }
+    55%  { opacity: 1; transform: translate(-50%, 0) scale(1.06); }
+    100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
 .close-card__gap b {
-    color: #fff;
+    color: var(--blue-700);
     font-family: var(--font-title);
-    font-size: 21px;
+    font-size: 19px;
+}
+
+/* 아래의 판멍이를 향해 꼬리가 올라가는 말풍선. */
+.close-card__gap::after {
+    position: absolute;
+    z-index: -1;
+    top: -8px;
+    left: 22px;
+    width: 14px;
+    height: 14px;
+    border-top: 2px solid var(--blue-700);
+    border-left: 2px solid var(--blue-700);
+    background: #fff;
+    content: '';
+    transform: rotate(45deg);
 }
 .swap-card {
     box-sizing: border-box;
@@ -2032,13 +2071,27 @@ img.ai-card__mascot {
 .swap-card__side { gap: 0; }
 .swap-card__side b { font-size: 12px; }
 .vote-cta {
+    display: block;
+    width: 100%;
     min-height: 52px;
     box-sizing: border-box;
     padding: 16px 0;
+    border: 0;
     border-radius: var(--radius-lg);
     background: var(--orange-700);
+    box-shadow: 0 5px 14px rgba(32, 35, 43, 0.09);
+    color: #fff;
     font-size: 16px;
     font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+}
+
+.vote-cta:disabled {
+    background: var(--neutral-300);
+    box-shadow: none;
+    cursor: not-allowed;
 }
 @media (prefers-reduced-motion: reduce) {
     .close-card__arc path, .close-card__needle, .close-card__knob,
@@ -2046,6 +2099,9 @@ img.ai-card__mascot {
     .swap-card__bar i { transition: none; }
     .close-card__arc path { animation: none; }
     .close-section--gauge-visible .close-card__needle i { animation: none; }
+    .close-section--gauge-visible .close-card__gap,
+    .close-section--gauge-visible .close-card__mascot { animation: none; }
+    .close-card__gap { transform: translate(-50%, 0) scale(1); }
     .close-card__arc path { stroke-dashoffset: 0; opacity: 1; }
     .close-card__needle, .close-card__knob, .close-card__mascot,
     .close-card__choice, .close-card__gap { opacity: 1; }
