@@ -129,7 +129,7 @@
     animation: home-search-recent-in 320ms 60ms cubic-bezier(.22, 1, .36, 1) both;
 }
 
-.home-search__recent > span {
+.home-search__recent>span {
     display: block;
     margin-bottom: 10px;
     color: var(--neutral-600);
@@ -138,7 +138,7 @@
     line-height: 1.3;
 }
 
-.home-search__recent > div {
+.home-search__recent>div {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
@@ -190,21 +190,41 @@
 }
 
 @keyframes home-search-drop-in {
-    from { opacity: 0; transform: translateY(-12px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes home-search-dim-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes home-search-recent-in {
-    from { opacity: 0; transform: translateY(-8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
+
     .home-search__backdrop,
     .home-search,
     .home-search__recent {
@@ -352,7 +372,7 @@
     transform: translateY(0);
 }
 
-.participant-count__track > span {
+.participant-count__track>span {
     height: 1.3em;
     flex: none;
     backface-visibility: hidden;
@@ -373,9 +393,11 @@
         filter: blur(0);
         transform: translateY(0);
     }
+
     45% {
         filter: blur(.35px);
     }
+
     100% {
         filter: blur(0);
         transform: translateY(calc(var(--participant-roll-steps, 1) * -1.3em));
@@ -415,7 +437,9 @@
 }
 
 @keyframes popular-case-cta-float {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translateY(0);
         box-shadow: 0 6px 14px rgb(255 149 36 / 18%);
     }
@@ -738,8 +762,15 @@
 }
 
 @keyframes balance-refresh-enter {
-    from { opacity: 0; transform: translateY(3px) scale(.96); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+    from {
+        opacity: 0;
+        transform: translateY(3px) scale(.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .balance-question {
@@ -783,7 +814,9 @@
     margin-top: 2px;
 }
 
-.balance-section--mint .balance-section__refresh { top: 311px; }
+.balance-section--mint .balance-section__refresh {
+    top: 311px;
+}
 
 .balance-board__draggable {
     position: absolute;
@@ -914,6 +947,20 @@
 .balance-board__guide img {
     width: 22px;
     height: 26px;
+    animation: balance-guide-hand 1.6s ease-in-out infinite;
+    will-change: transform;
+}
+
+@keyframes balance-guide-hand {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(-12px);
+    }
 }
 
 /* ---------------------------------------------------------------- */
@@ -1165,7 +1212,8 @@
     top: -10px;
     bottom: auto;
     left: 50%;
-    width: 405px;   /* 74% 투명 여백 비율을 반영해 실제 흰 종이가 봉투 내부 폭의 약 88%가 된다. */
+    width: 405px;
+    /* 74% 투명 여백 비율을 반영해 실제 흰 종이가 봉투 내부 폭의 약 88%가 된다. */
     height: 411px;
     transform: translateX(-50%);
     /* box-shadow는 투명 여백까지 네모로 그려진다. drop-shadow는 알파를 따라간다. */
@@ -1224,7 +1272,8 @@
     left: 50%;
     display: flex;
     flex-direction: column;
-    width: 262px;   /* 편지지 실제 면적 안에 좌우 여백을 남긴다. */
+    width: 262px;
+    /* 편지지 실제 면적 안에 좌우 여백을 남긴다. */
     margin: 0;
     transform: translateX(-50%);
 }
@@ -1405,7 +1454,7 @@
 }
 
 /* 열린 봉투의 아래 그림자와 후기 카드가 맞닿지 않도록 여백을 확보한다. */
-.letter.is-open + .story-scroll {
+.letter.is-open+.story-scroll {
     margin-top: 20px;
 }
 
@@ -1530,14 +1579,12 @@
     border: 1.5px solid transparent;
     background:
         linear-gradient(#fff, #fff) padding-box,
-        conic-gradient(
-            from var(--ai-card-stroke-angle),
+        conic-gradient(from var(--ai-card-stroke-angle),
             var(--blue-100) 0deg 220deg,
             var(--blue-200) 260deg,
             var(--blue-400) 300deg,
             var(--blue-200) 338deg,
-            var(--blue-100) 360deg
-        ) border-box;
+            var(--blue-100) 360deg) border-box;
     animation: ai-card-stroke-orbit 3.2s linear infinite;
 }
 
@@ -1548,7 +1595,9 @@
 }
 
 @keyframes ai-card-stroke-orbit {
-    to { --ai-card-stroke-angle: 360deg; }
+    to {
+        --ai-card-stroke-angle: 360deg;
+    }
 }
 
 /* 시안은 판멍이를 좌우로 뒤집어 넣었다. */
@@ -1611,7 +1660,11 @@ img.ai-card__mascot {
     user-select: none;
     filter: none;
 }
-.balance-board__draggable:active { cursor: grabbing; }
+
+.balance-board__draggable:active {
+    cursor: grabbing;
+}
+
 /* 이미지 주변도 잡히는 투명 터치 영역. 실제 그림·이동 기준은 바꾸지 않는다. */
 .balance-board__draggable::before {
     content: '';
@@ -1619,6 +1672,7 @@ img.ai-card__mascot {
     inset: -30px -24px;
     pointer-events: auto;
 }
+
 /* 깻잎은 젓가락 끝이 아닌 잎 중심(드래그 기준점 35%)을 중심으로 잡히게 한다. */
 .balance-section:not(.balance-section--mint) .balance-board__draggable::before {
     top: -30px;
@@ -1630,6 +1684,7 @@ img.ai-card__mascot {
 .balance-section:not(.balance-section--idle) .balance-board__draggable::before {
     pointer-events: none;
 }
+
 .balance-board__subject {
     display: block;
     width: 100%;
@@ -1641,6 +1696,7 @@ img.ai-card__mascot {
     left: calc(50% - 95px);
     width: 190px;
 }
+
 .balance-board__scenario {
     display: flex;
     align-items: center;
@@ -1656,14 +1712,40 @@ img.ai-card__mascot {
     text-align: center;
     word-break: keep-all;
 }
-.balance-board, .balance-question { max-width: 100%; }
-.balance-board__plate { max-width: 42.37%; }
-.balance-choice { max-width: 39.55%; }
-.balance-board__side--left .balance-board__plate { left: 3.67%; }
-.balance-board__side--right .balance-board__plate { left: auto; right: 3.67%; }
-.balance-choice--left { left: 5.08%; }
-.balance-choice--right { left: auto; right: 5.08%; }
-.balance-choice:focus-visible, .balance-section__refresh:focus-visible {
+
+.balance-board,
+.balance-question {
+    max-width: 100%;
+}
+
+.balance-board__plate {
+    max-width: 42.37%;
+}
+
+.balance-choice {
+    max-width: 39.55%;
+}
+
+.balance-board__side--left .balance-board__plate {
+    left: 3.67%;
+}
+
+.balance-board__side--right .balance-board__plate {
+    left: auto;
+    right: 3.67%;
+}
+
+.balance-choice--left {
+    left: 5.08%;
+}
+
+.balance-choice--right {
+    left: auto;
+    right: 5.08%;
+}
+
+.balance-choice:focus-visible,
+.balance-section__refresh:focus-visible {
     outline: 2px solid var(--blue-700);
     outline-offset: 4px;
 }
@@ -1674,52 +1756,146 @@ img.ai-card__mascot {
     /* 젓가락까지 포함한 박스 대신 잎의 중심을 확대 기준으로 사용한다. */
     transform-origin: 35% 90%;
 }
-.balance-section--idle .balance-board__draggable { transition: none; }
-.balance-section--left:not(.balance-section--idle) .balance-board__draggable { left: calc(24.85% - 44.45px); top: 2px; }
-.balance-section--right:not(.balance-section--idle) .balance-board__draggable { left: calc(75.15% - 44.45px); top: 6px; }
-.balance-section--growing .balance-board__draggable { transform: scale(1.08); }
-.balance-board__plate, .balance-choice { transition: transform 1200ms ease, opacity 400ms ease, left 650ms ease, right 650ms ease, top 650ms ease; }
+
+.balance-section--idle .balance-board__draggable {
+    transition: none;
+}
+
+.balance-section--left:not(.balance-section--idle) .balance-board__draggable {
+    left: calc(24.85% - 44.45px);
+    top: 2px;
+}
+
+.balance-section--right:not(.balance-section--idle) .balance-board__draggable {
+    left: calc(75.15% - 44.45px);
+    top: 6px;
+}
+
+.balance-section--growing .balance-board__draggable {
+    transform: scale(1.08);
+}
+
+.balance-board__plate,
+.balance-choice {
+    transition: transform 1200ms ease, opacity 400ms ease, left 650ms ease, right 650ms ease, top 650ms ease;
+}
+
 .balance-section--left:not(.balance-section--idle) .balance-board__side--right,
-.balance-section--right:not(.balance-section--idle) .balance-board__side--left { opacity: .65; }
+.balance-section--right:not(.balance-section--idle) .balance-board__side--left {
+    opacity: .65;
+}
+
 .balance-section--left:not(.balance-section--idle) .balance-board__side--right .balance-board__plate,
 .balance-section--left:not(.balance-section--idle) .balance-board__side--right .balance-choice,
 .balance-section--right:not(.balance-section--idle) .balance-board__side--left .balance-board__plate,
-.balance-section--right:not(.balance-section--idle) .balance-board__side--left .balance-choice { transform: scale(.65); }
-.balance-section--growing.balance-section--left .balance-board__side--left .balance-board__plate,
-.balance-section--growing.balance-section--right .balance-board__side--right .balance-board__plate { transform: scale(1.2); }
-.balance-section--growing .balance-choice.is-selected { transform: scale(1.15); border-color: var(--blue-050); }
-.balance-board__pile {
-    position: absolute; width: 270px; max-width: 88%; height: 205px;
-    object-fit: contain; left: 50%; top: 28px;
-    transform: translateX(-50%) scale(.65); opacity: 0; pointer-events: none;
-    transition: transform 650ms ease, opacity 450ms ease;
+.balance-section--right:not(.balance-section--idle) .balance-board__side--left .balance-choice {
+    transform: scale(.65);
 }
-.balance-section--result .balance-board__pile { opacity: 1; transform: translateX(-50%) scale(1); }
-.balance-section--result .balance-board__draggable { opacity: 0; pointer-events: none; }
-.balance-section--result .balance-board__plate { opacity: 0; }
-.balance-section--result.balance-section--left .balance-board__side--right,
-.balance-section--result.balance-section--right .balance-board__side--left { visibility: hidden; }
-.balance-section--result .balance-choice.is-selected {
-    top: 220px; left: 50%; right: auto; transform: translateX(-50%);
+
+.balance-section--growing.balance-section--left .balance-board__side--left .balance-board__plate,
+.balance-section--growing.balance-section--right .balance-board__side--right .balance-board__plate {
+    transform: scale(1.2);
+}
+
+.balance-section--growing .balance-choice.is-selected {
+    transform: scale(1.15);
     border-color: var(--blue-050);
 }
-.balance-section--result .balance-choice.is-selected img { left: 59px; }
-.balance-section:not(.balance-section--idle) .balance-board__guide { opacity: 0; }
-.balance-answer { color: var(--blue-600); }
-.balance-section--right .balance-answer { color: var(--negative); }
-.balance-question { min-height: 37px; padding-inline: 8px; }
+
+.balance-board__pile {
+    position: absolute;
+    width: 270px;
+    max-width: 88%;
+    height: 205px;
+    object-fit: contain;
+    left: 50%;
+    top: 28px;
+    transform: translateX(-50%) scale(.65);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 650ms ease, opacity 450ms ease;
+}
+
+.balance-section--result .balance-board__pile {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+}
+
+.balance-section--result .balance-board__draggable {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.balance-section--result .balance-board__plate {
+    opacity: 0;
+}
+
+.balance-section--result.balance-section--left .balance-board__side--right,
+.balance-section--result.balance-section--right .balance-board__side--left {
+    visibility: hidden;
+}
+
+.balance-section--result .balance-choice.is-selected {
+    top: 220px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    border-color: var(--blue-050);
+}
+
+.balance-section--result .balance-choice.is-selected img {
+    left: 59px;
+}
+
+.balance-section:not(.balance-section--idle) .balance-board__guide {
+    opacity: 0;
+}
+
+.balance-answer {
+    color: var(--blue-600);
+}
+
+.balance-section--right .balance-answer {
+    color: var(--negative);
+}
+
+.balance-question {
+    min-height: 37px;
+    padding-inline: 8px;
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .balance-board__draggable, .balance-board__plate, .balance-choice, .balance-board__pile { transition: none; }
-    .balance-section__refresh { animation: none; }
+
+    .balance-board__draggable,
+    .balance-board__plate,
+    .balance-choice,
+    .balance-board__pile {
+        transition: none;
+    }
+
+    .balance-section__refresh {
+        animation: none;
+    }
 }
 
 /* 결과에서도 젓가락이 집은 깻잎을 더미 위에 남겨 참조 시안과 연결한다. */
 .balance-section--result.balance-section--left .balance-board__draggable,
 .balance-section--result.balance-section--right .balance-board__draggable {
-    opacity: 1; left: min(calc(74% - 44.45px), calc(100% - 127px)); top: -3px; transform: scale(1);
+    opacity: 1;
+    left: min(calc(74% - 44.45px), calc(100% - 127px));
+    top: -3px;
+    transform: scale(1);
 }
-.balance-board__pile { width: 300px; height: 225px; top: 15px; }
-.balance-section--result .balance-choice.is-selected { top: 228px; }
+
+.balance-board__pile {
+    width: 300px;
+    height: 225px;
+    top: 15px;
+}
+
+.balance-section--result .balance-choice.is-selected {
+    top: 228px;
+}
 
 /* 접시 확대 전에 잎을 중앙에 고정한다. 좌표 보간으로 옆에서 자라는 현상을 막는다. */
 .balance-section--placing .balance-board__draggable {
@@ -1729,8 +1905,8 @@ img.ai-card__mascot {
 @media (prefers-reduced-motion: no-preference) {
     .balance-section--result .balance-board__draggable {
         transition: left 750ms cubic-bezier(.22, 1, .36, 1),
-                    top 750ms cubic-bezier(.22, 1, .36, 1),
-                    transform 750ms cubic-bezier(.22, 1, .36, 1);
+            top 750ms cubic-bezier(.22, 1, .36, 1),
+            transform 750ms cubic-bezier(.22, 1, .36, 1);
     }
 }
 
@@ -1740,27 +1916,54 @@ img.ai-card__mascot {
     transform: scale(1.2);
     transition: transform 900ms ease-out;
 }
+
 .balance-section--hover-left .balance-choice--left,
-.balance-section--hover-right .balance-choice--right { transform: scale(1.1); }
+.balance-section--hover-right .balance-choice--right {
+    transform: scale(1.1);
+}
+
 .balance-section--placing.balance-section--left .balance-board__side--left .balance-board__plate,
-.balance-section--placing.balance-section--right .balance-board__side--right .balance-board__plate { transform: scale(1.2); }
-.balance-section--left .balance-board__pile { left: 24.85%; }
-.balance-section--right .balance-board__pile { left: 75.15%; }
+.balance-section--placing.balance-section--right .balance-board__side--right .balance-board__plate {
+    transform: scale(1.2);
+}
+
+.balance-section--left .balance-board__pile {
+    left: 24.85%;
+}
+
+.balance-section--right .balance-board__pile {
+    left: 75.15%;
+}
+
 .balance-board__pile {
     transform: translateX(-50%) scale(.6);
     transform-origin: center 65%;
     transition: left 900ms cubic-bezier(.22, 1, .36, 1), transform 900ms cubic-bezier(.22, 1, .36, 1), opacity 700ms ease;
 }
-.balance-section--result .balance-board__pile { left: 50%; transform: translateX(-50%) scale(1); }
+
+.balance-section--result .balance-board__pile {
+    left: 50%;
+    transform: translateX(-50%) scale(1);
+}
+
 .balance-section--result.balance-section--left .balance-board__side--left .balance-board__plate,
 .balance-section--result.balance-section--right .balance-board__side--right .balance-board__plate {
-    left: calc(50% - 75px); right: auto; top: 130px;
-    transform: scale(1.7); opacity: 0;
+    left: calc(50% - 75px);
+    right: auto;
+    top: 130px;
+    transform: scale(1.7);
+    opacity: 0;
     transition: left 900ms cubic-bezier(.22, 1, .36, 1), top 900ms ease, transform 900ms ease, opacity 700ms ease;
 }
+
 @media (prefers-reduced-motion: reduce) {
-    .balance-section .balance-board__plate, .balance-section .balance-board__pile,
-    .balance-section .balance-choice, .balance-section .balance-board__draggable { transition: none; }
+
+    .balance-section .balance-board__plate,
+    .balance-section .balance-board__pile,
+    .balance-section .balance-choice,
+    .balance-section .balance-board__draggable {
+        transition: none;
+    }
 }
 
 /* 빈 접시 확대를 끝낸 뒤 같은 자리에 결과 이미지만 교체한다. */
@@ -1768,32 +1971,61 @@ img.ai-card__mascot {
 .balance-section--expanding.balance-section--right .balance-board__side--right .balance-board__plate,
 .balance-section--result.balance-section--left .balance-board__side--left .balance-board__plate,
 .balance-section--result.balance-section--right .balance-board__side--right .balance-board__plate {
-    left: calc(50% - 75px); right: auto; top: 130px;
+    left: calc(50% - 75px);
+    right: auto;
+    top: 130px;
     transform: scale(1.74, 1.1);
     transition: left 900ms cubic-bezier(.22, 1, .36, 1), top 900ms cubic-bezier(.22, 1, .36, 1),
-                transform 900ms cubic-bezier(.22, 1, .36, 1), opacity 550ms ease;
+        transform 900ms cubic-bezier(.22, 1, .36, 1), opacity 550ms ease;
 }
-.balance-section--expanding .balance-board__plate { opacity: 1; }
+
+.balance-section--expanding .balance-board__plate {
+    opacity: 1;
+}
+
 .balance-section--expanding.balance-section--left .balance-board__side--right,
-.balance-section--expanding.balance-section--right .balance-board__side--left { opacity: 0; transition: opacity 350ms ease; }
-.balance-section--expanding .balance-choice.is-selected {
-    top: 228px; left: 50%; right: auto; transform: translateX(-50%);
+.balance-section--expanding.balance-section--right .balance-board__side--left {
+    opacity: 0;
+    transition: opacity 350ms ease;
 }
+
+.balance-section--expanding .balance-choice.is-selected {
+    top: 228px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+}
+
 .balance-section--expanding.balance-section--left .balance-board__draggable,
 .balance-section--expanding.balance-section--right .balance-board__draggable {
-    left: calc(50% - 44.45px); top: 50px; transform: scale(1.08);
+    left: calc(50% - 44.45px);
+    top: 50px;
+    transform: scale(1.08);
     transition: left 900ms cubic-bezier(.22, 1, .36, 1), top 900ms cubic-bezier(.22, 1, .36, 1), transform 900ms ease;
 }
+
 .balance-section--expanding .balance-board__pile,
 .balance-section--result .balance-board__pile {
-    left: 50%; transform: translateX(-50%) scale(1);
+    left: 50%;
+    transform: translateX(-50%) scale(1);
     transition: opacity 550ms ease;
 }
-.balance-section--expanding .balance-board__pile { opacity: 0; }
-.balance-section--result .balance-board__pile { opacity: 1; }
+
+.balance-section--expanding .balance-board__pile {
+    opacity: 0;
+}
+
+.balance-section--result .balance-board__pile {
+    opacity: 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .balance-section .balance-board__plate, .balance-section .balance-board__pile,
-    .balance-section .balance-board__draggable { transition: none; }
+
+    .balance-section .balance-board__plate,
+    .balance-section .balance-board__pile,
+    .balance-section .balance-board__draggable {
+        transition: none;
+    }
 }
 
 
@@ -1803,6 +2035,7 @@ img.ai-card__mascot {
     padding: 20px var(--content-gutter);
     background: #fff;
 }
+
 .close-card {
     position: relative;
     --gauge-ink: #30333a;
@@ -1816,6 +2049,7 @@ img.ai-card__mascot {
     border-radius: 16px;
     background: var(--blue-050);
 }
+
 .close-card__title {
     margin: 0;
     font-family: var(--font-body);
@@ -1825,7 +2059,11 @@ img.ai-card__mascot {
     color: var(--neutral-900);
     text-align: center;
 }
-.close-card__title span:last-child br { display: none; }
+
+.close-card__title span:last-child br {
+    display: none;
+}
+
 /* Figma `수정?` 기준 게이지 상자. 안쪽 좌표는 모두 이 309×191 상자에 맞춰 잡았다. */
 .close-card__gauge {
     position: relative;
@@ -1833,6 +2071,7 @@ img.ai-card__mascot {
     max-width: 100%;
     height: 191px;
 }
+
 /*
  * 눈금 두 줄. 파랑이 끝나는 자리에서 빨강이 이어지되, 바깥 끝은 둥글게 마감한다.
  * 파랑·빨강이 갈리는 각도는 컴포넌트가 실제 비율로 계산해 path에 넣는다.
@@ -1845,6 +2084,7 @@ img.ai-card__mascot {
     width: 100%;
     height: 100%;
 }
+
 .close-card__arc path {
     fill: none;
     stroke-width: 18;
@@ -1853,19 +2093,23 @@ img.ai-card__mascot {
     stroke-dashoffset: 100;
     opacity: 0;
 }
+
 .close-section--gauge-visible .close-card__arc-fill {
     animation: close-gauge-fill 1.4s cubic-bezier(.42, 0, .58, 1) forwards;
 }
+
 @keyframes close-gauge-fill {
     from {
         stroke-dashoffset: 100;
         opacity: 1;
     }
+
     to {
         stroke-dashoffset: 0;
         opacity: 1;
     }
 }
+
 /*
  * 바늘은 두 겹이다.
  * 겉(span)은 비율에 따른 실제 각도를 맡고, 속(i)은 계속 흔들리는 몫을 맡는다.
@@ -1884,7 +2128,11 @@ img.ai-card__mascot {
     opacity: 0;
     transition: transform 600ms cubic-bezier(.22, 1, .36, 1);
 }
-.close-section--gauge-visible .close-card__needle { opacity: 1; transition: opacity 1ms linear 1.5s, transform 600ms cubic-bezier(.22, 1, .36, 1); }
+
+.close-section--gauge-visible .close-card__needle {
+    opacity: 1;
+    transition: opacity 1ms linear 1.5s, transform 600ms cubic-bezier(.22, 1, .36, 1);
+}
 
 .close-card__needle i {
     display: block;
@@ -1895,6 +2143,7 @@ img.ai-card__mascot {
     /* 아래쪽을 축으로 돌아야 끝만 좌우로 움직인다. */
     transform-origin: 50% 100%;
 }
+
 .close-section--gauge-visible .close-card__needle i {
     /* 눈금이 차오른 뒤 시침이 나타나며 움직이기 시작한다. */
     animation: close-needle-drift 4.8s ease-in-out 1.5s infinite;
@@ -1913,21 +2162,47 @@ img.ai-card__mascot {
     opacity: 0;
     transition: opacity 1ms linear 1.5s;
 }
-.close-section--gauge-visible .close-card__knob { opacity: 1; }
+
+.close-section--gauge-visible .close-card__knob {
+    opacity: 1;
+}
 
 /*
  * 비율이 팽팽한 느낌을 주되 승패가 바뀐 것처럼 보이지 않도록 기준 각도를 중심으로 흔든다.
  * 가려지지 않은 시침 끝이 실제로 움직여 보이도록 약 ±10도에서 불규칙하게 머문다.
  */
 @keyframes close-needle-drift {
-    0%, 100% { transform: rotate(0deg); }
-    13% { transform: rotate(-10deg); }
-    24% { transform: rotate(-8deg); }
-    42% { transform: rotate(9deg); }
-    54% { transform: rotate(11deg); }
-    71% { transform: rotate(-7deg); }
-    83% { transform: rotate(-9deg); }
+
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+
+    13% {
+        transform: rotate(-10deg);
+    }
+
+    24% {
+        transform: rotate(-8deg);
+    }
+
+    42% {
+        transform: rotate(9deg);
+    }
+
+    54% {
+        transform: rotate(11deg);
+    }
+
+    71% {
+        transform: rotate(-7deg);
+    }
+
+    83% {
+        transform: rotate(-9deg);
+    }
 }
+
 .close-card__mascot {
     position: absolute;
     z-index: 2;
@@ -1939,15 +2214,25 @@ img.ai-card__mascot {
     opacity: 0;
     transition: opacity 180ms ease-out 120ms;
 }
+
 /* 말풍선이 나오는 순간 판멍이도 한 번 들썩여, 저 말이 누구 입에서 나왔는지 분명해진다. */
 .close-section--gauge-visible .close-card__mascot {
     opacity: 1;
     animation: close-mascot-speak 420ms cubic-bezier(.34, 1.56, .64, 1) 1.86s both;
 }
+
 @keyframes close-mascot-speak {
-    0%, 100% { transform: translateX(-50%) scale(1) translateY(0); }
-    45%      { transform: translateX(-50%) scale(1.09) translateY(-2px); }
+
+    0%,
+    100% {
+        transform: translateX(-50%) scale(1) translateY(0);
+    }
+
+    45% {
+        transform: translateX(-50%) scale(1.09) translateY(-2px);
+    }
 }
+
 .close-card__choice {
     position: absolute;
     z-index: 3;
@@ -1964,10 +2249,21 @@ img.ai-card__mascot {
     opacity: 0;
     transition: opacity 200ms ease-out 1.5s, transform 200ms ease-out 1.5s;
 }
-.close-section--gauge-visible .close-card__choice { opacity: 1; transform: translateY(0); }
+
+.close-section--gauge-visible .close-card__choice {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 /* 게이지 바깥의 양 끝에 같은 폭으로 둬 숫자와 캐릭터가 겹치지 않게 한다. */
-.close-card__choice--left { left: 0; }
-.close-card__choice--right { right: 0; }
+.close-card__choice--left {
+    left: 0;
+}
+
+.close-card__choice--right {
+    right: 0;
+}
+
 .close-card__choice p {
     margin: 0;
     text-align: center;
@@ -1976,18 +2272,27 @@ img.ai-card__mascot {
     line-height: 1.3;
     white-space: nowrap;
 }
+
 .close-card__choice strong {
     font-size: 28px;
     font-weight: 700;
     line-height: 1;
     letter-spacing: .02em;
 }
+
 .close-card__choice strong i {
     font-size: 16px;
     font-style: normal;
 }
-.close-card__choice--left strong { color: var(--blue-700); }
-.close-card__choice--right strong { color: var(--negative); }
+
+.close-card__choice--left strong {
+    color: var(--blue-700);
+}
+
+.close-card__choice--right strong {
+    color: var(--negative);
+}
+
 .close-card__gap {
     position: absolute;
     z-index: 3;
@@ -2018,6 +2323,7 @@ img.ai-card__mascot {
     transform: translate(-50%, 0) scale(.55);
     opacity: 0;
 }
+
 /*
  * 순서: 눈금이 차고(0~1.4s) → 좌우 퍼센트가 뜨고(1.5~1.7s) → 판멍이가 말한다(1.9s).
  * 퍼센트와 같이 뜨면 "결과 숫자"의 일부로 읽혀서, 한 박자 뒤에 나오게 한다.
@@ -2025,11 +2331,24 @@ img.ai-card__mascot {
 .close-section--gauge-visible .close-card__gap {
     animation: close-gap-speak 420ms cubic-bezier(.34, 1.56, .64, 1) 1.9s both;
 }
+
 @keyframes close-gap-speak {
-    0%   { opacity: 0; transform: translate(-50%, 4px) scale(.55); }
-    55%  { opacity: 1; transform: translate(-50%, 0) scale(1.06); }
-    100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 4px) scale(.55);
+    }
+
+    55% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1.06);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+    }
 }
+
 .close-card__gap b {
     color: var(--blue-700);
     font-family: var(--font-title);
@@ -2050,6 +2369,7 @@ img.ai-card__mascot {
     content: '';
     transform: rotate(45deg);
 }
+
 .swap-card {
     position: relative;
     box-sizing: border-box;
@@ -2060,6 +2380,7 @@ img.ai-card__mascot {
     border-radius: var(--radius-lg);
     background: var(--neutral-050);
 }
+
 .swap-card__title {
     overflow: hidden;
     width: 100%;
@@ -2069,18 +2390,101 @@ img.ai-card__mascot {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-.swap-card__bar i { transition: width 280ms ease; }
-.swap-card__side { gap: 0; }
-.swap-card__side b { font-size: 12px; }
-.close-card, .swap-card { transition: transform 200ms cubic-bezier(.4, 0, 1, 1), opacity 200ms ease-out, filter 200ms ease-out; }
-.close-section--leaving .close-card { transform: translateY(92px) scale(.94); opacity: .68; filter: blur(1px); }
-.close-section--leaving .swap-card { z-index: 2; transform: translateY(-92px) scale(1.06); opacity: .68; filter: blur(1px); }
-.close-section--entering .close-card { animation: close-card-enter 460ms cubic-bezier(.18, .82, .2, 1) both; }
-.close-section--entering .swap-card { z-index: 2; animation: swap-card-enter 460ms cubic-bezier(.18, .82, .2, 1) both; }
+.swap-card__bar i {
+    transition: width 280ms ease;
+}
+
+.swap-card__side {
+    gap: 0;
+}
+
+.swap-card__side b {
+    font-size: 12px;
+}
+
+.close-card,
+.swap-card {
+    transition: transform 200ms cubic-bezier(.4, 0, 1, 1), opacity 200ms ease-out, filter 200ms ease-out;
+}
+
+.close-section--leaving .close-card {
+    transform: translateY(92px) scale(.94);
+    opacity: .68;
+    filter: blur(1px);
+}
+
+.close-section--leaving .swap-card {
+    z-index: 2;
+    transform: translateY(-92px) scale(1.06);
+    opacity: .68;
+    filter: blur(1px);
+}
+
+.close-section--entering .close-card {
+    animation: close-card-enter 460ms cubic-bezier(.18, .82, .2, 1) both;
+}
+
+.close-section--entering .swap-card {
+    z-index: 2;
+    animation: swap-card-enter 460ms cubic-bezier(.18, .82, .2, 1) both;
+}
+
 @keyframes close-card-enter {
-    from { transform: translateY(92px) scale(.94); opacity: .68; filter: blur(1px); }
-    72% { transform: translateY(-4px) scale(1.008); opacity: 1; filter: blur(0); }
-    to { transform: translateY(0) scale(1); opacity: 1; filter: blur(0); }
+    from {
+        transform: translateY(92px) scale(.94);
+        opacity: .68;
+        filter: blur(1px);
+    }
+
+    72% {
+        transform: translateY(-4px) scale(1.008);
+        opacity: 1;
+        filter: blur(0);
+    }
+
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+        filter: blur(0);
+    }
+}
+
+.vote-cta {
+    display: block;
+    width: 100%;
+    min-height: 52px;
+    box-sizing: border-box;
+    padding: 16px 0;
+    border: 0;
+    border-radius: var(--radius-lg);
+    background: var(--orange-700);
+    box-shadow: 0 5px 14px rgba(32, 35, 43, 0.09);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+}
+
+@keyframes swap-card-enter {
+    from {
+        transform: translateY(-92px) scale(1.06);
+        opacity: .68;
+        filter: blur(1px);
+    }
+
+    72% {
+        transform: translateY(4px) scale(.992);
+        opacity: 1;
+        filter: blur(0);
+    }
+
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+        filter: blur(0);
+    }
 }
 @keyframes swap-card-enter {
     from { transform: translateY(-92px) scale(1.06); opacity: .68; filter: blur(1px); }
@@ -2101,20 +2505,57 @@ img.ai-card__mascot {
     outline: 2px solid var(--blue-700);
     outline-offset: 3px;
 }
+
 @media (prefers-reduced-motion: reduce) {
-    .close-card, .swap-card { transition: none; }
-    .close-section--entering .close-card, .close-section--entering .swap-card { animation: none; }
-    .close-card__arc path, .close-card__needle, .close-card__knob,
-    .close-card__mascot, .close-card__choice, .close-card__gap,
-    .swap-card__bar i { transition: none; }
-    .close-card__arc path { animation: none; }
-    .close-section--gauge-visible .close-card__needle i { animation: none; }
+    .close-card,
+    .swap-card {
+        transition: none;
+    }
+
+    .close-section--entering .close-card,
+    .close-section--entering .swap-card {
+        animation: none;
+    }
+
+    .close-card__arc path,
+    .close-card__needle,
+    .close-card__knob,
+    .close-card__mascot,
+    .close-card__choice,
+    .close-card__gap,
+    .swap-card__bar i {
+        transition: none;
+    }
+
+    .close-card__arc path {
+        animation: none;
+    }
+
+    .close-section--gauge-visible .close-card__needle i {
+        animation: none;
+    }
+
     .close-section--gauge-visible .close-card__gap,
-    .close-section--gauge-visible .close-card__mascot { animation: none; }
-    .close-card__gap { transform: translate(-50%, 0) scale(1); }
-    .close-card__arc path { stroke-dashoffset: 0; opacity: 1; }
-    .close-card__needle, .close-card__knob, .close-card__mascot,
-    .close-card__choice, .close-card__gap { opacity: 1; }
+    .close-section--gauge-visible .close-card__mascot {
+        animation: none;
+    }
+
+    .close-card__gap {
+        transform: translate(-50%, 0) scale(1);
+    }
+
+    .close-card__arc path {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+
+    .close-card__needle,
+    .close-card__knob,
+    .close-card__mascot,
+    .close-card__choice,
+    .close-card__gap {
+        opacity: 1;
+    }
 }
 
 /* 말풍선 꼬리와 본체는 하나의 SVG 외곽선으로 그려, 경계가 끊기지 않게 한다. */
@@ -2129,6 +2570,7 @@ img.ai-card__mascot {
     filter: none;
     isolation: isolate;
 }
+
 .balance-choice__outline {
     position: absolute;
     z-index: 0;
@@ -2140,6 +2582,7 @@ img.ai-card__mascot {
     filter: drop-shadow(0 4px 6px rgba(18, 20, 64, 0.08));
     pointer-events: none;
 }
+
 .balance-choice__outline path {
     fill: #fff;
     stroke: var(--bubble-stroke);
@@ -2148,6 +2591,7 @@ img.ai-card__mascot {
     vector-effect: non-scaling-stroke;
     transition: stroke 180ms ease;
 }
+
 .balance-choice__label {
     position: relative;
     z-index: 1;
@@ -2162,18 +2606,31 @@ img.ai-card__mascot {
     white-space: nowrap;
     animation: balance-percent-enter 280ms 90ms ease-out both;
 }
+
 .balance-section--result .balance-board .balance-choice.is-selected {
     width: 180px;
     max-width: none;
     gap: 8px;
 }
+
 @keyframes balance-percent-enter {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
+
 @media (prefers-reduced-motion: reduce) {
-    .balance-choice__percent { animation: none; }
+    .balance-choice__percent {
+        animation: none;
+    }
 }
+
 .balance-section .balance-board .balance-choice.is-selected,
 .balance-section--hover-left .balance-board .balance-choice--left,
 .balance-section--hover-right .balance-board .balance-choice--right {
@@ -2187,15 +2644,21 @@ img.ai-card__mascot {
     transform: translateX(-50%);
     transition: transform 260ms ease, opacity 400ms ease, left 520ms cubic-bezier(.22, 1, .36, 1), top 520ms cubic-bezier(.22, 1, .36, 1), width 520ms cubic-bezier(.22, 1, .36, 1);
 }
-.balance-section .balance-board .balance-choice--right { left: 75.15%; }
+
+.balance-section .balance-board .balance-choice--right {
+    left: 75.15%;
+}
+
 .balance-section--hover-left .balance-board .balance-choice--left,
 .balance-section--hover-right .balance-board .balance-choice--right {
     transform: translateX(-50%) scale(1.1);
 }
+
 .balance-section--left:not(.balance-section--idle) .balance-board__side--right .balance-choice,
 .balance-section--right:not(.balance-section--idle) .balance-board__side--left .balance-choice {
     transform: translateX(-50%) scale(.65);
 }
+
 .balance-section--placing .balance-choice.is-selected,
 .balance-section--expanding .balance-choice.is-selected,
 .balance-section--result .balance-choice.is-selected {
@@ -2204,6 +2667,7 @@ img.ai-card__mascot {
     right: auto;
     transform: translateX(-50%);
 }
+
 .balance-section--expanding .balance-choice.is-selected,
 .balance-section--result .balance-choice.is-selected {
     transition: none;
@@ -2215,6 +2679,7 @@ img.ai-card__mascot {
     left: inherit;
     transform: translateX(-50%);
 }
+
 .balance-section--expanding .balance-choice.is-selected {
     top: 228px;
     left: 50%;
@@ -2222,89 +2687,106 @@ img.ai-card__mascot {
     transform: translateX(-50%);
     transition: left 900ms cubic-bezier(.22, 1, .36, 1), top 900ms cubic-bezier(.22, 1, .36, 1), transform 900ms cubic-bezier(.22, 1, .36, 1);
 }
+
 .balance-section--result .balance-choice.is-selected {
     transition: width 360ms cubic-bezier(.22, 1, .36, 1);
 }
+
 .balance-section--placing.balance-section--left .balance-choice.is-selected {
     top: 172px;
     left: 24.85%;
     right: auto;
 }
+
 .balance-section--placing.balance-section--right .balance-choice.is-selected {
     top: 172px;
     left: 75.15%;
     right: auto;
 }
 
-.popular-case__cta { text-decoration: none; }
+.popular-case__cta {
+    text-decoration: none;
+}
 
 
 /* 후일담 편지는 봉투 → 편지지 → 내용 순으로 열린다. */
 .letter {
     transition: height 900ms cubic-bezier(.22, 1, .36, 1);
 }
+
 .letter.is-open {
     transition-delay: 140ms;
 }
+
 .letter .letter__closed {
     opacity: 1;
     transform: translateY(0) scale(1);
     transition: opacity 240ms ease 420ms, transform 240ms ease 420ms;
 }
+
 .letter.is-open .letter__closed {
     opacity: 0;
     transform: translateY(14px) scale(.97);
     transition-delay: 0ms;
 }
+
 .letter .letter__back {
     opacity: 0;
     transform: translateX(-50%) translateY(8px);
     transition: opacity 200ms ease, transform 280ms cubic-bezier(.22, 1, .36, 1);
 }
+
 .letter .letter__front {
     opacity: 0;
     transform: translateY(8px);
     transition: opacity 200ms ease, transform 280ms cubic-bezier(.22, 1, .36, 1);
 }
+
 .letter.is-open .letter__back {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
     transition-delay: 160ms;
 }
+
 .letter.is-open .letter__front {
     opacity: 1;
     transform: translateY(0);
     transition-delay: 190ms;
 }
+
 .letter .letter__paper {
-  opacity: .96;
-  transform: translateX(-50%) translateY(175px);
-  /* 닫힌 봉투 밖으로 밀려난 종이 하단은 보이지 않게 가린다. */
-  clip-path: inset(-24px 0 190px);
-  transition:
-    transform 680ms cubic-bezier(.22, 1, .36, 1),
-    opacity 260ms ease,
-    clip-path 680ms cubic-bezier(.22, 1, .36, 1);
+    opacity: .96;
+    transform: translateX(-50%) translateY(175px);
+    /* 닫힌 봉투 밖으로 밀려난 종이 하단은 보이지 않게 가린다. */
+    clip-path: inset(-24px 0 190px);
+    transition:
+        transform 680ms cubic-bezier(.22, 1, .36, 1),
+        opacity 260ms ease,
+        clip-path 680ms cubic-bezier(.22, 1, .36, 1);
 }
+
 .letter.is-open .letter__paper {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-  /* 앞면이 불투명해진 뒤, 종이와 가림 영역이 함께 위로 열린다. */
-  clip-path: inset(-24px 0 39px);
-  transition-delay: 400ms, 400ms, 400ms;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    /* 앞면이 불투명해진 뒤, 종이와 가림 영역이 함께 위로 열린다. */
+    clip-path: inset(-24px 0 39px);
+    transition-delay: 400ms, 400ms, 400ms;
 }
+
 .letter .letter__content {
     opacity: 0;
     visibility: hidden;
     transform: translateY(190px) scale(.98);
     transition: transform 180ms ease, opacity 180ms ease, visibility 0s linear 180ms;
 }
+
 .letter.is-open .letter__content {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0) scale(1);
-  transition: transform 480ms cubic-bezier(.22, 1, .36, 1) 800ms, opacity 340ms ease 800ms, visibility 0s linear 800ms;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    transition: transform 480ms cubic-bezier(.22, 1, .36, 1) 800ms, opacity 340ms ease 800ms, visibility 0s linear 800ms;
 }
+
 /* 열림 전환 중에만 등장시키고, 링크로 교체된 뒤에는 투명 상태를 다시 시작하지 않는다. */
 .letter--opening .letter__cta {
     animation: letter-cta-appear 280ms ease 1020ms both;
@@ -2317,23 +2799,51 @@ img.ai-card__mascot {
 }
 
 @keyframes letter-detail-peel {
-    0% { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
-    38% { opacity: 1; transform: translateY(-7px) rotate(-.6deg) scale(1.01); }
-    100% { opacity: 0; transform: translate(28px, -24px) rotate(2deg) scale(1.025); }
+    0% {
+        opacity: 1;
+        transform: translateY(0) rotate(0) scale(1);
+    }
+
+    38% {
+        opacity: 1;
+        transform: translateY(-7px) rotate(-.6deg) scale(1.01);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(28px, -24px) rotate(2deg) scale(1.025);
+    }
 }
 
 @keyframes letter-cta-appear {
-    from { opacity: 0; transform: translateX(-50%) translateY(6px); }
-    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
 }
-.letter__toggle:disabled { cursor: default; pointer-events: none; }
+
+.letter__toggle:disabled {
+    cursor: default;
+    pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
+
     .letter__cta,
-    .letter.is-leaving-detail { animation: none; }
+    .letter.is-leaving-detail {
+        animation: none;
+    }
 }
 
 /* 전역 이미지 최대 폭 제한을 해제해야 원본 편지지 폭이 적용된다. */
-.letter .letter__paper { max-width: none; }
+.letter .letter__paper {
+    max-width: none;
+}
 
 
 /*
@@ -2348,7 +2858,10 @@ img.ai-card__mascot {
  * 두 장 모두 원본 2배 해상도이며, 원본에 구워져 있던 그림자는 빼고 잘랐다.
  * 그림자는 .balance-board__draggable의 drop-shadow가 두 장에 함께 걸린다.
  */
-.balance-board__subject--perilla { position: relative; }
+.balance-board__subject--perilla {
+    position: relative;
+}
+
 .balance-board__leaf,
 .balance-board__chopsticks {
     position: absolute;
@@ -2358,12 +2871,24 @@ img.ai-card__mascot {
     object-fit: contain;
     pointer-events: none;
 }
+
 /* 젓가락이 잎 위에 있어야 원본과 같은 그림이 된다. */
-.balance-board__chopsticks { z-index: 1; }
+.balance-board__chopsticks {
+    z-index: 1;
+}
+
 /* 끝까지 살린 젓가락은 잎을 놓은 뒤에만 나온다. */
-.balance-board__chopsticks--full { opacity: 0; }
-.balance-section--result.balance-section--right:not(.balance-section--mint) .balance-board__chopsticks { opacity: 0; }
-.balance-section--result.balance-section--right:not(.balance-section--mint) .balance-board__chopsticks--full { opacity: 1; }
+.balance-board__chopsticks--full {
+    opacity: 0;
+}
+
+.balance-section--result.balance-section--right:not(.balance-section--mint) .balance-board__chopsticks {
+    opacity: 0;
+}
+
+.balance-section--result.balance-section--right:not(.balance-section--mint) .balance-board__chopsticks--full {
+    opacity: 1;
+}
 
 /*
  * `절대 안됨` = 떼어 주지 않는다. 그래서 젓가락이 집고 있던 깻잎을 도로 접시에 떨어뜨린다.
@@ -2372,6 +2897,7 @@ img.ai-card__mascot {
 .balance-section--result.balance-section--right:not(.balance-section--mint) .balance-board__leaf {
     animation: perilla-drop 820ms cubic-bezier(.4, 0, .7, 1) 140ms both;
 }
+
 /* 빈 젓가락이 허공에 박제된 것처럼 보이지 않게, 놓는 순간 살짝 물러난다. */
 .balance-section--result.balance-section--right:not(.balance-section--mint) .balance-board__chopsticks,
 .balance-section--result.balance-section--right:not(.balance-section--mint) .balance-board__chopsticks--full {
@@ -2379,20 +2905,33 @@ img.ai-card__mascot {
 }
 
 @keyframes perilla-drop {
+
     /* 놓기 직전 잠깐 들렸다가 떨어진다. 바로 떨어뜨리면 놓는 동작이 안 보인다. */
-    0% { transform: none; }
+    0% {
+        transform: none;
+    }
 
-    16% { transform: translate(-3px, -10px) rotate(-8deg); }
+    16% {
+        transform: translate(-3px, -10px) rotate(-8deg);
+    }
 
-    100% { transform: translate(-76px, 58px) rotate(26deg); }
+    100% {
+        transform: translate(-76px, 58px) rotate(26deg);
+    }
 }
 
 @keyframes chopsticks-release {
-    0% { transform: none; }
+    0% {
+        transform: none;
+    }
 
-    18% { transform: translate(0, -4px) rotate(-2deg); }
+    18% {
+        transform: translate(0, -4px) rotate(-2deg);
+    }
 
-    100% { transform: translate(4px, -10px) rotate(-5deg); }
+    100% {
+        transform: translate(4px, -10px) rotate(-5deg);
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
