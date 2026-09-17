@@ -199,7 +199,7 @@ export const personalizedRecommendation = {
 /** 섹션 제목 — 시안의 `SectionTitle` 인스턴스 값 */
 export const homeSectionTitles = {
   today: { title: '오늘의 사건' },
-  recent: { title: '최근 본 사건', action: '더보기 +' },
+  recent: { title: '최근 본 사건' },
   balance: { title: '밸런스 게임' },
   closeCall: { title: '막상막하', description: '한 표로 달라질 수 있는, 팽팽한 사건', action: '자세히 보기' },
   afterStory: { title: '왈가왈후~', description: '판정 이후, 이렇게 달라졌어요.', action: '더보기' },

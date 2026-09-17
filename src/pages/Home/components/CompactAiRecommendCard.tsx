@@ -30,7 +30,7 @@ function CompactAiRecommendCard() {
     <aside className="ai-section" aria-label="AI 추천 안내">
       <SectionTitle
         title={homeSectionTitles.aiRecommend.title}
-        description={homeSectionTitles.aiRecommend.description}
+        description="비슷한 고민을 먼저 살펴보세요."
       />
       {isAuthenticated ? (
         <div className="ai-card">{content}</div>

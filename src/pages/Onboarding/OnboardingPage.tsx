@@ -29,7 +29,7 @@ const STEP_COPY = [
   },
   {
     title: <>판결 <em>그 후의 이야기</em>도<br />함께 만나보세요</>,
-    description: 'AI 판멍이가 당신의 이야기를 먼저 들어드려요',
+    description: '판결 뒤, 관계가 어떻게 달라졌는지 함께 살펴보세요.',
   },
 ] as const
 
@@ -65,7 +65,17 @@ function FirstScene() {
 function SecondScene() {
   return (
     <div className="onboarding-page__scene onboarding-page__scene--video" aria-hidden="true">
-      <video autoPlay loop muted playsInline preload="auto" src={onboardingVideo} />
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        src={onboardingVideo}
+        onLoadedMetadata={(event) => {
+          event.currentTarget.playbackRate = 0.9
+        }}
+      />
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import type { FormEvent } from 'react'
 import useLoginGate from '../../hooks/useLoginGate'
@@ -115,6 +115,49 @@ const COMMUNITY_AFTER_STORIES = [
     title: '친구에게 빌려준 300만 원, 6개월째 미변제', summary: '직접 대화한 뒤 서로 오해를 풀었어요.', reactions: 3,
   },
 ] as const
+
+type CommunityAfterStory = typeof COMMUNITY_AFTER_STORIES[number]
+
+function CommunityAfterStoryCard({ story }: { story: CommunityAfterStory }) {
+  const cardRef = useRef<HTMLElement>(null)
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    const card = cardRef.current
+    if (!card || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setIsVisible(true)
+      return
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      setIsVisible(true)
+      observer.disconnect()
+    /*
+     * 하단 내비게이션(100px)은 화면을 덮기 때문에, 그 영역에서 보이는 카드로는
+     * 등장 효과를 시작하지 않는다. 테이프까지 네비게이션 위로 올라온 뒤에만 연다.
+     */
+    }, { rootMargin: '0px 0px -100px 0px', threshold: 0.2 })
+
+    observer.observe(card)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <article
+      className={'afterstory-community-card afterstory-community-card--' + story.tone + (isVisible ? ' is-visible' : '')}
+      ref={cardRef}
+    >
+      <span className="afterstory-community-card__tape" aria-hidden="true" />
+      <header>
+        <span className="afterstory-community-card__category">{story.category}</span>
+        <span>{story.updatedAt} · 공감 {story.reactions}</span>
+      </header>
+      <h3 title={story.title}>{story.title}</h3>
+      <p className="afterstory-community-card__outcome">{story.summary}</p>
+    </article>
+  )
+}
 interface AfterStoryLocationState { content?: string; from?: string }
 
 /**
@@ -205,15 +248,7 @@ export function AfterStoryHomePage() {
 
           <div className="afterstory-community__list">
             {COMMUNITY_AFTER_STORIES.map((story) => (
-              <article className={'afterstory-community-card afterstory-community-card--' + story.tone} key={story.id}>
-                <span className="afterstory-community-card__tape" aria-hidden="true" />
-                <header>
-                  <span className="afterstory-community-card__category">{story.category}</span>
-                  <span>{story.updatedAt} · 공감 {story.reactions}</span>
-                </header>
-                <h3 title={story.title}>{story.title}</h3>
-                <p className="afterstory-community-card__outcome">{story.summary}</p>
-              </article>
+              <CommunityAfterStoryCard key={story.id} story={story} />
             ))}
           </div>
         </section>

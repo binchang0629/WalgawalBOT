@@ -364,28 +364,35 @@
 }
 
 .afterstory-community--board .afterstory-community-card {
+  --note-rotation: -0.65deg;
   position: relative;
   padding: 22px 18px 18px;
   border: 0;
   border-radius: 2px;
   background: #fffdf8;
   box-shadow: 0 5px 12px rgb(97 77 40 / 0.14);
-  transform: rotate(-0.65deg);
+  opacity: 0;
+  transform: rotate(var(--note-rotation));
+}
+
+.afterstory-community--board .afterstory-community-card.is-visible {
+  animation: afterstory-note-arrive 680ms cubic-bezier(.22, 1, .36, 1) both;
 }
 
 .afterstory-community--board .afterstory-community-card:nth-child(2) {
+  --note-rotation: 0.7deg;
   margin-left: 13px;
   background: #eaf6ff;
-  transform: rotate(0.7deg);
 }
 
 .afterstory-community--board .afterstory-community-card:nth-child(3) {
+  --note-rotation: -0.32deg;
   margin-right: 11px;
   background: #fff;
-  transform: rotate(-0.32deg);
 }
 
 .afterstory-community-card__tape {
+  --tape-rotation: -2deg;
   position: absolute;
   top: -9px;
   left: 50%;
@@ -394,12 +401,27 @@
   border: 1px solid rgb(255 255 255 / 0.35);
   background: rgb(255 211 150 / 0.8);
   opacity: 0.92;
-  transform: translateX(-50%) rotate(-2deg);
+  transform: translateX(-50%) rotate(var(--tape-rotation));
+}
+
+.afterstory-community--board .afterstory-community-card.is-visible .afterstory-community-card__tape {
+  animation: afterstory-tape-settle 340ms 300ms cubic-bezier(.34, 1.2, .64, 1) both;
 }
 
 .afterstory-community--board .afterstory-community-card:nth-child(2) .afterstory-community-card__tape {
   background: rgb(180 215 255 / 0.78);
-  transform: translateX(-50%) rotate(1.6deg);
+  --tape-rotation: 1.6deg;
+}
+
+@keyframes afterstory-note-arrive {
+  from { opacity: 0; transform: translateY(16px) rotate(var(--note-rotation)); }
+  72% { opacity: 1; transform: translateY(-2px) rotate(var(--note-rotation)); }
+  to { opacity: 1; transform: translateY(0) rotate(var(--note-rotation)); }
+}
+
+@keyframes afterstory-tape-settle {
+  from { opacity: 0; transform: translateX(-50%) translateY(-5px) scaleX(.72) rotate(var(--tape-rotation)); }
+  to { opacity: .92; transform: translateX(-50%) translateY(0) scaleX(1) rotate(var(--tape-rotation)); }
 }
 
 .afterstory-community--board .afterstory-community-card h3 {
@@ -597,4 +619,15 @@
 
 .afterstory-community--board::before {
   border-color: #fff6dc;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .afterstory-community--board .afterstory-community-card,
+  .afterstory-community-card__tape {
+    animation: none;
+  }
+
+  .afterstory-community--board .afterstory-community-card {
+    opacity: 1;
+  }
 }

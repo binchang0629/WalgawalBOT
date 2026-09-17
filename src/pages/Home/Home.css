@@ -2196,16 +2196,17 @@ img.ai-card__mascot {
     transition-delay: 190ms;
 }
 .letter .letter__paper {
-    opacity: .96;
-    transform: translateX(-50%) translateY(175px) scale(.96);
-    transition: transform 680ms cubic-bezier(.22, 1, .36, 1), opacity 260ms ease;
+  opacity: .96;
+  transform: translateX(-50%) translateY(175px) scale(.96);
+  /* 봉투 안에 들어간 종이의 아랫부분은 열리는 동안에도 앞면 뒤에 남긴다. */
+  clip-path: inset(-24px 0 39px);
+  transition: transform 680ms cubic-bezier(.22, 1, .36, 1), opacity 260ms ease;
 }
 .letter.is-open .letter__paper {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
-    transition-delay: 210ms;
-    /* 위쪽 그림자는 남기되, 봉투 아래로 빠지는 종이 하단은 가린다. */
-    clip-path: inset(-24px 0 39px);
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+  /* 앞면이 불투명해진 뒤, 그 뒤쪽에서 편지지가 빠져나온다. */
+  transition-delay: 400ms;
 }
 .letter .letter__content {
     opacity: 0;
@@ -2214,13 +2215,13 @@ img.ai-card__mascot {
     transition: transform 180ms ease, opacity 180ms ease, visibility 0s linear 180ms;
 }
 .letter.is-open .letter__content {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);
-    transition: transform 480ms cubic-bezier(.22, 1, .36, 1) 620ms, opacity 340ms ease 620ms, visibility 0s linear 620ms;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  transition: transform 480ms cubic-bezier(.22, 1, .36, 1) 800ms, opacity 340ms ease 800ms, visibility 0s linear 800ms;
 }
 .letter.is-open .letter__cta {
-    animation: letter-cta-appear 280ms ease 840ms both;
+  animation: letter-cta-appear 280ms ease 1020ms both;
 }
 @keyframes letter-cta-appear {
     from { opacity: 0; transform: translateX(-50%) translateY(6px); }

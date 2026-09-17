@@ -17,8 +17,6 @@ function RecentCasesSection() {
     <section className="recent-section">
       <SectionTitle
         title={homeSectionTitles.recent.title}
-        action={homeSectionTitles.recent.action}
-        actionArrow={false}
       />
 
       <div className="recent-section__grid">
