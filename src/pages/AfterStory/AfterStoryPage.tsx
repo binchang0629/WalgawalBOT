@@ -8,7 +8,7 @@ import EmptyCaseState from '../../components/common/EmptyCaseState'
 import CaseFolderCard from '../../components/common/CaseFolderCard'
 import CompletionScene from '../../components/common/CompletionScene'
 import IconCloseButton from '../../components/common/IconCloseButton'
-import { PATHS, toAfterStoryDetail } from '../../routes/paths'
+import { PATHS, toAfterStoryDetail, toCaseDetail } from '../../routes/paths'
 import CaseSubmitProgress from '../Submit/components/CaseSubmitProgress'
 import CaseSubmitDemoFill from '../Submit/components/CaseSubmitDemoFill'
 import backIcon from '../../assets/my/back.svg'
@@ -17,6 +17,8 @@ import { profileAvatars } from '../../data/common/profileAvatars'
 import CommentThread from '../../components/common/CommentThread'
 import Pagination from '../../components/common/Pagination'
 import { afterStoryAuthor, afterStoryComments, afterStoryLetter } from '../../data/common/afterStoryDetailContent'
+import { COMMUNITY_AFTER_STORIES } from '../../data/common/afterStoryList'
+import { withJihoonAfterStoryComment } from '../../data/personas/jihoonComments'
 import { afterStoryCardComments, parseElapsedMinutes, retimeComments } from '../../data/common/afterStoryCardComments'
 import scrollBackground from '../../assets/afterstory/figma/scroll-background.png'
 import letterPaper from '../../assets/afterstory/figma/letter-paper.png'
@@ -158,122 +160,14 @@ const MY_CLOSED_CASES = [
  * 연인·가족·직장이 각각 한 건씩 모자라서, 그 세 건은 같은 결의 생활 갈등으로 새로 썼다.
  * (id에 광장 사건이 없으면 상세 화면이 공통 후일담 문구로 채운다.)
  */
-const COMMUNITY_AFTER_STORIES = [
-  {
-    id: 'birthday-gift', category: '친구', tone: 'friend', updatedAt: '5분 전',
-    title: '친한 친구의 생일 선물 때문에 생긴 오해', summary: '늦게라도 마음을 전하고 화해했어요.', reactions: 4,
-  },
-  {
-    id: 'video-payment', category: '직장', tone: 'company', updatedAt: '12분 전',
-    title: '카페 홍보영상 제작, 수정 범위와 잔금 갈등', summary: '최종본을 전달한 뒤 잔금도 무사히 받았어요.', reactions: 7,
-  },
-  {
-    id: 'friend-loan', category: '친구', tone: 'friend', updatedAt: '19분 전',
-    title: '친구에게 빌려준 300만 원, 6개월째 미변제', summary: '직접 대화한 뒤 서로 오해를 풀었어요.', reactions: 3,
-  },
-  {
-    id: 'idea-credit-card', category: '직장', tone: 'company', updatedAt: '27분 전',
-    title: '상사가 제 아이디어를 자신의 공로로 발표했어요', summary: '기록을 정리해 공동 기여를 인정받았어요.', reactions: 5,
-  },
-  {
-    id: 'secret-told', category: '친구', tone: 'friend', updatedAt: '34분 전',
-    title: '친구가 제 비밀을 다른 친구에게 말했어요', summary: '서로의 경계를 다시 정하며 대화를 이어갔어요.', reactions: 2,
-  },
-  {
-    id: 'anniversary', category: '연인', tone: 'friend', updatedAt: '42분 전',
-    title: '기념일 약속을 깜빡한 연인에게 서운함을 말해도 될까요?', summary: '바랐던 마음을 솔직하게 전하고 오해를 풀었어요.', reactions: 6,
-  },
-  {
-    id: 'phone-notification', category: '연인', tone: 'friend', updatedAt: '51분 전',
-    title: '연인이 제 휴대폰 알림을 보는 건 관심일까요, 침해일까요?', summary: '서로 지켜야 할 사적인 경계를 정했어요.', reactions: 4,
-  },
-  {
-    id: 'travel-cost', category: '연인', tone: 'friend', updatedAt: '1시간 전',
-    title: '여행 경비를 더 낸 쪽이 일정을 정해도 되는 걸까요?', summary: '비용과 일정 기준을 함께 다시 정했어요.', reactions: 5,
-  },
-  {
-    id: 'trip-cancel', category: '친구', tone: 'friend', updatedAt: '1시간 15분 전',
-    title: '여행 직전 취소한 친구에게 예약금을 모두 받아야 할까요?', summary: '환불 가능한 부분부터 차분히 정리했어요.', reactions: 3,
-  },
-  {
-    id: 'group-chat', category: '친구', tone: 'friend', updatedAt: '1시간 30분 전',
-    title: '단체 대화방에서 제 이야기만 빼고 약속을 잡는 친구들', summary: '서운했던 점을 전하고 다음 약속을 함께 잡았어요.', reactions: 8,
-  },
-  {
-    id: 'parents-interfere', category: '가족', tone: 'friend', updatedAt: '2시간 전',
-    title: '부모님이 제 결정에 너무 간섭하세요', summary: '서로 존중할 수 있는 결정 범위를 정했어요.', reactions: 5,
-  },
-  {
-    id: 'family-care', category: '가족', tone: 'friend', updatedAt: '2시간 20분 전',
-    title: '부모님 병원 동행을 저에게만 부탁하는 형제자매', summary: '돌봄 일정을 나눠 맡기로 했어요.', reactions: 7,
-  },
-  {
-    id: 'after-hours', category: '직장', tone: 'company', updatedAt: '2시간 45분 전',
-    title: '퇴근 뒤 단체 대화방 업무 지시에 답하지 않았어요', summary: '근무 시간의 연락 기준을 팀과 맞췄어요.', reactions: 4,
-  },
-  {
-    id: 'attendance', category: '학업', tone: 'friend', updatedAt: '3시간 전',
-    title: '친구 대신 출석을 불러달라는 부탁을 거절했더니 멀어졌어요', summary: '규정을 지키는 이유를 설명하고 풀었어요.', reactions: 6,
-  },
-  {
-    id: 'ai-report', category: '학업', tone: 'friend', updatedAt: '3시간 20분 전',
-    title: 'AI를 활용한 과제라서 표절이 아니라는 조원의 주장', summary: '과제 도구 사용 기준을 다시 정리했어요.', reactions: 9,
-  },
-
-  /* ── 여기부터는 태그마다 5건을 채우려고 추가한 후일담 ── */
-
-  // 연인
-  {
-    id: 'invite-ex', category: '연인', tone: 'friend', updatedAt: '3시간 40분 전',
-    title: '전 애인을 친구 모임에 초대해도 괜찮을까요?', summary: '모임 전에 미리 알리기로 약속했어요.', reactions: 5,
-  },
-  {
-    id: 'reply-pace', category: '연인', tone: 'friend', updatedAt: '4시간 전',
-    title: '연락 빈도가 서로 달라 서운함이 쌓였어요', summary: '바쁜 시간대를 공유하고 기대치를 맞췄어요.', reactions: 6,
-  },
-
-  // 가족
-  {
-    id: 'family-living-expenses', category: '가족', tone: 'friend', updatedAt: '4시간 20분 전',
-    title: '취업 후에도 생활비를 전부 내라는 부모님 말씀', summary: '부담 가능한 금액을 함께 정했어요.', reactions: 8,
-  },
-  {
-    id: 'family-moving', category: '가족', tone: 'friend', updatedAt: '4시간 45분 전',
-    title: '이사 날짜를 가족이 먼저 정한 뒤 도움을 부탁했어요', summary: '다음부터는 일정을 먼저 묻기로 했어요.', reactions: 4,
-  },
-  {
-    id: 'holiday-schedule', category: '가족', tone: 'friend', updatedAt: '5시간 전',
-    title: '명절마다 한쪽 집에만 가는 일정이 반복됐어요', summary: '해마다 번갈아 가기로 정리했어요.', reactions: 7,
-  },
-
-  // 직장
-  {
-    id: 'work-new-hire', category: '직장', tone: 'company', updatedAt: '5시간 20분 전',
-    title: '신입 교육 자료를 혼자 만들라는 요청이 부담스러워요', summary: '분량을 나누고 마감을 다시 잡았어요.', reactions: 6,
-  },
-  {
-    id: 'team-dinner', category: '직장', tone: 'company', updatedAt: '5시간 45분 전',
-    title: '회식 불참을 말했더니 분위기가 어색해졌어요', summary: '참석 기준을 팀과 미리 공유하기로 했어요.', reactions: 5,
-  },
-
-  // 학업
-  {
-    id: 'group-project-credit', category: '학업', tone: 'friend', updatedAt: '6시간 전',
-    title: '조별 과제에서 친구를 공개적으로 지적한 사건', summary: '먼저 사과한 뒤 서로의 의견을 묻게 됐어요.', reactions: 9,
-  },
-  {
-    id: 'school-lab-data', category: '학업', tone: 'friend', updatedAt: '6시간 20분 전',
-    title: '실험 결과가 나오지 않아 데이터를 다시 정리하자고 했어요', summary: '기록 방식을 통일하고 다시 측정했어요.', reactions: 4,
-  },
-  {
-    id: 'study-presentation', category: '학업', tone: 'friend', updatedAt: '6시간 45분 전',
-    title: '제 의견은 무시하고 팀원이 발표 자료를 바꿨어요', summary: '수정 전에 서로 확인하기로 했어요.', reactions: 7,
-  },
-] as const
-
 const AFTER_STORY_CATEGORIES = ['전체', '연인', '친구', '가족', '직장', '학업'] as const
 type AfterStoryCategory = (typeof AFTER_STORY_CATEGORIES)[number]
-const AFTER_STORIES_PER_PAGE = 5
+
+/*
+ * 한 장에 4건. 후일담 16건을 5개씩 끊으면 마지막 장에 한 건만 남는다.
+ * 광장 목록도 4개 단위라 페이지 모양이 서로 맞는다. (PROJECT_SPEC.md §9-14)
+ */
+const AFTER_STORIES_PER_PAGE = 4
 
 interface AfterStoryLocationState {
   content?: string
@@ -683,7 +577,14 @@ export function AfterStoryDetailPage() {
   const baseComments = storyId && storyId in afterStoryCardComments
     ? afterStoryCardComments[storyId as keyof typeof afterStoryCardComments]
     : afterStoryComments
-  const comments = retimeComments(baseComments, parseElapsedMinutes(communityStory?.updatedAt))
+  /*
+   * 지훈 계정이 예전에 남긴 댓글은 이 목록의 한 자리를 대신한다.
+   * MY > 내가 쓴 댓글에서 눌러 들어왔을 때 같은 글이 실제로 있어야 한다.
+   */
+  const comments = withJihoonAfterStoryComment(
+    storyId,
+    retimeComments(baseComments, parseElapsedMinutes(communityStory?.updatedAt)),
+  )
 
   if (storyId !== 'friend' && !variant && !communityStory) return <Navigate to={PATHS.afterStory} replace />
 
@@ -727,6 +628,19 @@ export function AfterStoryDetailPage() {
               <strong>{author.name}</strong>
               <span>{author.meta}</span>
             </div>
+            {/*
+              읽다가 `무슨 사건이었더라` 싶을 때 바로 돌아갈 곳을 둔다.
+              광장 목록 밖으로 밀려난 예전 사건의 후일담은 갈 곳이 없어 버튼을 그리지 않는다.
+            */}
+            {communityStory?.caseId && (
+              <Link
+                className="afterstory-detail__case-link"
+                to={toCaseDetail(communityStory.caseId)}
+                aria-label={`${communityStory.title} 사건 상세로 이동`}
+              >
+                그날의 사건 보기<span aria-hidden="true">›</span>
+              </Link>
+            )}
           </div>
 
           <article className={`afterstory-detail__letter${variant && storyId !== 'afterstory-secret-told' ? ' afterstory-detail__letter--long' : ''}`} aria-label="후일담 전문">

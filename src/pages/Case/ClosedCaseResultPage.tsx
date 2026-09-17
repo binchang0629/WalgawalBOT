@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import type { FormEvent } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import dislikeIcon from '../../assets/case/result/dislike.svg'
 import emojiIcon from '../../assets/case/result/emoji.svg'
@@ -20,6 +20,7 @@ import {
   jihoonSimilarReasonComparison,
   jihoonSimilarResult,
 } from '../../data/common/jihoonSimilarCaseContent'
+import { findAfterStoryByCaseId, toAfterStoryId } from '../../data/common/afterStoryList'
 import { getPlazaCaseStory, getPlazaJuryBreakdown } from '../../data/common/plazaCaseStories'
 import type {
   JihoonSimilarComment,
@@ -29,7 +30,7 @@ import useSession from '../../hooks/useSession'
 import { addMyComment } from '../../utils/myComments'
 import useToast from '../../hooks/useToast'
 import useLoginGate from '../../hooks/useLoginGate'
-import { PATHS } from '../../routes/paths'
+import { PATHS, toAfterStoryDetail } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
 import CommentStickerPicker from './components/CommentStickerPicker'
 import VerdictDisagreementHero from './components/VerdictDisagreementHero'
@@ -37,6 +38,9 @@ import VerdictReasonComparison from './components/VerdictReasonComparison'
 import ResultBreakdown from './components/ResultBreakdown'
 import './CaseResultPage.css'
 import './ClosedCaseResultPage.css'
+
+/** 이 사건(카페 홍보영상 잔금)의 후일담. `afterStoryList.ts`의 `video-payment`와 같은 글이다. */
+const JIHOON_AFTER_STORY_ID = 'afterstory-video-payment'
 
 const COMMENTS_PER_PAGE = 5
 const MAX_COMMENT_PAGES = 5
@@ -165,10 +169,13 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
 function ClosedCaseResultPage() {
   const { caseId } = useParams()
   const plazaStory = getPlazaCaseStory(caseId)
+  // 이 사건에 이어진 후일담. 없으면 맨 아래 후일담 카드를 그리지 않는다.
+  const plazaAfterStory = findAfterStoryByCaseId(plazaStory?.id)
   const { currentUser, sessionStatus, personaId } = useSession()
   const { showToast } = useToast()
   const { requireLogin } = useLoginGate()
   const location = useLocation()
+  const navigate = useNavigate()
   const routeState = location.state as { fromPlaza?: boolean; returnTo?: string; homeCaseId?: string } | null
   const [draft, setDraft] = useState('')
   const [selectedStickerId, setSelectedStickerId] = useState<CommentStickerId | null>(null)
@@ -417,16 +424,68 @@ function ClosedCaseResultPage() {
           </div>
         </section>}
 
+        {/*
+          해결된 광장 사건의 후일담. `AppRoutes`가 status가 closed인 광장 사건 결과를
+          모두 이 화면으로 보내므로, 후일담 카드도 여기서 그려야 한다.
+          투표 중인 사건에는 후일담이 없어 이 자리가 비어 있다.
+        */}
+        {plazaAfterStory?.quote && <section className="after-story" aria-labelledby="after-story-title">
+          <h2 id="after-story-title">이 사건의 후일담</h2>
+          <Link
+            className="after-story__link"
+            to={toAfterStoryDetail(toAfterStoryId(plazaAfterStory.id))}
+            state={{ from: location.pathname, caseResultState: routeState }}
+            aria-label={`${plazaAfterStory.title} 후일담 보기`}
+            onClick={(event) => {
+              if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+              event.preventDefault()
+              const scrollTop = event.currentTarget.closest<HTMLElement>('.main-layout__scroll')?.scrollTop ?? 0
+              navigate(toAfterStoryDetail(toAfterStoryId(plazaAfterStory.id)), {
+                state: { from: location.pathname, caseResultState: routeState, caseResultScrollTop: scrollTop },
+              })
+            }}
+          >
+            <article>
+              <blockquote>{plazaAfterStory.quote}</blockquote>
+              <img className="after-story__divider" src={quoteDivider} alt="" />
+              <div>
+                <p>{plazaAfterStory.title}</p>
+                <span><img src={storyLinkIcon} alt="" /></span>
+              </div>
+            </article>
+          </Link>
+        </section>}
+
+        {/*
+          카드 전체가 이 사건의 후일담으로 가는 링크다. 화살표만 눌리는 것처럼 보이지만
+          실제로는 아무 데로도 가지 않던 자리라, 카드째 연결한다.
+          돌아올 위치와 스크롤을 같이 넘겨서 뒤로가기가 보던 자리로 되돌아온다.
+        */}
         {!plazaStory && <section className="after-story" aria-labelledby="after-story-title">
           <h2 id="after-story-title">이 사건의 후일담</h2>
-          <article>
-            <blockquote>{jihoonSimilarResult.afterStory.quote}</blockquote>
-            <img className="after-story__divider" src={quoteDivider} alt="" />
-            <div>
-              <p>{jihoonSimilarResult.afterStory.title}</p>
-              <span><img src={storyLinkIcon} alt="" /></span>
-            </div>
-          </article>
+          <Link
+            className="after-story__link"
+            to={toAfterStoryDetail(JIHOON_AFTER_STORY_ID)}
+            state={{ from: location.pathname, caseResultState: routeState }}
+            aria-label={`${jihoonSimilarResult.afterStory.title.replace('\n', ' ')} 후일담 보기`}
+            onClick={(event) => {
+              if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+              event.preventDefault()
+              const scrollTop = event.currentTarget.closest<HTMLElement>('.main-layout__scroll')?.scrollTop ?? 0
+              navigate(toAfterStoryDetail(JIHOON_AFTER_STORY_ID), {
+                state: { from: location.pathname, caseResultState: routeState, caseResultScrollTop: scrollTop },
+              })
+            }}
+          >
+            <article>
+              <blockquote>{jihoonSimilarResult.afterStory.quote}</blockquote>
+              <img className="after-story__divider" src={quoteDivider} alt="" />
+              <div>
+                <p>{jihoonSimilarResult.afterStory.title}</p>
+                <span><img src={storyLinkIcon} alt="" /></span>
+              </div>
+            </article>
+          </Link>
         </section>}
       </div>
       {pendingDeleteId && (

@@ -139,15 +139,21 @@ const secretSeeds: CommentSeed[] = [
 const avatars = profileAvatars
 
 /**
- * `5분 전`, `1시간 15분 전` 같은 문구를 분으로 바꾼다.
+ * `24분 전`, `3시간 전`, `2일 전` 같은 문구를 분으로 바꾼다.
  * 후일담 카드의 updatedAt이 이 형식이라, 댓글 시각을 맞출 때 기준으로 쓴다.
+ *
+ * 목록 뒤쪽 글은 하루가 넘어 `N일 전`으로 적히므로 일 단위도 함께 읽는다.
+ * 빠뜨리면 그 글들의 댓글 시각이 원래 값으로 남아 글보다 오래된 댓글이 생긴다.
  */
 export function parseElapsedMinutes(label: string | undefined): number | null {
   if (!label) return null
+  const days = /(\d+)\s*일/.exec(label)
   const hours = /(\d+)\s*시간/.exec(label)
   const minutes = /(\d+)\s*분/.exec(label)
-  if (!hours && !minutes) return null
-  return (hours ? Number(hours[1]) * 60 : 0) + (minutes ? Number(minutes[1]) : 0)
+  if (!days && !hours && !minutes) return null
+  return (days ? Number(days[1]) * 24 * 60 : 0)
+    + (hours ? Number(hours[1]) * 60 : 0)
+    + (minutes ? Number(minutes[1]) : 0)
 }
 
 /**

@@ -512,9 +512,14 @@
 .afterstory-community--board .afterstory-community__list {
   gap: 28px;
 }
-/* 섹션 안내와 첫 메모 사이에 숨 쉴 여백을 둔다. */
+/*
+ * 제목 아래 안내 문구의 간격. 배심원 광장의 `전체 사건` 머리글과 같은 값을 쓴다.
+ * 광장은 제목~설명 4px, 설명~검색창 22px이다. (Plaza.css의 `.case-feed` gap과 `.case-feed__description`)
+ * 전에는 안내 아래가 32px이었는데, 그때는 바로 메모 목록이 붙어 있었다.
+ * 지금은 사이에 검색창이 들어와 두 화면의 머리글 높이가 눈에 띄게 달라 보였다.
+ */
 .afterstory-community--board .afterstory-community__intro {
-  margin-bottom: 32px;
+  margin: 4px 0 22px;
 }
 /* 내가 쓴 후일담: 내 이야기만 한눈에 확인하는 전용 목록 */
 /*
@@ -715,21 +720,68 @@
   margin-bottom: 30px;
 }
 
+/*
+ * 배심원 광장의 검색창(`.case-search`)과 같은 모양이다.
+ * 테두리는 단색이 아니라 conic-gradient를 border-box에 깔고 안쪽만 흰색으로 덮은 것이라,
+ * 각도를 돌리면 밝은 부분이 테두리를 따라 한 바퀴 도는 것처럼 보인다.
+ *
+ * 각도 변수는 광장 것과 이름을 나눠 뒀다. 같은 이름을 쓰면 한쪽 화면의 CSS만 불러온
+ * 개발 환경에서 `@property` 선언이 없어 애니메이션이 멈춘다.
+ */
 .afterstory-discovery__search {
+  --afterstory-search-stroke-angle: 0deg;
+
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
   height: 46px;
   padding: 0 14px;
-  border: 2px solid var(--blue-200);
+  overflow: hidden;
+  border: 2px solid transparent;
   border-radius: 23px;
-  background: #fff;
-  box-shadow: 0 4px 12px rgb(77 142 253 / 7%);
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    conic-gradient(
+      from var(--afterstory-search-stroke-angle),
+      var(--blue-100) 0deg 212deg,
+      var(--blue-150) 238deg,
+      rgb(143 192 255) 270deg,
+      var(--blue-200) 300deg,
+      rgb(143 192 255) 328deg,
+      var(--blue-150) 350deg,
+      var(--blue-100) 360deg
+    ) border-box;
+  box-shadow:
+    0 0 0 1px rgb(129 183 255 / 8%),
+    0 4px 12px rgb(77 142 253 / 7%);
+  transition: box-shadow 160ms ease;
+  animation: afterstory-search-stroke-orbit 2.6s linear infinite;
 }
 
 .afterstory-discovery__search:focus-within {
-  border-color: var(--blue-500);
-  box-shadow: 0 0 0 3px rgb(129 183 255 / 12%), 0 4px 12px rgb(55 75 255 / 5%);
+  box-shadow:
+    0 0 0 3px rgb(129 183 255 / 12%),
+    0 4px 12px rgb(55 75 255 / 5%);
+}
+
+@property --afterstory-search-stroke-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes afterstory-search-stroke-orbit {
+  to {
+    --afterstory-search-stroke-angle: 360deg;
+  }
+}
+
+/* 움직임을 줄이는 설정에서는 테두리가 돌지 않고 한자리에 머문다. */
+@media (prefers-reduced-motion: reduce) {
+  .afterstory-discovery__search {
+    animation: none;
+  }
 }
 
 .afterstory-discovery__search > img {

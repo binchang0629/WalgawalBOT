@@ -1,4 +1,5 @@
 import { DEMO } from '../config/app'
+import { jihoonCommentRecords } from '../data/personas/jihoonComments'
 import type { PersonaId } from '../types'
 
 /**
@@ -42,18 +43,34 @@ function isRecord(value: unknown): value is MyCommentRecord {
     && typeof item.createdAt === 'number'
 }
 
-/** 최신 댓글이 앞에 온다. */
-export function readMyComments(personaId: PersonaId): MyCommentRecord[] {
+/**
+ * 이 계정이 시연 시작 시점에 이미 갖고 있는 댓글.
+ *
+ * 지훈은 기존 사용자라 처음부터 지난 댓글이 있어야 자연스럽다. 광장 사건에 미리 심어 둔
+ * 12건을 여기서 함께 읽는다. (`data/personas/jihoonComments.ts`)
+ * 서아는 신규 가입이라 비어 있고, 직접 댓글을 써야 목록이 생긴다.
+ */
+function seededRecords(personaId: PersonaId): MyCommentRecord[] {
+  return personaId === 'B' ? jihoonCommentRecords() : []
+}
+
+function readStoredRecords(personaId: PersonaId): MyCommentRecord[] {
   try {
     const raw = window.localStorage.getItem(storageKey(personaId))
     if (!raw) return []
     const parsed: unknown = JSON.parse(raw)
     if (!Array.isArray(parsed)) return []
-    return parsed.filter(isRecord).sort((a, b) => b.createdAt - a.createdAt)
+    return parsed.filter(isRecord)
   } catch {
     // 저장소를 못 쓰거나 값이 깨진 경우. 기록이 없는 것으로 본다.
     return []
   }
+}
+
+/** 최신 댓글이 앞에 온다. 미리 심어 둔 댓글과 직접 쓴 댓글을 시각 순으로 함께 늘어놓는다. */
+export function readMyComments(personaId: PersonaId): MyCommentRecord[] {
+  return [...readStoredRecords(personaId), ...seededRecords(personaId)]
+    .sort((a, b) => b.createdAt - a.createdAt)
 }
 
 export function addMyComment(personaId: PersonaId, record: Omit<MyCommentRecord, 'id' | 'createdAt'>) {
@@ -61,9 +78,10 @@ export function addMyComment(personaId: PersonaId, record: Omit<MyCommentRecord,
   if (!body) return
 
   try {
+    // 미리 심어 둔 댓글은 저장소에 다시 쓰지 않는다. 직접 쓴 것만 쌓는다.
     const next: MyCommentRecord[] = [
       { ...record, body, id: `my-comment-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, createdAt: Date.now() },
-      ...readMyComments(personaId),
+      ...readStoredRecords(personaId),
     ].slice(0, MAX_RECORDS)
     window.localStorage.setItem(storageKey(personaId), JSON.stringify(next))
   } catch {

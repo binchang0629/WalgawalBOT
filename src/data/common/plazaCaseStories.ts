@@ -3,6 +3,7 @@ import writerArtwork from '../../assets/case/result/panmung-scale-first-frame.pn
 import otherArtwork from '../../assets/case/result/panmung-scale-left-first-frame.png'
 import { weddingGiftCase, type WeddingGiftVoteId } from './caseDetailContent'
 import { latestPlazaCaseIds, plazaCases, type PlazaCase } from './plazaContent'
+import { findJihoonCommentSeed, jihoonCommentAuthor, jihoonCommentId, jihoonCommentMinutesAgo } from '../personas/jihoonComments'
 import type { ThreadComment } from '../../components/common/CommentThread'
 
 type VoteId = WeddingGiftVoteId
@@ -395,7 +396,7 @@ function seededComments(id: string, narrative: Narrative, count: number, caseAge
   const voteCounts = closedCaseVotes[id]
   const totalVotes = voteCounts ? voteIds.reduce((sum, side) => sum + voteCounts[side], 0) : 0
 
-  return Array.from({ length: count }, (_, index) => {
+  const list = Array.from({ length: count }, (_, index) => {
     const sample = totalVotes ? (index * 37 + id.length * 11) % totalVotes : 0
     const voteId = voteCounts
       ? voteIds.find((side) => sample < voteIds.slice(0, voteIds.indexOf(side) + 1)
@@ -415,6 +416,35 @@ function seededComments(id: string, narrative: Narrative, count: number, caseAge
       dislikes: index % 4 === 0 ? 1 : 0,
     }
   })
+
+  return withJihoonComment(id, list)
+}
+
+/**
+ * 지훈 계정이 예전에 남긴 댓글을 이 사건의 댓글 한 자리에 대신 넣는다.
+ *
+ * 새로 끼워 넣지 않고 기존 한 건을 바꾸는 이유는, 목록 카드에 적힌 댓글 수와
+ * 실제로 보이는 댓글 수를 같게 유지하기 위해서다.
+ * 목록은 `CommentThread`가 `minutesAgo`로 다시 정렬하므로 배열에서의 자리는 화면 순서와 무관하다.
+ */
+function withJihoonComment(caseId: string, list: ThreadComment[]): ThreadComment[] {
+  const seed = findJihoonCommentSeed(caseId)
+  if (!seed || list.length === 0) return list
+
+  const slot = Math.min(list.length - 1, Math.floor(list.length * 0.45))
+  const next = [...list]
+  next[slot] = {
+    id: jihoonCommentId(caseId),
+    nickname: jihoonCommentAuthor.nickname,
+    avatarUrl: jihoonCommentAuthor.avatarUrl,
+    minutesAgo: jihoonCommentMinutesAgo(caseId),
+    voteId: seed.voteId,
+    voteLabel: voteLabels[seed.voteId],
+    body: seed.body,
+    likes: 4,
+    dislikes: 0,
+  }
+  return next
 }
 
 const categoryCode: Record<string, string> = { 연인: 'LOVE', 친구: 'FRIEND', 가족: 'FAMILY', 직장: 'WORK', 학업: 'SCHOOL' }
