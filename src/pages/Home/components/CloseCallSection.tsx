@@ -65,7 +65,7 @@ function arcPath(fromAngle: number, toAngle: number) {
  * 시안 바늘은 반대로 7.72도(왼쪽 10.95도) 자리인데, 그 역시 손으로 놓은 값이다.
  * 어느 쪽이든 비율이 바뀌면 같은 규칙으로 따라간다.
  */
-const NEEDLE_AIM_OFFSET = 5
+const NEEDLE_AIM_OFFSET = -2
 
 /** 회전축에서 경계 지점을 바라보는 각도. 타원이라 단순 비례로는 안 맞는다. */
 function needleAngle(splitAngle: number) {
