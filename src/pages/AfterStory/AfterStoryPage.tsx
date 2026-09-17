@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import type { FormEvent } from 'react'
 import useLoginGate from '../../hooks/useLoginGate'
@@ -10,6 +10,7 @@ import backIcon from '../../assets/my/back.svg'
 import walgadakEmpathy from '../../assets/case/stickers/walgadak-empathy.png'
 import loanStoryAvatar from '../../assets/case/result/comment-avatar-2.png'
 import creditStoryAvatar from '../../assets/case/result/comment-avatar-3.png'
+import secretStoryAvatar from '../../assets/case/result/comment-avatar-4.png'
 import panMungyeeJudge from '../../assets/submit/panmung-judge-hq.png'
 import CommentThread from '../../components/common/CommentThread'
 import { afterStoryAuthor, afterStoryComments, afterStoryLetter } from '../../data/common/afterStoryDetailContent'
@@ -42,6 +43,36 @@ const DEMO_STORY = [
 ].map((paragraph) => paragraph.trimStart()).join('\n')
 
 const AFTER_STORY_DETAILS = {
+  'afterstory-birthday-gift': {
+    author: { ...afterStoryAuthor, titleLines: ['늦게라도 마음을 전하고,', '친구와 오해를 풀었어요.'], lead: '선물보다 서운했던 이유를 듣는 게 먼저였어요.', name: '늦은축하편지', avatarUrl: secretStoryAvatar },
+    lines: [
+      '친한 친구의 생일에 선물을 바로 전하지 못했어요.',
+      '바쁜 일정이 지나면 제대로 챙겨주려고 했는데',
+      '친구는 제가 생일을 잊은 줄 알고 서운해했어요.',
+      '늦게 준비한 선물만 건네면 풀릴 거라 생각했지만',
+      '먼저 왜 속상했는지 직접 물어봤어요.',
+      '친구는 비싼 선물보다 생일에 연락 한마디라도',
+      '받고 싶었다고 말했어요. 제 사정을 설명하고',
+      '제때 마음을 전하지 못한 점을 사과했어요.',
+      '뒤늦게 선물과 편지를 건넸고, 서로의 마음을',
+      '확인한 뒤 다시 편하게 이야기하게 됐어요.',
+    ],
+  },
+  'afterstory-video-payment': {
+    author: { ...afterStoryAuthor, titleLines: ['요청한 색감으로 고친 뒤,', '잔금도 받을 수 있었어요.'], lead: '수정 범위를 다시 확인하고 약속한 결과물을 전달했어요.', meta: '직장 · 후일담', name: '색감다시보기', avatarUrl: creditStoryAvatar },
+    lines: [
+      '카페 홍보영상을 180만 원에 제작했어요.',
+      '두 차례 수정했지만 의뢰인이 처음 요청한',
+      '밝고 따뜻한 색감은 충분히 반영하지 못했어요.',
+      '영상이 게시됐다는 이유만으로 잔금을 요구하기보다',
+      '계약서와 주고받은 요청을 함께 다시 확인했어요.',
+      '색감 보완 범위를 합의한 뒤 최종본을 수정했고,',
+      '계약에 포함된 원본 파일도 함께 전달했어요.',
+      '의뢰인이 최종 결과물을 확인하고 승인해',
+      '남은 잔금 90만 원을 무사히 받을 수 있었어요.',
+      '다음 작업부터는 수정 기준을 더 분명히 적어두려 해요.',
+    ],
+  },
   'afterstory-friend-loan': {
     author: { ...afterStoryAuthor, titleLines: ['직접 대화해보니,', '서로 오해를 풀었어요.'], lead: '돈 이야기를 피하지 않고 꺼내니 관계가 조금 달라졌어요.', name: '달력에동그라미', avatarUrl: loanStoryAvatar },
     lines: [
@@ -70,6 +101,20 @@ const AFTER_STORY_DETAILS = {
       '팀장도 자료를 보니 제 기여가 분명하다고 말해줬어요.',
       '최종 보고서에 두 사람의 이름이 들어가',
       '공동 기여를 인정받을 수 있었습니다.',
+    ],
+  },
+  'afterstory-secret-told': {
+    author: { ...afterStoryAuthor, titleLines: ['친구와 다시 이야기하며,', '서로의 경계를 정했어요.'], lead: '사과를 받았지만 신뢰는 천천히 회복하고 있어요.', name: '잠긴일기장', avatarUrl: secretStoryAvatar },
+    lines: [
+      '친구에게만 털어놓은 이야기가 학교에서',
+      '다른 친구들에게 전해졌다는 걸 알았어요.',
+      '화가 났지만 먼저 어떻게 된 일인지 물어봤어요.',
+      '친구는 가볍게 말해도 되는 얘기인 줄 알았다며',
+      '미안하다고 했어요. 저는 그 말이 왜 상처였는지',
+      '설명했고, 더는 제 이야기를 옮기지 말아 달라고 했어요.',
+      '친구는 들은 사람들에게도 그만 이야기해 달라고',
+      '전했어요. 예전처럼 바로 편해지진 않았지만,',
+      '이제는 서로의 허락을 먼저 묻기로 했어요.',
     ],
   },
 } as const
@@ -149,6 +194,49 @@ function CaseContextCard() {
 
 export function AfterStoryHomePage() {
   const { requireLogin } = useLoginGate()
+  const navigate = useNavigate()
+  const communityListRef = useRef<HTMLDivElement>(null)
+  const peelTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [peelingStoryId, setPeelingStoryId] = useState<string | null>(null)
+
+  useEffect(() => () => {
+    if (peelTimerRef.current) clearTimeout(peelTimerRef.current)
+  }, [])
+
+  const openCommunityStory = (storyId: string) => {
+    if (peelingStoryId) return
+    const destination = toAfterStoryDetail(`afterstory-${storyId}`)
+    const state = { from: PATHS.afterStory }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      navigate(destination, { state })
+      return
+    }
+    setPeelingStoryId(storyId)
+    peelTimerRef.current = setTimeout(() => navigate(destination, { state }), 400)
+  }
+
+  useEffect(() => {
+    const list = communityListRef.current
+    const scrollRoot = list?.closest<HTMLElement>('.main-layout__scroll')
+    if (!list || !scrollRoot) return
+
+    const cards = [...list.querySelectorAll<HTMLElement>('.afterstory-community-card')]
+    if (!('IntersectionObserver' in window)) {
+      cards.forEach((card) => card.classList.add('is-visible'))
+      return
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return
+        entry.target.classList.add('is-visible')
+        observer.unobserve(entry.target)
+      })
+    }, { root: scrollRoot, rootMargin: '0px 0px -10% 0px', threshold: 0.15 })
+
+    cards.forEach((card) => observer.observe(card))
+    return () => observer.disconnect()
+  }, [])
 
   return (
     <main className="afterstory-home">
@@ -203,9 +291,20 @@ export function AfterStoryHomePage() {
           </header>
           <p className="afterstory-community__intro">방금 작성된 이야기를 확인해보세요.</p>
 
-          <div className="afterstory-community__list">
+          <div ref={communityListRef} className="afterstory-community__list">
             {COMMUNITY_AFTER_STORIES.map((story) => (
-              <article className={'afterstory-community-card afterstory-community-card--' + story.tone} key={story.id}>
+              <Link
+                className={'afterstory-community-card afterstory-community-card--' + story.tone + ' is-pending' + (peelingStoryId === story.id ? ' is-peeling' : '')}
+                key={story.id}
+                to={toAfterStoryDetail(`afterstory-${story.id}`)}
+                state={{ from: PATHS.afterStory }}
+                onClick={(event) => {
+                  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+                  event.preventDefault()
+                  openCommunityStory(story.id)
+                }}
+                aria-label={`${story.title} 후일담 전문 읽기`}
+              >
                 <span className="afterstory-community-card__tape" aria-hidden="true" />
                 <header>
                   <span className="afterstory-community-card__category">{story.category}</span>
@@ -213,7 +312,7 @@ export function AfterStoryHomePage() {
                 </header>
                 <h3 title={story.title}>{story.title}</h3>
                 <p className="afterstory-community-card__outcome">{story.summary}</p>
-              </article>
+              </Link>
             ))}
           </div>
         </section>
@@ -235,6 +334,27 @@ export function MyPublishedAfterStoryPage() {
   const storyCount = publishedAfterStoryIds.length
   const hasStory = storyCount > 0
   const hasSubmittedCase = activityStats.submittedCases > 0
+  const storyNoteRef = useRef<HTMLAnchorElement>(null)
+
+  useEffect(() => {
+    const note = storyNoteRef.current
+    if (!hasStory || !note) return
+
+    const scrollRoot = note.closest<HTMLElement>('.main-layout__scroll')
+    if (!scrollRoot || !('IntersectionObserver' in window)) {
+      note.classList.add('is-visible')
+      return
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting) return
+      note.classList.add('is-visible')
+      observer.disconnect()
+    }, { root: scrollRoot, rootMargin: '0px 0px -10% 0px', threshold: 0.15 })
+
+    observer.observe(note)
+    return () => observer.disconnect()
+  }, [hasStory])
 
   return (
     <main className={`afterstory-home afterstory-my-stories${hasStory ? '' : ' afterstory-my-stories--empty'}`}>
@@ -253,7 +373,8 @@ export function MyPublishedAfterStoryPage() {
               돌아올 화면을 state로 같이 넘겨서, 상세의 뒤로가기가 여기로 되돌아오게 한다.
             */}
             <Link
-              className="afterstory-my-stories__item"
+              ref={storyNoteRef}
+              className="afterstory-my-stories__item is-pending"
               to={toAfterStoryDetail('friend')}
               state={{ from: PATHS.afterStoryMineStories }}
               aria-label={CONNECTED_CASE.context + ' 후일담 전문 읽기'}
@@ -309,7 +430,10 @@ export function AfterStoryDetailPage() {
 
   return (
     <main className="afterstory-detail">
-      <AfterStoryHeader title="왈가왈후~" onBack={() => navigate(backTo)} />
+      <AfterStoryHeader
+        title="왈가왈후~"
+        onBack={() => navigate(backTo, { state: backTo === PATHS.home ? { restoreHomeScroll: true } : undefined })}
+      />
       <div className="afterstory-detail__scroll">
         <section
           className="afterstory-detail__hero"
@@ -331,7 +455,7 @@ export function AfterStoryDetailPage() {
             </div>
           </div>
 
-          <article className="afterstory-detail__letter" aria-label="후일담 전문">
+          <article className={`afterstory-detail__letter${variant && storyId !== 'afterstory-secret-told' ? ' afterstory-detail__letter--long' : ''}`} aria-label="후일담 전문">
             {/* Figma AS06의 편지지 원본 레이어. */}
             <div className="afterstory-detail__letter-paper" aria-hidden="true">
               <img src={letterPaper} alt="" />

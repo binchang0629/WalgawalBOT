@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import LoginRewardPopUp from '../components/common/LoginRewardPopUp'
 import useSession from '../hooks/useSession'
 import { DEMO_ACCOUNTS } from '../data/personas'
@@ -11,16 +11,10 @@ import { clearLoginReward, getLoginReward, subscribeLoginReward } from './loginR
  * 신호는 `loginRewardSignal`이 들고 있다.
  */
 
-/** 회원가입과 서아 로그인 모두 같은 신규 계정 시연 흐름으로 0PT에서 시작한다. */
-const REWARD_START_POINT = 0
-
-function LoginRewardHost() {
-  const { currentUser, syncRewardPointTotal } = useSession()
-  const kind = useSyncExternalStore(subscribeLoginReward, getLoginReward, getLoginReward)
-
-  if (!kind) return null
-
-  // 시안은 성을 뗀 이름으로 부른다. 로그인 상태가 아직 없으면 시안 기본값을 쓴다.
+function RewardForCurrentLogin({ kind }: { kind: 'login' | 'signup' }) {
+  const { currentUser, activityStats, syncRewardPointTotal } = useSession()
+  // 팝업 중간에 합계가 갱신돼도 시작 숫자가 다시 바뀌지 않게 첫 값을 고정한다.
+  const [startPoint] = useState(() => kind === 'signup' ? 0 : activityStats.points)
   const fullName = currentUser?.name ?? DEMO_ACCOUNTS.A.name
   const name = currentUser?.isCustomProfile ? fullName : fullName.length > 2 ? fullName.slice(1) : fullName
 
@@ -28,11 +22,18 @@ function LoginRewardHost() {
     <LoginRewardPopUp
       kind={kind}
       name={name}
-      startPoint={REWARD_START_POINT}
+      startPoint={startPoint}
       onSettled={syncRewardPointTotal}
       onClose={clearLoginReward}
     />
   )
+}
+
+function LoginRewardHost() {
+  const kind = useSyncExternalStore(subscribeLoginReward, getLoginReward, getLoginReward)
+
+  if (!kind) return null
+  return <RewardForCurrentLogin kind={kind} />
 }
 
 export default LoginRewardHost

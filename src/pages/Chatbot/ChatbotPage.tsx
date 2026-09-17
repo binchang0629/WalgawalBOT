@@ -5,7 +5,7 @@ import useWizardBack from '../../hooks/useWizardBack'
 import { BACK_FALLBACK, PATHS } from '../../routes/paths'
 import { requestChatbotReply } from '../../services/chatbotService'
 import type { ChatOption } from './chatbotScript'
-import { CASE_ROUTED_OPTION_IDS, GUEST_MENU_STEP_ID, INITIAL_OPTIONS } from './chatbotScript'
+import { CASE_ROUTED_OPTION_IDS, GUEST_MENU_STEP_ID, INITIAL_OPTIONS, RESTART_STEP_ID, STEP_MAP } from './chatbotScript'
 import type { ChatTurn } from './types'
 import ChatbotHeader from './components/ChatbotHeader'
 import ChatEmptyState from './components/ChatEmptyState'
@@ -49,9 +49,6 @@ function ChatbotPage() {
   const [turns, setTurns] = useState<ChatTurn[]>([])
   const [activeStepId, setActiveStepId] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
-  const [retryRequest, setRetryRequest] = useState<
-    { kind: 'option'; option: ChatOption } | { kind: 'text'; text: string } | null
-  >(null)
   /** 선택지를 고른 직후, 오렌지색이 보이는 동안 같은 그룹의 다른 버튼을 막기 위한 표시. */
   const [pendingSelection, setPendingSelection] = useState<{ turnId: string; optionId: string } | null>(null)
 
@@ -96,7 +93,6 @@ function ChatbotPage() {
     request: { kind: 'option'; option: ChatOption } | { kind: 'text'; text: string },
   ) => {
     setIsPending(true)
-    setRetryRequest(null)
 
     try {
       const reply = await requestChatbotReply(
@@ -110,8 +106,10 @@ function ChatbotPage() {
         setActiveStepId(reply.step.id)
       }
     } catch {
-      setTurns((prev) => [...prev, { id: nextTurnId(), role: 'bot-error', at: Date.now() }])
-      setRetryRequest(request)
+      // 스크립트 연결이 잘못된 경우에도 데모 오류 화면 대신 선택 메뉴로 돌아간다.
+      const restartStep = STEP_MAP[RESTART_STEP_ID]
+      setTurns((prev) => [...prev, { id: nextTurnId(), role: 'bot', step: restartStep, at: Date.now() }])
+      setActiveStepId(restartStep.id)
     } finally {
       setIsPending(false)
     }
@@ -164,12 +162,6 @@ function ChatbotPage() {
     void runRequest({ kind: 'text', text })
   }
 
-  const handleRetry = () => {
-    if (!retryRequest) return
-    setTurns((prev) => prev.filter((turn) => turn.role !== 'bot-error'))
-    void runRequest(retryRequest)
-  }
-
   const hasStarted = turns.length > 0
 
   return (
@@ -192,25 +184,6 @@ function ChatbotPage() {
                     <div key={turn.id} className="chatbot-msg chatbot-msg--user">
                       <p className="chatbot-bubble--user">{turn.text}</p>
                       <span className="chatbot-msg__time">{formatChatTime(new Date(turn.at))}</span>
-                    </div>
-                  )
-                }
-
-                if (turn.role === 'bot-error') {
-                  return (
-                    <div key={turn.id} className="chatbot-msg chatbot-msg--bot">
-                      <div className="chatbot-bot-row">
-                        <span className="chatbot-bot-avatar">
-                          <img src={botLogo} alt="" width={40} height={40} />
-                        </span>
-                        <div className="chatbot-error">
-                          <p>답변을 가져오지 못했어요.</p>
-                          <p className="chatbot-error__hint">(데모: 네트워크 오류를 임의로 재현했어요)</p>
-                          <button type="button" className="chatbot-error__retry" onClick={handleRetry}>
-                            다시 시도
-                          </button>
-                        </div>
-                      </div>
                     </div>
                   )
                 }

@@ -1280,6 +1280,17 @@
     text-align: center;
 }
 
+.letter__cta--link {
+    display: block;
+    text-decoration: none;
+}
+
+.letter__cta--link:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
 /* ---------- 편지 열고 닫기 ---------- */
 
 /*
@@ -1369,11 +1380,12 @@
 .story-scroll {
     display: flex;
     gap: 12px;
-    /* 카드 줄은 화면 양끝까지 열고, 섹션 제목·봉투만 기존 콘텐츠 여백을 유지한다. */
+    /* 스크롤 영역은 화면 끝까지 열되, 첫 카드는 봉투의 왼쪽 선에 맞춘다. */
+    box-sizing: border-box;
     width: calc(100% + var(--content-gutter) + var(--content-gutter));
     margin-inline: calc(-1 * var(--content-gutter));
     overflow-x: auto;
-    padding-bottom: 4px;
+    padding: 0 var(--content-gutter) 4px;
     scrollbar-width: none;
     /* 마우스로 끌 수 있다는 걸 커서로 알린다. 터치는 원래대로 손가락 스와이프. */
     cursor: grab;
@@ -1848,16 +1860,16 @@ img.ai-card__mascot {
 .close-card__needle {
     position: absolute;
     z-index: 1;
-    top: 48px;
+    top: 42px;
     left: calc(50% - 2px);
     width: 4px;
-    height: 60px;
+    height: 66px;
     transform: rotate(var(--close-needle-angle));
     transform-origin: 50% 100%;
     opacity: 0;
-    transition: transform 280ms ease;
+    transition: transform 600ms cubic-bezier(.22, 1, .36, 1);
 }
-.close-section--gauge-visible .close-card__needle { opacity: 1; transition: opacity 1ms linear 1.5s, transform 280ms ease; }
+.close-section--gauge-visible .close-card__needle { opacity: 1; transition: opacity 1ms linear 1.5s, transform 600ms cubic-bezier(.22, 1, .36, 1); }
 
 .close-card__needle i {
     display: block;
@@ -1867,7 +1879,10 @@ img.ai-card__mascot {
     background: var(--gauge-ink);
     /* 아래쪽을 축으로 돌아야 끝만 좌우로 움직인다. */
     transform-origin: 50% 100%;
-    animation: close-needle-drift 11s ease-in-out infinite;
+}
+.close-section--gauge-visible .close-card__needle i {
+    /* 눈금이 차오른 뒤 시침이 나타나며 움직이기 시작한다. */
+    animation: close-needle-drift 4.8s ease-in-out 1.5s infinite;
 }
 
 /* 바늘이 박혀 있는 축 덮개. */
@@ -1886,58 +1901,17 @@ img.ai-card__mascot {
 .close-section--gauge-visible .close-card__knob { opacity: 1; }
 
 /*
- * NYT 선거 바늘 방식. 기준값(실제 비율)을 중심으로 정해진 폭 안에서만 천천히 배회한다.
- * 규칙적으로 왕복하면 메트로놈처럼 보이고, 폭이 크면 계기판이 고장 난 것처럼 보인다.
- * 그래서 최대 ±2.2도로 좁게 묶고, 멈추는 지점을 불규칙하게 흩어 놓았다.
+ * 비율이 팽팽한 느낌을 주되 승패가 바뀐 것처럼 보이지 않도록 기준 각도를 중심으로 흔든다.
+ * 가려지지 않은 시침 끝이 실제로 움직여 보이도록 약 ±10도에서 불규칙하게 머문다.
  */
 @keyframes close-needle-drift {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    9% {
-        transform: rotate(1.6deg);
-    }
-
-    17% {
-        transform: rotate(1.1deg);
-    }
-
-    28% {
-        transform: rotate(-1.9deg);
-    }
-
-    36% {
-        transform: rotate(-1.2deg);
-    }
-
-    47% {
-        transform: rotate(2.2deg);
-    }
-
-    55% {
-        transform: rotate(1.4deg);
-    }
-
-    64% {
-        transform: rotate(-0.7deg);
-    }
-
-    73% {
-        transform: rotate(-2.1deg);
-    }
-
-    82% {
-        transform: rotate(-0.4deg);
-    }
-
-    91% {
-        transform: rotate(1.8deg);
-    }
-
-    100% {
-        transform: rotate(0deg);
-    }
+    0%, 100% { transform: rotate(0deg); }
+    13% { transform: rotate(-10deg); }
+    24% { transform: rotate(-8deg); }
+    42% { transform: rotate(9deg); }
+    54% { transform: rotate(11deg); }
+    71% { transform: rotate(-7deg); }
+    83% { transform: rotate(-9deg); }
 }
 .close-card__mascot {
     position: absolute;
@@ -2051,7 +2025,7 @@ img.ai-card__mascot {
     .close-card__mascot, .close-card__choice, .close-card__gap,
     .swap-card__bar i { transition: none; }
     .close-card__arc path { animation: none; }
-    .close-card__needle i { animation: none; }
+    .close-section--gauge-visible .close-card__needle i { animation: none; }
     .close-card__arc path { stroke-dashoffset: 0; opacity: 1; }
     .close-card__needle, .close-card__knob, .close-card__mascot,
     .close-card__choice, .close-card__gap { opacity: 1; }
@@ -2219,14 +2193,15 @@ img.ai-card__mascot {
     transform: translateY(0) scale(1);
     transition: transform 480ms cubic-bezier(.22, 1, .36, 1) 620ms, opacity 340ms ease 620ms, visibility 0s linear 620ms;
 }
-.letter.is-open .letter__cta {
+/* 열림 전환 중에만 등장시키고, 링크로 교체된 뒤에는 투명 상태를 다시 시작하지 않는다. */
+.letter--opening .letter__cta {
     animation: letter-cta-appear 280ms ease 840ms both;
 }
 @keyframes letter-cta-appear {
     from { opacity: 0; transform: translateX(-50%) translateY(6px); }
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
-.letter__toggle:disabled { cursor: default; }
+.letter__toggle:disabled { cursor: default; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) {
     .letter__cta { animation: none; }
 }

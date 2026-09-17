@@ -109,10 +109,16 @@
   position: relative;
   /* Figma AS06 `편지지` 레이어: 354 × 382px. */
   box-sizing: border-box;
-  height: 382px;
-  min-height: 382px;
+  --letter-paper-height: 382px;
+  height: var(--letter-paper-height);
+  min-height: var(--letter-paper-height);
   margin-top: 14px;
   padding: 0;
+}
+
+/* 홈의 두 후일담은 본문이 한 줄 더 길어 원본 편지지보다 한 칸만 늘린다. */
+.afterstory-detail__letter--long {
+  --letter-paper-height: 415px;
 }
 
 /*
@@ -124,7 +130,7 @@
   top: -4px;
   left: 0;
   width: 100%;
-  height: 382px;
+  height: var(--letter-paper-height);
   overflow: hidden;
   /* 투명한 편지지 윤곽을 따라가는 새 그림자라 사각 테두리가 생기지 않는다. */
   filter: drop-shadow(2px 4px 8px rgb(65 66 95 / 14%));

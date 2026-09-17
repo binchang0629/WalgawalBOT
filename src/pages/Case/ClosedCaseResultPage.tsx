@@ -12,6 +12,7 @@ import storyLinkIcon from '../../assets/case/result/story-link.svg'
 import submitIcon from '../../assets/case/result/submit.svg'
 import customProfileAvatar from '../../assets/my/custom-walgadak-avatar.svg'
 import ConfirmDialog from '../../components/common/ConfirmDialog'
+import { COMMENT_TOAST_MESSAGES } from '../../components/common/commentToastMessages'
 import Pagination from '../../components/common/Pagination'
 import { commentStickerById, type CommentStickerId } from '../../data/common/commentStickers'
 import {
@@ -25,6 +26,7 @@ import type {
   JihoonSimilarVoteId,
 } from '../../data/common/jihoonSimilarCaseContent'
 import useSession from '../../hooks/useSession'
+import useToast from '../../hooks/useToast'
 import useLoginGate from '../../hooks/useLoginGate'
 import CaseHeader from './components/CaseHeader'
 import CommentStickerPicker from './components/CommentStickerPicker'
@@ -278,6 +280,7 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
 
 function ClosedCaseResultPage() {
   const { currentUser, sessionStatus, personaId } = useSession()
+  const { showToast } = useToast()
   const { requireLogin } = useLoginGate()
   const location = useLocation()
   const [draft, setDraft] = useState('')
@@ -452,6 +455,7 @@ function ClosedCaseResultPage() {
                   setAddedComments((comments) => comments.map((item) => (
                     item.id === comment.id ? { ...item, body, createdAt: '방금 전 · 수정됨' } : item
                   )))
+                  showToast(COMMENT_TOAST_MESSAGES.edited)
                 } : undefined}
                 onDelete={comment.id.startsWith('new-comment-') ? () => setPendingDeleteId(comment.id) : undefined}
               />
@@ -489,6 +493,7 @@ function ClosedCaseResultPage() {
               return next
             })
             setPendingDeleteId(null)
+            showToast(COMMENT_TOAST_MESSAGES.deleted)
           }}
         />
       )}

@@ -5,8 +5,26 @@ import avatar4 from '../../assets/case/result/comment-avatar-4.png'
 import avatar5 from '../../assets/case/result/comment-avatar-5.png'
 import type { ThreadComment } from '../../components/common/CommentThread'
 
-/** 홈의 두 후일담 카드에만 쓰는 시연용 댓글. 한 페이지에 다섯 개씩 보인다. */
+/** 홈 카드와 다른 후일담 메모지에 쓰는 시연용 댓글. 한 페이지에 다섯 개씩 보인다. */
 type CommentSeed = readonly [nickname: string, body: string]
+
+const birthdaySeeds: CommentSeed[] = [
+  ['초록리본', '선물 가격보다 생일에 연락을 기다렸다는 친구 마음을 들으니 오해가 이해돼요.'],
+  ['늦은케이크', '늦게라도 변명보다 먼저 서운했던 이유를 물어봐서 다행이에요.'],
+  ['한줄축하', '바쁠 때도 축하한다는 메시지 한 통은 먼저 보낼 수 있었겠죠.'],
+  ['종이포장지', '편지까지 전하며 마음을 확인했으니 친구도 안심했을 것 같아요.'],
+  ['생일달력', '다음에는 날짜를 미리 적어두면 같은 오해를 줄일 수 있겠어요.'],
+]
+
+const videoSeeds: CommentSeed[] = [
+  ['따뜻한화면', '처음 요청받은 색감까지 다시 확인하고 고친 점이 중요해 보여요.'],
+  ['편집실노트', '영상 게시와 최종 승인은 다를 수 있다는 걸 서로 확인해서 다행이네요.'],
+  ['원본파일함', '계약에 원본 파일 제공이 포함됐다면 함께 전달한 게 맞죠.'],
+  ['잔금달력', '수정 범위를 다시 합의하니 잔금 지급 기준도 분명해졌겠어요.'],
+  ['카페창가', '의뢰인 입장도 듣고 결과물을 보완해서 원만하게 끝난 것 같아요.'],
+  ['계약서책갈피', '다음에는 색감 기준을 시안으로 먼저 합의하면 도움이 되겠네요.'],
+  ['마지막렌더링', '최종 승인 후 잔금 90만 원을 받았다는 흐름이라 서로 납득할 수 있겠어요.'],
+]
 
 const loanSeeds: CommentSeed[] = [
   ['노을빛장부', '돈 이야기를 꺼내기 어려웠을 텐데 직접 만나서 이야기한 게 잘한 선택 같아요.'],
@@ -99,6 +117,29 @@ const creditSeeds: CommentSeed[] = [
   ['완료표시연필', '다음 보고서에는 처음부터 모든 기여자의 이름이 들어가길 바라요.'],
 ]
 
+const secretSeeds: CommentSeed[] = [
+  ['잠금장치달빛', '어떤 이야기였는지 공개하지 않고도 상처받은 이유를 충분히 전할 수 있어요.'],
+  ['말의무게', '친구가 허락 없이 말한 게 문제였다는 점을 분명히 짚으셨네요.'],
+  ['조용한책갈피', '사과를 받아도 바로 전처럼 믿기 어려운 마음이 자연스러워요.'],
+  ['파란색일기', '들은 친구들에게도 더 퍼뜨리지 말아 달라고 전한 건 필요한 행동이었어요.'],
+  ['한걸음거리', '관계를 끊거나 무조건 용서하는 것 사이에도 여러 선택이 있죠.'],
+  ['귓속말지킴이', '다음부터는 서로에게 말해도 되는 범위를 먼저 확인하면 좋겠어요.'],
+  ['천천히믿기', '신뢰는 한 번의 사과보다 이후 행동으로 다시 쌓이는 것 같아요.'],
+  ['작은열쇠', '친구가 변명만 하지 않고 직접 수습하려 한 점은 다행이에요.'],
+  ['비밀의온도', '학교에서 이야기가 퍼졌을 때 얼마나 당황했을지 상상돼요.'],
+  ['여백있는대화', '바로 화내기보다 사실부터 확인한 덕분에 대화가 가능했던 것 같아요.'],
+  ['서랍속메모', '허락을 묻는 약속이 앞으로도 지켜지길 바라요.'],
+  ['마음의자물쇠', '친구 사이에도 사생활의 경계는 분명히 필요하죠.'],
+  ['조심스런한마디', '미안하다는 말과 소문을 바로잡는 행동이 함께 있어서 좋았어요.'],
+  ['느린화해', '예전처럼 편해지지 않아도 지금의 거리를 존중해 주면 좋겠네요.'],
+  ['하교길노트', '누구에게 어디까지 전해졌는지 확인하는 과정도 쉽지 않았겠어요.'],
+  ['안전한대화', '친구가 듣는 사람들에게 그만 말해 달라고 한 건 최소한의 책임이라고 생각해요.'],
+  ['반듯한약속', '앞으로는 내 얘기를 할 때 먼저 물어봐 달라고 말한 게 인상적이에요.'],
+  ['구름뒤햇살', '상처가 바로 사라지지 않는다고 스스로를 탓하지 않았으면 해요.'],
+  ['한쪽씩듣기', '친구도 왜 잘못인지 이해해야 같은 일이 반복되지 않을 거예요.'],
+  ['다시쓰는일기', '천천히 관계를 다시 정해 가는 모습이 현실적이라 공감돼요.'],
+]
+
 const avatars = [avatar1, avatar2, avatar3, avatar4, avatar5]
 
 function toComments(seeds: CommentSeed[], idPrefix: string): ThreadComment[] {
@@ -115,7 +156,10 @@ function toComments(seeds: CommentSeed[], idPrefix: string): ThreadComment[] {
   }))
 }
 
-export const afterStoryCardComments: Record<'afterstory-friend-loan' | 'afterstory-idea-credit-card', ThreadComment[]> = {
+export const afterStoryCardComments: Record<'afterstory-birthday-gift' | 'afterstory-video-payment' | 'afterstory-friend-loan' | 'afterstory-idea-credit-card' | 'afterstory-secret-told', ThreadComment[]> = {
+  'afterstory-birthday-gift': toComments(birthdaySeeds, 'birthday-gift'),
+  'afterstory-video-payment': toComments(videoSeeds, 'video-payment'),
   'afterstory-friend-loan': toComments(loanSeeds, 'friend-loan'),
   'afterstory-idea-credit-card': toComments(creditSeeds, 'idea-credit'),
+  'afterstory-secret-told': toComments(secretSeeds, 'secret-told'),
 }

@@ -55,18 +55,23 @@ function CaseDetailPage() {
 
   const isAuthenticated = sessionStatus === 'authenticated'
   const loginPath = `${PATHS.login}?from=${encodeURIComponent(location.pathname)}`
-  const shouldSlideIn = (location.state as { entryMotion?: string } | null)?.entryMotion === 'slide-forward'
+  const entryState = location.state as { entryMotion?: string; returnTo?: string; fromPlaza?: boolean } | null
+  const shouldSlideIn = entryState?.entryMotion === 'slide-forward'
   const overlayRoot = document.getElementById('app-overlay-root')
 
   useEffect(() => {
     if (!confirmedVote) return
     const timer = window.setTimeout(() => {
       navigate(toCaseResult(caseContent.id), {
-        state: { selectedVote: confirmedVote, fromPlaza: caseContent.id === parentsCase.id },
+        state: {
+          selectedVote: confirmedVote,
+          fromPlaza: caseContent.id === parentsCase.id,
+          returnTo: entryState?.returnTo,
+        },
       })
     }, 1000)
     return () => window.clearTimeout(timer)
-  }, [caseContent.id, confirmedVote, navigate])
+  }, [caseContent.id, confirmedVote, entryState?.returnTo, navigate])
 
   if (caseId !== weddingGiftCase.id && caseId !== parentsCase.id) return <MissingCase />
 
@@ -87,7 +92,10 @@ function CaseDetailPage() {
 
   return (
     <main className={`case-detail${caseContent.id === parentsCase.id ? ' case-detail--family' : ''}${shouldSlideIn ? ' case-detail--slide-forward' : ''}`}>
-      <CaseHeader title={caseContent.id === parentsCase.id ? '사건 상세' : undefined} />
+      <CaseHeader
+        title={caseContent.id === parentsCase.id ? '사건 상세' : undefined}
+        backTo={entryState?.returnTo === PATHS.home ? PATHS.home : undefined}
+      />
 
       <div className="case-detail__body">
         <section className="case-overview" aria-labelledby="case-title">

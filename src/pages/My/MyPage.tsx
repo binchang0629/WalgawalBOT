@@ -25,7 +25,6 @@ import serviceIcon from '../../assets/my/service.svg'
 import expertIcon from '../../assets/my/expert.svg'
 import chevronIcon from '../../assets/my/chevron.svg'
 import chevronDisabledIcon from '../../assets/my/chevron-disabled.svg'
-import chevronExpertIcon from '../../assets/my/chevron-expert.svg'
 import seoaSwitchIcon from '../../assets/my/seoa-switch.svg'
 import seoaAchievementIcon from '../../assets/my/seoa-achievement.svg'
 import seoaJusticeIcon from '../../assets/my/seoa-justice.svg'
@@ -152,7 +151,9 @@ function MyPage() {
                   <strong>{displayName}</strong>
                   {displayNickname && <span className="profile-card__nickname">{displayNickname}</span>}
                 </span>
-                <small>{activityCount === 0 ? '아직 활동 기록이 없어요' : `접수·배심 활동 ${activityCount}건`}</small>
+                <small>{activityCount === 0
+                  ? '아직 활동 기록이 없어요'
+                  : `접수 ${activityStats.submittedCases}건 · 배심 참여 ${activityStats.juryParticipations}건`}</small>
               </span>
             </div>
             <button type="button" className="profile-card__switch" onClick={handleSwitchAccount} aria-haspopup="dialog" aria-expanded={accountSheetOpen}>
@@ -174,7 +175,7 @@ function MyPage() {
               type="button"
               className={`profile-card__stat profile-card__stat--action${activityStats.juryParticipations === 0 ? ' is-empty' : ''}`}
               disabled={activityStats.juryParticipations === 0}
-              onClick={() => navigate(toCaseResult(weddingGiftCase.id))}
+              onClick={() => navigate(toCaseResult(weddingGiftCase.id), { state: { returnTo: PATHS.my } })}
               aria-label={`배심 참여 ${activityStats.juryParticipations}건${activityStats.juryParticipations > 0 ? ', 참여한 사건 결과로 이동' : ''}`}
             >
               <span className="profile-card__stat-label">배심 참여</span>
@@ -223,7 +224,12 @@ function MyPage() {
             <div>
               <MenuRow label="업적 · 미션 (뱃지 및 리워드)" icon={isSeoa ? seoaAchievementIcon : achievementIcon} iconSize={isSeoa ? 17 : 20} disabled />
               <MenuRow label="내 사건 (접수한 사건 목록 및 결과)" icon={isSeoa ? seoaJusticeIcon : justiceIcon} iconSize={isSeoa ? 17.67 : 20} onClick={() => navigate(PATHS.myCases)} />
-              <MenuRow label="참여한 사건 (투표 및 배심원 활동)" icon={isSeoa ? seoaVoteIcon : voteIcon} disabled />
+              <MenuRow
+                label="참여한 사건 (투표 및 배심원 활동)"
+                icon={isSeoa ? seoaVoteIcon : voteIcon}
+                disabled={activityStats.juryParticipations === 0}
+                onClick={() => navigate(toCaseResult(weddingGiftCase.id), { state: { returnTo: PATHS.my } })}
+              />
               <MenuRow label="저장함 (판결 스크랩 및 북마크)" icon={isSeoa ? seoaBookmarkIcon : bookmarkIcon} disabled />
             </div>
           )}
@@ -245,7 +251,7 @@ function MyPage() {
 
         <button type="button" className="expert-card is-disabled" disabled>
           <span><MenuIcon icon={expertIcon} />전문가 정보 기록</span>
-          <img className="my-menu__chevron" src={isSeoa ? chevronExpertIcon : chevronDisabledIcon} alt="" />
+          <img className="my-menu__chevron" src={chevronDisabledIcon} alt="" />
         </button>
         <button
           type="button"
