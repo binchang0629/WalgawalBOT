@@ -265,11 +265,11 @@
 .my-page--seoa .profile-card__stat-value { display: flex; align-items: center; justify-content: center; }
 .my-page--seoa .profile-card__switch { padding: 7px 13px; line-height: 1.3; }
 .my-page--seoa .profile-card__switch img { width: 10.5px; height: 10.5px; margin: 1.75px; }
-.my-page--seoa .my-menu__header { min-height: 47px; padding-block: 12px; }
+/* .my-page--seoa .my-menu__header { min-height: 47px; padding-block: 12px; }
 .my-page--seoa .my-menu__row { min-height: 57px; padding-block: 12px; }
 .my-page--seoa .my-menu__row:first-child { min-height: 56px; padding-bottom: 11px; }
 .my-page--seoa .my-menu__row.is-disabled { border-color: var(--neutral-400); }
-.my-page--seoa .my-menu__row:not(.is-disabled) { border-color: var(--neutral-400); }
+.my-page--seoa .my-menu__row:not(.is-disabled) { border-color: var(--neutral-400); } */
 .my-page--seoa .expert-card.is-disabled { min-height: 62px; padding-block: 14px; }
 
 .my-menu {
@@ -281,8 +281,6 @@
 }
 .my-menu__header { width: 100%; min-height: 44px; padding: 11px 16px 12px; border: 0; border-bottom: 1px solid var(--neutral-400); color: var(--ink); background: #fff; font-size: 18px; font-weight: 600; line-height: 1.2; }
 .my-menu__header[aria-expanded="false"] { border-bottom-color: transparent; }
-.my-menu__header img { width: 16px; height: 16px; transition: transform .2s ease; }
-.my-menu__header img.is-closed { transform: rotate(180deg); }
 .my-menu__row { width: 100%; min-height: 48px; gap: 12px; padding: 8px 16px; border: 0; border-bottom: 1px solid rgba(232, 230, 234, .6); color: var(--neutral-700); background: #fff; font-size: 14px; font-weight: 400; line-height: 1.3; text-align: left; }
 .my-menu__row:last-child { border-bottom: 0; }
 .my-menu__row.is-disabled,
@@ -291,6 +289,7 @@
 .my-menu__icon { display: grid; place-items: center; flex: none; width: 32px; height: 32px; border: 1px solid var(--neutral-400); border-radius: 50%; color: var(--orange-700); background: #fff; }
 .my-menu__row.is-disabled .my-menu__icon,
 .expert-card.is-disabled .my-menu__icon { border-color: transparent; color: #939094; background: var(--neutral-250); }
+.my-menu__row--comments.is-disabled .my-menu__icon { color: var(--neutral-500); }
 .my-menu__icon::before { content: ''; width: var(--my-menu-icon-size, 20px); height: var(--my-menu-icon-size, 20px); background: currentColor; mask: var(--my-menu-icon) center / contain no-repeat; -webkit-mask: var(--my-menu-icon) center / contain no-repeat; }
 .my-menu__chevron { flex: none; width: 14px; height: 14px; }
 .my-menu__row:not(.is-disabled) .my-menu__chevron {

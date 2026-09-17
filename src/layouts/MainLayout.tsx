@@ -23,6 +23,12 @@ function MainLayout() {
   const previousPathRef = useRef<string | null>(null)
 
   useLayoutEffect(() => {
+    if (location.pathname === PATHS.afterStory && previousPathRef.current === PATHS.home) {
+      const routeState = location.state as { scrollToTop?: boolean } | null
+      if (routeState?.scrollToTop) {
+        scrollRef.current?.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+      }
+    }
     if (location.pathname === PATHS.home && previousPathRef.current !== PATHS.home) {
       const routeState = location.state as { restoreHomeScroll?: boolean; homeCaseId?: string } | null
       const restore = navigationType === 'POP'

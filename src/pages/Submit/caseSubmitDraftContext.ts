@@ -13,6 +13,8 @@ import type { PersonaId } from '../../types'
  */
 export interface CaseSubmitDraftValue {
   personaId: PersonaId
+  /** 접수 시작 직전의 앱 방문 기록. 완료 화면에서 작성 단계를 건너뛰고 돌아간다. */
+  returnHistoryIndex: number | null
   relationship: Relationship | null
   setRelationship: Dispatch<SetStateAction<Relationship | null>>
 

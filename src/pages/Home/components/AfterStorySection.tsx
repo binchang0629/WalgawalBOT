@@ -61,7 +61,7 @@ function AfterStorySection() {
         title={homeSectionTitles.afterStory.title}
         description={homeSectionTitles.afterStory.description}
         action={homeSectionTitles.afterStory.action}
-        onActionClick={() => navigate(PATHS.afterStory)}
+        onActionClick={() => navigate(PATHS.afterStory, { state: { scrollToTop: true } })}
       />
 
       <article className={'letter letter--' + letterState + (isLetterOpen ? ' is-open' : '') + (isLeavingDetail ? ' is-leaving-detail' : '')}>
