@@ -1,5 +1,6 @@
 import type { Persona, PersonaId } from '../../types'
 import { accountProfileAvatars } from '../common/profileAvatars'
+import { JIHUN_JURY_HISTORY } from './juryHistory'
 
 /**
  * 시연 퍼소나 정의.
@@ -77,7 +78,7 @@ export const DEMO_ACCOUNTS: Record<PersonaId, DemoAccount> = {
     email: 'kwak_isfree@wgwb.com',
     nickname: '익명의 왈랑이',
     submittedCases: 0,
-    juryParticipations: 12,
+    juryParticipations: JIHUN_JURY_HISTORY.length,
     points: 320,
     anonymousAvatarUrl: accountProfileAvatars.jihun,
     passwordPlaceholder: 'jihun1234!',

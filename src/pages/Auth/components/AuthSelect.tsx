@@ -149,7 +149,6 @@ function AuthSelect({ options, value, onChange, closedLabel, ariaLabel, suffix, 
                     role="option"
                     aria-selected={option.value === value}
                     onClick={() => choose(option.value)}
-                    onMouseEnter={() => setActiveIndex(index)}
                   >
                     {option.label}
                   </button>

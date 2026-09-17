@@ -1,8 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import {
   caseCategories,
-  categoryDotColor,
   latestPlazaCaseIds,
   plazaCases,
   plazaViewOptions,
@@ -12,12 +11,11 @@ import type { CaseCategory } from '../../../types'
 import useSession from '../../../hooks/useSession'
 import { MY_CASES } from '../../../data/personas/myCases'
 import Pagination from '../../../components/common/Pagination'
-import { PATHS, toCaseDetail } from '../../../routes/paths'
+import CaseFeedCard from '../../../components/common/CaseFeedCard'
 import {
   savePlazaReturnState,
   type PlazaReturnState,
 } from '../../../utils/plazaReturnState'
-import { readPlazaComments } from '../../../utils/plazaComments'
 import searchIcon from '../../../assets/plaza/search-field.svg'
 import chevronDown from '../../../assets/icons/chevron-down.svg'
 
@@ -263,78 +261,26 @@ function CaseFeedSection({ restoreState }: { restoreState?: PlazaReturnState | n
           )}
 
           <ul className="case-list" key={`case-list-${activeCategory}-${normalizedSearchQuery}`}>
-            {pageCases.map((item, index) => {
-              const cardContent = (
-                <>
-                  <div className="case-card__meta">
-                    <span className="case-card__category">
-                      <i style={{ background: categoryDotColor[item.category] }} aria-hidden="true" />
-                      <span style={{ color: categoryDotColor[item.category] }}>{item.tag}</span>
-                    </span>
-                    <span
-                      className={
-                        item.status === 'voting' || (item.verdictTone ?? (item.isVerdictAligned ? 'blue' : 'orange')) === 'blue'
-                          ? `case-card__verdict is-blue${item.status === 'voting' ? ' is-voting' : ''}`
-                          : 'case-card__verdict'
-                      }
-                    >
-                      {item.status === 'voting' && <i className="case-card__live-dot" aria-hidden="true" />}
-                      {item.status === 'voting' ? '투표 중' : `AI와 배심원 의견 ${item.isVerdictAligned ? '일치' : '불일치'}`}
-                    </span>
-                  </div>
-
-                  <h3 className="case-card__title">
-                    {item.title.split('\n').map((line) => (
-                      <span key={line}>{line}</span>
-                    ))}
-                  </h3>
-                  <p className="case-card__summary">{item.summary}</p>
-
-                  <div className="case-card__info">
-                    <span>조회수 {item.viewCount}</span>
-                    <span>댓글 {(item.commentCount ?? 0) + readPlazaComments(item.id).length}</span>
-                  </div>
-                </>
-              )
-
-              return (
-                <li
-                  className="case-card"
-                  key={item.id}
-                  data-case-id={item.id}
-                  style={{ animationDelay: `${index * 90}ms` }}
-                >
-                  <Link
-                    className="case-card__link"
-                    to={item.id === 'case-company-874' ? PATHS.jihoonCaseDetail : toCaseDetail(item.id)}
-                    state={{ fromPlaza: true }}
-                    aria-label={item.title.replace('\n', ' ') + ' 사건 상세 보기'}
-                    onClick={(event) => {
-                      if (
-                        event.button !== 0
-                        || event.metaKey
-                        || event.ctrlKey
-                        || event.shiftKey
-                        || event.altKey
-                      ) return
-
-                      const scrollContainer = caseFeedRef.current
-                        ?.closest<HTMLElement>('.main-layout__scroll')
-                      savePlazaReturnState({
-                        cardId: item.id,
-                        category,
-                        currentPage,
-                        searchQuery,
-                        scrollTop: scrollContainer?.scrollTop ?? 0,
-                        view,
-                      })
-                    }}
-                  >
-                    {cardContent}
-                  </Link>
-                </li>
-              )
-            })}
+            {pageCases.map((item, index) => (
+              <CaseFeedCard
+                key={item.id}
+                item={item}
+                index={index}
+                fromPlaza
+                onOpen={() => {
+                  const scrollContainer = caseFeedRef.current
+                    ?.closest<HTMLElement>('.main-layout__scroll')
+                  savePlazaReturnState({
+                    cardId: item.id,
+                    category,
+                    currentPage,
+                    searchQuery,
+                    scrollTop: scrollContainer?.scrollTop ?? 0,
+                    view,
+                  })
+                }}
+              />
+            ))}
           </ul>
 
           {pageCases.length === 0 && (

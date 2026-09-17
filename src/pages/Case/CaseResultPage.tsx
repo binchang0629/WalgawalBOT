@@ -249,7 +249,7 @@ function CaseResultPage() {
   if (sessionStatus !== 'authenticated' && !isClosedPlazaCase) return <Navigate to={loginPath} replace />
 
   const routeState = location.state as ResultRouteState | null
-  const returnTo = routeState?.returnTo === PATHS.my ? PATHS.my : routeState?.returnTo === PATHS.home ? PATHS.home : isParentsCase || plazaStory ? PATHS.plaza : PATHS.home
+  const returnTo = routeState?.returnTo === PATHS.myJury ? PATHS.myJury : routeState?.returnTo === PATHS.my ? PATHS.my : routeState?.returnTo === PATHS.home ? PATHS.home : isParentsCase || plazaStory ? PATHS.plaza : PATHS.home
   const rememberedVote = caseId ? juryVotes[caseId] : undefined
   const selectedVote = isVoteId(routeState?.selectedVote) ? routeState.selectedVote : rememberedVote ?? 'writer'
   const seededComments = Array.from(

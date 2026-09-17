@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import type { PersonaId, SessionStatus } from '../types'
 import type { WeddingGiftVoteId } from '../data/common/caseDetailContent'
 import { DEMO_ACCOUNTS, PERSONAS } from '../data/personas'
+import { JIHUN_JURY_CASE_IDS, JIHUN_JURY_VOTES } from '../data/personas/juryHistory'
 import { DEMO } from '../config/app'
 import { SessionContext } from './sessionContext'
 import type { SessionUser, SignupProfile } from './sessionContext'
@@ -335,6 +336,7 @@ function SessionProvider({ children }: { children: ReactNode }) {
 
   const recordJuryVote = useCallback((caseId: string, voteId: WeddingGiftVoteId) => {
     if (session.sessionStatus !== 'authenticated' || !caseId.trim()) return
+    if (!session.signupProfile && session.personaId === 'B' && JIHUN_JURY_CASE_IDS.includes(caseId)) return
     const recordVote = (current: ActivityRecord): ActivityRecord => {
       if (current.votedCaseIds.includes(caseId)) return current
       return {
@@ -367,8 +369,9 @@ function SessionProvider({ children }: { children: ReactNode }) {
     const personaId = session.personaId
     const account = DEMO_ACCOUNTS[personaId]
     const activity = activityRecords[personaId]
-    const earnedPoints = account.points
-      + activity.votedCaseIds.length * DEMO_JURY_VOTE_POINTS
+    const earnedVotes = activity.votedCaseIds.filter((caseId) =>
+      personaId !== 'B' || !JIHUN_JURY_CASE_IDS.includes(caseId)).length
+    const earnedPoints = account.points + earnedVotes * DEMO_JURY_VOTE_POINTS
 
     // 현재 합계와 목표 합계의 차이만 보관해 이후 배심 포인트도 계속 누적되게 한다.
     setRewardPointAdjustments((current) => ({
@@ -388,7 +391,8 @@ function SessionProvider({ children }: { children: ReactNode }) {
     const account = DEMO_ACCOUNTS[session.personaId]
     const activity = activityRecords[session.personaId]
     const submittedCases = activity.submittedCaseIds.length
-    const juryParticipations = activity.votedCaseIds.length
+    const juryParticipations = activity.votedCaseIds.filter((caseId) =>
+      session.personaId !== 'B' || !JIHUN_JURY_CASE_IDS.includes(caseId)).length
     return {
       submittedCases: Math.min(
         MAX_SUBMITTED_CASES,
@@ -410,10 +414,14 @@ function SessionProvider({ children }: { children: ReactNode }) {
       activityStats,
       votedCaseIds: session.signupProfile
         ? customActivity.votedCaseIds
-        : activityRecords[session.personaId].votedCaseIds,
+        : session.personaId === 'B'
+          ? [...new Set([...JIHUN_JURY_CASE_IDS, ...activityRecords.B.votedCaseIds])]
+          : activityRecords.A.votedCaseIds,
       juryVotes: session.signupProfile
         ? customActivity.juryVotes
-        : activityRecords[session.personaId].juryVotes,
+        : session.personaId === 'B'
+          ? { ...JIHUN_JURY_VOTES, ...activityRecords.B.juryVotes }
+          : activityRecords.A.juryVotes,
       publishedAfterStoryIds: session.signupProfile
         ? customActivity.publishedAfterStoryIds
         : activityRecords[session.personaId].publishedAfterStoryIds,

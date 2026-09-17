@@ -1,5 +1,6 @@
 import type React from 'react'
-import { NavLink } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom'
 import useLoginGate from '../../hooks/useLoginGate'
 import type { LoginGateReason } from '../../state/loginGateContext'
 import { PATHS } from '../../routes/paths'
@@ -69,6 +70,13 @@ function NavIcon({ src, isCta }: { src: string; isCta?: boolean }) {
 
 function BottomNavigation() {
   const { requireLogin } = useLoginGate()
+  const navigate = useNavigate()
+  const ctaTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [ctaPressed, setCtaPressed] = useState(false)
+
+  useEffect(() => () => {
+    if (ctaTimer.current) clearTimeout(ctaTimer.current)
+  }, [])
 
   return (
     <nav className="bottom-nav" aria-label="주요 메뉴">
@@ -96,12 +104,29 @@ function BottomNavigation() {
           <NavLink
             key={item.label}
             to={item.to}
-            className={({ isActive }) => (isActive ? `${className} active` : className)}
+            className={({ isActive }) => `${className}${isActive ? ' active' : ''}${item.isCta && ctaPressed ? ' case-nav--pressed' : ''}`}
             aria-label={item.isCta ? item.label : undefined}
             onClick={(event) => {
+              if (item.isCta && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)) return
+
               // 비로그인이면 이동을 막고 안내 팝업만 띄운다. 보던 화면은 그대로 남는다.
               if (item.gate && !requireLogin(item.gate, item.to)) {
                 event.preventDefault()
+                return
+              }
+
+              if (item.isCta) {
+                event.preventDefault()
+                if (ctaTimer.current) return
+                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                  navigate(item.to)
+                  return
+                }
+                setCtaPressed(true)
+                ctaTimer.current = setTimeout(() => {
+                  ctaTimer.current = null
+                  navigate(item.to)
+                }, 240)
                 return
               }
 

@@ -16,6 +16,7 @@ import LoginPage from '../pages/Auth/LoginPage'
 import MyPage from '../pages/My/MyPage'
 import WalbotPlanPage from '../pages/My/WalbotPlanPage'
 import MyCasesPage from '../pages/My/MyCasesPage'
+import MyJuryPage from '../pages/My/MyJuryPage'
 import MyCommentsPage from '../pages/My/MyCommentsPage'
 import MyCaseResultPage from '../pages/My/MyCaseResultPage'
 import CaseSubmitFlow from '../pages/Submit/CaseSubmitFlow'
@@ -111,6 +112,7 @@ function AppRoutes() {
 
         {/* MY 하위 상세 화면은 Figma 시안대로 하단 내비게이션 없이 표시한다. */}
         <Route path={PATHS.myCases} element={<MyCasesPage />} />
+        <Route path={PATHS.myJury} element={<MyJuryPage />} />
         <Route path={PATHS.myComments} element={<MyCommentsPage />} />
         <Route path={PATHS.myCaseResult} element={<MyCaseResultPage />} />
 

@@ -46,15 +46,6 @@
 .walbot-plan__benefit-icon img { position: absolute; top: 10.67%; left: 12.09%; width: 73.13%; height: 79.95%; }
 .walbot-plan__benefit-icon--unlimited img { top: 10.24%; left: 9.42%; width: 78.84%; height: 79.62%; }
 
-@media (hover: hover) {
-    .walbot-plan__option:not(:has(input:checked)):hover {
-        border-color: var(--neutral-400);
-        background: #fff;
-        box-shadow: 0 4px 12px rgb(37 37 37 / 7%);
-        transform: translateY(-1px);
-    }
-}
-
 /* 사건접수와 같은 flex 고정 푸터. 본문만 스크롤되고 CTA는 화면 하단에 남는다. */
 .walbot-plan .walbot-plan__footer { z-index: 1; }
 .walbot-plan__skip { position: relative; justify-self: center; padding: 0; border: 0; background: transparent; }

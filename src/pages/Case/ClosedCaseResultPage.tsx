@@ -298,7 +298,7 @@ function ClosedCaseResultPage() {
 
   return (
     <main className="case-result case-result--closed">
-      <CaseHeader title="투표 결과" backTo={routeState?.returnTo === PATHS.home ? PATHS.home : plazaStory || routeState?.fromPlaza ? PATHS.plaza : undefined} />
+      <CaseHeader title="투표 결과" backTo={routeState?.returnTo === PATHS.myJury ? PATHS.myJury : routeState?.returnTo === PATHS.home ? PATHS.home : plazaStory || routeState?.fromPlaza ? PATHS.plaza : undefined} />
 
       <div className="case-result__body case-result__body--closed">
         <section className="result-overview" aria-labelledby="result-case-title">

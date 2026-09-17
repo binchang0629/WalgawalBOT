@@ -376,10 +376,6 @@
     text-align: left;
 }
 
-.result-comment__menu-popover button:hover {
-    background: var(--neutral-050);
-}
-
 .result-comment__menu-popover button.is-delete {
     color: var(--negative);
 }

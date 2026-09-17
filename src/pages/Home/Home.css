@@ -154,7 +154,6 @@
     transition: border-color 140ms ease, color 140ms ease, background 140ms ease;
 }
 
-.home-search__recent-chip:hover,
 .home-search__recent-chip:focus-within {
     border-color: var(--blue-200);
     color: var(--blue-700);
@@ -411,7 +410,6 @@
     will-change: transform, box-shadow;
 }
 
-.popular-case__cta:hover,
 .popular-case__cta:focus-visible {
     animation-play-state: paused;
 }
@@ -809,6 +807,25 @@
     height: 85px;
     object-fit: contain;
 }
+.balance-board__plate-target {
+    position: absolute;
+    z-index: 0;
+    top: 77px;
+    width: 170px;
+    height: 106px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+}
+.balance-board__plate-target--left { left: 0; }
+.balance-board__plate-target--right { right: 0; }
+.balance-board__plate-target:disabled { pointer-events: none; }
+.balance-board__plate-target:focus-visible {
+    outline: 2px solid var(--blue-700);
+    outline-offset: 2px;
+}
 
 .balance-board__side--left .balance-board__plate {
     top: 87px;
@@ -1095,27 +1112,6 @@
     align-items: flex-end;
     color: var(--negative);
     text-align: right;
-}
-
-.vote-cta {
-    display: block;
-    width: 100%;
-    padding: 16px 0;
-    border: 0;
-    border-radius: var(--radius-lg);
-    background: var(--orange-700);
-    box-shadow: 0 5px 14px rgba(32, 35, 43, 0.09);
-    color: #fff;
-    font-size: 18px;
-    font-weight: 600;
-    line-height: 1.2;
-    text-align: center;
-}
-
-.vote-cta:disabled {
-    background: var(--neutral-300);
-    box-shadow: none;
-    cursor: not-allowed;
 }
 
 /* ---------------------------------------------------------------- */
@@ -1620,16 +1616,19 @@ img.ai-card__mascot {
 .balance-board__draggable::before {
     content: '';
     position: absolute;
-    inset: -24px;
+    inset: -30px -24px;
     pointer-events: auto;
 }
 /* 깻잎은 젓가락 끝이 아닌 잎 중심(드래그 기준점 35%)을 중심으로 잡히게 한다. */
 .balance-section:not(.balance-section--mint) .balance-board__draggable::before {
-    top: -24px;
-    bottom: -24px;
+    top: -30px;
+    bottom: -30px;
     left: -42px;
     right: auto;
     width: 172px;
+}
+.balance-section:not(.balance-section--idle) .balance-board__draggable::before {
+    pointer-events: none;
 }
 .balance-board__subject {
     display: block;
@@ -1805,6 +1804,7 @@ img.ai-card__mascot {
     background: #fff;
 }
 .close-card {
+    position: relative;
     --gauge-ink: #30333a;
     box-sizing: border-box;
     justify-content: flex-start;
@@ -2051,6 +2051,7 @@ img.ai-card__mascot {
     transform: rotate(45deg);
 }
 .swap-card {
+    position: relative;
     box-sizing: border-box;
     gap: 10px;
     min-height: 142px;
@@ -2071,30 +2072,38 @@ img.ai-card__mascot {
 .swap-card__bar i { transition: width 280ms ease; }
 .swap-card__side { gap: 0; }
 .swap-card__side b { font-size: 12px; }
-.vote-cta {
-    display: block;
-    width: 100%;
-    min-height: 52px;
-    box-sizing: border-box;
-    padding: 16px 0;
-    border: 0;
-    border-radius: var(--radius-lg);
-    background: var(--orange-700);
-    box-shadow: 0 5px 14px rgba(32, 35, 43, 0.09);
-    color: #fff;
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 1.2;
-    text-align: center;
-    text-decoration: none;
+.close-card, .swap-card { transition: transform 200ms cubic-bezier(.4, 0, 1, 1), opacity 200ms ease-out, filter 200ms ease-out; }
+.close-section--leaving .close-card { transform: translateY(92px) scale(.94); opacity: .68; filter: blur(1px); }
+.close-section--leaving .swap-card { z-index: 2; transform: translateY(-92px) scale(1.06); opacity: .68; filter: blur(1px); }
+.close-section--entering .close-card { animation: close-card-enter 460ms cubic-bezier(.18, .82, .2, 1) both; }
+.close-section--entering .swap-card { z-index: 2; animation: swap-card-enter 460ms cubic-bezier(.18, .82, .2, 1) both; }
+@keyframes close-card-enter {
+    from { transform: translateY(92px) scale(.94); opacity: .68; filter: blur(1px); }
+    72% { transform: translateY(-4px) scale(1.008); opacity: 1; filter: blur(0); }
+    to { transform: translateY(0) scale(1); opacity: 1; filter: blur(0); }
 }
-
-.vote-cta:disabled {
-    background: var(--neutral-300);
-    box-shadow: none;
-    cursor: not-allowed;
+@keyframes swap-card-enter {
+    from { transform: translateY(-92px) scale(1.06); opacity: .68; filter: blur(1px); }
+    72% { transform: translateY(4px) scale(.992); opacity: 1; filter: blur(0); }
+    to { transform: translateY(0) scale(1); opacity: 1; filter: blur(0); }
+}
+.close-section__card-action {
+    position: absolute;
+    z-index: 5;
+    inset: 0;
+    width: 100%;
+    border: 0;
+    border-radius: inherit;
+    background: transparent;
+    cursor: pointer;
+}
+.close-section__card-action:focus-visible {
+    outline: 2px solid var(--blue-700);
+    outline-offset: 3px;
 }
 @media (prefers-reduced-motion: reduce) {
+    .close-card, .swap-card { transition: none; }
+    .close-section--entering .close-card, .close-section--entering .swap-card { animation: none; }
     .close-card__arc path, .close-card__needle, .close-card__knob,
     .close-card__mascot, .close-card__choice, .close-card__gap,
     .swap-card__bar i { transition: none; }
@@ -2144,6 +2153,27 @@ img.ai-card__mascot {
     z-index: 1;
     white-space: nowrap;
 }
+.balance-choice__percent {
+    position: relative;
+    z-index: 1;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    animation: balance-percent-enter 280ms 90ms ease-out both;
+}
+.balance-section--result .balance-board .balance-choice.is-selected {
+    width: 180px;
+    max-width: none;
+    gap: 8px;
+}
+@keyframes balance-percent-enter {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .balance-choice__percent { animation: none; }
+}
 .balance-section .balance-board .balance-choice.is-selected,
 .balance-section--hover-left .balance-board .balance-choice--left,
 .balance-section--hover-right .balance-board .balance-choice--right {
@@ -2155,7 +2185,7 @@ img.ai-card__mascot {
     left: 24.85%;
     right: auto;
     transform: translateX(-50%);
-    transition: transform 260ms ease, opacity 400ms ease, left 520ms cubic-bezier(.22, 1, .36, 1), top 520ms cubic-bezier(.22, 1, .36, 1);
+    transition: transform 260ms ease, opacity 400ms ease, left 520ms cubic-bezier(.22, 1, .36, 1), top 520ms cubic-bezier(.22, 1, .36, 1), width 520ms cubic-bezier(.22, 1, .36, 1);
 }
 .balance-section .balance-board .balance-choice--right { left: 75.15%; }
 .balance-section--hover-left .balance-board .balance-choice--left,
@@ -2193,7 +2223,7 @@ img.ai-card__mascot {
     transition: left 900ms cubic-bezier(.22, 1, .36, 1), top 900ms cubic-bezier(.22, 1, .36, 1), transform 900ms cubic-bezier(.22, 1, .36, 1);
 }
 .balance-section--result .balance-choice.is-selected {
-    transition: none;
+    transition: width 360ms cubic-bezier(.22, 1, .36, 1);
 }
 .balance-section--placing.balance-section--left .balance-choice.is-selected {
     top: 172px;

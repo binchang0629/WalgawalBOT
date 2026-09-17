@@ -37,6 +37,11 @@ function CaseHeader({ title = '오늘의 사건', backTo, onBack }: { title?: st
     }
 
     if (backTo) {
+      if (backTo === PATHS.myJury && location.key !== 'default') {
+        // MY 목록에서 연 사건은 기존 기록으로 돌아가야 다시 뒤로 갔을 때 상세가 반복되지 않는다.
+        navigate(location.pathname.endsWith('/result') ? -2 : -1)
+        return
+      }
       if (backTo === PATHS.plaza && (location.state as { fromPlaza?: boolean } | null)?.fromPlaza) {
         markPlazaReturnReady()
       }

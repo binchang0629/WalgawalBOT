@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { DEMO_ACCOUNTS } from '../../data/personas'
-import { weddingGiftCase } from '../../data/common/caseDetailContent'
 import { Link, useNavigate } from 'react-router-dom'
 import useSession from '../../hooks/useSession'
-import { PATHS, toCaseResult } from '../../routes/paths'
+import { PATHS } from '../../routes/paths'
 import { readMyComments } from '../../utils/myComments'
 import profileImage from '../../assets/my/profile.png'
 import jihunProfileImage from '../../assets/my/account-jihun.png'
@@ -15,7 +14,6 @@ import LogoutConfirmDialog from './components/LogoutConfirmDialog'
 import useToast from '../../hooks/useToast'
 import switchIcon from '../../assets/my/switch.svg'
 import chevronBrownIcon from '../../assets/my/chevron-brown.svg'
-import achievementIcon from '../../assets/my/achievement.svg'
 import justiceIcon from '../../assets/my/justice.svg'
 import bookmarkIcon from '../../assets/my/bookmark.svg'
 import commentIcon from '../../assets/my/comment.svg'
@@ -27,7 +25,6 @@ import chevronIcon from '../../assets/my/chevron.svg'
 import chevronDisabledIcon from '../../assets/my/chevron-disabled.svg'
 import seoaSwitchIcon from '../../assets/my/seoa-switch.svg'
 import seoaAchievementIcon from '../../assets/my/seoa-achievement.svg'
-import seoaJusticeIcon from '../../assets/my/seoa-justice.svg'
 import seoaBookmarkIcon from '../../assets/my/seoa-bookmark.svg'
 import seoaBellIcon from '../../assets/my/seoa-bell.svg'
 import './MyPage.css'
@@ -177,8 +174,8 @@ function MyPage() {
               type="button"
               className={`profile-card__stat profile-card__stat--action${activityStats.juryParticipations === 0 ? ' is-empty' : ''}`}
               disabled={activityStats.juryParticipations === 0}
-              onClick={() => navigate(toCaseResult(weddingGiftCase.id), { state: { returnTo: PATHS.my } })}
-              aria-label={`배심 참여 ${activityStats.juryParticipations}건${activityStats.juryParticipations > 0 ? ', 참여한 사건 결과로 이동' : ''}`}
+              onClick={() => navigate(PATHS.myJury)}
+              aria-label={`배심 참여 ${activityStats.juryParticipations}건${activityStats.juryParticipations > 0 ? ', 참여한 사건 목록으로 이동' : ''}`}
             >
               <span className="profile-card__stat-label">배심 참여</span>
               <span className="profile-card__stat-value"><strong>{activityStats.juryParticipations}</strong>건</span>

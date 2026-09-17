@@ -101,7 +101,7 @@ function CaseDetailPage() {
     <main className={`case-detail${caseContent.id === parentsCase.id ? ' case-detail--family' : ''}${isClosed ? ' case-detail--closed' : ''}${shouldSlideIn ? ' case-detail--slide-forward' : ''}`}>
       <CaseHeader
         title={plazaStory ? (isClosed ? '지난 사건' : '사건 상세') : caseContent.id === parentsCase.id ? '사건 상세' : undefined}
-        backTo={entryState?.returnTo === PATHS.home ? PATHS.home : plazaStory ? PATHS.plaza : undefined}
+        backTo={entryState?.returnTo === PATHS.myJury ? PATHS.myJury : entryState?.returnTo === PATHS.home ? PATHS.home : plazaStory ? PATHS.plaza : undefined}
       />
 
       <div className="case-detail__body">
@@ -146,14 +146,14 @@ function CaseDetailPage() {
           <section className="case-vote-complete" aria-labelledby="case-vote-complete-title">
             <span className="case-vote-complete__check" aria-hidden="true">✓</span>
             <div>
-              <h2 id="case-vote-complete-title">이미 투표했어요</h2>
-              <p>{savedChoice ? `나의 선택 · ${savedChoice.label.join(' ')}` : '이 사건에 투표한 기록이 있어요.'}</p>
+              <h2 id="case-vote-complete-title">이미 투표한 사건이에요.</h2>
+              <p>{savedChoice ? `나의 선택 : ${savedChoice.label.join(' ')}` : '이 사건에 투표한 기록이 있어요.'}</p>
             </div>
             <Link
               to={toCaseResult(caseContent.id)}
               state={{ selectedVote: savedVote, fromPlaza: entryState?.fromPlaza, returnTo: entryState?.returnTo, homeCaseId: entryState?.homeCaseId }}
             >
-              투표 결과 보기
+              결과 다시 보기
             </Link>
           </section>
         ) : <CaseVoteSection

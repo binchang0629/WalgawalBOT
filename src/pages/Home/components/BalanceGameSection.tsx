@@ -38,6 +38,7 @@ function BalanceRound({ questionIndex, onNext }: { questionIndex: number; onNext
   const leftBowl = isMint ? mintBowlBlue : plateLeft
   const rightBowl = isMint ? mintBowlRed : plateRight
   const gameName = isMint ? '민트초코' : '깻잎'
+  const expandedBubble = phase === 'result'
 
   // 재시작·화면 이탈 때 이전 애니메이션 타이머를 모두 정리한다.
   useEffect(() => {
@@ -158,13 +159,23 @@ function BalanceRound({ questionIndex, onNext }: { questionIndex: number; onNext
         {(['left', 'right'] as const).map(side => (
           <div key={side} className={'balance-board__side balance-board__side--' + side}>
             <img className="balance-board__plate" src={side === 'left' ? leftBowl : rightBowl} alt="" aria-hidden="true" />
+            <button type="button" className={'balance-board__plate-target balance-board__plate-target--' + side}
+              aria-label={`${side === 'left' ? question.leftLabel : question.rightLabel} 접시 선택`}
+              disabled={!!choice} onClick={() => handleChoose(side)} />
             <button type="button"
               className={'balance-choice balance-choice--' + side + (choice === side ? ' is-selected' : '')}
               disabled={!!choice && choice !== side} aria-pressed={choice === side} onClick={() => handleChoose(side)}>
-              <svg className="balance-choice__outline" viewBox="0 0 140 64" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-                <path d="M23 18.5H60L65 1.5L80 18.5H117A22.5 22.5 0 0 1 139.5 41V41A22.5 22.5 0 0 1 117 63.5H23A22.5 22.5 0 0 1 .5 41V41A22.5 22.5 0 0 1 23 18.5Z" vectorEffect="non-scaling-stroke" />
+              <svg className="balance-choice__outline" viewBox={expandedBubble && choice === side ? '0 0 180 64' : '0 0 140 64'} preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                <path d={expandedBubble && choice === side
+                  ? 'M23 18.5H80L85 1.5L100 18.5H157A22.5 22.5 0 0 1 179.5 41A22.5 22.5 0 0 1 157 63.5H23A22.5 22.5 0 0 1 .5 41A22.5 22.5 0 0 1 23 18.5Z'
+                  : 'M23 18.5H60L65 1.5L80 18.5H117A22.5 22.5 0 0 1 139.5 41A22.5 22.5 0 0 1 117 63.5H23A22.5 22.5 0 0 1 .5 41A22.5 22.5 0 0 1 23 18.5Z'} vectorEffect="non-scaling-stroke" />
               </svg>
               <span className="balance-choice__label">{side === 'left' ? question.leftLabel : question.rightLabel}</span>
+              {phase === 'result' && choice === side && (
+                <span className="balance-choice__percent" aria-label={`이 선택을 고른 비율 ${side === 'left' ? question.leftPercent : question.rightPercent}%`}>
+                  {side === 'left' ? question.leftPercent : question.rightPercent}%
+                </span>
+              )}
             </button>
           </div>
         ))}

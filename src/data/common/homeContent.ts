@@ -89,15 +89,17 @@ export const adBanner = {
  * 주제 참고: https://www.nocutnews.co.kr/news/5788798
  */
 export const mintBalanceQuestion = {
-  id: 'balance-mint', order: 'B.', title: '민트초코,당신의 선택은?',
-  scenario: '스쿱에 담긴 민트초코 아이스크림',
-  leftLabel: '좋다', rightLabel: '싫다', guide: '아이스크림을 좌우로 밀어 선택!',
+    id: 'balance-mint', order: 'B.', title: '민트초코,당신의 선택은?',
+    scenario: '스쿱에 담긴 민트초코 아이스크림',
+    leftLabel: '좋다', rightLabel: '싫다', guide: '아이스크림을 밀거나 접시를 눌러 선택!',
+    leftPercent: 57, rightPercent: 43,
 } as const
 
 export const balanceQuestions = [
-  { id: 'balance-perilla', order: 'A.', title: '깻잎 논쟁, 당신의 선택은?',
-    scenario: '내 애인이 이성 친구의 붙은 깻잎을 떼어 준다면?',
-    leftLabel: '상관 없음', rightLabel: '절대 안됨', guide: '깻잎을 좌우로 밀어 선택!' },
+    { id: 'balance-perilla', order: 'A.', title: '깻잎 논쟁, 당신의 선택은?',
+      scenario: '내 애인이 이성 친구의 붙은 깻잎을 떼어 준다면?',
+      leftLabel: '상관 없음', rightLabel: '절대 안됨', guide: '깻잎을 밀거나 접시를 눌러 선택!',
+      leftPercent: 38, rightPercent: 62 },
   { id: 'balance-shrimp', order: 'B.', title: '새우 논쟁, 당신의 선택은?',
     scenario: '내 애인이 이성 친구의 새우 껍질을 까 준다면?',
     leftLabel: '상관 없음', rightLabel: '절대 안됨', guide: '질문을 밀거나 버튼으로 선택!' },

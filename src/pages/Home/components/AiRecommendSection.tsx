@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import SectionTitle from '../../../components/common/SectionTitle'
+import VotingStatusBadge from '../../../components/common/VotingStatusBadge'
 import useSession from '../../../hooks/useSession'
 import mascot from '../../../assets/home/figma/chat-mascot.png'
 import { personalizedRecommendation, homeSectionTitles } from '../../../data/common/homeContent'
@@ -42,13 +43,15 @@ function AiRecommendSection() {
                   <span className={`ai-recommendation__category ai-recommendation__category--${item.categoryKey}`}>
                     {item.category}
                   </span>
-                  <span className={`ai-recommendation__agreement${isVoting ? ' is-voting' : agrees ? ' is-agreed' : ''}`}>
-                    {isVoting ? '투표 중' : `AI와 배심원 의견 ${agrees ? '일치' : '불일치'}`}
-                  </span>
+                  {isVoting ? <VotingStatusBadge /> : (
+                    <span className={`ai-recommendation__agreement${agrees ? ' is-agreed' : ''}`}>
+                      AI와 배심원 의견 {agrees ? '일치' : '불일치'}
+                    </span>
+                  )}
                 </div>
                 <h4>{item.title}</h4>
                 <p className="ai-recommendation__details">
-                  {!isVoting && <span>판결 완료</span>}
+                  {!isVoting && <span>투표 완료</span>}
                   {linkedCase?.commentCount !== undefined && <span>댓글 {linkedCase.commentCount}개</span>}
                 </p>
               </article>

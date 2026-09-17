@@ -16,7 +16,7 @@ function ClosedCaseDetailPage() {
 
   return (
     <main className="case-detail case-detail--closed">
-      <CaseHeader title="지난 사건" backTo={routeState?.returnTo === PATHS.home ? PATHS.home : plazaStory ? PATHS.plaza : undefined} />
+      <CaseHeader title="지난 사건" backTo={routeState?.returnTo === PATHS.myJury ? PATHS.myJury : routeState?.returnTo === PATHS.home ? PATHS.home : plazaStory ? PATHS.plaza : undefined} />
 
       <div className="case-detail__body">
         <section className="case-overview case-overview--closed" aria-labelledby="case-title">

@@ -36,6 +36,7 @@ export const PATHS = {
   my: '/my',
   myPlan: '/my/plan',
   myCases: '/my/cases',
+  myJury: '/my/jury',
   /** MY > 나의 활동 > 내가 쓴 댓글. 로그인한 계정으로 등록한 댓글만 모인다. */
   myComments: '/my/comments',
   myCaseResult: '/my/cases/:caseId',

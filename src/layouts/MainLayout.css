@@ -121,6 +121,7 @@
     line-height: 1;
     text-decoration: none;
     white-space: nowrap;
+    transition: color 260ms ease;
 }
 
 /*
@@ -142,6 +143,18 @@
     -webkit-mask-repeat: no-repeat;
     -webkit-mask-position: center;
     -webkit-mask-size: contain;
+}
+
+/* 기존 아이콘 형태 안에서 파란색이 아래부터 차오른다. */
+.bottom-nav__item:not(.case-nav) .bottom-nav__icon {
+    background: linear-gradient(176deg, var(--neutral-600) 45%, var(--blue) 55%);
+    background-size: 100% 220%;
+    background-position: center top;
+    transition: background-position 430ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.bottom-nav__item:not(.case-nav).active .bottom-nav__icon {
+    background-position: center bottom;
 }
 
 .bottom-nav__item.active {
@@ -170,6 +183,16 @@
     mask: none;
     -webkit-mask: none;
     position: relative;
+}
+
+.bottom-nav .case-nav--pressed .bottom-nav__icon--cta {
+    animation: case-nav-press 240ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes case-nav-press {
+    0% { transform: translateY(0) scale(1); }
+    46% { transform: translateY(3px) scale(.91); box-shadow: 0 2px 4px rgb(61 92 217 / 14%), inset 1px 2px 6px rgb(0 0 0 / 11%); }
+    100% { transform: translateY(0) scale(1); }
 }
 
 .bottom-nav .case-nav .bottom-nav__icon--cta::after {
@@ -210,4 +233,9 @@
     .bottom-nav .case-nav {
         flex: 0 0 60px;
     }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bottom-nav__item, .bottom-nav__item:not(.case-nav) .bottom-nav__icon { transition: none; }
+    .bottom-nav .case-nav--pressed .bottom-nav__icon--cta { animation: none; }
 }

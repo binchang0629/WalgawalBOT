@@ -207,6 +207,10 @@ function CaseContextCard() {
   )
 }
 
+function VerdictCompleteBadge() {
+  return <span className="afterstory-verdict-badge">판결 완료</span>
+}
+
 function CaseContextFolder({ onOpen, isOpen, triggerRef }: {
   onOpen: () => void
   isOpen: boolean
@@ -233,7 +237,7 @@ function CaseContextFolder({ onOpen, isOpen, triggerRef }: {
         <h2>{CONNECTED_CASE.title.split('\n').map((line) => <span key={line}>{line}</span>)}</h2>
         <div className="afterstory-case-folder__status">
           <span>후일담 연결 사건</span>
-          <strong>투표 종료</strong>
+          <VerdictCompleteBadge />
         </div>
       </CaseFolderCard>
     </div>
@@ -716,7 +720,7 @@ export function MyAfterStoryPage() {
                 <article className="afterstory-mine__card" key={item.id}>
                   <div className="afterstory-mine__tags">
                     <em className={'afterstory-mine__category afterstory-mine__category--' + item.tone}>{item.category}</em>
-                    <span className="afterstory-mine__badge">판결 완료</span>
+                    <VerdictCompleteBadge />
                   </div>
                   <h4>{item.titleLines.join(' ')}</h4>
                   <p>사건의 결말을 확인한 뒤, 그 이후의 변화와<br />당신의 선택을 들려주세요.</p>
@@ -834,7 +838,7 @@ export function PreviewAfterStoryPage() {
         <CaseSubmitProgress step={2} totalSteps={2} label="게시 확인" />
         <section className="afterstory-preview-intro"><h1>이 이야기로 게시할까요?</h1><p>게시될 내용과 연결된 사건을 확인해주세요.</p></section>
         <CaseContextFolder onOpen={() => setIsLetterOpen(true)} isOpen={isLetterOpen} triggerRef={folderRef} />
-        <button type="button" className="afterstory-preview-hint" onClick={() => setIsLetterOpen(true)} aria-haspopup="dialog" aria-expanded={isLetterOpen}><img src={clickTapIcon} alt="" aria-hidden="true" />파일을 누르면 후일담을 미리 볼 수 있어요.</button>
+        <button type="button" className="afterstory-preview-hint" onClick={() => setIsLetterOpen(true)} aria-haspopup="dialog" aria-expanded={isLetterOpen}><span className="afterstory-preview-hint__gesture" aria-hidden="true"><img src={clickTapIcon} alt="" /></span>파일을 누르면 후일담을 미리 볼 수 있어요.</button>
         <aside className="afterstory-publish-notice"><img src={walgadakEmpathy} alt="" />게시하면 다른 사용자에게 공개돼요.<br />이름·연락처 등 개인정보를 다시 확인해주세요.</aside>
       </div>
       <footer className="afterstory-flow__footer" inert={isLetterOpen}><button type="button" onClick={handlePublish}>후일담 게시하기</button><small>게시 후에도 MY에서 공개 범위를 바꿀 수 있어요.</small></footer>

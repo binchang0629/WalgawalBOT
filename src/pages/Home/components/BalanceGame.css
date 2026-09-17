@@ -3,6 +3,7 @@
 .balance-section--mint .balance-board { height: 364px; }
 .balance-section--mint .balance-board__draggable { height: 117px; filter: none; z-index: 2; }
 .balance-section--mint .balance-board__plate { height: 105px; top: 108px; }
+.balance-section--mint .balance-board__plate-target { top: 97px; height: 127px; }
 .balance-section--mint .balance-board .balance-choice { top: 218px; }
 .balance-section--mint .balance-board__guide { top: 287px; }
 /* 선택지·결과·선택 테두리의 파랑/빨강은 깻잎의 공통 규칙을 그대로 상속한다. */

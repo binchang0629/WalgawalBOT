@@ -162,11 +162,6 @@
     font-weight: 500;
 }
 
-.showcase__toggle:hover {
-    border-color: var(--blue-200);
-    color: var(--blue-700);
-}
-
 /*
  * 양쪽 패널이 들어가려면 (240 + 40) × 2 + 426 + 48 ≈ 1034px가 필요하다.
  * 그보다 좁으면 둘 다 감춘다. 좌우를 함께 감추므로 기기는 계속 중앙에 있다.

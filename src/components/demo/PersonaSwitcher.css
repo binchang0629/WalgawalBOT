@@ -30,16 +30,6 @@
     text-align: left;
 }
 
-.persona-switcher__item:hover {
-    border-color: var(--blue-200);
-}
-
-/* 서아가 선택된 동안 비활성 지훈 카드에는 연한 서브 오렌지 호버를 사용한다. */
-.persona-switcher__item--B:not(.persona-switcher__item--current):hover {
-    border-color: var(--orange-300);
-    background: var(--orange-050);
-}
-
 .persona-switcher__item--current {
     border-color: var(--blue-700);
     background: #fff;
@@ -110,10 +100,6 @@
     cursor: pointer;
 }
 
-.persona-switcher__auth-item:hover {
-    border-color: var(--blue-200);
-}
-
 .persona-switcher__auth-item--current {
     border-color: var(--blue-700);
     background: var(--blue-700);
@@ -138,8 +124,4 @@
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
-}
-
-.persona-switcher__onboarding:hover {
-    background: var(--orange-050);
 }

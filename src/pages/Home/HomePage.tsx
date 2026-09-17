@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import TopBar from '../../components/common/TopBar'
 import useSession from '../../hooks/useSession'
 import useLoginGate from '../../hooks/useLoginGate'
@@ -40,26 +39,6 @@ function HomePage() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isAccountSwitchOpen, setIsAccountSwitchOpen] = useState(false)
 
-  /*
-    시연 흐름상 가입 진입점은 사건 상세의 `로그인하고 나도 투표하기`다.
-    홈 시안에도 같은 문구의 버튼이 막상막하 아래에 있어 여기에 연결해 둔다.
-    사건 상세를 구현하면 그쪽이 본래 자리다. (PROJECT_SPEC.md §7-3, §9-3)
-  */
-  const cta = isAuthenticated ? (
-    <button
-      type="button"
-      className="vote-cta"
-      disabled
-      title="사건 상세 화면을 만들면 연결됩니다"
-    >
-      나도 투표하기
-    </button>
-  ) : (
-    <Link className="vote-cta" to={`${PATHS.signup}?from=${PATHS.home}`}>
-      로그인 하고 나도 투표하기
-    </Link>
-  )
-
   return (
     <main className="home-screen">
       <TopBar
@@ -84,7 +63,7 @@ function HomePage() {
       {!isAuthenticated && <CompactAiRecommendCard />}
       {isAuthenticated && <AiRecommendSection />}
       <BalanceGameSection key={personaId} />
-      <CloseCallSection cta={cta} />
+      <CloseCallSection />
       <AfterStorySection />
       {isAccountSwitchOpen && currentUser && (
         <AccountSwitchSheet

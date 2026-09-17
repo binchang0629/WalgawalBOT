@@ -1,15 +1,11 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import type { CSSProperties, ReactNode } from 'react'
+import type { CSSProperties } from 'react'
 import SectionTitle from '../../../components/common/SectionTitle'
+import useToast from '../../../hooks/useToast'
 import { homeIcons } from '../homeAssets'
 import CompactSwitchButton from './CompactSwitchButton'
 import mascot from '../../../assets/home/figma/close-call-mascot.svg'
 import { closeCallCases, homeSectionTitles } from '../../../data/common/homeContent'
-
-interface CloseCallSectionProps {
-  /** 비로그인일 때 가입으로 보내는 링크, 로그인일 때 투표 버튼 */
-  cta: ReactNode
-}
 
 /*
  * Figma 개발 > `수정?` 프레임(1949:3366)을 Plugin API로 직접 읽은 값.
@@ -75,10 +71,15 @@ function needleAngle(splitAngle: number) {
 }
 
 /** 최신 Figma 개발 시안의 게이지형 막상막하. 바꿔보기는 두 사건을 실제로 교환한다. */
-function CloseCallSection({ cta }: CloseCallSectionProps) {
+function CloseCallSection() {
+  const { showToast } = useToast()
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [swapPhase, setSwapPhase] = useState<'idle' | 'leaving' | 'entering'>('idle')
   const [isGaugeVisible, setIsGaugeVisible] = useState(false)
   const gaugeCardRef = useRef<HTMLElement>(null)
+  const swapTimerRef = useRef<number | null>(null)
+  const settleTimerRef = useRef<number | null>(null)
+  const gaugeFrameRef = useRef<number | null>(null)
   const currentCase = closeCallCases[currentIndex]
   const nextCase = closeCallCases[(currentIndex + 1) % closeCallCases.length]
   const gap = Math.abs(currentCase.leftPercent - currentCase.rightPercent)
@@ -95,8 +96,29 @@ function CloseCallSection({ cta }: CloseCallSectionProps) {
   } as CSSProperties
 
   function handleSwap() {
-    setCurrentIndex((index) => (index + 1) % closeCallCases.length)
+    if (swapPhase !== 'idle') return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setCurrentIndex((index) => (index + 1) % closeCallCases.length)
+      return
+    }
+
+    setSwapPhase('leaving')
+    swapTimerRef.current = window.setTimeout(() => {
+      setIsGaugeVisible(false)
+      setCurrentIndex((index) => (index + 1) % closeCallCases.length)
+      setSwapPhase('entering')
+      gaugeFrameRef.current = window.requestAnimationFrame(() => {
+        gaugeFrameRef.current = window.requestAnimationFrame(() => setIsGaugeVisible(true))
+      })
+      settleTimerRef.current = window.setTimeout(() => setSwapPhase('idle'), 460)
+    }, 200)
   }
+
+  useEffect(() => () => {
+    if (swapTimerRef.current !== null) window.clearTimeout(swapTimerRef.current)
+    if (settleTimerRef.current !== null) window.clearTimeout(settleTimerRef.current)
+    if (gaugeFrameRef.current !== null) window.cancelAnimationFrame(gaugeFrameRef.current)
+  }, [])
 
   // 첫 게이지 카드가 거의 화면 안에 들어왔을 때 한 번만 채운다.
   useEffect(() => {
@@ -119,7 +141,7 @@ function CloseCallSection({ cta }: CloseCallSectionProps) {
   }, [])
 
   return (
-    <section className={isGaugeVisible ? 'close-section close-section--gauge-visible' : 'close-section'}>
+    <section className={`close-section${isGaugeVisible ? ' close-section--gauge-visible' : ''}${swapPhase !== 'idle' ? ` close-section--${swapPhase}` : ''}`}>
       <SectionTitle
         title={homeSectionTitles.closeCall.title}
         description={homeSectionTitles.closeCall.description}
@@ -135,10 +157,11 @@ function CloseCallSection({ cta }: CloseCallSectionProps) {
       />
 
       <article ref={gaugeCardRef} className="close-card" aria-live="polite">
+        <button type="button" className="close-section__card-action" onClick={() => showToast('막상막하 사건 상세는 업데이트 예정입니다.')} aria-label={`${currentCase.titleLines.join(' ')} 상세 업데이트 예정 안내`} />
         <h3 className="close-card__title">
           {currentCase.titleLines.map((line) => <span key={line}>{line}<br /></span>)}
         </h3>
-        <div className="close-card__gauge" style={gaugeStyle}>
+        <div key={currentCase.id} className="close-card__gauge" style={gaugeStyle}>
           {/* 하나의 선을 채워 색 경계도 끊기지 않게 한다. */}
           <svg className="close-card__arc" viewBox="0 0 309 191" aria-hidden="true" focusable="false">
             <defs>
@@ -166,6 +189,7 @@ function CloseCallSection({ cta }: CloseCallSectionProps) {
       </article>
 
       <article className="swap-card" aria-live="polite">
+        <button type="button" className="close-section__card-action" onClick={handleSwap} aria-label={`${nextCase.titleLines.join(' ')} 위 카드로 바꿔 보기`} />
         <div className="swap-card__head">
           <span className="swap-card__tag"><img src={homeIcons.fireIcon} alt="" aria-hidden="true" />치열한 공방 중</span>
         </div>
@@ -176,7 +200,6 @@ function CloseCallSection({ cta }: CloseCallSectionProps) {
           <span className="swap-card__side swap-card__side--red"><b>{nextCase.rightPercent}%</b>{nextCase.rightLabel}</span>
         </div>
       </article>
-      {cta}
     </section>
   )
 }

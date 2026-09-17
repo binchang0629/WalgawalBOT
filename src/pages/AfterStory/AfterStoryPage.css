@@ -22,7 +22,7 @@
 /* 하단바 바깥에도 페이지의 파란 배경이 이어진다. */
 .main-layout:has(.afterstory-home) .main-layout__scroll { padding-bottom: 0; background: #4056ee; }.afterstory-story-summary p { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.5; }.afterstory-story-summary__link { display: inline-flex; align-items: center; gap: 6px; margin-top: 20px; padding: 10px 16px; border: 1px solid rgb(255 255 255 / 60%); border-radius: var(--radius-pill); color: #fff; background: rgb(255 255 255 / 12%); font-size: 14px; font-weight: 700; line-height: 1.2; text-decoration: none; }.afterstory-story-summary__link:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 .afterstory-flow { position: relative; display: flex; flex-direction: column; height: 100%; overflow: hidden; }.afterstory-flow__body { --content-gutter: 24px; flex: 1; min-height: 0; padding: 16px var(--content-gutter) 20px; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }.afterstory-flow__body--with-progress > .case-submit__progress { width: calc(100% + var(--content-gutter) + var(--content-gutter)); margin: -16px calc(0px - var(--content-gutter)) 16px; }.afterstory-flow__body::-webkit-scrollbar { width: 0; height: 0; display: none; }.afterstory-case-context { padding: 16px; border-radius: 8px; background: var(--blue-050); }.afterstory-case-context p { margin: 0 0 7px; color: var(--neutral-700); font-size: 12px; line-height: 1.3; }.afterstory-case-context h2 { margin: 0; font-size: 16px; line-height: 1.3; }.afterstory-case-context h2 span, .afterstory-complete h2 span { display: block; }
-.afterstory-flow__intro { margin: 27px 0 25px; }.afterstory-flow__intro h1, .afterstory-preview-intro h1 { margin: 0; font-size: 26px; line-height: 1.2; }.afterstory-flow__intro p, .afterstory-preview-intro p { margin: 8px 0 0; color: var(--neutral-600); font-size: 13px; line-height: 1.3; }.afterstory-field__head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 9px; }.afterstory-field label { color: var(--blue); font-size: 14px; font-weight: 700; }.afterstory-field label b { color: var(--blue); }/* 발표 시연용 예시 채우기. 브랜드 오렌지 텍스트 버튼. */.afterstory-field__demo { padding: 0; border: 0; background: none; color: var(--orange); font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; }.afterstory-field__demo:hover { color: var(--orange); }.afterstory-field__demo:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 4px; }.afterstory-field__box { position: relative; height: 240px; padding: 16px; border: 1px solid var(--neutral-200); border-radius: 12px; }.afterstory-field textarea { width: 100%; height: 184px; padding: 0; border: 0; outline: 0; resize: none; color: var(--neutral-800); background: transparent; font: 14px/1.5 var(--font-body); }.afterstory-field textarea::placeholder { color: var(--neutral-600); }.afterstory-field small { position: absolute; right: 16px; bottom: 16px; color: var(--neutral-600); font-size: 11px; }.afterstory-privacy { display: flex; align-items: center; gap: 12px; margin-top: 24px; color: var(--neutral-600); font-size: 12px; }.afterstory-privacy img { width: 40px; height: 40px; }
+.afterstory-flow__intro { margin: 27px 0 25px; }.afterstory-flow__intro h1, .afterstory-preview-intro h1 { margin: 0; font-size: 26px; line-height: 1.2; }.afterstory-flow__intro p, .afterstory-preview-intro p { margin: 8px 0 0; color: var(--neutral-600); font-size: 13px; line-height: 1.3; }.afterstory-field__head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 9px; }.afterstory-field label { color: var(--blue); font-size: 14px; font-weight: 700; }.afterstory-field label b { color: var(--blue); }/* 발표 시연용 예시 채우기. 브랜드 오렌지 텍스트 버튼. */.afterstory-field__demo { padding: 0; border: 0; background: none; color: var(--orange); font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; }.afterstory-field__demo:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 4px; }.afterstory-field__box { position: relative; height: 240px; padding: 16px; border: 1px solid var(--neutral-200); border-radius: 12px; }.afterstory-field textarea { width: 100%; height: 184px; padding: 0; border: 0; outline: 0; resize: none; color: var(--neutral-800); background: transparent; font: 14px/1.5 var(--font-body); }.afterstory-field textarea::placeholder { color: var(--neutral-600); }.afterstory-field small { position: absolute; right: 16px; bottom: 16px; color: var(--neutral-600); font-size: 11px; }.afterstory-privacy { display: flex; align-items: center; gap: 12px; margin-top: 24px; color: var(--neutral-600); font-size: 12px; }.afterstory-privacy img { width: 40px; height: 40px; }
 .afterstory-flow__footer { flex: none; height: calc(126px + env(safe-area-inset-bottom, 0px)); padding: 12px 24px calc(32px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--neutral-100); background: #fff; }.afterstory-flow__footer button { width: 100%; height: 52px; border: 0; border-radius: 8px; color: #fff; background: var(--orange); font-size: 16px; font-weight: 700; }.afterstory-flow__footer button:disabled { background: var(--neutral-300); }.afterstory-flow__footer small { display: block; margin-top: 10px; color: var(--neutral-600); font-size: 11px; text-align: center; }
 .afterstory-preview-intro { margin: 0 0 20px; }.afterstory-publish-notice { display: flex; align-items: center; gap: 12px; margin-top: 20px; padding: 12px 16px; border: 1px solid var(--orange-300); border-radius: 8px; color: var(--neutral-700); background: var(--orange-100); font-size: 12px; line-height: 1.35; }.afterstory-publish-notice img { width: 48px; height: 48px; object-fit: contain; }
 .afterstory-complete__spacer { flex: none; height: 56px; }
@@ -67,7 +67,7 @@
 .afterstory-mine__category::before { width: 6px; height: 6px; border-radius: 50%; background: currentColor; content: ''; }
 .afterstory-mine__category--friend { color: var(--blue); }
 .afterstory-mine__category--company { color: var(--orange); }
-.afterstory-mine__badge { padding: 4px 10px; border-radius: 11px; color: var(--blue); background: var(--blue-050); font-size: 12px; font-weight: 500; }
+.afterstory-verdict-badge { display: inline-flex; align-items: center; flex: none; padding: 4px 10px; border-radius: 11px; color: var(--blue); background: var(--blue-050); font-size: 12px; font-weight: 500; }
 /* 제목은 자연스럽게 접히게 둔다. 시안(402px)보다 좁은 화면에서 줄을 강제로 나누면 한 글자만 남는다. */
 .afterstory-mine__card h4 { margin: 12px 0 0; font-size: 16px; line-height: 1.45; }
 .afterstory-mine__card p { margin: 12px 0 0; color: var(--neutral-600); font-size: 13px; line-height: 1.45; }
@@ -932,15 +932,6 @@
   white-space: nowrap;
 }
 
-.afterstory-case-folder__status strong {
-  flex: none;
-  padding: 4px 9px;
-  border-radius: 12px;
-  color: var(--blue-700);
-  background: #e8f2ff;
-  font-weight: 700;
-}
-
 /* 완료 화면의 하단 버튼도 폴더가 나타난 뒤에 보여준다. */
 .afterstory-complete__footer {
   animation: afterstory-complete-footer 440ms cubic-bezier(.22, 1, .36, 1) 1600ms both;
@@ -955,10 +946,6 @@
   border-radius: 20px;
   cursor: pointer;
   transition: transform 180ms ease;
-}
-
-@media (hover: hover) {
-  .afterstory-case-folder-trigger:hover { transform: translateY(-2px); }
 }
 
 .afterstory-case-folder-trigger:active {
@@ -977,7 +964,7 @@
   gap: 6px;
   width: 100%;
   max-width: 330px;
-  margin: 10px auto 0;
+  margin: 5px auto 0;
   padding: 0;
   border: 0;
   color: var(--neutral-600);
@@ -994,21 +981,54 @@
   border-radius: 4px;
 }
 
-.afterstory-preview-hint img {
-  display: block;
+.afterstory-preview-hint__gesture {
+  position: relative;
+  display: grid;
+  place-items: center;
   flex: none;
-  width: 24px;
-  height: 24px;
-  animation: afterstory-preview-float 3.4s ease-in-out infinite;
+  width: 28px;
+  height: 28px;
 }
 
-@keyframes afterstory-preview-float {
-  0%, 100% { transform: translateY(1px); }
-  50% { transform: translateY(-2px); }
+.afterstory-preview-hint__gesture img {
+  display: block;
+  width: 24px;
+  height: 24px;
+  animation: afterstory-preview-tap 3s ease-in-out infinite;
+}
+
+.afterstory-preview-hint__gesture::after {
+  position: absolute;
+  top: 0;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--blue-700);
+  border-radius: 50%;
+  content: '';
+  pointer-events: none;
+  opacity: 0;
+  animation: afterstory-preview-tap-ring 3s ease-out infinite;
+}
+
+@keyframes afterstory-preview-tap {
+  0%, 8%, 22%, 36%, 100% { transform: translateY(-2px) scale(1); }
+  14%, 28% { transform: translateY(3px) scale(.92); }
+}
+
+@keyframes afterstory-preview-tap-ring {
+  0%, 12%, 26%, 100% { opacity: 0; transform: scale(.4); }
+  15%, 29% { opacity: .5; transform: scale(.65); }
+  22%, 36% { opacity: 0; transform: scale(1.3); }
+}
+
+.afterstory-preview-hint:active .afterstory-preview-hint__gesture img {
+  animation: none;
+  transform: translateY(3px) scale(.92);
 }
 
 .afterstory-preview-hint + .afterstory-publish-notice {
-  margin-top: 16px;
+  margin-top: 28px;
 }
 
 .afterstory-letter-preview {
@@ -1110,7 +1130,8 @@
 @media (prefers-reduced-motion: reduce) {
   .afterstory-letter-preview,
   .afterstory-letter-preview__dialog,
-  .afterstory-preview-hint img { animation: none; }
+  .afterstory-preview-hint__gesture img,
+  .afterstory-preview-hint__gesture::after { animation: none; }
 
   .afterstory-case-folder-trigger { transition: none; }
 }
