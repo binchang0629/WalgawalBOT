@@ -319,7 +319,14 @@ function ClosedCaseResultPage() {
         <div className="case-result__section-divider case-result__section-divider--closed" />
 
         {plazaStory ? (
-          <CommentThread key={plazaStory.id} comments={plazaStory.comments} headingId="comments-title" plazaCaseId={plazaStory.id} />
+          <CommentThread
+            key={plazaStory.id}
+            comments={plazaStory.comments}
+            headingId="comments-title"
+            plazaCaseId={plazaStory.id}
+            /* 이 화면의 인라인 댓글과 마찬가지로 MY > 내가 쓴 댓글에 남긴다. */
+            commentRecord={{ caseId: plazaStory.id, caseTitle: plazaStory.title, href: location.pathname }}
+          />
         ) : <section ref={commentSectionRef} className="comment-section" aria-labelledby="comments-title">
           <div className="comment-section__heading">
             <h2 id="comments-title">댓글 ({allComments.length})</h2>

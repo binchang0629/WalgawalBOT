@@ -138,11 +138,43 @@ const secretSeeds: CommentSeed[] = [
 
 const avatars = profileAvatars
 
+/**
+ * `5분 전`, `1시간 15분 전` 같은 문구를 분으로 바꾼다.
+ * 후일담 카드의 updatedAt이 이 형식이라, 댓글 시각을 맞출 때 기준으로 쓴다.
+ */
+export function parseElapsedMinutes(label: string | undefined): number | null {
+  if (!label) return null
+  const hours = /(\d+)\s*시간/.exec(label)
+  const minutes = /(\d+)\s*분/.exec(label)
+  if (!hours && !minutes) return null
+  return (hours ? Number(hours[1]) * 60 : 0) + (minutes ? Number(minutes[1]) : 0)
+}
+
+/**
+ * 댓글 시각을 글이 올라온 뒤로 옮긴다.
+ *
+ * 전에는 글 나이와 상관없이 `4 + index * 17`분이라, 5분 전에 올라온 글에
+ * 21분 전·38분 전 댓글이 달려 있었다. 글보다 오래된 댓글은 있을 수 없다.
+ *
+ * 글이 올라온 시점과 지금 사이를 댓글 수 + 1로 나눠 고르게 놓는다.
+ * 목록은 최신순이므로 index 0이 가장 최근이고, 마지막이 글 직후다.
+ * 짧은 시간에 댓글이 많으면 같은 분이 겹치는데, 실제로도 그렇게 몰린다.
+ */
+export function retimeComments(comments: ThreadComment[], storyMinutesAgo: number | null): ThreadComment[] {
+  if (storyMinutesAgo === null || !Number.isFinite(storyMinutesAgo) || storyMinutesAgo <= 0) return comments
+  const total = comments.length
+  return comments.map((comment, index) => ({
+    ...comment,
+    minutesAgo: Math.max(1, Math.round((storyMinutesAgo * (index + 1)) / (total + 1))),
+  }))
+}
+
 function toComments(seeds: CommentSeed[], idPrefix: string): ThreadComment[] {
   return seeds.map(([nickname, body], index) => ({
     id: `${idPrefix}-comment-${index + 1}`,
     nickname,
     body,
+    // 실제로 보이는 시각은 retimeComments가 글 나이에 맞춰 다시 정한다.
     minutesAgo: 4 + index * 17,
     voteId: null,
     voteLabel: null,

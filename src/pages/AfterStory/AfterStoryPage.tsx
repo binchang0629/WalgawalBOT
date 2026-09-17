@@ -17,7 +17,7 @@ import { profileAvatars } from '../../data/common/profileAvatars'
 import CommentThread from '../../components/common/CommentThread'
 import Pagination from '../../components/common/Pagination'
 import { afterStoryAuthor, afterStoryComments, afterStoryLetter } from '../../data/common/afterStoryDetailContent'
-import { afterStoryCardComments } from '../../data/common/afterStoryCardComments'
+import { afterStoryCardComments, parseElapsedMinutes, retimeComments } from '../../data/common/afterStoryCardComments'
 import scrollBackground from '../../assets/afterstory/figma/scroll-background.png'
 import letterPaper from '../../assets/afterstory/figma/letter-paper.png'
 import detailBackground from '../../assets/afterstory/figma/detail-background.png'
@@ -148,8 +148,15 @@ const MY_CLOSED_CASES = [
 ] as const
 
 /**
- * 다른 사용자가 공개한 후일담. 이미 광장과 홈에 있는 시연 사건만 연결해,
- * 화면을 채우기 위해 새로운 갈등 사례를 만들어내지 않는다.
+ * 다른 사용자가 공개한 후일담.
+ *
+ * 태그(연인·친구·가족·직장·학업)마다 5건씩, 모두 25건이다.
+ * 한 쪽에 5건씩 보이므로 `전체`는 정확히 5페이지가 되고,
+ * 태그를 고르면 그 태그의 5건이 한 쪽에 들어온다.
+ *
+ * 되도록 광장에 이미 있는 시연 사건을 연결한다. 다만 광장 사건만으로는
+ * 연인·가족·직장이 각각 한 건씩 모자라서, 그 세 건은 같은 결의 생활 갈등으로 새로 썼다.
+ * (id에 광장 사건이 없으면 상세 화면이 공통 후일담 문구로 채운다.)
  */
 const COMMUNITY_AFTER_STORIES = [
   {
@@ -211,6 +218,56 @@ const COMMUNITY_AFTER_STORIES = [
   {
     id: 'ai-report', category: '학업', tone: 'friend', updatedAt: '3시간 20분 전',
     title: 'AI를 활용한 과제라서 표절이 아니라는 조원의 주장', summary: '과제 도구 사용 기준을 다시 정리했어요.', reactions: 9,
+  },
+
+  /* ── 여기부터는 태그마다 5건을 채우려고 추가한 후일담 ── */
+
+  // 연인
+  {
+    id: 'invite-ex', category: '연인', tone: 'friend', updatedAt: '3시간 40분 전',
+    title: '전 애인을 친구 모임에 초대해도 괜찮을까요?', summary: '모임 전에 미리 알리기로 약속했어요.', reactions: 5,
+  },
+  {
+    id: 'reply-pace', category: '연인', tone: 'friend', updatedAt: '4시간 전',
+    title: '연락 빈도가 서로 달라 서운함이 쌓였어요', summary: '바쁜 시간대를 공유하고 기대치를 맞췄어요.', reactions: 6,
+  },
+
+  // 가족
+  {
+    id: 'family-living-expenses', category: '가족', tone: 'friend', updatedAt: '4시간 20분 전',
+    title: '취업 후에도 생활비를 전부 내라는 부모님 말씀', summary: '부담 가능한 금액을 함께 정했어요.', reactions: 8,
+  },
+  {
+    id: 'family-moving', category: '가족', tone: 'friend', updatedAt: '4시간 45분 전',
+    title: '이사 날짜를 가족이 먼저 정한 뒤 도움을 부탁했어요', summary: '다음부터는 일정을 먼저 묻기로 했어요.', reactions: 4,
+  },
+  {
+    id: 'holiday-schedule', category: '가족', tone: 'friend', updatedAt: '5시간 전',
+    title: '명절마다 한쪽 집에만 가는 일정이 반복됐어요', summary: '해마다 번갈아 가기로 정리했어요.', reactions: 7,
+  },
+
+  // 직장
+  {
+    id: 'work-new-hire', category: '직장', tone: 'company', updatedAt: '5시간 20분 전',
+    title: '신입 교육 자료를 혼자 만들라는 요청이 부담스러워요', summary: '분량을 나누고 마감을 다시 잡았어요.', reactions: 6,
+  },
+  {
+    id: 'team-dinner', category: '직장', tone: 'company', updatedAt: '5시간 45분 전',
+    title: '회식 불참을 말했더니 분위기가 어색해졌어요', summary: '참석 기준을 팀과 미리 공유하기로 했어요.', reactions: 5,
+  },
+
+  // 학업
+  {
+    id: 'group-project-credit', category: '학업', tone: 'friend', updatedAt: '6시간 전',
+    title: '조별 과제에서 친구를 공개적으로 지적한 사건', summary: '먼저 사과한 뒤 서로의 의견을 묻게 됐어요.', reactions: 9,
+  },
+  {
+    id: 'school-lab-data', category: '학업', tone: 'friend', updatedAt: '6시간 20분 전',
+    title: '실험 결과가 나오지 않아 데이터를 다시 정리하자고 했어요', summary: '기록 방식을 통일하고 다시 측정했어요.', reactions: 4,
+  },
+  {
+    id: 'study-presentation', category: '학업', tone: 'friend', updatedAt: '6시간 45분 전',
+    title: '제 의견은 무시하고 팀원이 발표 자료를 바꿨어요', summary: '수정 전에 서로 확인하기로 했어요.', reactions: 7,
   },
 ] as const
 
@@ -618,9 +675,15 @@ export function AfterStoryDetailPage() {
         '솔직하게 이야기하기로 했습니다.',
       ]
     : afterStoryLetter.lines)
-  const comments = storyId && storyId in afterStoryCardComments
+  /*
+   * 댓글은 글이 올라온 뒤에 달린 것이어야 한다.
+   * 카드의 `5분 전` 같은 문구를 분으로 바꿔, 그 안으로 댓글 시각을 다시 배치한다.
+   * 어느 글인지 못 찾으면(예: 예전 `friend` 경로) 원래 시각을 그대로 둔다.
+   */
+  const baseComments = storyId && storyId in afterStoryCardComments
     ? afterStoryCardComments[storyId as keyof typeof afterStoryCardComments]
     : afterStoryComments
+  const comments = retimeComments(baseComments, parseElapsedMinutes(communityStory?.updatedAt))
 
   if (storyId !== 'friend' && !variant && !communityStory) return <Navigate to={PATHS.afterStory} replace />
 
