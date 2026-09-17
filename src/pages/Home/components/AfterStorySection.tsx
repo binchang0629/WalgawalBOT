@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import useDragScroll from '../../../hooks/useDragScroll'
 import SectionTitle from '../../../components/common/SectionTitle'
 import { PATHS, toAfterStoryDetail } from '../../../routes/paths'
@@ -20,6 +20,7 @@ import {
  * 봉투 세 장의 겹치는 위치는 이미지의 밑변 폭을 맞춰 계산했다(Home.css 참고).
  */
 function AfterStorySection() {
+  const navigate = useNavigate()
   const [letterState, setLetterState] = useState<'closed' | 'opening' | 'open'>('closed')
   const transitionTimer = useRef<number | null>(null)
   // 후일담 카드 줄은 마우스로도 끌어서 넘길 수 있어야 한다.
@@ -43,6 +44,7 @@ function AfterStorySection() {
         title={homeSectionTitles.afterStory.title}
         description={homeSectionTitles.afterStory.description}
         action={homeSectionTitles.afterStory.action}
+        onActionClick={() => navigate(PATHS.afterStory)}
       />
 
       <article className={'letter letter--' + letterState + (isLetterOpen ? ' is-open' : '')}>
