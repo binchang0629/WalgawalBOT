@@ -33,8 +33,9 @@ export interface BotStep {
   freeTextNext?: string
 }
 
-function p(text: string): BotBlock {
-  return { kind: 'p', text }
+/** 같은 말풍선 안에서 줄을 나누려면 p('첫 줄', '둘째 줄')처럼 적는다. */
+function p(...lines: string[]): BotBlock {
+  return { kind: 'p', text: lines.join('\n') }
 }
 
 function list(items: string[]): BotBlock {
@@ -107,9 +108,9 @@ export const STEP_MAP: Record<string, BotStep> = {
     id: 'howToUse',
     blocks: [
       p('왈가왈봇은 크게 세 단계로 쓸 수 있어요.'),
-      p('**① 사례 둘러보기** — 로그인 없이 홈과 배심원 광장에서 비슷한 사건을 먼저 살펴볼 수 있어요.'),
-      p('**② 사건 접수와 AI 1심** — 내 사건을 접수하면 판멍이가 먼저 핵심 쟁점을 정리해드려요.'),
-      p('**③ 배심원 2심** — 필요하다고 느끼면 사건을 공개해 여러 사람의 관점을 더 모을 수 있어요.'),
+      p('**① 사례 둘러보기** — 로그인 없이 홈과 배심원', '광장에서 비슷한 사건을 먼저 살펴볼 수 있어요.'),
+      p('**② 사건 접수와 AI 1심** — 내 사건을 접수하면', '판멍이가 먼저 핵심 쟁점을 정리해드려요.'),
+      p('**③ 배심원 2심** — 필요하다고 느끼면 사건을', '공개해 여러 사람의 관점을 더 모을 수 있어요.'),
     ],
     options: [{ id: 'more', label: '다른 질문 할게요', next: RESTART_STEP_ID }],
   },
@@ -117,10 +118,10 @@ export const STEP_MAP: Record<string, BotStep> = {
   aiResultInfo: {
     id: 'aiResultInfo',
     blocks: [
-      p('AI 판정은 배심원 투표를 하기 전까지는 보여드리지 않아요.'),
-      p('먼저 결과를 보면 **의견을 따라가는 편향**이 생길 수 있기 때문이에요.'),
+      p('AI 판정은 배심원 투표를 하기 전까지는', '보여드리지 않아요.'),
+      p('먼저 결과를 보면 **의견을 따라가는 편향**이', '생길 수 있기 때문이에요.'),
       p(
-        '투표를 마치면 **배심원 최다 의견**과 **AI 1심 판단**, 그리고 둘의 판단 확신도를 함께 확인할 수 있어요.',
+        '투표를 마치면 **배심원 최다 의견**과 **AI 1심 판단**, 그리고 둘의 판단 확신도를 함께 확인할 수','있어요.',
       ),
     ],
     options: [{ id: 'more', label: '다른 질문 할게요', next: RESTART_STEP_ID }],
@@ -131,9 +132,9 @@ export const STEP_MAP: Record<string, BotStep> = {
     blocks: [
       p('모든 사건에 전문가가 필요한 건 아니에요.'),
       p(
-        '다만 **금전·법률처럼 되돌리기 어려운 문제**거나 **감정적으로 많이 힘든 상황**이라면 전문가 도움을 먼저 권해드려요.',
+        '다만 **금전·법률처럼 되돌리기 어려운 문제**거나', '**감정적으로 많이 힘든 상황**이라면 전문가 도움을', '먼저 권해드려요.',
       ),
-      p('접수한 사건이 있다면 그 내용을 바탕으로 더 구체적으로 안내해드릴게요.'),
+      p('접수한 사건이 있다면 그 내용을 바탕으로 더', '구체적으로 안내해드릴게요.'),
     ],
     options: [
       { id: 'goCase', label: '내 사건으로 확인할게요', next: 'caseIntro' },
@@ -144,9 +145,9 @@ export const STEP_MAP: Record<string, BotStep> = {
   troubleInfo: {
     id: 'troubleInfo',
     blocks: [
-      p('이용 중 불편한 점이 있었다면 먼저 사과드릴게요.'),
-      p('지금은 시연용 데모라 **실제 신고·문의 접수는 연결되어 있지 않아요.**'),
-      p('급한 문제라면 MY의 고객센터 안내를 확인해주세요. (준비 중)'),
+      p('이용 중 불편한 점이 있었다면', '먼저 사과드릴게요.'),
+      p('지금은 시연용 데모라 **실제 신고·문의 접수는', '연결되어 있지 않아요.**'),
+      p('급한 문제라면 MY의 고객센터 안내를 확인','해주세요. (준비 중)'),
     ],
     options: [{ id: 'more', label: '다른 질문 할게요', next: RESTART_STEP_ID }],
   },
@@ -155,8 +156,8 @@ export const STEP_MAP: Record<string, BotStep> = {
   caseIntroEmpty: {
     id: 'caseIntroEmpty',
     blocks: [
-      p('아직 접수한 사건이 없어서 함께 볼 내용이 없어요.'),
-      p('사건을 먼저 접수하면 그 내용을 바탕으로 답변해드릴 수 있어요.'),
+      p('아직 접수한 사건이 없어서 함께 볼 내용이', '없어요.'),
+      p('사건을 먼저 접수하면 그 내용을 바탕으로', '답변해드릴 수 있어요.'),
     ],
     options: [
       { id: 'toSubmit', label: '사건 접수하러 갈게요', next: RESTART_STEP_ID },

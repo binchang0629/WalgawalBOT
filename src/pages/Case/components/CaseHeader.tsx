@@ -28,12 +28,7 @@ function CaseHeader({ title = '오늘의 사건', backTo }: { title?: string; ba
       if (backTo === PATHS.plaza && (location.state as { fromPlaza?: boolean } | null)?.fromPlaza) {
         markPlazaReturnReady()
       }
-      if (backTo === PATHS.home) {
-        headerRef.current
-          ?.closest<HTMLElement>('.main-layout__scroll')
-          ?.scrollTo({ top: 0, left: 0, behavior: 'auto' })
-      }
-      navigate(backTo)
+      navigate(backTo, { state: backTo === PATHS.home ? { restoreHomeScroll: true } : undefined })
       return
     }
 
@@ -55,7 +50,7 @@ function CaseHeader({ title = '오늘의 사건', backTo }: { title?: string; ba
           type="button"
           className="case-detail-header__back"
           onClick={handleBack}
-          aria-label={backTo === PATHS.home ? '홈으로 이동' : '뒤로 가기'}
+          aria-label="뒤로 가기"
         >
           <img src={backIcon} alt="" width={24} height={24} />
         </button>

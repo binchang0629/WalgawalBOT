@@ -29,18 +29,25 @@ function PostedCaseCard({ postedCase }: { postedCase: PostedCase }) {
 
 /**
  * `**강조**` 표시를 파랑 SemiBold 글자로 바꾼다.
+ * 문구 안의 `\n`과 `<br>`는 HTML로 실행하지 않고 React 줄바꿈으로 그린다.
  * Figma 답변 문구에서 파란 글자로 강조된 구간(예: "잔금 220만 원이 지급되지 않았고")을
  * 데이터 파일(chatbotScript.ts)에서는 마크다운처럼 `**`로 감싸 표현했다.
  */
 function renderInlineText(text: string) {
+  const withLineBreaks = (value: string) => value.split(/<br\s*\/?>|\n/gi).map((line, index) => (
+    <Fragment key={index}>
+      {index > 0 && <br />}
+      {line}
+    </Fragment>
+  ))
   const parts = text.split('**')
   return parts.map((part, index) =>
     index % 2 === 1 ? (
       <strong key={index} className="chatbot-bot-text__strong">
-        {part}
+        {withLineBreaks(part)}
       </strong>
     ) : (
-      <Fragment key={index}>{part}</Fragment>
+      <Fragment key={index}>{withLineBreaks(part)}</Fragment>
     ),
   )
 }

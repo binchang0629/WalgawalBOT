@@ -11,6 +11,7 @@ import customProfileAvatar from '../../assets/my/custom-walgadak-avatar.svg'
 import { commentStickerById, type CommentStickerId } from '../../data/common/commentStickers'
 import useLoginGate from '../../hooks/useLoginGate'
 import useSession from '../../hooks/useSession'
+import useToast from '../../hooks/useToast'
 /*
  * 스티커 고르는 창은 사건 결과 화면에서 먼저 만들어 둔 것을 그대로 쓴다.
  * 공용 컴포넌트가 화면 폴더 안을 가리키는 건 정리 대상이지만,
@@ -19,6 +20,7 @@ import useSession from '../../hooks/useSession'
 import CommentStickerPicker from '../../pages/Case/components/CommentStickerPicker'
 import Pagination from './Pagination'
 import ConfirmDialog from './ConfirmDialog'
+import { COMMENT_TOAST_MESSAGES } from './commentToastMessages'
 import './CommentThread.css'
 
 /** 댓글 한 건. 사건 결과 화면과 왈가왈후 후일담 상세 화면이 같은 모양을 쓴다. */
@@ -212,6 +214,7 @@ interface CommentThreadProps {
 function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge = true, headingId = 'comment-thread-title' }: CommentThreadProps) {
   const { currentUser, sessionStatus, personaId } = useSession()
   const { requireLogin } = useLoginGate()
+  const { showToast } = useToast()
   const location = useLocation()
 
   const [draft, setDraft] = useState('')
@@ -375,6 +378,7 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
               setAddedComments((current) => current.map((item) => (
                 item.id === comment.id ? { ...item, body, createdAtLabel: '방금 전 · 수정됨' } : item
               )))
+              showToast(COMMENT_TOAST_MESSAGES.edited)
             } : undefined}
             onDelete={comment.id.startsWith('new-comment-') ? () => setPendingDeleteId(comment.id) : undefined}
           />
@@ -399,6 +403,7 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
               return next
             })
             setPendingDeleteId(null)
+            showToast(COMMENT_TOAST_MESSAGES.deleted)
           }}
         />
       )}

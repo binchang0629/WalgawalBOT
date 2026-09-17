@@ -11,6 +11,7 @@ import storyLinkIcon from '../../assets/case/result/story-link.svg'
 import submitIcon from '../../assets/case/result/submit.svg'
 import customProfileAvatar from '../../assets/my/custom-walgadak-avatar.svg'
 import ConfirmDialog from '../../components/common/ConfirmDialog'
+import { COMMENT_TOAST_MESSAGES } from '../../components/common/commentToastMessages'
 import Pagination from '../../components/common/Pagination'
 import { commentStickerById, type CommentStickerId } from '../../data/common/commentStickers'
 import { weddingGiftCase } from '../../data/common/caseDetailContent'
@@ -23,6 +24,7 @@ import {
 } from '../../data/common/caseResultContent'
 import type { CaseResultComment } from '../../data/common/caseResultContent'
 import useSession from '../../hooks/useSession'
+import useToast from '../../hooks/useToast'
 import { PATHS } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
 import CommentStickerPicker from './components/CommentStickerPicker'
@@ -32,6 +34,7 @@ import './WeddingGiftResultPage.css'
 
 interface ResultRouteState {
   selectedVote?: WeddingGiftVoteId
+  returnTo?: string
 }
 
 const COMMENTS_PER_PAGE = 5
@@ -166,6 +169,7 @@ function CaseResultPage() {
   const { caseId } = useParams()
   const location = useLocation()
   const { sessionStatus, currentUser, personaId } = useSession()
+  const { showToast } = useToast()
   const [draft, setDraft] = useState('')
   const [selectedStickerId, setSelectedStickerId] = useState<CommentStickerId | null>(null)
   const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false)
@@ -188,6 +192,7 @@ function CaseResultPage() {
   if (sessionStatus !== 'authenticated') return <Navigate to={loginPath} replace />
 
   const routeState = location.state as ResultRouteState | null
+  const returnTo = routeState?.returnTo === PATHS.my ? PATHS.my : isParentsCase ? PATHS.plaza : PATHS.home
   const selectedVote = isVoteId(routeState?.selectedVote) ? routeState.selectedVote : 'writer'
   const seededComments = Array.from(
     { length: Math.min(resultContent.commentCount, MAX_PAGINATED_COMMENTS) },
@@ -242,7 +247,7 @@ function CaseResultPage() {
 
   return (
     <main className="case-result case-result--wedding">
-      <CaseHeader title={isParentsCase ? '사건 결과' : undefined} backTo={isParentsCase ? PATHS.plaza : PATHS.home} />
+      <CaseHeader title={isParentsCase ? '사건 결과' : undefined} backTo={returnTo} />
 
       <div className="case-result__body">
         <section className="result-overview" aria-labelledby="result-case-title">
@@ -373,6 +378,7 @@ function CaseResultPage() {
                   setAddedComments((comments) => comments.map((item) => (
                     item.id === comment.id ? { ...item, body, createdAt: '방금 전 · 수정됨' } : item
                   )))
+                  showToast(COMMENT_TOAST_MESSAGES.edited)
                 } : undefined}
                 onDelete={comment.id.startsWith('new-comment-') ? () => setPendingDeleteId(comment.id) : undefined}
               />
@@ -410,6 +416,7 @@ function CaseResultPage() {
               return next
             })
             setPendingDeleteId(null)
+            showToast(COMMENT_TOAST_MESSAGES.deleted)
           }}
         />
       )}

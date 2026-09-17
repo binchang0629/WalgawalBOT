@@ -182,7 +182,7 @@
 .profile-card__top { gap: 8px; }
 .profile-card__name-row { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; }
 .profile-card__nickname { color: #939094; font-size: 11px; font-weight: 400; line-height: 1.4; }
-.profile-card__user small { color: var(--neutral-700); font-size: 11px; line-height: 1.4; white-space: nowrap; }
+.profile-card__user small { color: var(--neutral-700); font-size: 11px; line-height: 1.4; white-space: normal; word-break: keep-all; }
 
 .profile-card__switch {
     flex: none;
@@ -270,8 +270,7 @@
 .my-page--seoa .my-menu__row:first-child { min-height: 56px; padding-bottom: 11px; }
 .my-page--seoa .my-menu__row.is-disabled { border-color: var(--neutral-400); }
 .my-page--seoa .my-menu__row:not(.is-disabled) { border-color: var(--neutral-400); }
-.my-page--seoa .expert-card.is-disabled { min-height: 62px; padding-block: 14px; color: var(--neutral-700); background: #fff; }
-.my-page--seoa .expert-card.is-disabled .my-menu__icon { color: var(--neutral-650); background: var(--neutral-200); }
+.my-page--seoa .expert-card.is-disabled { min-height: 62px; padding-block: 14px; }
 
 .my-menu {
     overflow: hidden;

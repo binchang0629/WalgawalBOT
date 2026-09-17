@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PATHS } from '../../routes/paths'
 import sofaBot from '../../assets/onboarding/figma/onboarding-sofa-bot.png'
@@ -96,8 +96,20 @@ function ThirdScene() {
 
 function OnboardingPage() {
   const navigate = useNavigate()
-  const [isSplash, setIsSplash] = useState(true)
+  const [splashPhase, setSplashPhase] = useState<'playing' | 'leaving' | 'done'>('playing')
+  const splashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [step, setStep] = useState<OnboardingStep>(0)
+
+  useEffect(() => () => {
+    if (splashTimerRef.current) clearTimeout(splashTimerRef.current)
+  }, [])
+
+  const finishSplash = () => {
+    if (splashPhase !== 'playing') return
+    setSplashPhase('leaving')
+    const fadeDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 420
+    splashTimerRef.current = setTimeout(() => setSplashPhase('done'), fadeDuration)
+  }
 
   const finishOnboarding = () => navigate(PATHS.home)
   const moveBack = () => {
@@ -115,40 +127,46 @@ function OnboardingPage() {
     setStep((current) => (current + 1) as OnboardingStep)
   }
 
-  if (isSplash) {
-    return (
-      <button className="onboarding-splash" onClick={() => setIsSplash(false)} type="button" aria-label="스플래시 영상 건너뛰기">
-        <video autoPlay muted onEnded={() => setIsSplash(false)} onError={() => setIsSplash(false)} playsInline preload="auto" src={splashVideo} />
-      </button>
-    )
-  }
-
   const copy = STEP_COPY[step]
 
   return (
-    <main className={'onboarding-page onboarding-page--step-' + (step + 1)}>
-      <header className="onboarding-page__header">
-        <button aria-label="이전 온보딩으로 돌아가기" onClick={moveBack} type="button"><img src={backIcon} alt="" /></button>
-        <button className="onboarding-page__skip" onClick={finishOnboarding} type="button">SKIP</button>
-      </header>
+    <div className="onboarding-intro">
+      {splashPhase !== 'playing' && (
+        <main className={'onboarding-page onboarding-page--step-' + (step + 1)}>
+          <header className="onboarding-page__header">
+            <button aria-label="이전 온보딩으로 돌아가기" onClick={moveBack} type="button"><img src={backIcon} alt="" /></button>
+            <button className="onboarding-page__skip" onClick={finishOnboarding} type="button">SKIP</button>
+          </header>
 
-      <section className="onboarding-page__main">
-        <div className="onboarding-page__copy">
-          <h1>{copy.title}</h1>
-          <p>{copy.description}</p>
-        </div>
-        {step === 0 && <FirstScene />}
-        {step === 1 && <SecondScene />}
-        {step === 2 && <ThirdScene />}
-      </section>
+          <section className="onboarding-page__main">
+            <div className="onboarding-page__copy">
+              <h1>{copy.title}</h1>
+              <p>{copy.description}</p>
+            </div>
+            {step === 0 && <FirstScene />}
+            {step === 1 && <SecondScene />}
+            {step === 2 && <ThirdScene />}
+          </section>
 
-      <footer className="onboarding-page__footer">
-        <PageIndicator step={step} onSelect={setStep} />
-        <button className="onboarding-page__next" onClick={moveNext} type="button" aria-label={step === 2 ? '홈으로 이동' : '다음 온보딩 보기'}>
-          <img src={nextArrow} alt="" />
+          <footer className="onboarding-page__footer">
+            <PageIndicator step={step} onSelect={setStep} />
+            <button className="onboarding-page__next" onClick={moveNext} type="button" aria-label={step === 2 ? '홈으로 이동' : '다음 온보딩 보기'}>
+              <img src={nextArrow} alt="" />
+            </button>
+          </footer>
+        </main>
+      )}
+      {splashPhase !== 'done' && (
+        <button
+          className={'onboarding-splash' + (splashPhase === 'leaving' ? ' is-leaving' : '')}
+          onClick={finishSplash}
+          type="button"
+          aria-label="스플래시 영상 건너뛰기"
+        >
+          <video autoPlay muted onEnded={finishSplash} onError={finishSplash} playsInline preload="auto" src={splashVideo} />
         </button>
-      </footer>
-    </main>
+      )}
+    </div>
   )
 }
 

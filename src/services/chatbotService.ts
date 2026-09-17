@@ -28,8 +28,6 @@ export type ChatbotReply =
   | { kind: 'clarify'; step: BotStep }
 
 const MOCK_DELAY_RANGE_MS: [number, number] = [500, 900]
-/** 재시도 동작이 실제로 검증되도록 낮은 확률로 실패를 재현한다. (PROJECT_SPEC.md §6) */
-const MOCK_FAILURE_RATE = 0.12
 
 function wait(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -68,15 +66,11 @@ function buildClarifyStep(currentStepId: string | null): BotStep {
 
 /**
  * mock 챗봇에 한 턴을 요청한다.
- * 호출부는 이 함수가 실패(reject)할 수 있다는 것을 전제로 재시도 UI를 둔다.
+ * 시연 중 임의 네트워크 오류를 발생시키지 않는다.
  */
 export async function requestChatbotReply(request: ChatbotRequest): Promise<ChatbotReply> {
   const [min, max] = MOCK_DELAY_RANGE_MS
   await wait(min + Math.random() * (max - min))
-
-  if (Math.random() < MOCK_FAILURE_RATE) {
-    throw new Error('mock-network-error')
-  }
 
   if (request.kind === 'option') {
     return { kind: 'step', step: pickStep(request.option.next) }

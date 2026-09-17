@@ -131,7 +131,7 @@ export const closeCallCases = [
 
 /** 왈가왈후~ (이어진 이야기) — 편지 카드 */
 export const featuredAfterStory = {
-  id: 'afterstory-idea-credit',
+  id: 'afterstory-idea-credit-card',
   isNew: true,
   quoteLines: ['조언대로 이메일 증거 제출 후', '공동 기여를 인정받았어요'],
   caseTitleLines: ['제 아이디어를 가로챈', '직속 사수와의 면담'],
@@ -141,9 +141,7 @@ export const featuredAfterStory = {
 /**
  * 왈가왈후~ 가로 스크롤 인용 카드.
  *
- * 시안에는 카드가 3장 있으나 같은 내용이 반복되는 자리 표시다.
- * IA에 실제 후일담이 적힌 사건은 두 건뿐이라 두 장만 둔다.
- * 세 번째 카드의 사건이 정해지면 여기에 추가한다. → PROJECT_SPEC.md §9-21
+ * 대표 봉투의 직장 후일담과 겹치지 않게 각각 다른 사건의 후일담을 보여준다.
  */
 export const afterStoryQuotes = [
   {
@@ -152,9 +150,9 @@ export const afterStoryQuotes = [
     caseTitleLines: ['친구에게 300만원', '빌려주고 6개월째 미변제'],
   },
   {
-    id: 'afterstory-idea-credit-card',
-    bodyLines: ['조언대로 이메일 증거를', '제출한 뒤 공동 기여를', '인정받았습니다.'],
-    caseTitleLines: ['제 아이디어를 가로챈', '직속 사수와의 면담'],
+    id: 'afterstory-secret-told',
+    bodyLines: ['친구와 직접 이야기하고,', '제 이야기를 더 퍼뜨리지 않기로', '약속했어요.'],
+    caseTitleLines: ['친구가 학교에서', '제 비밀을 말한 일'],
   },
 ]
 
@@ -174,11 +172,11 @@ export const personalizedRecommendation = {
     total: 3,
     cases: [
       { id: 'recommend-friend-secret', plazaCaseId: 'case-secret-told', categoryKey: 'friend', category: '친구',
-        title: '친한 친구가 학교에서 저의 비밀을 다른 친구에게 말했어요' },
+        title: '친한 친구가 학교에서 저의 비밀을 다른 친구에게 말했어요.' },
       { id: 'recommend-study-presentation', categoryKey: 'study', category: '학업', agrees: true,
-        title: '조별 과제에서 제 의견은 무시하고 팀원이\n발표 자료를 바꿨어요' },
+        title: '조별 과제에서 제 의견은 무시하고 팀원이\n발표 자료를 바꿨어요.' },
       { id: 'recommend-friend-mistake', categoryKey: 'friend', category: '친구', agrees: false,
-        title: '오랜 친구가 다른 친구들이 있는 자리에서\n제 실수를 계속 이야기해요' },
+        title: '오랜 친구가 다른 친구들이 있는 자리에서\n제 실수를 계속 이야기해요.' },
     ],
   },
   B: {

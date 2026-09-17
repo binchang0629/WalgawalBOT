@@ -72,9 +72,18 @@ function AfterStorySection() {
         <img className="letter__front" src={homeImages.envelopeFront} alt="" aria-hidden="true" />
         <img className="letter__closed" src={homeImages.envelopeClosed} alt="" aria-hidden="true" />
 
-        <b className="letter__cta">
-          {isLetterOpen ? featuredAfterStory.envelopeCta : '편지 열어보기'}
-        </b>
+        {letterState === 'open' ? (
+          <Link
+            className="letter__cta letter__cta--link"
+            to={toAfterStoryDetail(featuredAfterStory.id)}
+            state={{ from: PATHS.home }}
+            aria-label="직속 사수와의 면담 후일담 자세히 보기"
+          >
+            {featuredAfterStory.envelopeCta}
+          </Link>
+        ) : (
+          <b className="letter__cta">{isLetterOpen ? featuredAfterStory.envelopeCta : '편지 열어보기'}</b>
+        )}
 
         {/*
           봉투 전체가 누르는 영역이다. 보이는 글자는 `letter__cta`가 이미 맡고 있어서

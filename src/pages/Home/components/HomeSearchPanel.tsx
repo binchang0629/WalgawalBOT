@@ -11,29 +11,43 @@ interface HomeSearchPanelProps {
 
 const JIHOON_RECENT_SEARCHES = ['외주 잔금', '수정 요청', '프리랜서 계약'] as const
 const JIHOON_RECENT_SEARCHES_KEY = 'wgwb:jihoon-recent-searches'
+const MAX_RECENT_SEARCHES = 6
 
-function readJihoonRecentSearches() {
+function recentSearchesKey(accountId: string) {
+  return accountId === 'B'
+    ? JIHOON_RECENT_SEARCHES_KEY
+    : `walgawalbot:${accountId}:recent-searches:v1`
+}
+
+function readRecentSearches(key: string, isJihoon: boolean) {
+  const fallback = isJihoon ? [...JIHOON_RECENT_SEARCHES] : []
   try {
-    const savedSearches = window.sessionStorage.getItem(JIHOON_RECENT_SEARCHES_KEY)
-    if (!savedSearches) return [...JIHOON_RECENT_SEARCHES]
+    const savedSearches = window.sessionStorage.getItem(key)
+    if (!savedSearches) return fallback
 
     const parsedSearches: unknown = JSON.parse(savedSearches)
     return Array.isArray(parsedSearches)
-      ? parsedSearches.filter((keyword): keyword is string => typeof keyword === 'string')
-      : [...JIHOON_RECENT_SEARCHES]
+      ? [...new Set(parsedSearches.filter((keyword): keyword is string => typeof keyword === 'string' && keyword.trim().length > 0))].slice(0, MAX_RECENT_SEARCHES)
+      : fallback
   } catch {
-    return [...JIHOON_RECENT_SEARCHES]
+    return fallback
   }
+}
+
+function saveRecentSearches(key: string, searches: string[]) {
+  try { window.sessionStorage.setItem(key, JSON.stringify(searches)) } catch { /* 저장소가 막혀도 검색은 계속된다. */ }
 }
 
 /** 홈 상단에서 펼쳐지는 큰 사건 검색창. 결과는 광장의 기존 데모 검색으로 연결한다. */
 function HomeSearchPanel({ onClose }: HomeSearchPanelProps) {
   const navigate = useNavigate()
-  const { personaId } = useSession()
+  const { personaId, currentUser } = useSession()
+  const accountId = currentUser?.isCustomProfile ? 'custom' : currentUser ? personaId : 'guest'
+  const storageKey = recentSearchesKey(accountId)
   const panelRef = useRef<HTMLElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [query, setQuery] = useState('')
-  const [recentSearches, setRecentSearches] = useState(readJihoonRecentSearches)
+  const [recentSearches, setRecentSearches] = useState(() => readRecentSearches(storageKey, accountId === 'B'))
 
   useEffect(() => {
     const scrollRoot = panelRef.current?.closest<HTMLElement>('.main-layout__scroll')
@@ -54,6 +68,11 @@ function HomeSearchPanel({ onClose }: HomeSearchPanelProps) {
       return
     }
 
+    const nextSearches = [
+      normalizedQuery,
+      ...recentSearches.filter((keyword) => keyword !== normalizedQuery),
+    ].slice(0, MAX_RECENT_SEARCHES)
+    saveRecentSearches(storageKey, nextSearches)
     navigate(`${PATHS.plaza}?section=cases&q=${encodeURIComponent(normalizedQuery)}`)
   }
 
@@ -63,11 +82,9 @@ function HomeSearchPanel({ onClose }: HomeSearchPanelProps) {
   }
 
   const removeRecentSearch = (keywordToRemove: string) => {
-    setRecentSearches((currentSearches) => {
-      const nextSearches = currentSearches.filter((keyword) => keyword !== keywordToRemove)
-      window.sessionStorage.setItem(JIHOON_RECENT_SEARCHES_KEY, JSON.stringify(nextSearches))
-      return nextSearches
-    })
+    const nextSearches = recentSearches.filter((keyword) => keyword !== keywordToRemove)
+    saveRecentSearches(storageKey, nextSearches)
+    setRecentSearches(nextSearches)
   }
 
   return (
@@ -92,7 +109,7 @@ function HomeSearchPanel({ onClose }: HomeSearchPanelProps) {
           <span className="search-close-mark" aria-hidden="true" />
         </button>
       </form>
-      {personaId === 'B' && recentSearches.length > 0 && (
+      {recentSearches.length > 0 && (
         <div className="home-search__recent" aria-label="최근 검색어">
           <span>최근 검색어</span>
           <div>

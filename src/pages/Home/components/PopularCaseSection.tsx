@@ -5,7 +5,7 @@ import useCountdown from '../../../hooks/useCountdown'
 import SectionTitle from '../../../components/common/SectionTitle'
 import { homeIcons, homeImages } from '../homeAssets'
 import { homeSectionTitles, todayCase } from '../../../data/common/homeContent'
-import { toCaseDetail } from '../../../routes/paths'
+import { PATHS, toCaseDetail } from '../../../routes/paths'
 import {
   getRememberedCaseParticipantCount,
   rememberCaseParticipantCount,
@@ -190,7 +190,7 @@ function PopularCaseSection() {
             <Link
               className="popular-case__cta"
               to={toCaseDetail(todayCase.id)}
-              state={{ entryMotion: 'slide-forward' }}
+              state={{ entryMotion: 'slide-forward', returnTo: PATHS.home }}
               onClick={() => rememberCaseParticipantCount(todayCase.id, participantCount)}
             >
               {todayCase.ctaLabel}
