@@ -214,28 +214,6 @@
   margin-top: 24px;
 }
 
-/*
- * AS06 시안은 `공감`·`반대`에 항상 색이 들어가 있다.
- * 누른 상태는 아이콘을 또렷하게 하고 글자를 굵게 해서 구분한다.
- */
-.afterstory-detail .result-comment__actions button:first-child {
-  color: var(--blue-700);
-}
-
-.afterstory-detail .result-comment__actions button:nth-child(2) {
-  color: var(--negative);
-}
-
-.afterstory-detail .result-comment__actions button:not(.is-active) img {
-  filter: none;
-  opacity: .7;
-}
-
-.afterstory-detail .result-comment__actions button.is-active {
-  font-weight: 700;
-}
-
-
 @media (max-width: 370px) {
   .afterstory-detail__hero { padding-inline: 18px; }
   .afterstory-detail__comments { padding-inline: 18px; }

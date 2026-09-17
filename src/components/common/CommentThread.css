@@ -498,6 +498,34 @@
     opacity: .65;
 }
 
+/* 후일담은 투표 결과 배지가 없어서, 반응을 머리말 오른쪽에 올려 본문 아래를 비운다. */
+.result-comment--actions-in-head {
+    gap: 10px;
+}
+
+.result-comment--actions-in-head .result-comment__head > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.result-comment--actions-in-head .result-comment__actions {
+    flex: none;
+    gap: 8px;
+    margin-left: auto;
+    font-size: 10px;
+}
+
+.result-comment--actions-in-head .result-comment__actions button {
+    gap: 3px;
+    font-size: 11px;
+}
+
+.result-comment--actions-in-head .result-comment__actions img {
+    width: 13px;
+    height: 12px;
+}
+
 /* AS06 시안에만 있는 `대댓글 달기`. 사건 결과 화면에서는 렌더링하지 않는다. */
 .result-comment__reply {
     flex: none;

@@ -67,11 +67,12 @@ function elapsedLabel(minutesAgo: number) {
   return `${Math.floor(minutesAgo / 1440)}일 전`
 }
 
-function CommentRow({ comment, reaction, showReply, showVoteBadge, onReact, onEdit, onDelete }: {
+function CommentRow({ comment, reaction, showReply, showVoteBadge, actionsInHeader, onReact, onEdit, onDelete }: {
   comment: ThreadComment
   reaction: CommentReaction
   showReply: boolean
   showVoteBadge: boolean
+  actionsInHeader: boolean
   onReact: (reaction: Exclude<CommentReaction, null>) => void
   onEdit?: (body: string) => void
   onDelete?: () => void
@@ -98,8 +99,30 @@ function CommentRow({ comment, reaction, showReply, showVoteBadge, onReact, onEd
     setIsEditing(false)
   }
 
+  const actions = (
+    <div className="result-comment__actions">
+      <button
+        type="button"
+        className={reaction === 'like' ? 'is-active' : ''}
+        onClick={() => onReact('like')}
+        aria-pressed={reaction === 'like'}
+      >
+        <img src={likeIcon} alt="" /> 공감 {comment.likes + (reaction === 'like' ? 1 : 0)}
+      </button>
+      <button
+        type="button"
+        className={reaction === 'dislike' ? 'is-active' : ''}
+        onClick={() => onReact('dislike')}
+        aria-pressed={reaction === 'dislike'}
+      >
+        <img src={dislikeIcon} alt="" /> 반대 {comment.dislikes + (reaction === 'dislike' ? 1 : 0)}
+      </button>
+      {showReply && <span className="result-comment__reply">대댓글 달기</span>}
+    </div>
+  )
+
   return (
-    <article className="result-comment">
+    <article className={'result-comment' + (actionsInHeader ? ' result-comment--actions-in-head' : '')}>
       <div className="result-comment__head">
         <div className={`result-comment__avatar${comment.avatarUrl === customProfileAvatar ? ' result-comment__avatar--custom' : ''}`} aria-hidden="true">
           <img src={comment.avatarUrl} alt="" />
@@ -108,6 +131,7 @@ function CommentRow({ comment, reaction, showReply, showVoteBadge, onReact, onEd
         {showVoteBadge && tone && comment.voteLabel && (
           <strong className={'result-comment__badge is-' + tone}>{comment.voteLabel}</strong>
         )}
+        {actionsInHeader && actions}
         {onDelete && (
           <div className="result-comment__more">
             <button
@@ -160,30 +184,7 @@ function CommentRow({ comment, reaction, showReply, showVoteBadge, onReact, onEd
         </>
       )}
 
-      <div className="result-comment__actions">
-        <button
-          type="button"
-          className={reaction === 'like' ? 'is-active' : ''}
-          onClick={() => onReact('like')}
-          aria-pressed={reaction === 'like'}
-        >
-          <img src={likeIcon} alt="" /> 공감 {comment.likes + (reaction === 'like' ? 1 : 0)}
-        </button>
-        <button
-          type="button"
-          className={reaction === 'dislike' ? 'is-active' : ''}
-          onClick={() => onReact('dislike')}
-          aria-pressed={reaction === 'dislike'}
-        >
-          <img src={dislikeIcon} alt="" /> 반대 {comment.dislikes + (reaction === 'dislike' ? 1 : 0)}
-        </button>
-        {/*
-          시안에 있는 `대댓글 달기`. 대댓글 기능 자체는 아직 없어서 글자만 둔다.
-          누를 수 있는 것처럼 보이면 발표 중에 눌렀다가 아무 일도 안 일어나므로,
-          버튼이 아니라 안내 문구로 표시한다.
-        */}
-        {showReply && <span className="result-comment__reply">대댓글 달기</span>}
-      </div>
+      {!actionsInHeader && actions}
     </article>
   )
 }
@@ -197,6 +198,8 @@ interface CommentThreadProps {
   showReply?: boolean
   /** 원래 사건의 투표 선택 배지를 댓글 머리말에 표시할지. */
   showVoteBadge?: boolean
+  /** 투표 배지가 없는 화면에서 공감·반대를 댓글 머리말 오른쪽에 둘지. */
+  actionsInHeader?: boolean
   /** 스티커 창에서 처음 보여줄 캐릭터를 정할 때 쓰는 제목 id. */
   headingId?: string
 }
@@ -211,7 +214,7 @@ interface CommentThreadProps {
  * 서버가 없으므로 새로고침하면 사라진다. 실제로 저장되는 것처럼 보이게 하지 않는다.
  * (PROJECT_SPEC.md — mock 응답을 실제인 것처럼 표시하지 않는다)
  */
-function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge = true, headingId = 'comment-thread-title' }: CommentThreadProps) {
+function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge = true, actionsInHeader = false, headingId = 'comment-thread-title' }: CommentThreadProps) {
   const { currentUser, sessionStatus, personaId } = useSession()
   const { requireLogin } = useLoginGate()
   const { showToast } = useToast()
@@ -369,6 +372,7 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
             comment={comment}
             showReply={showReply}
             showVoteBadge={showVoteBadge}
+            actionsInHeader={actionsInHeader}
             reaction={reactions[comment.id] ?? null}
             onReact={(reaction) => setReactions((previous) => ({
               ...previous,

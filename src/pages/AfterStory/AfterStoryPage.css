@@ -368,6 +368,9 @@
   --note-delay: 0ms;
   position: relative;
   display: block;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   padding: 22px 18px 18px;
   border: 0;
   border-radius: 2px;
@@ -386,6 +389,7 @@
 .afterstory-community--board .afterstory-community-card:nth-child(2) {
   --note-angle: 0.7deg;
   --note-delay: 110ms;
+  width: calc(100% - 13px);
   margin-left: 13px;
   background: #eaf6ff;
 }
@@ -393,8 +397,25 @@
 .afterstory-community--board .afterstory-community-card:nth-child(3) {
   --note-angle: -0.32deg;
   --note-delay: 220ms;
+  width: calc(100% - 11px);
   margin-right: 11px;
   background: #fff;
+}
+
+.afterstory-community--board .afterstory-community-card:nth-child(4) {
+  --note-angle: 0.48deg;
+  --note-delay: 330ms;
+  width: calc(100% - 8px);
+  margin-left: 8px;
+  background: #eaf6ff;
+}
+
+.afterstory-community--board .afterstory-community-card:nth-child(5) {
+  --note-angle: -0.48deg;
+  --note-delay: 440ms;
+  width: calc(100% - 7px);
+  margin-right: 7px;
+  background: #fffdf8;
 }
 
 /* 각 메모가 스크롤 영역에 들어올 때 한 번씩, 테이프로 붙는 듯 살짝 자리 잡는다. */
@@ -457,12 +478,25 @@
   --tape-rotation: 1.6deg;
 }
 
+.afterstory-community--board .afterstory-community-card:nth-child(4) .afterstory-community-card__tape {
+  background: rgb(180 215 255 / 0.78);
+  --tape-rotation: 1.2deg;
+}
+
+.afterstory-community--board .afterstory-community-card:nth-child(5) .afterstory-community-card__tape {
+  --tape-rotation: -1.3deg;
+}
+
 @keyframes afterstory-tape-settle {
   from { opacity: 0; transform: translateX(-50%) translateY(-5px) scaleX(.72) rotate(var(--tape-rotation)); }
   to { opacity: .92; transform: translateX(-50%) translateY(0) scaleX(1) rotate(var(--tape-rotation)); }
 }
 
 .afterstory-community--board .afterstory-community-card h3 {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
   font-size: 16px;
 }
 
@@ -672,13 +706,125 @@
 .afterstory-home:not(.afterstory-mine):not(.afterstory-my-stories) .afterstory-community--board {
   margin-top: 38px;
 }
-/* 소개 영역에 쓰던 원래의 아주 옅은 아이보리 톤을 게시판에도 사용한다. */
+
+/* 광장의 탐색 도구를 제목 없이 가져와, 메모를 보기 전에 바로 좁혀 볼 수 있게 한다. */
+.afterstory-discovery {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 30px;
+}
+
+.afterstory-discovery__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 14px;
+  border: 2px solid var(--blue-200);
+  border-radius: 23px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgb(77 142 253 / 7%);
+}
+
+.afterstory-discovery__search:focus-within {
+  border-color: var(--blue-500);
+  box-shadow: 0 0 0 3px rgb(129 183 255 / 12%), 0 4px 12px rgb(55 75 255 / 5%);
+}
+
+.afterstory-discovery__search > img {
+  flex: none;
+}
+
+.afterstory-discovery__search input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--ink);
+  font: 14px/1.3 var(--font-body);
+}
+
+.afterstory-discovery__search input::placeholder {
+  color: var(--neutral-500);
+}
+
+.afterstory-discovery__search input::-webkit-search-cancel-button {
+  display: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.afterstory-discovery__search button {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--neutral-100);
+  color: var(--neutral-600);
+  font: 400 18px/1 var(--font-body);
+  place-items: center;
+}
+
+.afterstory-discovery__categories {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.afterstory-discovery__categories::-webkit-scrollbar {
+  display: none;
+}
+
+.afterstory-discovery__categories button {
+  height: 32px;
+  flex: none;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 50px;
+  background: #fff;
+  color: var(--neutral-700);
+  font: 500 12px/1.3 var(--font-body);
+  white-space: nowrap;
+}
+
+.afterstory-discovery__categories button.is-active {
+  border-color: var(--blue-700);
+  background: var(--blue-700);
+  color: #fff;
+  font-weight: 700;
+}
+
+.afterstory-discovery__categories button:focus-visible,
+.afterstory-discovery__search button:focus-visible {
+  outline: 2px solid var(--blue-500);
+  outline-offset: 2px;
+}
+
+.afterstory-community--board .afterstory-community__pagination {
+  margin-top: 34px;
+}
+
+.afterstory-community__empty {
+  margin: 0;
+  padding: 32px 12px;
+  color: var(--neutral-600);
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* 배심원 광장의 댓글·사건 목록과 같은 중성 바탕으로 메모를 또렷하게 분리한다. */
 .afterstory-community--board {
-  background: #fefbef;
+  background: var(--neutral-050);
 }
 
 .afterstory-community--board::before {
-  border-color: #fff6dc;
+  border-color: var(--neutral-200);
 }
 
 @media (prefers-reduced-motion: reduce) {

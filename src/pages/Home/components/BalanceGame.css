@@ -1,5 +1,6 @@
 /* 민트초코 전용 소재 비율. 깻잎의 기존 좌표·애니메이션에는 적용하지 않는다. */
-.balance-section--mint .balance-board { height: 320px; }
+/* 민트초코는 결과에서 다시하기 버튼이 top 311까지 내려가므로 깻잎보다 32px 더 높다. */
+.balance-section--mint .balance-board { height: 364px; }
 .balance-section--mint .balance-board__draggable { height: 117px; filter: none; z-index: 2; }
 .balance-section--mint .balance-board__plate { height: 105px; top: 108px; }
 .balance-section--mint .balance-board .balance-choice { top: 218px; }

@@ -13,6 +13,7 @@ import creditStoryAvatar from '../../assets/case/result/comment-avatar-3.png'
 import secretStoryAvatar from '../../assets/case/result/comment-avatar-4.png'
 import panMungyeeJudge from '../../assets/submit/panmung-judge-hq.png'
 import CommentThread from '../../components/common/CommentThread'
+import Pagination from '../../components/common/Pagination'
 import { afterStoryAuthor, afterStoryComments, afterStoryLetter } from '../../data/common/afterStoryDetailContent'
 import { afterStoryCardComments } from '../../data/common/afterStoryCardComments'
 import scrollBackground from '../../assets/afterstory/figma/scroll-background.png'
@@ -21,6 +22,7 @@ import detailBackground from '../../assets/afterstory/figma/detail-background.pn
 import writePencil from '../../assets/afterstory/figma/write-pencil.png'
 import readBook from '../../assets/afterstory/figma/read-book.png'
 import walgadakFace from '../../assets/home/figma/close-call-mascot.svg'
+import searchIcon from '../../assets/plaza/search-field.svg'
 import './AfterStoryPage.css'
 import './AfterStoryDetailPage.css'
 
@@ -159,7 +161,59 @@ const COMMUNITY_AFTER_STORIES = [
     id: 'friend-loan', category: '친구', tone: 'friend', updatedAt: '19분 전',
     title: '친구에게 빌려준 300만 원, 6개월째 미변제', summary: '직접 대화한 뒤 서로 오해를 풀었어요.', reactions: 3,
   },
+  {
+    id: 'idea-credit-card', category: '직장', tone: 'company', updatedAt: '27분 전',
+    title: '상사가 제 아이디어를 자신의 공로로 발표했어요', summary: '기록을 정리해 공동 기여를 인정받았어요.', reactions: 5,
+  },
+  {
+    id: 'secret-told', category: '친구', tone: 'friend', updatedAt: '34분 전',
+    title: '친구가 제 비밀을 다른 친구에게 말했어요', summary: '서로의 경계를 다시 정하며 대화를 이어갔어요.', reactions: 2,
+  },
+  {
+    id: 'anniversary', category: '연인', tone: 'friend', updatedAt: '42분 전',
+    title: '기념일 약속을 깜빡한 연인에게 서운함을 말해도 될까요?', summary: '바랐던 마음을 솔직하게 전하고 오해를 풀었어요.', reactions: 6,
+  },
+  {
+    id: 'phone-notification', category: '연인', tone: 'friend', updatedAt: '51분 전',
+    title: '연인이 제 휴대폰 알림을 보는 건 관심일까요, 침해일까요?', summary: '서로 지켜야 할 사적인 경계를 정했어요.', reactions: 4,
+  },
+  {
+    id: 'travel-cost', category: '연인', tone: 'friend', updatedAt: '1시간 전',
+    title: '여행 경비를 더 낸 쪽이 일정을 정해도 되는 걸까요?', summary: '비용과 일정 기준을 함께 다시 정했어요.', reactions: 5,
+  },
+  {
+    id: 'trip-cancel', category: '친구', tone: 'friend', updatedAt: '1시간 15분 전',
+    title: '여행 직전 취소한 친구에게 예약금을 모두 받아야 할까요?', summary: '환불 가능한 부분부터 차분히 정리했어요.', reactions: 3,
+  },
+  {
+    id: 'group-chat', category: '친구', tone: 'friend', updatedAt: '1시간 30분 전',
+    title: '단체 대화방에서 제 이야기만 빼고 약속을 잡는 친구들', summary: '서운했던 점을 전하고 다음 약속을 함께 잡았어요.', reactions: 8,
+  },
+  {
+    id: 'parents-interfere', category: '가족', tone: 'friend', updatedAt: '2시간 전',
+    title: '부모님이 제 결정에 너무 간섭하세요', summary: '서로 존중할 수 있는 결정 범위를 정했어요.', reactions: 5,
+  },
+  {
+    id: 'family-care', category: '가족', tone: 'friend', updatedAt: '2시간 20분 전',
+    title: '부모님 병원 동행을 저에게만 부탁하는 형제자매', summary: '돌봄 일정을 나눠 맡기로 했어요.', reactions: 7,
+  },
+  {
+    id: 'after-hours', category: '직장', tone: 'company', updatedAt: '2시간 45분 전',
+    title: '퇴근 뒤 단체 대화방 업무 지시에 답하지 않았어요', summary: '근무 시간의 연락 기준을 팀과 맞췄어요.', reactions: 4,
+  },
+  {
+    id: 'attendance', category: '학업', tone: 'friend', updatedAt: '3시간 전',
+    title: '친구 대신 출석을 불러달라는 부탁을 거절했더니 멀어졌어요', summary: '규정을 지키는 이유를 설명하고 풀었어요.', reactions: 6,
+  },
+  {
+    id: 'ai-report', category: '학업', tone: 'friend', updatedAt: '3시간 20분 전',
+    title: 'AI를 활용한 과제라서 표절이 아니라는 조원의 주장', summary: '과제 도구 사용 기준을 다시 정리했어요.', reactions: 9,
+  },
 ] as const
+
+const AFTER_STORY_CATEGORIES = ['전체', '연인', '친구', '가족', '직장', '학업'] as const
+type AfterStoryCategory = (typeof AFTER_STORY_CATEGORIES)[number]
+const AFTER_STORIES_PER_PAGE = 5
 
 interface AfterStoryLocationState { content?: string; from?: string }
 
@@ -196,9 +250,44 @@ function CaseContextCard() {
 export function AfterStoryHomePage() {
   const { requireLogin } = useLoginGate()
   const navigate = useNavigate()
+  const communitySectionRef = useRef<HTMLElement>(null)
   const communityListRef = useRef<HTMLDivElement>(null)
   const peelTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [peelingStoryId, setPeelingStoryId] = useState<string | null>(null)
+  const [communityQuery, setCommunityQuery] = useState('')
+  const [communityCategory, setCommunityCategory] = useState<AfterStoryCategory>('전체')
+  const [communityPage, setCommunityPage] = useState(1)
+
+  const normalizedCommunityQuery = communityQuery.trim().toLowerCase()
+  const filteredCommunityStories = COMMUNITY_AFTER_STORIES.filter((story) => {
+    const matchesCategory = communityCategory === '전체' || story.category === communityCategory
+    const matchesQuery = !normalizedCommunityQuery || [story.title, story.summary, story.category]
+      .join(' ')
+      .toLowerCase()
+      .includes(normalizedCommunityQuery)
+    return matchesCategory && matchesQuery
+  })
+  const communityTotalPages = Math.max(1, Math.ceil(filteredCommunityStories.length / AFTER_STORIES_PER_PAGE))
+  const safeCommunityPage = Math.min(communityPage, communityTotalPages)
+  const visibleCommunityStories = filteredCommunityStories.slice(
+    (safeCommunityPage - 1) * AFTER_STORIES_PER_PAGE,
+    safeCommunityPage * AFTER_STORIES_PER_PAGE,
+  )
+
+  const handleCommunityPageChange = (page: number) => {
+    if (page === safeCommunityPage) return
+    setCommunityPage(page)
+
+    const section = communitySectionRef.current
+    const scrollRoot = section?.closest<HTMLElement>('.main-layout__scroll')
+    if (!section || !scrollRoot) return
+
+    const targetTop = scrollRoot.scrollTop + section.getBoundingClientRect().top - scrollRoot.getBoundingClientRect().top - 12
+    scrollRoot.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    })
+  }
 
   useEffect(() => () => {
     if (peelTimerRef.current) clearTimeout(peelTimerRef.current)
@@ -237,7 +326,7 @@ export function AfterStoryHomePage() {
 
     cards.forEach((card) => observer.observe(card))
     return () => observer.disconnect()
-  }, [])
+  }, [communityCategory, normalizedCommunityQuery, safeCommunityPage])
 
   return (
     <main className="afterstory-home">
@@ -283,17 +372,58 @@ export function AfterStoryHomePage() {
           </Link>
         </section>
 
-        <section className="afterstory-community afterstory-community--board" id="community-stories" aria-labelledby="community-story-title">
+        <section ref={communitySectionRef} className="afterstory-community afterstory-community--board" id="community-stories" aria-label="다른 사용자의 후일담">
           <header className="afterstory-community__header">
             <div>
-              <p>판결 이후</p>
-              <h2 id="community-story-title">다른 후일담</h2>
+              <h2>다른 후일담</h2>
             </div>
           </header>
           <p className="afterstory-community__intro">방금 작성된 이야기를 확인해보세요.</p>
 
+          <div className="afterstory-discovery">
+            <div className="afterstory-discovery__search">
+              <img src={searchIcon} alt="" width={24} height={24} />
+              <input
+                type="search"
+                value={communityQuery}
+                placeholder="후일담 키워드 검색..."
+                aria-label="후일담 키워드 검색"
+                onChange={(event) => {
+                  setCommunityQuery(event.target.value)
+                  setCommunityPage(1)
+                }}
+              />
+              {communityQuery && (
+                <button
+                  type="button"
+                  aria-label="검색어 지우기"
+                  onClick={() => {
+                    setCommunityQuery('')
+                    setCommunityPage(1)
+                  }}
+                >×</button>
+              )}
+            </div>
+            <div className="afterstory-discovery__categories" role="group" aria-label="후일담 카테고리">
+              {AFTER_STORY_CATEGORIES.map((category) => (
+                <button
+                  key={category}
+                  type="button"
+                  className={communityCategory === category ? 'is-active' : undefined}
+                  aria-pressed={communityCategory === category}
+                  onClick={() => {
+                    setCommunityCategory(category)
+                    setCommunityPage(1)
+                  }}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div ref={communityListRef} className="afterstory-community__list">
-            {COMMUNITY_AFTER_STORIES.map((story) => (
+            {visibleCommunityStories.map((story) => (
               <Link
                 className={'afterstory-community-card afterstory-community-card--' + story.tone + ' is-pending' + (peelingStoryId === story.id ? ' is-peeling' : '')}
                 key={story.id}
@@ -315,6 +445,18 @@ export function AfterStoryHomePage() {
                 <p className="afterstory-community-card__outcome">{story.summary}</p>
               </Link>
             ))}
+            {visibleCommunityStories.length === 0 && (
+              <p className="afterstory-community__empty">조건에 맞는 후일담이 아직 없어요.</p>
+            )}
+          </div>
+          <div className="afterstory-community__pagination">
+            <Pagination
+              currentPage={safeCommunityPage}
+              totalPages={communityTotalPages}
+              onPageChange={handleCommunityPageChange}
+              ariaLabel="후일담 목록 페이지"
+              neutralArrows
+            />
           </div>
         </section>
       </div>
@@ -415,13 +557,31 @@ export function AfterStoryDetailPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const variant = storyId ? AFTER_STORY_DETAILS[storyId as keyof typeof AFTER_STORY_DETAILS] : undefined
-  const author = variant?.author ?? afterStoryAuthor
-  const lines = variant?.lines ?? afterStoryLetter.lines
+  const communityStory = storyId
+    ? COMMUNITY_AFTER_STORIES.find((story) => `afterstory-${story.id}` === storyId)
+    : undefined
+  const author = variant?.author ?? (communityStory
+    ? {
+        ...afterStoryAuthor,
+        titleLines: [communityStory.summary],
+        lead: communityStory.title,
+        meta: `${communityStory.category} · 후일담`,
+      }
+    : afterStoryAuthor)
+  const lines = variant?.lines ?? (communityStory
+    ? [
+        '사건이 끝난 뒤 서로의 생각을 다시 이야기해 봤어요.',
+        '처음에는 쉽게 꺼내기 어려웠지만,',
+        '각자 어떤 점이 불편했는지 차분히 들었어요.',
+        '이번 일을 계기로 다음에는 먼저 확인하고',
+        '솔직하게 이야기하기로 했습니다.',
+      ]
+    : afterStoryLetter.lines)
   const comments = storyId && storyId in afterStoryCardComments
     ? afterStoryCardComments[storyId as keyof typeof afterStoryCardComments]
     : afterStoryComments
 
-  if (storyId !== 'friend' && !variant) return <Navigate to={PATHS.afterStory} replace />
+  if (storyId !== 'friend' && !variant && !communityStory) return <Navigate to={PATHS.afterStory} replace />
 
   /*
    * 어느 화면에서 들어왔는지는 넘겨받은 state로만 판단한다.
@@ -472,6 +632,7 @@ export function AfterStoryDetailPage() {
           <CommentThread
             comments={comments}
             showVoteBadge={false}
+            actionsInHeader
             headingId="afterstory-comments-title"
           />
         </div>
