@@ -265,11 +265,11 @@
 .my-page--seoa .profile-card__stat-value { display: flex; align-items: center; justify-content: center; }
 .my-page--seoa .profile-card__switch { padding: 7px 13px; line-height: 1.3; }
 .my-page--seoa .profile-card__switch img { width: 10.5px; height: 10.5px; margin: 1.75px; }
-.my-page--seoa .my-menu__header { min-height: 47px; padding-block: 12px; }
+/* .my-page--seoa .my-menu__header { min-height: 47px; padding-block: 12px; }
 .my-page--seoa .my-menu__row { min-height: 57px; padding-block: 12px; }
 .my-page--seoa .my-menu__row:first-child { min-height: 56px; padding-bottom: 11px; }
 .my-page--seoa .my-menu__row.is-disabled { border-color: var(--neutral-400); }
-.my-page--seoa .my-menu__row:not(.is-disabled) { border-color: var(--neutral-400); }
+.my-page--seoa .my-menu__row:not(.is-disabled) { border-color: var(--neutral-400); } */
 .my-page--seoa .expert-card.is-disabled { min-height: 62px; padding-block: 14px; }
 
 .my-menu {

@@ -223,8 +223,8 @@ function MyPage() {
           </button>
           {activityOpen && (
             <div>
-              <MenuRow label="업적 · 미션" icon={isSeoa ? seoaAchievementIcon : achievementIcon} iconSize={isSeoa ? 17 : 20} disabled />
-              <MenuRow label="내가 접수한 사건" icon={isSeoa ? seoaJusticeIcon : justiceIcon} iconSize={isSeoa ? 17.67 : 20} onClick={() => navigate(PATHS.myCases)} />
+              <MenuRow label="업적 · 미션" icon={seoaAchievementIcon} iconSize={17} disabled />
+              <MenuRow label="내가 참여한 사건" icon={justiceIcon} iconSize={20} onClick={() => navigate(PATHS.myCases)} />
               {/*
                 댓글을 한 번도 안 썼으면 열 것이 없으므로 비활성으로 둔다.
                 기록은 로그인한 계정으로 등록한 댓글만 쌓인다. (utils/myComments.ts)
