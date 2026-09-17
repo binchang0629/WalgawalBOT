@@ -26,6 +26,7 @@ import type {
   JihoonSimilarVoteId,
 } from '../../data/common/jihoonSimilarCaseContent'
 import useSession from '../../hooks/useSession'
+import { addMyComment } from '../../utils/myComments'
 import useToast from '../../hooks/useToast'
 import useLoginGate from '../../hooks/useLoginGate'
 import { PATHS } from '../../routes/paths'
@@ -247,6 +248,19 @@ function ClosedCaseResultPage() {
       },
       ...comments,
     ])
+    /*
+     * 댓글 UI가 화면마다 따로 있어서, 기록도 각 등록 지점에 붙여야 한다.
+     * (광장 사건은 CommentThread가, 이 화면은 여기가 맡는다.)
+     * 로그인한 계정만 여기까지 오므로 이 자리에서만 남긴다.
+     */
+    if (body) {
+      addMyComment(personaId, {
+        caseId: plazaStory?.id ?? jihoonSimilarCase.id,
+        caseTitle: (plazaStory?.title ?? jihoonSimilarCase.resultTitle).replace(/\n/g, ' '),
+        href: location.pathname,
+      })
+    }
+
     setDraft('')
     setSelectedStickerId(null)
     setIsStickerPickerOpen(false)

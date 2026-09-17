@@ -19,6 +19,7 @@ import { commentStickerById, type CommentStickerId } from '../../data/common/com
 import { weddingGiftCase } from '../../data/common/caseDetailContent'
 import { createParentsSeedComment, parentsCase, parentsResult } from '../../data/common/parentsCaseContent'
 import { getPlazaCaseResultContent, getPlazaCaseStory } from '../../data/common/plazaCaseStories'
+import { addMyComment } from '../../utils/myComments'
 import type { WeddingGiftVoteId } from '../../data/common/caseDetailContent'
 import {
   createWeddingGiftSeedComment,
@@ -281,6 +282,19 @@ function CaseResultPage() {
       },
       ...comments,
     ])
+    /*
+     * 댓글 UI가 화면마다 따로 있어서, 기록도 각 등록 지점에 붙여야 한다.
+     * (광장 사건은 CommentThread가, 이 화면은 여기가 맡는다.)
+     * 로그인한 계정만 여기까지 오므로 이 자리에서만 남긴다.
+     */
+    if (body) {
+      addMyComment(personaId, {
+        caseId: caseContent.id,
+        caseTitle: caseContent.title.replace(/\n/g, ' '),
+        href: location.pathname,
+      })
+    }
+
     setDraft('')
     setSelectedStickerId(null)
     setIsStickerPickerOpen(false)
@@ -418,7 +432,14 @@ function CaseResultPage() {
         <div className="case-result__section-divider case-result__section-divider--wedding" />
 
         {plazaStory ? (
-          <CommentThread key={plazaStory.id} comments={plazaStory.comments} headingId="comments-title" plazaCaseId={plazaStory.id} />
+          <CommentThread
+            key={plazaStory.id}
+            comments={plazaStory.comments}
+            headingId="comments-title"
+            plazaCaseId={plazaStory.id}
+            /* 여기서 단 댓글은 MY > 내가 쓴 댓글에 사건 제목과 함께 남는다. */
+            commentRecord={{ caseId: plazaStory.id, caseTitle: plazaStory.title, href: location.pathname }}
+          />
         ) : <section ref={commentSectionRef} className="comment-section" aria-labelledby="comments-title">
           <div className="comment-section__heading">
             <h2 id="comments-title">댓글 ({allComments.length})</h2>

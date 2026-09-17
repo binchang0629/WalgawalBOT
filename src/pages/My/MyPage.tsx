@@ -5,6 +5,7 @@ import { weddingGiftCase } from '../../data/common/caseDetailContent'
 import { Link, useNavigate } from 'react-router-dom'
 import useSession from '../../hooks/useSession'
 import { PATHS, toCaseResult } from '../../routes/paths'
+import { readMyComments } from '../../utils/myComments'
 import profileImage from '../../assets/my/profile.png'
 import jihunProfileImage from '../../assets/my/account-jihun.png'
 import guestMascotImage from '../../assets/auth/loginPopUpMy.webp'
@@ -17,8 +18,8 @@ import chevronBrownIcon from '../../assets/my/chevron-brown.svg'
 import collapseIcon from '../../assets/my/collapse.svg'
 import achievementIcon from '../../assets/my/achievement.svg'
 import justiceIcon from '../../assets/my/justice.svg'
-import voteIcon from '../../assets/my/vote.svg'
 import bookmarkIcon from '../../assets/my/bookmark.svg'
+import commentIcon from '../../assets/my/comment.svg'
 import bellIcon from '../../assets/my/bell.svg'
 import banIcon from '../../assets/my/ban.svg'
 import serviceIcon from '../../assets/my/service.svg'
@@ -28,7 +29,6 @@ import chevronDisabledIcon from '../../assets/my/chevron-disabled.svg'
 import seoaSwitchIcon from '../../assets/my/seoa-switch.svg'
 import seoaAchievementIcon from '../../assets/my/seoa-achievement.svg'
 import seoaJusticeIcon from '../../assets/my/seoa-justice.svg'
-import seoaVoteIcon from '../../assets/my/seoa-vote.svg'
 import seoaBookmarkIcon from '../../assets/my/seoa-bookmark.svg'
 import seoaBellIcon from '../../assets/my/seoa-bell.svg'
 import './MyPage.css'
@@ -99,6 +99,8 @@ function MyPage() {
   const displayName = currentUser?.name ?? (personaId === 'A' ? '윤서아' : '곽지훈')
   const displayNickname = currentUser?.isCustomProfile ? null : currentUser?.nickname ?? DEMO_ACCOUNTS[personaId].nickname
   const activityCount = activityStats.submittedCases + activityStats.juryParticipations
+  // 마이페이지에 들어올 때마다 다시 읽는다. 댓글을 쓰고 돌아오면 바로 활성화된다.
+  const myCommentCount = readMyComments(personaId).length
 
   const handleSwitchAccount = () => {
     setAccountSheetOpen(true)
@@ -222,15 +224,19 @@ function MyPage() {
           </button>
           {activityOpen && (
             <div>
-              <MenuRow label="업적 · 미션 (뱃지 및 리워드)" icon={isSeoa ? seoaAchievementIcon : achievementIcon} iconSize={isSeoa ? 17 : 20} disabled />
-              <MenuRow label="내 사건 (접수한 사건 목록 및 결과)" icon={isSeoa ? seoaJusticeIcon : justiceIcon} iconSize={isSeoa ? 17.67 : 20} onClick={() => navigate(PATHS.myCases)} />
+              <MenuRow label="업적 · 미션" icon={isSeoa ? seoaAchievementIcon : achievementIcon} iconSize={isSeoa ? 17 : 20} disabled />
+              <MenuRow label="내가 참여한 사건" icon={isSeoa ? seoaJusticeIcon : justiceIcon} iconSize={isSeoa ? 17.67 : 20} onClick={() => navigate(PATHS.myCases)} />
+              {/*
+                댓글을 한 번도 안 썼으면 열 것이 없으므로 비활성으로 둔다.
+                기록은 로그인한 계정으로 등록한 댓글만 쌓인다. (utils/myComments.ts)
+              */}
               <MenuRow
-                label="참여한 사건 (투표 및 배심원 활동)"
-                icon={isSeoa ? seoaVoteIcon : voteIcon}
-                disabled={activityStats.juryParticipations === 0}
-                onClick={() => navigate(toCaseResult(weddingGiftCase.id), { state: { returnTo: PATHS.my } })}
+                label="내가 쓴 댓글"
+                icon={commentIcon}
+                disabled={myCommentCount === 0}
+                onClick={() => navigate(PATHS.myComments)}
               />
-              <MenuRow label="저장함 (판결 스크랩 및 북마크)" icon={isSeoa ? seoaBookmarkIcon : bookmarkIcon} disabled />
+              <MenuRow label="사건 저장함" icon={isSeoa ? seoaBookmarkIcon : bookmarkIcon} disabled />
             </div>
           )}
         </section>

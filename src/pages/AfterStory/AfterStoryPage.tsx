@@ -646,6 +646,12 @@ export function AfterStoryDetailPage() {
             showVoteBadge={false}
             actionsInHeader
             headingId="afterstory-comments-title"
+            /* 후일담에 단 댓글도 MY > 내가 쓴 댓글에 모인다. */
+            commentRecord={{
+              caseId: storyId ?? 'afterstory',
+              caseTitle: author.titleLines.join(' '),
+              href: location.pathname,
+            }}
           />
         </div>
       </div>

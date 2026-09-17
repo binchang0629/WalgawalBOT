@@ -10,6 +10,7 @@ import submitIcon from '../../assets/case/result/submit.svg'
 import { commentStickerById, type CommentStickerId } from '../../data/common/commentStickers'
 import useLoginGate from '../../hooks/useLoginGate'
 import useSession from '../../hooks/useSession'
+import { addMyComment } from '../../utils/myComments'
 import useToast from '../../hooks/useToast'
 /*
  * 스티커 고르는 창은 사건 결과 화면에서 먼저 만들어 둔 것을 그대로 쓴다.
@@ -204,6 +205,11 @@ interface CommentThreadProps {
   headingId?: string
   /** 광장 사건에서만 세션 동안 새 댓글을 보존한다. */
   plazaCaseId?: string
+  /*
+   * MY > 내가 쓴 댓글에 남길 정보. 넘기지 않으면 기록하지 않는다.
+   * 어느 글에 단 댓글인지와, 눌렀을 때 돌아올 주소가 필요하다.
+   */
+  commentRecord?: { caseId: string; caseTitle: string; href: string }
 }
 
 /**
@@ -217,7 +223,7 @@ interface CommentThreadProps {
  * 같은 브라우저 세션에서만 보존한다.
  * (PROJECT_SPEC.md — mock 응답을 실제인 것처럼 표시하지 않는다)
  */
-function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge = true, actionsInHeader = false, headingId = 'comment-thread-title', plazaCaseId }: CommentThreadProps) {
+function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge = true, actionsInHeader = false, headingId = 'comment-thread-title', plazaCaseId, commentRecord }: CommentThreadProps) {
   const { currentUser, sessionStatus, personaId } = useSession()
   const { requireLogin } = useLoginGate()
   const { showToast } = useToast()
@@ -282,6 +288,13 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
       },
       ...current,
     ])
+    /*
+     * 여기까지 왔다는 건 로그인된 계정이 등록을 눌렀다는 뜻이다
+     * (requestCommentLogin이 비로그인은 위에서 되돌린다).
+     * 그래서 이 지점에서만 MY 기록에 남긴다. 스티커만 보낸 경우는 남길 글이 없어 건너뛴다.
+     */
+    if (commentRecord && body) addMyComment(personaId, { ...commentRecord, body })
+
     setDraft('')
     setSelectedStickerId(null)
     setIsStickerPickerOpen(false)
