@@ -3,7 +3,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #fff6dc;
+  background: #EAF6FF;
 }
 
 .onboarding-splash {
@@ -15,7 +15,7 @@
   height: 100%;
   padding: 0;
   border: 0;
-  background: #fff6dc;
+  background: #EAF6FF;
   cursor: pointer;
   transition: opacity 420ms ease;
 }
@@ -33,7 +33,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .onboarding-splash { transition: none; }
+  .onboarding-splash {
+    transition: none;
+  }
 }
 
 .onboarding-page {
@@ -46,9 +48,11 @@
   background: #fff6dc;
 }
 
-.app-viewport:has(.onboarding-page)::before,
-.app-viewport:has(.onboarding-splash)::before {
+.app-viewport:has(.onboarding-page)::before{
   background: #fff6dc;
+}
+.app-viewport:has(.onboarding-splash)::before {
+  background: #EAF6FF;
 }
 
 .onboarding-page__header {
@@ -170,20 +174,32 @@
   height: 40px;
 }
 
-/*
- * 아이콘 크기는 Figma 벡터 실제 치수를 그대로 쓴다.
- * 40px 칸에 꽉 채우면(width/height 40 + contain) 시안보다 커진다.
- * 세 아이콘은 가로세로 비율이 서로 달라서 한 값으로 묶을 수 없다.
- */
+/* * 아이콘 크기는 Figma 벡터 실제 치수를 그대로 쓴다. * 40px 칸에 꽉 채우면(width/height 40 + contain) 시안보다 커진다. * 세 아이콘은 가로세로 비율이 서로 달라서 한 값으로 묶을 수 없다. */
 .onboarding-note__icon img {
   display: block;
   max-width: none;
   object-fit: contain;
 }
-.onboarding-note--fact .onboarding-note__icon img { width: 26.7px; height: 33.3px; }
-.onboarding-note--emotion .onboarding-note__icon img { width: 33.3px; height: 30.6px; }
-.onboarding-note--private .onboarding-note__icon img { width: 30px; height: 33.3px; }
-.onboarding-note b { align-self: center; }
+
+.onboarding-note--fact .onboarding-note__icon img {
+  width: 26.7px;
+  height: 33.3px;
+}
+
+.onboarding-note--emotion .onboarding-note__icon img {
+  width: 33.3px;
+  height: 30.6px;
+}
+
+.onboarding-note--private .onboarding-note__icon img {
+  width: 30px;
+  height: 33.3px;
+}
+
+.onboarding-note b {
+  align-self: center;
+}
+
 .onboarding-note i {
   grid-column: 1 / -1;
   display: block;
@@ -193,54 +209,105 @@
   border-radius: 2px;
   background: rgb(97 77 40 / 14%);
 }
-.onboarding-note--fact i { background: rgb(69 145 78 / 20%); }
-.onboarding-note--private i { background: #c9d7ee; }
-.onboarding-note--fact i:first-of-type,
-.onboarding-note--emotion i:first-of-type { width: 100px; }
-.onboarding-note--fact i:last-of-type,
-.onboarding-note--private i:last-of-type { width: 100%; }
-.onboarding-note--emotion i:last-of-type,
-.onboarding-note--private i:first-of-type { width: 80px; }
 
-/*
- * 메모 세 장의 자리는 Figma 온보딩페이지1(2568:10984)에서 그대로 옮겼다.
- *
- * Figma는 노드의 왼쪽 위를 중심으로 회전하고, CSS는 요소의 한가운데를 중심으로 돈다.
- * 그래서 Figma의 좌표를 top/left에 그냥 적으면 기울어진 만큼 어긋난다.
- * 아래 값은 회전 후 결과가 시안과 겹치도록 그 차이를 미리 반영한 것이다.
- * (검산: 회전 후 바깥 사각형이 Figma의 145~316 / 424~557 등과 0.1px 안에서 일치한다.)
- *
- * 세 장 모두 150 × 100이고 좌표는 main(헤더 아래) 기준이다.
- * Figma 회전값은 반시계가 양수라 CSS에서는 부호가 뒤집힌다.
- */
+.onboarding-note--fact i {
+  background: rgb(69 145 78 / 20%);
+}
+
+.onboarding-note--private i {
+  background: #c9d7ee;
+}
+
+.onboarding-note--fact i:first-of-type,
+.onboarding-note--emotion i:first-of-type {
+  width: 100px;
+}
+
+.onboarding-note--fact i:last-of-type,
+.onboarding-note--private i:last-of-type {
+  width: 100%;
+}
+
+.onboarding-note--emotion i:last-of-type,
+.onboarding-note--private i:first-of-type {
+  width: 80px;
+}
+
+/* * 메모 세 장의 자리는 Figma 온보딩페이지1(2568:10984)에서 그대로 옮겼다. * * Figma는 노드의 왼쪽 위를 중심으로 회전하고, CSS는 요소의 한가운데를 중심으로 돈다. * 그래서 Figma의 좌표를 top/left에 그냥 적으면 기울어진 만큼 어긋난다. * 아래 값은 회전 후 결과가 시안과 겹치도록 그 차이를 미리 반영한 것이다. * * 세 장 모두 150 × 100이고 좌표는 main(헤더 아래) 기준이다. * Figma 회전값은 반시계가 양수라 CSS에서는 부호가 뒤집힌다. */
 .onboarding-note--fact {
   top: 188.6px;
   left: 155.9px;
   background: #efffd7;
-  transform: rotate(-14deg);
+  /* 사실 카드: 0.1초 후 천천히 등장 */
+  animation: onboarding-note-fact-rise 750ms cubic-bezier(.2, .8, .2, 1) both;
+  animation-delay: 100ms;
 }
 
 .onboarding-note--emotion {
   top: 234.1px;
   left: 234.5px;
   background: #fff6dc;
-  transform: rotate(-1.2deg);
+  /* 감정 카드: 사실 카드보다 늦게 등장 */
+  animation: onboarding-note-emotion-rise 750ms cubic-bezier(.2, .8, .2, 1) both;
+  animation-delay: 500ms;
 }
 
 .onboarding-note--private {
   top: 328.8px;
   left: 245.9px;
   background: #eaf6ff;
-  transform: rotate(14.1deg);
+  /* 나만 보기 카드: 가장 마지막에 등장 */
+  animation: onboarding-note-private-rise 750ms cubic-bezier(.2, .8, .2, 1) both;
+  animation-delay: 900ms;
+}
+
+/* * 온보딩 1페이지 카드 등장 애니메이션 * * 카드가 아래쪽에서 올라오면서 나타난다. * 각 카드의 기존 Figma 회전값도 함께 유지한다. */
+/* 사실 */
+@keyframes onboarding-note-fact-rise {
+  from {
+    opacity: 0;
+    transform: translateY(45px) rotate(-14deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(-14deg);
+  }
+}
+
+/* 감정 */
+@keyframes onboarding-note-emotion-rise {
+  from {
+    opacity: 0;
+    transform: translateY(45px) rotate(-1.2deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(-1.2deg);
+  }
+}
+
+/* 나만 보기 */
+@keyframes onboarding-note-private-rise {
+  from {
+    opacity: 0;
+    transform: translateY(45px) rotate(14.1deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(14.1deg);
+  }
 }
 
 .onboarding-page__sofa-bot {
   position: absolute;
   z-index: 2;
-  top: 297px;
-  left: -104px;
-  width: 482px;
-  height: 351px;
+  top: 300px;
+  left: -30px;
+  width: 283px;
+  height: auto;
   max-width: none;
 }
 
@@ -257,18 +324,7 @@
   object-fit: cover;
 }
 
-/*
- * 참고: 실제 기기에서 이 영상 아래에 검은 선이 한 줄 보일 때가 있다.
- *
- * 영상 파일 문제는 아니다. 125프레임 전부 맨 아랫줄이 크림색(253, 244, 217)이다.
- * 브라우저가 영상을 별도 레이어로 합성하면서 가장자리 한 줄이 투명(검정) 배경과
- * 섞여 생기는 것으로 보인다. 화면을 움직이면 보였다 안 보였다 하고, 같은 자리에
- * 캡처 이미지를 넣으면 안 보이는 것도 그래서다.
- *
- * 같은 색 띠로 경계를 덮어 봤지만 증상이 그대로여서 되돌렸다. 다시 손대야 한다면
- * 이 방법은 이미 안 되는 것으로 확인됐으니 다른 쪽을 보는 편이 좋다.
- */
-
+/* * 참고: 실제 기기에서 이 영상 아래에 검은 선이 한 줄 보일 때가 있다. * * 영상 파일 문제는 아니다. 125프레임 전부 맨 아랫줄이 크림색(253, 244, 217)이다. * 브라우저가 영상을 별도 레이어로 합성하면서 가장자리 한 줄이 투명(검정) 배경과 * 섞여 생기는 것으로 보인다. 화면을 움직이면 보였다 안 보였다 하고, 같은 자리에 * 캡처 이미지를 넣으면 안 보이는 것도 그래서다. * * 같은 색 띠로 경계를 덮어 봤지만 증상이 그대로여서 되돌렸다. 다시 손대야 한다면 * 이 방법은 이미 안 되는 것으로 확인됐으니 다른 쪽을 보는 편이 좋다. */
 .onboarding-page--step-2 .onboarding-page__copy {
   display: flex;
   flex-direction: column;
@@ -292,12 +348,7 @@
   z-index: 1;
 }
 
-/*
- * 편지 봉투 묶음. Figma 'Featured / Envelope artwork' (x 78, y 336, 305.3 x 314).
- * main이 화면 y 126에서 시작하므로 장면 기준 top은 336 - 126 = 210이다.
- * 가운데 정렬이 아니다. 왼쪽 아래 판멍이 자리를 비우려고 오른쪽으로 치우쳐 있다.
- * (가운데였다면 x 48.5이고, 실제로 30px 왼쪽으로 밀려 있었다.)
- */
+/* * 편지 봉투 묶음. Figma 'Featured / Envelope artwork' (x 78, y 336, 305.3 x 314). * main이 화면 y 126에서 시작하므로 장면 기준 top은 336 - 126 = 210이다. * 가운데 정렬이 아니다. 왼쪽 아래 판멍이 자리를 비우려고 오른쪽으로 치우쳐 있다. * (가운데였다면 x 48.5이고, 실제로 30px 왼쪽으로 밀려 있었다.) */
 .onboarding-page__envelope {
   position: absolute;
   top: 210px;
@@ -306,17 +357,7 @@
   height: 314px;
 }
 
-/*
- * 편지지.
- *
- * Figma 'Letter / Paper'는 263 x 284.5 칸에 img2.png(1254 x 1254)를 CROP으로 넣는다.
- * 잘라 쓰는 영역이 가로 938.8 / 세로 1183.1이므로 배율이 가로 0.2801 · 세로 0.2405로
- * 서로 다르다. 즉 원본을 세로로 살짝 눌러 넣은 그림이다.
- * 그래서 이미지 자체 크기는 1254 x 0.2801 = 351.3, 1254 x 0.2405 = 301.6이 된다.
- *
- * height: auto로 두면 원본이 정사각형이라 351 x 351이 되어 세로가 49px 길어지고,
- * 편지지 아래끝이 봉투 앞면(아래끝 314)을 뚫고 나왔다. 그래서 높이를 고정한다.
- */
+/* * 편지지. * * Figma 'Letter / Paper'는 263 x 284.5 칸에 img2.png(1254 x 1254)를 CROP으로 넣는다. * 잘라 쓰는 영역이 가로 938.8 / 세로 1183.1이므로 배율이 가로 0.2801 · 세로 0.2405로 * 서로 다르다. 즉 원본을 세로로 살짝 눌러 넣은 그림이다. * 그래서 이미지 자체 크기는 1254 x 0.2801 = 351.3, 1254 x 0.2405 = 301.6이 된다. * * height: auto로 두면 원본이 정사각형이라 351 x 351이 되어 세로가 49px 길어지고, * 편지지 아래끝이 봉투 앞면(아래끝 314)을 뚫고 나왔다. 그래서 높이를 고정한다. */
 .onboarding-page__letter {
   position: absolute;
   z-index: 1;
@@ -327,7 +368,7 @@
   max-width: none;
   transform: translateX(-50%);
   filter: drop-shadow(0 -2px 10px rgb(65 66 95 / 0.14));
-  animation: onboarding-letter-rise 620ms cubic-bezier(.2, .8, .2, 1) both;
+  animation: onboarding-letter-rise 1100ms 1000ms cubic-bezier(.2, .8, .2, 1) both;
 }
 
 .onboarding-page__letter-copy {
@@ -340,10 +381,10 @@
   font-family: var(--font-serif);
   text-align: center;
   transform: translateX(-50%);
-  animation: onboarding-letter-copy-rise 620ms 65ms cubic-bezier(.2, .8, .2, 1) both;
+  animation: onboarding-letter-copy-rise 700ms 1250ms cubic-bezier(.2, .8, .2, 1) both;
 }
 
-.onboarding-page__letter-copy > span {
+.onboarding-page__letter-copy>span {
   display: block;
   color: var(--neutral-200);
   font-family: var(--font-quote);
@@ -370,13 +411,27 @@
 }
 
 @keyframes onboarding-letter-rise {
-  from { opacity: 0; transform: translateX(-50%) translateY(22px); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(22px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 @keyframes onboarding-letter-copy-rise {
-  from { opacity: 0; transform: translateX(-50%) translateY(16px); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .onboarding-page__envelope-back,
@@ -387,45 +442,64 @@
   transform: translateX(-50%);
 }
 
-.onboarding-page__envelope-back { z-index: 0; top: 22px; width: 296px; height: 292px; }
-.onboarding-page__envelope-front { z-index: 4; top: 153px; width: 295px; height: 160px; }
-
-/*
- * 두루마리를 든 판멍이. Figma 칸은 198 x 177, 장면 기준 top 415(화면 541).
- *
- * 쓰던 onboarding-map-mascot.png는 원본이 가로로 1.275배 늘어난 파일이었다.
- * (그림 영역이 946 x 675 = 1.401, 원본은 366 x 333 = 1.099)
- * 그래서 어떤 크기로 넣어도 판멍이가 눌린 것처럼 보였다.
- * 가로 눌림만 되돌려 594 x 531로 다시 저장했고, 이제 198 x 177과 비율이 같다.
- * (594 / 531 = 198 / 177 = 1.1186이라 object-fit이 필요 없다.)
- *
- * left가 0이 아닌 이유: Figma는 늘어난 그림의 좌우를 잘라 썼다. 그때 그림이
- * 놓이던 자리에 맞추려면 2.9px 왼쪽에서 시작해야 한다.
- */
-.onboarding-page__map-mascot {
-  position: absolute;
-  z-index: 5;
-  top: 415px;
-  left: -2.9px;
-  width: 198px;
-  height: 177px;
+.onboarding-page__envelope-back {
+  z-index: 0;
+  top: 22px;
+  width: 296px;
+  height: 292px;
+  opacity: 0;
+  animation: onboarding-envelope-open 500ms 800ms ease forwards;
 }
 
-/*
- * 하단 컨트롤(순서 표시 · 다음 버튼).
- *
- * Figma(온보딩페이지 1·2·3 공통, 402 x 874 기준):
- *   컨테이너   y 749 ~ 823 (높이 74)
- *   순서 표시  x 28,  y 787 ~ 811 (64 x 24)
- *   다음 버튼  x 322, y 761 ~ 811 (50 x 50)
- *
- * 둘 다 컨테이너 아래쪽에 맞춰져 있고(아래 여백 12px), 컨테이너 바닥에서
- * 화면 바닥(874)까지 51px이 남는다. 그래서 가운데 정렬이 아니라 flex-end다.
- *
- * 51px을 margin으로 빼면 그만큼 main이 줄어 장면 그림이 아래에서 잘린다.
- * relative + bottom은 자리(74px)는 그대로 두고 그리는 위치만 올리므로
- * main 높이가 변하지 않는다.
- */
+.onboarding-page__envelope-front {
+  z-index: 4;
+  top: 153px;
+  width: 295px;
+  height: 160px;
+}
+
+@keyframes onboarding-envelope-open {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.onboarding-page__envelope-closed {
+  position: absolute;
+  z-index: 6;
+  bottom: -10px;
+  left: 0px;
+  width: 340px;
+  height: 192px;
+  object-fit: contain;
+  animation: onboarding-envelope-close-hide 500ms 800ms ease forwards;
+}
+
+@keyframes onboarding-envelope-close-hide {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+/* * 두루마리를 든 판멍이. Figma 칸은 198 x 177, 장면 기준 top 415(화면 541). * * 쓰던 onboarding-map-mascot.png는 원본이 가로로 1.275배 늘어난 파일이었다. * (그림 영역이 946 x 675 = 1.401, 원본은 366 x 333 = 1.099) * 그래서 어떤 크기로 넣어도 판멍이가 눌린 것처럼 보였다. * 가로 눌림만 되돌려 594 x 531로 다시 저장했고, 이제 198 x 177과 비율이 같다. * (594 / 531 = 198 / 177 = 1.1186이라 object-fit이 필요 없다.) * * left가 0이 아닌 이유: Figma는 늘어난 그림의 좌우를 잘라 썼다. 그때 그림이 * 놓이던 자리에 맞추려면 2.9px 왼쪽에서 시작해야 한다. */
+.onboarding-page__letter-mascot {
+  position: absolute;
+  z-index: 7;
+  top: 415px;
+  left: -2.9px;
+  width: 200px;
+  height: 200px;
+}
+
+/* * 하단 컨트롤(순서 표시 · 다음 버튼). * * Figma(온보딩페이지 1·2·3 공통, 402 x 874 기준): * 컨테이너 y 749 ~ 823 (높이 74) * 순서 표시 x 28, y 787 ~ 811 (64 x 24) * 다음 버튼 x 322, y 761 ~ 811 (50 x 50) * * 둘 다 컨테이너 아래쪽에 맞춰져 있고(아래 여백 12px), 컨테이너 바닥에서 * 화면 바닥(874)까지 51px이 남는다. 그래서 가운데 정렬이 아니라 flex-end다. */
 .onboarding-page__footer {
   position: relative;
   z-index: 4;
@@ -435,7 +509,6 @@
   align-items: flex-end;
   justify-content: space-between;
   height: 74px;
-  /* Figma 좌 28 / 우 30(402 - 372), 아래 12 */
   padding: 0 30px 12px 28px;
 }
 
@@ -480,9 +553,23 @@
   height: 14px;
 }
 
+/* * 모션 줄이기 설정이 켜져 있는 사용자는 * 카드와 편지 애니메이션을 생략하고 최종 상태를 바로 보여준다. */
 @media (prefers-reduced-motion: reduce) {
-  .onboarding-page__scene--video video { display: none; }
+  .onboarding-page__scene--first .onboarding-note {
+    animation: none;
+    opacity: 1;
+  }
+
+  .onboarding-page__scene--video video {
+    display: none;
+  }
+
   .onboarding-page__letter,
-  .onboarding-page__letter-copy { animation: none; }
-  .onboarding-page__scene--video { background: #fff6dc; }
+  .onboarding-page__letter-copy {
+    animation: none;
+  }
+
+  .onboarding-page__scene--video {
+    background: #fff6dc;
+  }
 }

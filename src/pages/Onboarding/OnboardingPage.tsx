@@ -1,16 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PATHS } from '../../routes/paths'
-import sofaBot from '../../assets/onboarding/figma/onboarding-sofa-bot.png'
+// import sofaBot from '../../assets/onboarding/figma/onboarding-sofa-bot.png'
+import sofaBot from '../../assets/onboarding/figma/onboarding_newimg_sofa.png'
 import onboardingWave from '../../assets/onboarding/figma/onboarding-wave.png'
 import noteFactIcon from '../../assets/onboarding/figma/onboarding-note-fact.png'
 import noteEmotionIcon from '../../assets/onboarding/figma/onboarding-note-emotion.png'
 import notePrivateIcon from '../../assets/onboarding/figma/onboarding-note-private.png'
-import mapMascot from '../../assets/onboarding/figma/onboarding-map-mascot.png'
+// import mapMascot from '../../assets/onboarding/figma/onboarding-map-mascot.png'
+import letterMascot from '../../assets/onboarding/figma/onboarding_newimg_letter.png'
 import backIcon from '../../assets/onboarding/figma/onboarding-back.svg'
 import nextArrow from '../../assets/home/figma/btn-arrow.svg'
 import onboardingVideo from '../../assets/videos/onboarding.mp4'
-import splashVideo from '../../assets/videos/splash.mp4'
+// import splashVideo from '../../assets/videos/splash.mp4'
+import splashVideo from '../../assets/videos/splash_new.mp4'
+import envelopeClosed from '../../assets/home/figma/envelope-closed.webp'
 import envelopeBack from '../../assets/home/figma/envelope-back.webp'
 import envelopeFront from '../../assets/home/figma/envelope-front.webp'
 import letterPaper from '../../assets/home/figma/img2.png'
@@ -67,7 +71,6 @@ function SecondScene() {
     <div className="onboarding-page__scene onboarding-page__scene--video" aria-hidden="true">
       <video
         autoPlay
-        loop
         muted
         playsInline
         preload="auto"
@@ -86,10 +89,23 @@ function ThirdScene() {
       <div className="onboarding-page__envelope">
         <img className="onboarding-page__letter" src={letterPaper} alt="" />
         <img className="onboarding-page__envelope-back" src={envelopeBack} alt="" />
-        <div className="onboarding-page__letter-copy"><span>“</span><p>먼저 사과한 뒤,<br />서로의 의견을 묻게 됐어요.</p><span>”</span><b>조별 과제에서 친구를<br />공개적으로 지적한 사건</b></div>
+        <div className="onboarding-page__letter-copy">
+          <span>“</span>
+          <p>먼저 사과한 뒤,<br />서로의 의견을 묻게 됐어요.</p>
+          <span>”</span>
+          <b>조별 과제에서 친구를<br />공개적으로 지적한 사건</b>
+        </div>
         <img className="onboarding-page__envelope-front" src={envelopeFront} alt="" />
+
+        {/* 닫힌 봉투 */}
+        <img
+          className="onboarding-page__envelope-closed"
+          src={envelopeClosed}
+          alt=""
+        />
       </div>
-      <img className="onboarding-page__map-mascot" src={mapMascot} alt="" />
+
+      <img className="onboarding-page__letter-mascot" src={letterMascot} alt="" />
     </div>
   )
 }
@@ -131,7 +147,7 @@ function OnboardingPage() {
 
   return (
     <div className="onboarding-intro">
-      {splashPhase !== 'playing' && (
+      {splashPhase === 'done' && (
         <main className={'onboarding-page onboarding-page--step-' + (step + 1)}>
           <header className="onboarding-page__header">
             <button aria-label="이전 온보딩으로 돌아가기" onClick={moveBack} type="button"><img src={backIcon} alt="" /></button>
