@@ -173,9 +173,9 @@ export const personalizedRecommendation = {
     cases: [
       { id: 'recommend-friend-secret', plazaCaseId: 'case-secret-told', categoryKey: 'friend', category: '친구',
         title: '친한 친구가 학교에서 저의 비밀을 다른 친구에게 말했어요.' },
-      { id: 'recommend-study-presentation', categoryKey: 'study', category: '학업', agrees: true,
+      { id: 'recommend-study-presentation', plazaCaseId: 'case-study-presentation', categoryKey: 'study', category: '학업', agrees: true,
         title: '조별 과제에서 제 의견은 무시하고 팀원이\n발표 자료를 바꿨어요.' },
-      { id: 'recommend-friend-mistake', categoryKey: 'friend', category: '친구', agrees: false,
+      { id: 'recommend-friend-mistake', plazaCaseId: 'case-friend-mistake', categoryKey: 'friend', category: '친구', agrees: false,
         title: '오랜 친구가 다른 친구들이 있는 자리에서\n제 실수를 계속 이야기해요.' },
     ],
   },

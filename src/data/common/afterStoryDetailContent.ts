@@ -1,8 +1,4 @@
-import avatar1 from '../../assets/case/result/comment-avatar-1.png'
-import avatar2 from '../../assets/case/result/comment-avatar-2.png'
-import avatar3 from '../../assets/case/result/comment-avatar-3.png'
-import avatar4 from '../../assets/case/result/comment-avatar-4.png'
-import avatar5 from '../../assets/case/result/comment-avatar-5.png'
+import { profileAvatars } from './profileAvatars'
 import type { ThreadComment } from '../../components/common/CommentThread'
 import { DEMO_ACCOUNTS } from '../personas'
 
@@ -45,7 +41,7 @@ export const afterStoryLetter = {
   ],
 } as const
 
-const avatars = [avatar1, avatar2, avatar3, avatar4, avatar5]
+const avatars = profileAvatars
 
 const voteLabels = {
   writer: '투표 · 글쓴이 입장',

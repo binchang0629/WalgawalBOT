@@ -85,18 +85,17 @@
 }
 
 /*
- * 시안의 Footer / Sticky action — 높이 110, 위 12, 버튼 52, 아래 46.
- * 아래 46 중 24는 목업 홈 인디케이터 자리다.
+ * 버튼 아래 62px 중 24px은 목업 홈 인디케이터 자리다.
  */
 .signUpCompleteFooter {
     width: 100%;
     margin-top: auto;
-    padding: 12px 24px 46px;
+    padding: 12px 24px 62px;
 }
 
 /* 모바일에는 목업 인디케이터가 없다. 대신 기기의 안전 영역을 확보한다. */
 .showcase--mobile .signUpCompleteFooter {
-    padding-bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(38px + env(safe-area-inset-bottom, 0px));
 }
 
 .signUpCompleteStart {

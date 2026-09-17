@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import type { PersonaId } from '../../types'
 import useSession from '../../hooks/useSession'
 import { PERSONAS, PERSONA_ORDER } from '../../data/personas'
 import seoaProfileImage from '../../assets/my/account-seoa.png'
@@ -19,6 +20,10 @@ const PROFILE_IMAGES = {
  *
  * 발표에서 윤서아 → 곽지훈으로 넘어갈 때 쓴다.
  * 퍼소나는 시나리오 선택 기준일 뿐 인증 수단이 아니다. (PROJECT_SPEC.md §7-5)
+ *
+ * 계정을 고르면 그 시나리오의 첫 화면으로 바로 넘어간다.
+ * 서아는 서비스를 처음 보는 신규 사용자라 온보딩부터, 지훈은 기존 사용자라 로그인 화면이다.
+ * 고르기만 하고 화면이 그대로면 발표 중 한 번 더 눌러 찾아가야 했다. (PROJECT_SPEC.md §4)
  */
 function PersonaSwitcher() {
   const navigate = useNavigate()
@@ -27,6 +32,19 @@ function PersonaSwitcher() {
   if (sessionStatus === 'restoring') return null
 
   const isAuthenticated = sessionStatus === 'authenticated'
+
+  /** 고른 계정의 시연 시작 화면으로 보낸다. 서아 = 온보딩, 지훈 = 로그인. */
+  const handlePersonaSelect = (id: PersonaId) => {
+    if (id === 'A') {
+      // 서아는 서비스를 처음 보는 신규 사용자다. 온보딩 → 회원가입 순서로 시연한다.
+      switchPersona('A')
+      navigate(PATHS.onboarding)
+      return
+    }
+    // 지훈은 기존 사용자라 기본값이 로그인 상태다. 로그인 화면을 보여주려고 비로그인에서 시작한다.
+    switchPersona('B', { startSignedOut: true })
+    navigate(PATHS.login)
+  }
 
   return (
     <section className="persona-switcher" aria-label="시연 계정 전환">
@@ -45,7 +63,7 @@ function PersonaSwitcher() {
               className={`persona-switcher__item persona-switcher__item--${id}${
                 isCurrent ? ' persona-switcher__item--current' : ''
               }`}
-              onClick={() => switchPersona(id)}
+              onClick={() => handlePersonaSelect(id)}
               aria-pressed={isCurrent}
             >
               <img

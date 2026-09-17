@@ -1,4 +1,4 @@
-import authorWalang from '../../assets/case/author-hamster.png'
+import { profileAvatars } from './profileAvatars'
 import voteWriter from '../../assets/case/vote-writer-updated.svg'
 import voteOther from '../../assets/case/vote-other-updated.svg'
 import voteBoth from '../../assets/case/vote-both-updated.svg'
@@ -16,7 +16,7 @@ export const weddingGiftCase = {
   author: {
     nickname: '익명의 햄스터',
     createdAt: demoTimeline.weddingGift.createdAt,
-    avatarUrl: authorWalang,
+    avatarUrl: profileAvatars[1],
   },
   title: '10년 지기 친구 결혼식에 축의금 10만 원을 냈는데, 적은 건가요?',
   caseNumber: '#CASE-FRIEND-87',

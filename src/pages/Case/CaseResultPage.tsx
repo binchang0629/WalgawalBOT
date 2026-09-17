@@ -1,7 +1,9 @@
-import { Fragment, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import juryStatusCharacter from '../../assets/case/vote-other-updated.svg'
+import verdictVideo from '../../assets/case/result/panmung-scale-once.mp4'
+import otherVerdictVideo from '../../assets/case/result/panmung-scale-left-once.mp4'
 import dislikeIcon from '../../assets/case/result/dislike.svg'
 import emojiIcon from '../../assets/case/result/emoji.svg'
 import likeIcon from '../../assets/case/result/like.svg'
@@ -9,13 +11,14 @@ import menuIcon from '../../assets/case/result/menu.svg'
 import quoteDivider from '../../assets/case/result/quote-divider.svg'
 import storyLinkIcon from '../../assets/case/result/story-link.svg'
 import submitIcon from '../../assets/case/result/submit.svg'
-import customProfileAvatar from '../../assets/my/custom-walgadak-avatar.svg'
 import ConfirmDialog from '../../components/common/ConfirmDialog'
+import CommentThread from '../../components/common/CommentThread'
 import { COMMENT_TOAST_MESSAGES } from '../../components/common/commentToastMessages'
 import Pagination from '../../components/common/Pagination'
 import { commentStickerById, type CommentStickerId } from '../../data/common/commentStickers'
 import { weddingGiftCase } from '../../data/common/caseDetailContent'
 import { createParentsSeedComment, parentsCase, parentsResult } from '../../data/common/parentsCaseContent'
+import { getPlazaCaseResultContent, getPlazaCaseStory } from '../../data/common/plazaCaseStories'
 import type { WeddingGiftVoteId } from '../../data/common/caseDetailContent'
 import {
   createWeddingGiftSeedComment,
@@ -28,13 +31,18 @@ import useToast from '../../hooks/useToast'
 import { PATHS } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
 import CommentStickerPicker from './components/CommentStickerPicker'
+import ResultBreakdown from './components/ResultBreakdown'
 import useDemoCountdown from './components/useDemoCountdown'
+import useDetailSlide from '../../hooks/useDetailSlide'
 import './CaseResultPage.css'
+import '../My/MyPageTransitions.css'
 import './WeddingGiftResultPage.css'
 
 interface ResultRouteState {
   selectedVote?: WeddingGiftVoteId
   returnTo?: string
+  fromPlaza?: boolean
+  homeCaseId?: string
 }
 
 const COMMENTS_PER_PAGE = 5
@@ -88,7 +96,7 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
   return (
     <article className="result-comment">
       <div className="result-comment__head">
-        <div className={`result-comment__avatar${comment.avatarUrl === customProfileAvatar ? ' result-comment__avatar--custom' : ''}`}>
+        <div className="result-comment__avatar">
           <img src={comment.avatarUrl} alt="" />
         </div>
         <span>{comment.nickname} · {comment.createdAt}</span>
@@ -168,6 +176,12 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
 function CaseResultPage() {
   const { caseId } = useParams()
   const location = useLocation()
+  /*
+   * MY의 `참여한 사건`에서 들어온 경우에만 MY 상세 화면과 같은 좌우 슬라이드를 쓴다.
+   * 광장이나 홈에서 들어올 때는 원래대로 전환 없이 뜬다.
+   */
+  const fromMy = (location.state as ResultRouteState | null)?.returnTo === PATHS.my
+  const slide = useDetailSlide(fromMy)
   const { sessionStatus, currentUser, personaId } = useSession()
   const { showToast } = useToast()
   const [draft, setDraft] = useState('')
@@ -175,35 +189,76 @@ function CaseResultPage() {
   const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false)
   const [addedComments, setAddedComments] = useState<CaseResultComment[]>([])
   const [currentPage, setCurrentPage] = useState(1)
+  /*
+   * 댓글 정렬. 시안에는 `등록순 | 최신순`이 글자로만 있어 눌러도 반응이 없었다.
+   * 공용 댓글 컴포넌트(CommentThread)와 같은 규칙으로 실제 정렬을 붙인다.
+   * 기본값은 방금 쓴 댓글이 위로 오는 최신순이다.
+   */
+  const [sortKey, setSortKey] = useState<'latest' | 'registered'>('latest')
+  const [playingCaseId, setPlayingCaseId] = useState<string | null>(null)
+  const [speechCaseId, setSpeechCaseId] = useState<string | null>(null)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   // 페이지가 바뀌어 댓글이 언마운트되어도 공감/반대 선택을 유지한다.
   const [commentReactions, setCommentReactions] = useState<Record<string, CommentReaction>>({})
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const commentSectionRef = useRef<HTMLElement>(null)
+  const verdictVideoRef = useRef<HTMLVideoElement>(null)
   const nextCommentId = useRef(1)
-  const caseContent = caseId === parentsCase.id ? parentsCase : weddingGiftCase
-  const resultContent = caseId === parentsCase.id ? parentsResult : weddingGiftResult
+  const plazaStory = getPlazaCaseStory(caseId)
+  const plazaResult = getPlazaCaseResultContent(caseId)
+  const caseContent = caseId === parentsCase.id ? parentsCase : plazaStory ?? weddingGiftCase
+  const resultContent = caseId === parentsCase.id ? parentsResult : plazaResult ?? weddingGiftResult
   const isParentsCase = caseId === parentsCase.id
+  const isClosedPlazaCase = plazaStory?.status === 'closed'
   const countdown = useDemoCountdown(resultContent.deadline, caseContent.id)
 
-  if (caseId !== weddingGiftCase.id && !isParentsCase) return <MissingCase />
+  useEffect(() => {
+    const video = verdictVideoRef.current
+    if (!video) return
+
+    video.pause()
+    video.load()
+    video.playbackRate = 0.8
+    const timer = window.setTimeout(() => {
+      void video.play().catch(() => {})
+    }, 1000)
+
+    return () => {
+      window.clearTimeout(timer)
+      video.pause()
+    }
+  }, [caseId])
+
+  if (caseId !== weddingGiftCase.id && !isParentsCase && !plazaStory) return <MissingCase />
 
   const loginPath = `${PATHS.login}?from=${encodeURIComponent(location.pathname)}`
-  if (sessionStatus !== 'authenticated') return <Navigate to={loginPath} replace />
+  if (sessionStatus !== 'authenticated' && !isClosedPlazaCase) return <Navigate to={loginPath} replace />
 
   const routeState = location.state as ResultRouteState | null
-  const returnTo = routeState?.returnTo === PATHS.my ? PATHS.my : isParentsCase ? PATHS.plaza : PATHS.home
+  const returnTo = routeState?.returnTo === PATHS.my ? PATHS.my : routeState?.returnTo === PATHS.home ? PATHS.home : isParentsCase || plazaStory ? PATHS.plaza : PATHS.home
   const selectedVote = isVoteId(routeState?.selectedVote) ? routeState.selectedVote : 'writer'
   const seededComments = Array.from(
-    { length: Math.min(resultContent.commentCount, MAX_PAGINATED_COMMENTS) },
+    { length: plazaStory ? 0 : Math.min(resultContent.commentCount, MAX_PAGINATED_COMMENTS) },
     (_, index) => isParentsCase ? createParentsSeedComment(index) : createWeddingGiftSeedComment(index),
   )
   const allComments = [...addedComments, ...seededComments]
+  /*
+   * seed 댓글은 먼저 쓴 순서의 역순(최신 → 과거)으로 만들어져 있고,
+   * 새로 쓴 댓글은 맨 앞에 붙는다. 등록순은 이 순서를 그대로 뒤집으면 된다.
+   */
+  const orderedComments = sortKey === 'latest' ? allComments : [...allComments].reverse()
   const totalPages = Math.min(
     MAX_COMMENT_PAGES,
     Math.max(1, Math.ceil(allComments.length / COMMENTS_PER_PAGE)),
   )
-  const visibleComments = allComments.slice((currentPage - 1) * COMMENTS_PER_PAGE, currentPage * COMMENTS_PER_PAGE)
+  const visibleComments = orderedComments.slice((currentPage - 1) * COMMENTS_PER_PAGE, currentPage * COMMENTS_PER_PAGE)
+  const juryVoteIds: WeddingGiftVoteId[] = ['writer', 'other', 'both', 'neither']
+  const juryBreakdown = plazaStory ? [plazaStory.jurySide, ...juryVoteIds.filter((id) => id !== plazaStory.jurySide)]
+    .map((id, index) => ({
+      id,
+      label: weddingGiftCase.choices.find((choice) => choice.id === id)?.label.join(' ') ?? '',
+      percent: [58, 22, 13, 7][index],
+    })) : []
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -245,9 +300,20 @@ function CaseResultPage() {
     })
   }
 
+  /** 정렬을 바꾸면 첫 페이지부터 다시 본다. */
+  const changeCommentSort = (nextSort: 'latest' | 'registered') => {
+    if (nextSort === sortKey) return
+    setSortKey(nextSort)
+    setCurrentPage(1)
+  }
+
   return (
-    <main className="case-result case-result--wedding">
-      <CaseHeader title={isParentsCase ? '사건 결과' : undefined} backTo={returnTo} />
+    <main className={`case-result case-result--wedding${slide.className ? ` ${slide.className}` : ''}`}>
+      <CaseHeader
+        title={isParentsCase || plazaStory ? '사건 결과' : undefined}
+        backTo={returnTo}
+        onBack={fromMy ? () => slide.leave(returnTo) : undefined}
+      />
 
       <div className="case-result__body">
         <section className="result-overview" aria-labelledby="result-case-title">
@@ -259,24 +325,58 @@ function CaseResultPage() {
         </section>
 
         <section className="vote-result" aria-labelledby="vote-result-title">
-          <p className="vote-result__deadline">투표 마감까지&nbsp;&nbsp;{countdown}</p>
+          {!isClosedPlazaCase && <p className="vote-result__deadline">투표 마감까지&nbsp;&nbsp;{countdown}</p>}
           <div className="vote-result__status">
             <img src={juryStatusCharacter} alt="" />
             <div>
-              <strong>2심 배심원 투표 집계 중</strong>
-              <p>투표 종료 후 1심과 2심의 판단을 비교할 수 있어요.</p>
+              <strong>{isClosedPlazaCase ? '2심 배심원 투표가 끝났어요' : '2심 배심원 투표 집계 중'}</strong>
+              <p>{isClosedPlazaCase ? '아래에서 1심과 2심의 판단을 비교해 보세요.' : '투표 종료 후 1심과 2심의 판단을 비교할 수 있어요.'}</p>
             </div>
           </div>
           <div className="vote-result__heading">
             <h2 id="vote-result-title">1심 · 판멍이의 판단</h2>
           </div>
           <div className="vote-result__artwork">
-            <img src={resultContent.artworkUrl} alt="판멍이가 판결 결과를 발표하는 모습" />
+            <video
+              ref={verdictVideoRef}
+              src={plazaStory?.aiSide === 'other' ? otherVerdictVideo : verdictVideo}
+              poster={resultContent.artworkUrl}
+              aria-label="판멍이가 저울 위에서 판결 결과를 발표하는 영상"
+              muted
+              playsInline
+              preload="auto"
+              onLoadStart={() => {
+                setPlayingCaseId(null)
+                setSpeechCaseId(null)
+              }}
+              onPlaying={() => setPlayingCaseId(caseId ?? null)}
+              onTimeUpdate={(event) => {
+                const video = event.currentTarget
+                if (Number.isFinite(video.duration) && video.duration - video.currentTime <= 0.8) {
+                  setSpeechCaseId(caseId ?? null)
+                }
+              }}
+              onEnded={() => setSpeechCaseId(caseId ?? null)}
+            />
+            <img
+              className={`vote-result__first-frame${playingCaseId === caseId ? ' vote-result__first-frame--hidden' : ''}`}
+              src={resultContent.artworkUrl}
+              alt=""
+              aria-hidden="true"
+            />
             <div className="vote-result__summary">
               <span>{resultContent.verdict.label}</span>
               <h3>{resultContent.verdict.title}</h3>
               <p>{resultContent.verdict.description}</p>
             </div>
+            {speechCaseId === caseId && (
+              <div className={`vote-result__speech${plazaStory?.aiSide === 'other' ? ' vote-result__speech--other' : ''}`} aria-hidden="true">
+                <svg viewBox="0 0 84 48" focusable="false">
+                  <path d="M17 2h52q11 0 11 11v14q0 11-11 11H24L5 46l7-10q-7-3-7-9V13Q5 2 17 2Z" />
+                </svg>
+                <span>이쪽!</span>
+              </div>
+            )}
           </div>
         </section>
 
@@ -299,7 +399,13 @@ function CaseResultPage() {
           </div>
         </section>
 
-        <section className="jury-verdict-pending" aria-label="2심 배심원 투표 진행 상태">
+        {isClosedPlazaCase && plazaStory ? (
+          <ResultBreakdown
+            key={plazaStory.id}
+            breakdown={juryBreakdown}
+            headingId="jury-result-title"
+          />
+        ) : <section className="jury-verdict-pending" aria-label="2심 배심원 투표 진행 상태">
           <div className="jury-verdict-pending__marker" aria-hidden="true">
             <i />
             <span />
@@ -307,14 +413,20 @@ function CaseResultPage() {
           </div>
           <strong>2심 배심원 투표는 아직 진행 중이에요</strong>
           <p>투표 종료 후<br />AI와 배심원의 판단을 비교할 수 있어요.</p>
-        </section>
+        </section>}
 
         <div className="case-result__section-divider case-result__section-divider--wedding" />
 
-        <section ref={commentSectionRef} className="comment-section" aria-labelledby="comments-title">
+        {plazaStory ? (
+          <CommentThread key={plazaStory.id} comments={plazaStory.comments} headingId="comments-title" plazaCaseId={plazaStory.id} />
+        ) : <section ref={commentSectionRef} className="comment-section" aria-labelledby="comments-title">
           <div className="comment-section__heading">
             <h2 id="comments-title">댓글 ({allComments.length})</h2>
-            <span>등록순 <i /> 최신순</span>
+            <span className="comment-section__sort">
+              <button type="button" aria-pressed={sortKey === 'registered'} onClick={() => changeCommentSort('registered')}>등록순</button>
+              <i />
+              <button type="button" aria-pressed={sortKey === 'latest'} onClick={() => changeCommentSort('latest')}>최신순</button>
+            </span>
           </div>
 
           <form className="comment-composer" onSubmit={handleSubmit}>
@@ -388,9 +500,9 @@ function CaseResultPage() {
           <div className="comment-pagination">
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handleCommentPageChange} ariaLabel="댓글 페이지" />
           </div>
-        </section>
+        </section>}
 
-        {!isParentsCase && <section className="after-story" aria-labelledby="after-story-title">
+        {!isParentsCase && !plazaStory && <section className="after-story" aria-labelledby="after-story-title">
           <h2 id="after-story-title">비슷한 사건의 후일담</h2>
           <article>
             <blockquote>{weddingGiftResult.afterStory.quote}</blockquote>

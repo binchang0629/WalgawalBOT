@@ -24,11 +24,26 @@ function MainLayout() {
 
   useLayoutEffect(() => {
     if (location.pathname === PATHS.home && previousPathRef.current !== PATHS.home) {
+      const routeState = location.state as { restoreHomeScroll?: boolean; homeCaseId?: string } | null
       const restore = navigationType === 'POP'
-        || (location.state as { restoreHomeScroll?: boolean } | null)?.restoreHomeScroll === true
+        || routeState?.restoreHomeScroll === true
       const scrollTop = restore ? lastHomeScrollTop : 0
       if (!restore) lastHomeScrollTop = 0
       scrollRef.current?.scrollTo({ top: scrollTop, left: 0, behavior: 'auto' })
+      if (routeState?.homeCaseId && scrollRef.current) {
+        const scrollRoot = scrollRef.current
+        const caseLink = Array.from(scrollRoot.querySelectorAll<HTMLElement>('[data-home-case-id]'))
+          .find((element) => element.dataset.homeCaseId === routeState.homeCaseId)
+        if (caseLink) {
+          const rootRect = scrollRoot.getBoundingClientRect()
+          const cardRect = caseLink.getBoundingClientRect()
+          scrollRoot.scrollTo({
+            top: scrollRoot.scrollTop + cardRect.top - rootRect.top - (scrollRoot.clientHeight - cardRect.height) / 2,
+            behavior: 'auto',
+          })
+          lastHomeScrollTop = scrollRoot.scrollTop
+        }
+      }
     }
     previousPathRef.current = location.pathname
   }, [location.pathname, location.state, navigationType])

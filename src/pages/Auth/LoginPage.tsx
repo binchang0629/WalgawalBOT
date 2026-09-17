@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import useSession from '../../hooks/useSession'
 import { PATHS } from '../../routes/paths'
 import { requestLoginReward } from '../../state/loginRewardSignal'
-import { AUTH_DEMO_ACCOUNT, AUTH_DEMO_EMAIL } from './authDemoAccount'
+import { AUTH_DEMO_LOGINS, findDemoPersonaByEmail } from './authDemoAccount'
 import eyeOnIcon from '../../assets/auth/loginEyeOn.svg'
 import eyeOffIcon from '../../assets/auth/loginEyeOff.svg'
 import googleIcon from '../../assets/auth/loginSocialGoogle.png'
@@ -15,9 +15,13 @@ import './LoginPage.css'
 /**
  * 로그인. Figma `2187:24325`(빈 상태) · `2264:13801`(입력됨) · `2264:13898`(비밀번호 보임).
  *
- * 시안 메모대로 `서아 계정 로그인`을 누르면 이메일과 비밀번호가 한 번에 채워진다.
+ * 시안 메모대로 `<이름> 계정 로그인`을 누르면 이메일과 비밀번호가 한 번에 채워진다.
  * 발표에서 타이핑하지 않고 넘어가기 위한 장치이며, 누른 뒤에는 문구가
- * `서아 계정 로그인 중`으로 바뀐다. 직접 입력도 그대로 된다.
+ * `<이름> 계정 로그인 중`으로 바뀐다. 직접 입력도 그대로 된다.
+ *
+ * 채우는 값은 기존 사용자 곽지훈의 계정이다. 윤서아는 신규 가입 시나리오라
+ * 회원가입으로 들어오고, 로그인 화면을 쓰는 쪽은 지훈이기 때문이다.
+ * 이메일을 직접 친 경우에도 그 이메일의 계정으로 로그인한다. (PROJECT_SPEC.md §4)
  *
  * SNS 로그인 세 개는 시안에 모양만 있고 연결할 곳이 없다.
  * 카카오는 시안에 `비활성화`로 표시돼 있어 셋 다 비활성으로 둔다. → PROJECT_SPEC.md §9
@@ -40,7 +44,13 @@ function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-  const [isDemoFilled, setIsDemoFilled] = useState(false)
+
+  // 로그인 화면은 기존 사용자 곽지훈의 시연 계정으로 고정한다.
+  // 윤서아는 신규 가입 시나리오라 회원가입으로 들어오고, 이 화면을 쓰는 쪽은 지훈이다.
+  // 퍼소나 선택과 무관하게 같은 값이 보여야 발표 중 계정이 섞이지 않는다. (PROJECT_SPEC.md §4)
+  const demoLogin = AUTH_DEMO_LOGINS.B
+  // 별도 상태로 두면 퍼소나를 바꿔도 `로그인 중` 문구가 남는다. 입력값에서 바로 읽는다.
+  const isDemoFilled = email === demoLogin.email && password === demoLogin.password
 
   /** 회원가입으로 이동할 때만 안전한 앱 내부 진입 경로를 이어준다. */
   const rawFrom = searchParams.get('from')
@@ -49,9 +59,8 @@ function LoginPage() {
   const canSubmit = email.trim() !== '' && password !== ''
 
   const handleDemoFill = () => {
-    setEmail(AUTH_DEMO_EMAIL)
-    setPassword(AUTH_DEMO_ACCOUNT.password)
-    setIsDemoFilled(true)
+    setEmail(demoLogin.email)
+    setPassword(demoLogin.password)
   }
 
   const handleSubmit = (event: React.FormEvent) => {
@@ -61,7 +70,9 @@ function LoginPage() {
     // 모바일 키보드·포커스가 남아 있으면 도착 화면의 하단 내비가 밀려 보일 수 있다.
     // 먼저 포커스를 해제하고 목적지 화면을 한 프레임 완성한 뒤 보상 팝업을 띄운다.
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
-    signIn(personaId)
+    // 시연 계정 이메일을 직접 친 경우 그 계정으로 들어간다.
+    // 그래야 로그인 직후 인사 팝업이 `지훈님`처럼 실제 입력한 계정 이름으로 뜬다.
+    signIn(findDemoPersonaByEmail(email) ?? personaId)
     navigate(PATHS.home, { replace: true })
     window.requestAnimationFrame(() => {
       window.requestAnimationFrame(() => requestLoginReward('login'))
@@ -83,7 +94,7 @@ function LoginPage() {
             className={isDemoFilled ? 'login__demoFill login__demoFillOn' : 'login__demoFill'}
             onClick={handleDemoFill}
           >
-            {isDemoFilled ? '서아 계정 로그인 중' : '서아 계정 로그인'}
+            {isDemoFilled ? `${demoLogin.shortName} 계정 로그인 중` : `${demoLogin.shortName} 계정 로그인`}
           </button>
 
           <label className="login__field">

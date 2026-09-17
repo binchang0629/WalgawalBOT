@@ -99,8 +99,8 @@
     object-fit: contain;
 }
 
-.top-bar__action--account-custom { background: var(--pink); }
-.top-bar__action--account-custom img { width: 92%; height: 92%; margin: 4%; object-fit: contain; }
+.top-bar__action--account-custom { background: none; }
+.top-bar__action--account-custom img { width: 100%; height: 100%; margin: 0; object-fit: contain; }
 
 .top-bar__action--account-guest {
     overflow: visible;

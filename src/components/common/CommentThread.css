@@ -296,10 +296,6 @@
     object-fit: cover;
 }
 
-/* 직접 가입 프로필은 MY와 같은 원형 배경·안쪽 여백으로 보여준다. */
-.result-comment__avatar--custom { background: var(--pink); }
-.result-comment__avatar--custom img { width: 92%; height: 92%; margin: 4%; object-fit: contain; }
-
 .result-comment__head>span {
     min-width: 0;
     flex: 1;

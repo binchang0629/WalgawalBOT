@@ -21,8 +21,11 @@ function AiSummary({ items }: { items: readonly SummaryItem[] }) {
       observer.disconnect()
     }, {
       root: appViewport,
-      /* 박스가 기기 내부 화면의 가운데 16% 영역을 통과할 때 재생한다. */
-      rootMargin: '-42% 0px -42% 0px',
+      /*
+       * 박스가 기기 내부 화면의 가운데 30% 영역에 들어오면 재생한다.
+       * 이전에는 16%로 좁아서 정확히 가운데까지 스크롤해야 시작해, 재생 자체가 늦게 느껴졌다.
+       */
+      rootMargin: '-35% 0px -35% 0px',
       threshold: 0.01,
     })
 

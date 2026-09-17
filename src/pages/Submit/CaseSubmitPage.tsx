@@ -5,10 +5,11 @@ import { BACK_FALLBACK, PATHS } from '../../routes/paths'
 import CaseSubmitHeader from './components/CaseSubmitHeader'
 import CaseSubmitProgress from './components/CaseSubmitProgress'
 import CaseSubmitFooter from './components/CaseSubmitFooter'
+import CaseSubmitDemoFill from './components/CaseSubmitDemoFill'
 import useCaseSubmitDraft from './useCaseSubmitDraft'
 import useWizardBack from '../../hooks/useWizardBack'
 import { RELATIONSHIPS } from './types'
-import { JIHUN_CONTENT, SEOA_CONTENT, SUBMIT_SCENARIOS } from './caseSubmitContent'
+import { DEMO_RELATIONSHIP, JIHUN_CONTENT, SEOA_CONTENT, SUBMIT_SCENARIOS } from './caseSubmitContent'
 import walgadakEmpathy from '../../assets/case/stickers/walgadak-empathy.png'
 import './CaseSubmit.css'
 import './CaseSubmitPage.css'
@@ -99,6 +100,18 @@ function CaseSubmitPage() {
     })
   }
 
+  /** 이 단계에 필요한 값(관계 · 사건 내용)을 한 번에 채운다. */
+  const demoValues = {
+    relationship: DEMO_RELATIONSHIP[personaId],
+    content: isSeoa ? SEOA_CONTENT : JIHUN_CONTENT,
+  }
+  const isDemoFilled = relationship === demoValues.relationship && content === demoValues.content
+
+  const handleStepDemoFill = () => {
+    setRelationship(demoValues.relationship)
+    setContent(demoValues.content)
+  }
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!canProceed) return
@@ -115,6 +128,8 @@ function CaseSubmitPage() {
         <div className="case-submit__intro">
           <h2 className="case-submit__heading">무슨 일이 있었나요?</h2>
           <p className="case-submit__description">편하게 적어주세요. 정리는 판멍이가 도와줄게요.</p>
+          {/* 발표 시연용. 관계와 사건 내용을 한 번에 채운다. 두 계정 모두 같은 자리에 둔다. */}
+          <CaseSubmitDemoFill personaId={personaId} done={isDemoFilled} onFill={handleStepDemoFill} />
         </div>
 
         <fieldset className="case-submit__field" aria-required="true">

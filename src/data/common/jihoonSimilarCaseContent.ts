@@ -1,9 +1,4 @@
-import commentAvatar1 from '../../assets/case/disagreement/comment-1.png'
-import commentAvatar2 from '../../assets/case/disagreement/comment-2.png'
-import commentAvatar3 from '../../assets/case/disagreement/comment-3.png'
-import commentAvatar4 from '../../assets/case/disagreement/comment-4.png'
-import commentAvatar5 from '../../assets/case/disagreement/comment-5.png'
-import authorAvatar from '../../assets/case/jihoon/author.png'
+import { profileAvatars } from './profileAvatars'
 import verdictArtwork from '../../assets/case/jihoon/verdict-artwork.png'
 import type { CommentStickerId } from './commentStickers'
 import { demoTimeline } from './demoTimeline'
@@ -29,7 +24,7 @@ export const jihoonSimilarCase = {
   author: {
     nickname: '원본은영업비밀',
     createdAt: demoTimeline.company.createdAt,
-    avatarUrl: authorAvatar,
+    avatarUrl: profileAvatars[6],
   },
   title: '수정 2회를 마쳤는데, 의뢰인이 잔금 지급을 미루고 있어요.',
   detailTitle: '수정 2회를 마쳤는데, 의뢰인이\n잔금 지급을 미루고 있어요.',
@@ -113,7 +108,7 @@ export const jihoonSimilarResult = {
   comments: [
     {
       id: 'jihoon-comment-1',
-      avatarUrl: commentAvatar1,
+      avatarUrl: profileAvatars[4],
       nickname: '달이예쁘네요',
       createdAt: '1분 전',
       voteId: 'other',
@@ -124,7 +119,7 @@ export const jihoonSimilarResult = {
     },
     {
       id: 'jihoon-comment-2',
-      avatarUrl: commentAvatar2,
+      avatarUrl: profileAvatars[5],
       nickname: '침낭펴야지?',
       createdAt: '3분 전',
       voteId: 'other',
@@ -136,7 +131,7 @@ export const jihoonSimilarResult = {
     },
     {
       id: 'jihoon-comment-3',
-      avatarUrl: commentAvatar3,
+      avatarUrl: profileAvatars[6],
       nickname: '월요병말기',
       createdAt: '12분 전',
       voteId: 'both',
@@ -147,7 +142,7 @@ export const jihoonSimilarResult = {
     },
     {
       id: 'jihoon-comment-4',
-      avatarUrl: commentAvatar4,
+      avatarUrl: profileAvatars[7],
       nickname: '판멍이는귀여워',
       createdAt: '11분 전',
       voteId: 'other',
@@ -159,7 +154,7 @@ export const jihoonSimilarResult = {
     },
     {
       id: 'jihoon-comment-5',
-      avatarUrl: commentAvatar5,
+      avatarUrl: profileAvatars[0],
       nickname: '아아러버',
       createdAt: '15분 전',
       voteId: 'both',
@@ -229,7 +224,7 @@ export function createJihoonSimilarSeedComment(index: number): JihoonSimilarComm
 
   return {
     id: `company-seed-comment-${index + 1}`,
-    avatarUrl: [commentAvatar1, commentAvatar2, commentAvatar3, commentAvatar4, commentAvatar5][index % 5],
+    avatarUrl: profileAvatars[(index + 4) % profileAvatars.length],
     nickname: companyCommentNicknames[index % companyCommentNicknames.length],
     createdAt: formatCommentElapsedTime(index * 10 - 25),
     voteId: opening.voteId,

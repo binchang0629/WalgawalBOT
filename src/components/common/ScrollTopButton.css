@@ -1,0 +1,49 @@
+/*
+ * 맨 위로 버튼. 내비 바로 위 오른쪽 — 예전 챗봇 버튼 자리다.
+ * 챗봇 머리(원형)와 구분되도록 납작한 알약 모양으로 둔다.
+ */
+.scroll-top-button {
+    position: absolute;
+    right: 18px;
+    bottom: calc(var(--device-bottom-nav) + 12px);
+    z-index: 30;
+    display: grid;
+    place-items: center;
+    width: 62px;
+    height: 40px;
+    padding: 0;
+    border: 1.5px solid var(--blue);
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgb(55 75 255 / 12%);
+    /* 아이콘은 currentColor를 따른다. */
+    color: var(--blue);
+    cursor: pointer;
+
+    /* 나타나기 전에는 클릭도 받지 않는다. */
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease;
+}
+
+.scroll-top-button.is-visible {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+}
+
+@media (hover: hover) {
+    .scroll-top-button.is-visible:hover { transform: translateY(-2px); }
+}
+
+.scroll-top-button.is-visible:active { transform: translateY(0) scale(.96); }
+
+.scroll-top-button:focus-visible {
+    outline: 3px solid var(--orange-500);
+    outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .scroll-top-button { transition: none; }
+}

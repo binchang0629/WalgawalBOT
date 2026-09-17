@@ -80,7 +80,8 @@
   width: 36px;
   height: 36px;
   flex: none;
-  object-fit: contain;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .afterstory-detail__author div {

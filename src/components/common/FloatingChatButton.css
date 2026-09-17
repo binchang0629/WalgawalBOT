@@ -20,11 +20,13 @@
     transition: transform .18s ease;
 }
 
-/* 시안(2191:3560)은 하단 내비에 딱 붙은 +0이다. 기존 +16px은 아이콘이 너무 떠 보인다는
-   피드백이 있어 내비 바로 위로 내렸고, 거기서 6px 더 내려 내비에 살짝 걸치게 했다.
-   머리 스프라이트 아래쪽에 투명 여백이 있어 실제로 가려지는 부분은 그보다 적다. */
+/*
+ * 내비 바로 위 오른쪽은 이제 `맨 위로` 버튼(ScrollTopButton) 자리다.
+ * 챗봇 머리는 그 위로 올라가 두 버튼이 세로로 쌓인다.
+ * 46px = 맨 위로 버튼 높이(40px) + 사이 여백. 머리 스프라이트의 투명 여백까지 감안한 값이다.
+ */
 .floating-chat-button--above-nav {
-    bottom: calc(var(--device-bottom-nav) - 6px);
+    bottom: calc(var(--device-bottom-nav) + 46px);
 }
 
 .floating-chat-button span {

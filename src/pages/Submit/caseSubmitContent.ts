@@ -1,4 +1,4 @@
-import type { CaseSummary } from './types'
+import type { CaseSummary, Relationship } from './types'
 import type { PersonaId } from '../../types'
 
 /**
@@ -30,6 +30,15 @@ export const SEOA_CONTENT = '동아리 축제 준비 중, 한 팀원이 약속�
  * 서아와 달리 확정 시안에 본문이 없어, 이 화면의 안내 문구를 늘려 쓴 임시 값이다.
  */
 export const JIHUN_CONTENT = '의뢰인에게 납품 일정에 맞춰 디자인 작업물을 모두 전달했어요.\n\n계약서에 적힌 잔금 지급일이 2주 지났는데 입금이 없고, 연락을 드려도 확인 중이라는 답만 돌아옵니다.\n\n그 사이 의뢰인은 제 작업물을 홈페이지와 SNS에 그대로 쓰고 있어요. 어디까지 요구할 수 있을까요?'
+
+/**
+ * 시연 자동 입력이 고르는 `상대와의 관계`. Figma 시안의 선택값 그대로다.
+ * 처음부터 눌러 두지 않고, 단계별 자동 입력 버튼을 눌렀을 때만 들어간다.
+ */
+export const DEMO_RELATIONSHIP: Record<PersonaId, Relationship> = {
+  A: '친구',
+  B: '직장',
+}
 
 export const SUBMIT_SCENARIOS = {
   A: {

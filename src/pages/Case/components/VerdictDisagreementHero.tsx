@@ -5,13 +5,28 @@ import author from '../../../assets/case/disagreement/author.svg'
 import opponent from '../../../assets/case/disagreement/opponent.svg'
 import aiArrow from '../../../assets/case/disagreement/ai-arrow.svg'
 import refreshIcon from '../../../assets/case/disagreement/refresh.svg'
+import type { WeddingGiftVoteId } from '../../../data/common/caseDetailContent'
 import './VerdictDisagreementHero.css'
 
 // 사용자 제공 HTML과 동일한 투표지 경로.
 const curve = (i: number) => `M ${340 + i % 4 * 16} -35 C ${320 + i % 3 * 10} 60, ${198 + i % 5 * 9} 124, ${242 + i % 4 * 8} 249`
 
 /** 종결 사건의 AI=글쓴이 / 배심원=상대방 비교 장면. 수치는 결과 데이터에서 받는다. */
-export default function VerdictDisagreementHero({ juryPercent }: { juryPercent: number }) {
+const sideLabel: Record<WeddingGiftVoteId, string> = {
+  writer: '글쓴이', other: '상대방', both: '양쪽 모두', neither: '양쪽 모두 아님',
+}
+const jurySpeech: Record<WeddingGiftVoteId, [string, string]> = {
+  writer: ['글쓴이 편을', '선택했어요!'],
+  other: ['상대편을', '선택했어요!'],
+  both: ['양쪽 모두에', '표를 줬어요!'],
+  neither: ['둘 다 아니라고', '봤어요!'],
+}
+
+export default function VerdictDisagreementHero({ juryPercent, aiSide = 'writer', jurySide = 'other' }: {
+  juryPercent: number
+  aiSide?: 'writer' | 'other'
+  jurySide?: WeddingGiftVoteId
+}) {
   const headingId = useId()
   const root = useRef<HTMLElement>(null)
   const [run, setRun] = useState(0)
@@ -80,9 +95,9 @@ export default function VerdictDisagreementHero({ juryPercent }: { juryPercent: 
         <img className="disagreement-hero__panmung" src={panmung} alt="" />
         <img className="disagreement-hero__author" src={author} alt="" />
         <img className="disagreement-hero__opponent" src={opponent} alt="" />
-        <p className="disagreement-hero__ai">판멍이는<br />글쓴이 편이에요!</p>
+        <p className="disagreement-hero__ai">판멍이는<br />{sideLabel[aiSide]} 편이에요!</p>
         <img className="disagreement-hero__arrow" src={aiArrow} alt="" />
-        <p className="disagreement-hero__jury">배심원은<br />상대편을<br />선택했어요!</p>
+        <p className="disagreement-hero__jury">배심원은<br />{jurySpeech[jurySide][0]}<br />{jurySpeech[jurySide][1]}</p>
         <div className="disagreement-hero__percent">
           <strong>{juryPercent}<small>%</small></strong>
           <span>배심원 최다 선택</span>
@@ -91,7 +106,7 @@ export default function VerdictDisagreementHero({ juryPercent }: { juryPercent: 
       <div className="disagreement-hero__footer">
       <button className="disagreement-hero__replay" type="button" onClick={() => replay.current()} disabled={reduced || !run} aria-label="판단 비교 애니메이션 다시 보기" title="다시 보기"><img src={refreshIcon} alt="" /></button>
       </div>
-      <p className="disagreement-hero__sr">AI는 글쓴이를, 배심원은 상대방을 선택했어요. 배심원 최다 선택 비율은 {juryPercent}%예요.</p>
+      <p className="disagreement-hero__sr">AI는 {sideLabel[aiSide]} 입장을, 배심원 다수는 {sideLabel[jurySide]} 입장을 선택했어요. 배심원 최다 선택 비율은 {juryPercent}%예요.</p>
     </section>
   )
 }

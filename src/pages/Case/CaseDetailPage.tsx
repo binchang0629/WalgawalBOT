@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import useSession from '../../hooks/useSession'
 import { weddingGiftCase } from '../../data/common/caseDetailContent'
 import { parentsCase } from '../../data/common/parentsCaseContent'
+import { getPlazaCaseStory } from '../../data/common/plazaCaseStories'
 import type { WeddingGiftVoteId } from '../../data/common/caseDetailContent'
 import { PATHS, toCaseResult } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
@@ -47,7 +48,9 @@ function CaseDetailPage() {
   const { showToast } = useToast()
   const [selectedVote, setSelectedVote] = useState<WeddingGiftVoteId | null>(null)
   const [confirmedVote, setConfirmedVote] = useState<WeddingGiftVoteId | null>(null)
-  const caseContent = caseId === parentsCase.id ? parentsCase : weddingGiftCase
+  const plazaStory = getPlazaCaseStory(caseId)
+  const caseContent = caseId === parentsCase.id ? parentsCase : plazaStory ?? weddingGiftCase
+  const isClosed = plazaStory?.status === 'closed'
   const [participantCount] = useState(() => getRememberedCaseParticipantCount(
     caseContent.id,
     caseContent.participantCount,
@@ -55,7 +58,7 @@ function CaseDetailPage() {
 
   const isAuthenticated = sessionStatus === 'authenticated'
   const loginPath = `${PATHS.login}?from=${encodeURIComponent(location.pathname)}`
-  const entryState = location.state as { entryMotion?: string; returnTo?: string; fromPlaza?: boolean } | null
+  const entryState = location.state as { entryMotion?: string; returnTo?: string; fromPlaza?: boolean; homeCaseId?: string } | null
   const shouldSlideIn = entryState?.entryMotion === 'slide-forward'
   const overlayRoot = document.getElementById('app-overlay-root')
 
@@ -65,15 +68,16 @@ function CaseDetailPage() {
       navigate(toCaseResult(caseContent.id), {
         state: {
           selectedVote: confirmedVote,
-          fromPlaza: caseContent.id === parentsCase.id,
+          fromPlaza: caseContent.id !== weddingGiftCase.id,
           returnTo: entryState?.returnTo,
+          homeCaseId: entryState?.homeCaseId,
         },
       })
     }, 1000)
     return () => window.clearTimeout(timer)
-  }, [caseContent.id, confirmedVote, entryState?.returnTo, navigate])
+  }, [caseContent.id, confirmedVote, entryState?.homeCaseId, entryState?.returnTo, navigate])
 
-  if (caseId !== weddingGiftCase.id && caseId !== parentsCase.id) return <MissingCase />
+  if (caseId !== weddingGiftCase.id && caseId !== parentsCase.id && !plazaStory) return <MissingCase />
 
   const handleVoteChoice = (choiceId: WeddingGiftVoteId) => {
     setSelectedVote(choiceId)
@@ -91,15 +95,15 @@ function CaseDetailPage() {
   }
 
   return (
-    <main className={`case-detail${caseContent.id === parentsCase.id ? ' case-detail--family' : ''}${shouldSlideIn ? ' case-detail--slide-forward' : ''}`}>
+    <main className={`case-detail${caseContent.id === parentsCase.id ? ' case-detail--family' : ''}${isClosed ? ' case-detail--closed' : ''}${shouldSlideIn ? ' case-detail--slide-forward' : ''}`}>
       <CaseHeader
-        title={caseContent.id === parentsCase.id ? '사건 상세' : undefined}
-        backTo={entryState?.returnTo === PATHS.home ? PATHS.home : undefined}
+        title={plazaStory ? (isClosed ? '지난 사건' : '사건 상세') : caseContent.id === parentsCase.id ? '사건 상세' : undefined}
+        backTo={entryState?.returnTo === PATHS.home ? PATHS.home : plazaStory ? PATHS.plaza : undefined}
       />
 
       <div className="case-detail__body">
         <section className="case-overview" aria-labelledby="case-title">
-          <VoteDeadline value={caseContent.deadline} caseId={caseContent.id} />
+          {!isClosed && <VoteDeadline value={caseContent.deadline} caseId={caseContent.id} />}
 
           <div className="case-overview__category">
             <i aria-hidden="true" />
@@ -131,14 +135,18 @@ function CaseDetailPage() {
 
         <AiSummary items={caseContent.summary} />
 
-        <CaseVoteSection
+        {isClosed ? (
+          <Link className="closed-case-result-link" to={toCaseResult(caseContent.id)} state={{ fromPlaza: entryState?.fromPlaza, returnTo: entryState?.returnTo, homeCaseId: entryState?.homeCaseId }}>
+            투표 결과보기
+          </Link>
+        ) : <CaseVoteSection
           choices={caseContent.choices}
           isAuthenticated={isAuthenticated}
           loginPath={loginPath}
           selectedVote={selectedVote}
           onSelect={handleVoteChoice}
           onSubmit={handleVoteSubmit}
-        />
+        />}
       </div>
       {confirmedVote && overlayRoot && createPortal(
         <div className="case-vote-confirmation" role="status" aria-live="polite" aria-atomic="true">

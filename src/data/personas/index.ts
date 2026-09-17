@@ -1,6 +1,5 @@
 import type { Persona, PersonaId } from '../../types'
-import seoaAnonymousAvatar from '../../assets/case/disagreement/comment-2.png'
-import jihunAnonymousAvatar from '../../assets/case/result/comment-avatar-3.png'
+import { accountProfileAvatars } from '../common/profileAvatars'
 
 /**
  * 시연 퍼소나 정의.
@@ -69,7 +68,7 @@ export const DEMO_ACCOUNTS: Record<PersonaId, DemoAccount> = {
     submittedCases: 0,
     juryParticipations: 0,
     points: 0,
-    anonymousAvatarUrl: seoaAnonymousAvatar,
+    anonymousAvatarUrl: accountProfileAvatars.seoa,
     passwordPlaceholder: 'seoa1234!',
   },
   B: {
@@ -80,7 +79,7 @@ export const DEMO_ACCOUNTS: Record<PersonaId, DemoAccount> = {
     submittedCases: 0,
     juryParticipations: 12,
     points: 320,
-    anonymousAvatarUrl: jihunAnonymousAvatar,
+    anonymousAvatarUrl: accountProfileAvatars.jihun,
     passwordPlaceholder: 'jihun1234!',
   },
 }

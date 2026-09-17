@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef } from 'react'
 import type { MouseEvent, PointerEvent, ReactNode } from 'react'
 import { useLocation } from 'react-router-dom'
 import FloatingChatButton from '../common/FloatingChatButton'
+import ScrollTopButton from '../common/ScrollTopButton'
 import ClickSpark from '../common/ClickSpark'
 import { PATHS } from '../../routes/paths'
 import './AppViewport.css'
@@ -148,6 +149,7 @@ function AppViewport({ children }: AppViewportProps) {
       onClickCapture={handlePrimaryClick}
     >
       <ClickSpark><div ref={routeContentRef} className="app-route-content">{children}</div></ClickSpark>
+      <ScrollTopButton />
       <FloatingChatButton />
       {/* 모달·바텀시트 portal 대상. 스크롤 콘텐츠 바깥이면서 기기 내부에 있다. */}
       <div id="app-overlay-root" />

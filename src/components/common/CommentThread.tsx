@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useLocation } from 'react-router-dom'
 
@@ -7,7 +7,6 @@ import emojiIcon from '../../assets/case/result/emoji.svg'
 import likeIcon from '../../assets/case/result/like.svg'
 import menuIcon from '../../assets/case/result/menu.svg'
 import submitIcon from '../../assets/case/result/submit.svg'
-import customProfileAvatar from '../../assets/my/custom-walgadak-avatar.svg'
 import { commentStickerById, type CommentStickerId } from '../../data/common/commentStickers'
 import useLoginGate from '../../hooks/useLoginGate'
 import useSession from '../../hooks/useSession'
@@ -21,6 +20,7 @@ import CommentStickerPicker from '../../pages/Case/components/CommentStickerPick
 import Pagination from './Pagination'
 import ConfirmDialog from './ConfirmDialog'
 import { COMMENT_TOAST_MESSAGES } from './commentToastMessages'
+import { readPlazaComments, savePlazaComments } from '../../utils/plazaComments'
 import './CommentThread.css'
 
 /** 댓글 한 건. 사건 결과 화면과 왈가왈후 후일담 상세 화면이 같은 모양을 쓴다. */
@@ -124,7 +124,7 @@ function CommentRow({ comment, reaction, showReply, showVoteBadge, actionsInHead
   return (
     <article className={'result-comment' + (actionsInHeader ? ' result-comment--actions-in-head' : '')}>
       <div className="result-comment__head">
-        <div className={`result-comment__avatar${comment.avatarUrl === customProfileAvatar ? ' result-comment__avatar--custom' : ''}`} aria-hidden="true">
+        <div className="result-comment__avatar" aria-hidden="true">
           <img src={comment.avatarUrl} alt="" />
         </div>
         <span>{comment.nickname} · {comment.createdAtLabel ?? elapsedLabel(comment.minutesAgo)}</span>
@@ -202,6 +202,8 @@ interface CommentThreadProps {
   actionsInHeader?: boolean
   /** 스티커 창에서 처음 보여줄 캐릭터를 정할 때 쓰는 제목 id. */
   headingId?: string
+  /** 광장 사건에서만 세션 동안 새 댓글을 보존한다. */
+  plazaCaseId?: string
 }
 
 /**
@@ -211,10 +213,11 @@ interface CommentThreadProps {
  * 새로 쓴 댓글은 맨 앞에 붙고 1페이지로 돌아간다. 내가 쓴 댓글만 수정·삭제할 수 있다.
  * 공감·반대는 댓글 ID별로 이 컴포넌트가 들고 있어서 페이지를 넘겨도 유지된다.
  *
- * 서버가 없으므로 새로고침하면 사라진다. 실제로 저장되는 것처럼 보이게 하지 않는다.
+ * 서버가 없으므로 기본 댓글은 새로고침하면 사라진다. 광장 사건 댓글은 시연을 위해
+ * 같은 브라우저 세션에서만 보존한다.
  * (PROJECT_SPEC.md — mock 응답을 실제인 것처럼 표시하지 않는다)
  */
-function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge = true, actionsInHeader = false, headingId = 'comment-thread-title' }: CommentThreadProps) {
+function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge = true, actionsInHeader = false, headingId = 'comment-thread-title', plazaCaseId }: CommentThreadProps) {
   const { currentUser, sessionStatus, personaId } = useSession()
   const { requireLogin } = useLoginGate()
   const { showToast } = useToast()
@@ -223,7 +226,7 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
   const [draft, setDraft] = useState('')
   const [selectedStickerId, setSelectedStickerId] = useState<CommentStickerId | null>(null)
   const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false)
-  const [addedComments, setAddedComments] = useState<ThreadComment[]>([])
+  const [addedComments, setAddedComments] = useState<ThreadComment[]>(() => plazaCaseId ? readPlazaComments(plazaCaseId) : [])
   const [currentPage, setCurrentPage] = useState(1)
   const [sortKey, setSortKey] = useState<SortKey>('latest')
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
@@ -233,6 +236,10 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
   const sectionRef = useRef<HTMLElement>(null)
   const nextCommentId = useRef(1)
   const isAuthenticated = sessionStatus === 'authenticated'
+
+  useEffect(() => {
+    if (plazaCaseId) savePlazaComments(plazaCaseId, addedComments)
+  }, [addedComments, plazaCaseId])
 
   const requestCommentLogin = () => {
     if (isAuthenticated) return true
@@ -261,7 +268,7 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
 
     setAddedComments((current) => [
       {
-        id: 'new-comment-' + nextCommentId.current++,
+        id: `new-comment-${Date.now()}-${nextCommentId.current++}`,
         nickname: currentUser?.nickname ?? '익명의 배심원',
         avatarUrl: currentUser?.anonymousAvatarUrl ?? comments[0].avatarUrl,
         minutesAgo: 0,

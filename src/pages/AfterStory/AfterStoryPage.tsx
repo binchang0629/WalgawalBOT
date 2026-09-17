@@ -4,13 +4,13 @@ import type { FormEvent } from 'react'
 import useLoginGate from '../../hooks/useLoginGate'
 import useSession from '../../hooks/useSession'
 import EmptyCaseState from '../../components/common/EmptyCaseState'
+import CaseFolderCard from '../../components/common/CaseFolderCard'
 import { PATHS, toAfterStoryDetail } from '../../routes/paths'
 import CaseSubmitProgress from '../Submit/components/CaseSubmitProgress'
+import CaseSubmitDemoFill from '../Submit/components/CaseSubmitDemoFill'
 import backIcon from '../../assets/my/back.svg'
 import walgadakEmpathy from '../../assets/case/stickers/walgadak-empathy.png'
-import loanStoryAvatar from '../../assets/case/result/comment-avatar-2.png'
-import creditStoryAvatar from '../../assets/case/result/comment-avatar-3.png'
-import secretStoryAvatar from '../../assets/case/result/comment-avatar-4.png'
+import { profileAvatars } from '../../data/common/profileAvatars'
 import panMungyeeJudge from '../../assets/submit/panmung-judge-hq.png'
 import CommentThread from '../../components/common/CommentThread'
 import Pagination from '../../components/common/Pagination'
@@ -35,7 +35,7 @@ const CONNECTED_CASE = {
 
 /*
  * 발표 시연용 예시 후일담.
- * `내용 작성하기`를 누르면 본문 칸이 이 글로 한 번에 채워진다.
+ * `후일담 예시 한번에 채우기`를 누르면 본문 칸이 이 글로 채워진다.
  * 무대에서 타이핑할 시간이 없어서 넣은 장치다.
  */
 const DEMO_STORY = [
@@ -46,7 +46,7 @@ const DEMO_STORY = [
 
 const AFTER_STORY_DETAILS = {
   'afterstory-birthday-gift': {
-    author: { ...afterStoryAuthor, titleLines: ['늦게라도 마음을 전하고,', '친구와 오해를 풀었어요.'], lead: '선물보다 서운했던 이유를 듣는 게 먼저였어요.', name: '늦은축하편지', avatarUrl: secretStoryAvatar },
+    author: { ...afterStoryAuthor, titleLines: ['늦게라도 마음을 전하고,', '친구와 오해를 풀었어요.'], lead: '선물보다 서운했던 이유를 듣는 게 먼저였어요.', name: '늦은축하편지', avatarUrl: profileAvatars[7] },
     lines: [
       '친한 친구의 생일에 선물을 바로 전하지 못했어요.',
       '바쁜 일정이 지나면 제대로 챙겨주려고 했는데',
@@ -61,7 +61,7 @@ const AFTER_STORY_DETAILS = {
     ],
   },
   'afterstory-video-payment': {
-    author: { ...afterStoryAuthor, titleLines: ['요청한 색감으로 고친 뒤,', '잔금도 받을 수 있었어요.'], lead: '수정 범위를 다시 확인하고 약속한 결과물을 전달했어요.', meta: '직장 · 후일담', name: '색감다시보기', avatarUrl: creditStoryAvatar },
+    author: { ...afterStoryAuthor, titleLines: ['요청한 색감으로 고친 뒤,', '잔금도 받을 수 있었어요.'], lead: '수정 범위를 다시 확인하고 약속한 결과물을 전달했어요.', meta: '직장 · 후일담', name: '색감다시보기', avatarUrl: profileAvatars[4] },
     lines: [
       '카페 홍보영상을 180만 원에 제작했어요.',
       '두 차례 수정했지만 의뢰인이 처음 요청한',
@@ -76,7 +76,7 @@ const AFTER_STORY_DETAILS = {
     ],
   },
   'afterstory-friend-loan': {
-    author: { ...afterStoryAuthor, titleLines: ['직접 대화해보니,', '서로 오해를 풀었어요.'], lead: '돈 이야기를 피하지 않고 꺼내니 관계가 조금 달라졌어요.', name: '달력에동그라미', avatarUrl: loanStoryAvatar },
+    author: { ...afterStoryAuthor, titleLines: ['직접 대화해보니,', '서로 오해를 풀었어요.'], lead: '돈 이야기를 피하지 않고 꺼내니 관계가 조금 달라졌어요.', name: '달력에동그라미', avatarUrl: profileAvatars[2] },
     lines: [
       '친구에게 300만 원을 빌려준 뒤 6개월 동안',
       '돌려받지 못했어요. 돈 이야기가 불편해서',
@@ -91,7 +91,7 @@ const AFTER_STORY_DETAILS = {
     ],
   },
   'afterstory-idea-credit-card': {
-    author: { ...afterStoryAuthor, titleLines: ['이메일 증거를 제출한 뒤,', '공동 기여를 인정받았어요.'], lead: '아이디어를 어떻게 만들었는지 차분히 설명했어요.', meta: '직장 · 후일담', name: '메일함탐정', avatarUrl: creditStoryAvatar },
+    author: { ...afterStoryAuthor, titleLines: ['이메일 증거를 제출한 뒤,', '공동 기여를 인정받았어요.'], lead: '아이디어를 어떻게 만들었는지 차분히 설명했어요.', meta: '직장 · 후일담', name: '메일함탐정', avatarUrl: profileAvatars[6] },
     lines: [
       '회의에서 제가 준비한 아이디어를 직속 사수가',
       '자신의 제안처럼 발표해 당황했어요.',
@@ -106,7 +106,7 @@ const AFTER_STORY_DETAILS = {
     ],
   },
   'afterstory-secret-told': {
-    author: { ...afterStoryAuthor, titleLines: ['친구와 다시 이야기하며,', '서로의 경계를 정했어요.'], lead: '사과를 받았지만 신뢰는 천천히 회복하고 있어요.', name: '잠긴일기장', avatarUrl: secretStoryAvatar },
+    author: { ...afterStoryAuthor, titleLines: ['친구와 다시 이야기하며,', '서로의 경계를 정했어요.'], lead: '사과를 받았지만 신뢰는 천천히 회복하고 있어요.', name: '잠긴일기장', avatarUrl: profileAvatars[3] },
     lines: [
       '친구에게만 털어놓은 이야기가 학교에서',
       '다른 친구들에게 전해졌다는 걸 알았어요.',
@@ -244,6 +244,18 @@ function CaseContextCard() {
       <p>{CONNECTED_CASE.category}</p>
       <h2>{CONNECTED_CASE.title.split('\n').map((line) => <span key={line}>{line}</span>)}</h2>
     </section>
+  )
+}
+
+function CaseContextFolder() {
+  return (
+    <CaseFolderCard className="afterstory-case-folder" paperClassName="afterstory-case-folder__paper">
+      <h2>{CONNECTED_CASE.title.split('\n').map((line) => <span key={line}>{line}</span>)}</h2>
+      <div className="afterstory-case-folder__status">
+        <span>후일담 연결 사건</span>
+        <strong>투표 종료</strong>
+      </div>
+    </CaseFolderCard>
   )
 }
 
@@ -700,6 +712,7 @@ export function MyAfterStoryPage() {
 
 export function WriteAfterStoryPage() {
   const navigate = useNavigate()
+  const { personaId } = useSession()
   const [content, setContent] = useState('')
   const canPreview = content.trim().length > 0
 
@@ -728,12 +741,14 @@ export function WriteAfterStoryPage() {
       <div className="afterstory-flow__body afterstory-flow__body--with-progress">
         <CaseSubmitProgress step={1} totalSteps={2} label="후일담 작성" />
         <CaseContextCard />
-        <section className="afterstory-flow__intro"><h1>그날 이후, 어떻게 달라졌나요?</h1><p>어떤 행동을 했고, 무엇이 달라졌나요?<br />아직 해결되지 않은 이야기라도 괜찮아요.</p></section>
+        <section className="afterstory-flow__intro">
+          <h1>그날 이후, 어떻게 달라졌나요?</h1>
+          <p>어떤 행동을 했고, 무엇이 달라졌나요?<br />아직 해결되지 않은 이야기라도 괜찮아요.</p>
+          <CaseSubmitDemoFill personaId={personaId} label="후일담" done={content === DEMO_STORY} onFill={handleDemoFill} />
+        </section>
         <section className="afterstory-field">
           <div className="afterstory-field__head">
             <label htmlFor="afterstory-content">후일담 내용 <b>*</b></label>
-            {/* 발표 시연용. 누르면 예시 후일담이 본문 칸에 바로 들어간다. */}
-            <button type="button" className="afterstory-field__demo" onClick={handleDemoFill}>내용 작성하기</button>
           </div>
           <div className="afterstory-field__box"><textarea id="afterstory-content" value={content} maxLength={1000} placeholder={'예) 요청 내용을 정리해 보낸 뒤,\n일주일 안에 잔금을 받았어요.\n\n내가 해 본 행동과 그 후의 변화를 적어주세요.'} onChange={(event) => setContent(event.target.value)} /><small>{content.length.toLocaleString()} / 1,000</small></div>
         </section>
@@ -766,8 +781,7 @@ export function PreviewAfterStoryPage() {
       <div className="afterstory-flow__body afterstory-flow__body--with-progress">
         <CaseSubmitProgress step={2} totalSteps={2} label="게시 확인" />
         <section className="afterstory-preview-intro"><h1>이 이야기로 게시할까요?</h1><p>게시될 내용과 연결된 사건을 확인해주세요.</p></section>
-        <CaseContextCard />
-        <section className="afterstory-preview-content"><h2>내가 남길 후일담</h2><p>{content || '작성한 후일담이 여기에 표시됩니다.'}</p></section>
+        <CaseContextFolder />
         <aside className="afterstory-publish-notice"><img src={walgadakEmpathy} alt="" />게시하면 다른 사용자에게 공개돼요.<br />이름·연락처 등 개인정보를 다시 확인해주세요.</aside>
       </div>
       <footer className="afterstory-flow__footer"><button type="button" onClick={handlePublish}>후일담 게시하기</button><small>게시 후에도 MY에서 공개 범위를 바꿀 수 있어요.</small></footer>

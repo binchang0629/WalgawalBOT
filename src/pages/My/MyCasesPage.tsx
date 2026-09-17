@@ -1,24 +1,26 @@
 import { Fragment, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { PATHS, toMyCaseResult } from '../../routes/paths'
 import backIcon from '../../assets/my/back.svg'
 import EmptyCaseState from '../../components/common/EmptyCaseState'
 import useSession from '../../hooks/useSession'
+import useDetailSlide from '../../hooks/useDetailSlide'
 import { getMyCaseFilters, MY_CASES } from '../../data/personas/myCases'
 import type { MyCase, MyCaseFilter } from '../../data/personas/myCases'
 import './MyCases.css'
 import './MyPageTransitions.css'
 
 function MyCasesContent({ caseInfo, hasSubmittedCase }: { caseInfo: MyCase; hasSubmittedCase: boolean }) {
-  const navigate = useNavigate()
+  // 마이페이지에서 오른쪽 → 왼쪽으로 들어오고, 돌아갈 때 왼쪽 → 오른쪽으로 빠진다.
+  const slide = useDetailSlide()
   const [filter, setFilter] = useState<MyCaseFilter>('all')
   const showCase = filter === 'all' || filter === caseInfo.status
   const isPrivate = caseInfo.status === 'private'
 
   return (
-    <main className="my-cases-page my-detail-slide-enter">
+    <main className={`my-cases-page ${slide.className}`}>
       <header className="my-sub-header">
-        <button type="button" onClick={() => navigate(PATHS.my)} aria-label="마이페이지로 돌아가기">
+        <button type="button" onClick={() => slide.leave(PATHS.my)} aria-label="마이페이지로 돌아가기">
           <img src={backIcon} alt="" />
         </button>
         <h1>내 사건</h1>

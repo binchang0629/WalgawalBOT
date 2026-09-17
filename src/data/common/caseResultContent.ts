@@ -1,9 +1,5 @@
-import avatar1 from '../../assets/case/result/comment-avatar-1.png'
-import avatar2 from '../../assets/case/result/comment-avatar-2.png'
-import avatar3 from '../../assets/case/result/comment-avatar-3.png'
-import avatar4 from '../../assets/case/result/comment-avatar-4.png'
-import avatar5 from '../../assets/case/result/comment-avatar-5.png'
-import resultArtwork from '../../assets/case/result/verdict-artwork.png'
+import { profileAvatars } from './profileAvatars'
+import resultArtwork from '../../assets/case/result/panmung-scale-first-frame.png'
 import { weddingGiftCase } from './caseDetailContent'
 import type { WeddingGiftVoteId } from './caseDetailContent'
 import type { CommentStickerId } from './commentStickers'
@@ -53,7 +49,7 @@ export const weddingGiftResult = {
   comments: [
     {
       id: 'comment-1',
-      avatarUrl: avatar1,
+      avatarUrl: profileAvatars[0],
       nickname: '현실주의토끼',
       createdAt: '2분 전',
       voteId: 'writer',
@@ -64,7 +60,7 @@ export const weddingGiftResult = {
     },
     {
       id: 'comment-2',
-      avatarUrl: avatar2,
+      avatarUrl: profileAvatars[1],
       nickname: '마음이먼저',
       createdAt: '4분 전',
       voteId: 'writer',
@@ -76,7 +72,7 @@ export const weddingGiftResult = {
     },
     {
       id: 'comment-3',
-      avatarUrl: avatar3,
+      avatarUrl: profileAvatars[2],
       nickname: '선은지켜요',
       createdAt: '7분 전',
       voteId: 'writer',
@@ -87,7 +83,7 @@ export const weddingGiftResult = {
     },
     {
       id: 'comment-4',
-      avatarUrl: avatar4,
+      avatarUrl: profileAvatars[3],
       nickname: '경조사어려워',
       createdAt: '11분 전',
       voteId: 'other',
@@ -98,7 +94,7 @@ export const weddingGiftResult = {
     },
     {
       id: 'comment-5',
-      avatarUrl: avatar5,
+      avatarUrl: profileAvatars[4],
       nickname: '한번더생각',
       createdAt: '15분 전',
       voteId: 'both',
@@ -180,7 +176,7 @@ export function createWeddingGiftSeedComment(index: number): CaseResultComment {
 
   return {
     id: `wedding-seed-comment-${index + 1}`,
-    avatarUrl: [avatar1, avatar2, avatar3, avatar4, avatar5][index % 5],
+    avatarUrl: profileAvatars[index % profileAvatars.length],
     nickname: weddingCommentNicknames[index % weddingCommentNicknames.length],
     createdAt: formatCommentElapsedTime(index * 9 - 20),
     voteId: opening.voteId,

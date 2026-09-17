@@ -5,7 +5,7 @@ import { DEMO_ACCOUNTS, PERSONAS } from '../data/personas'
 import { DEMO } from '../config/app'
 import { SessionContext } from './sessionContext'
 import type { SessionUser, SignupProfile } from './sessionContext'
-import customProfileAvatar from '../assets/my/custom-walgadak-avatar.svg'
+import { accountProfileAvatars } from '../data/common/profileAvatars'
 import { clearDemoDeadlines } from '../hooks/useCountdown'
 import { clearLoginReward } from './loginRewardSignal'
 
@@ -210,7 +210,7 @@ function toUser(personaId: PersonaId, signupProfile: SignupProfile | null): Sess
       name: signupProfile.nickname,
       email: signupProfile.email,
       nickname: signupProfile.nickname,
-      anonymousAvatarUrl: customProfileAvatar,
+      anonymousAvatarUrl: accountProfileAvatars.custom,
       isCustomProfile: true,
     }
   }
@@ -287,8 +287,13 @@ function SessionProvider({ children }: { children: ReactNode }) {
    * 서아를 고르면 비로그인, 지훈을 고르면 로그인 상태다.
    * 서아로 돌아왔는데 앞선 시연에서 로그인한 상태가 남아 있으면 가입 흐름을 다시 못 보여준다.
    */
-  const switchPersona = useCallback((personaId: PersonaId) => {
-    setSession({ personaId, sessionStatus: startStatusOf(personaId), signupProfile: null })
+  const switchPersona = useCallback((personaId: PersonaId, options?: { startSignedOut?: boolean }) => {
+    setSession({
+      personaId,
+      // 지훈의 로그인 화면부터 보여주려면 기존 사용자라도 비로그인에서 시작해야 한다.
+      sessionStatus: options?.startSignedOut ? 'anonymous' : startStatusOf(personaId),
+      signupProfile: null,
+    })
   }, [])
 
   const recordActivity = useCallback((field: keyof ActivityRecord, id: string) => {

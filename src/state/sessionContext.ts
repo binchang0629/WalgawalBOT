@@ -49,8 +49,14 @@ export interface SessionValue {
   /** 가입·로그인 완료. 직접 가입한 프로필은 서아 시나리오를 쓰되 활동 기록은 별도로 시작한다. */
   signIn: (personaId: PersonaId, signupProfile?: SignupProfile) => void
   signOut: () => void
-  /** 계정 전환. 발표에서 서아 → 지훈으로 넘어갈 때 쓴다. */
-  switchPersona: (personaId: PersonaId) => void
+  /**
+   * 계정 전환. 발표에서 서아 → 지훈으로 넘어갈 때 쓴다.
+   *
+   * 기본은 그 퍼소나의 시연 시작 지점(서아 비로그인 / 지훈 로그인)이다.
+   * `startSignedOut`을 주면 퍼소나와 상관없이 비로그인으로 시작한다.
+   * 지훈의 로그인 화면부터 보여주는 시연에서 쓴다.
+   */
+  switchPersona: (personaId: PersonaId, options?: { startSignedOut?: boolean }) => void
 }
 
 export const SessionContext = createContext<SessionValue | null>(null)

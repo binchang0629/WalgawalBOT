@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useParams } from 'react-router-dom'
 import ShowcaseLayout from '../layouts/ShowcaseLayout'
 import MainLayout from '../layouts/MainLayout'
 import AuthLayout from '../layouts/AuthLayout'
@@ -29,6 +29,7 @@ import NotFoundPage from '../pages/Error/NotFoundPage'
 import { AfterStoryDetailPage, AfterStoryHomePage, CompleteAfterStoryPage, MyAfterStoryPage, MyPublishedAfterStoryPage, PreviewAfterStoryPage, WriteAfterStoryPage } from '../pages/AfterStory/AfterStoryPage'
 import { PATHS } from './paths'
 import useSession from '../hooks/useSession'
+import { getPlazaCaseStory } from '../data/common/plazaCaseStories'
 
 /**
  * 화면·URL 대응표는 PROJECT_SPEC.md §7-3에 있다.
@@ -59,6 +60,20 @@ function DemoEntry() {
   return <Navigate to={PATHS.onboarding} replace />
 }
 
+function CaseDetailRoute() {
+  const { caseId } = useParams()
+  return getPlazaCaseStory(caseId)?.status === 'closed'
+    ? <ClosedCaseDetailPage />
+    : <CaseDetailPage />
+}
+
+function CaseResultRoute() {
+  const { caseId } = useParams()
+  return getPlazaCaseStory(caseId)?.status === 'closed'
+    ? <ClosedCaseResultPage />
+    : <CaseResultPage />
+}
+
 function AppRoutes() {
   const { sessionStatus } = useSession()
   return (
@@ -81,8 +96,8 @@ function AppRoutes() {
           <Route path={PATHS.plaza} element={<PlazaPage />} />
           <Route path={PATHS.jihoonCaseDetail} element={<ClosedCaseDetailPage />} />
           <Route path={PATHS.jihoonCaseResult} element={<ClosedCaseResultPage />} />
-          <Route path={PATHS.caseDetail} element={<CaseDetailPage />} />
-          <Route path={PATHS.caseResult} element={<CaseResultPage />} />
+          <Route path={PATHS.caseDetail} element={<CaseDetailRoute />} />
+          <Route path={PATHS.caseResult} element={<CaseResultRoute />} />
           <Route path={PATHS.my} element={<MyPage />} />
           <Route path={PATHS.afterStory} element={<AfterStoryHomePage />} />
           {/* 내 이야기 남기기. 시안에 하단 내비게이션이 있어 MainLayout 아래에 둔다. */}

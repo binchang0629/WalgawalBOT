@@ -4,6 +4,7 @@ import CaseSubmitHeader from './components/CaseSubmitHeader'
 import CaseSubmitFooter from './components/CaseSubmitFooter'
 import useCaseSubmitDraft from './useCaseSubmitDraft'
 import panMungyeeJudge from '../../assets/submit/panmung-judge-hq.png'
+import CaseFolderCard from '../../components/common/CaseFolderCard'
 import './CaseSubmit.css'
 import './CaseSubmitCompletePage.css'
 
@@ -31,25 +32,29 @@ function CaseSubmitCompletePage() {
       <div className="case-submit__complete-spacer" aria-hidden="true" />
 
       <div className="case-submit__complete-body">
-        <div className="case-submit__complete-art-stage">
-          <span className="case-submit__complete-check" aria-hidden="true">✓</span>
-          <img
-            src={panMungyeeJudge}
-            alt="판사 옷을 입은 판멍이 캐릭터"
-            className="case-submit__complete-art"
-            width={150}
-            height={122}
-          />
-        </div>
-        <div className="case-submit__complete-message">
-          <h2 className="case-submit__heading">사건 접수 완료!</h2>
-          <p className="case-submit__description">이제 내 사건에서 내용을 다시 확인할 수 있어요.</p>
+        <div className="case-submit__complete-hero">
+          <div className="case-submit__complete-art-stage">
+            <span className="case-submit__complete-check" aria-hidden="true">✓</span>
+            <img
+              src={panMungyeeJudge}
+              alt="판사 옷을 입은 판멍이 캐릭터"
+              className="case-submit__complete-art"
+              width={150}
+              height={122}
+            />
+          </div>
+          <div className="case-submit__complete-message">
+            <h2 className="case-submit__heading">사건 접수 완료!</h2>
+          </div>
         </div>
 
-        <div className="case-submit__receipt">
+        <CaseFolderCard className="case-submit__receipt case-submit__receipt--folder" paperClassName="case-submit__receipt-paper">
           <h3 className="case-submit__receipt-title">{summary.title}</h3>
-          <p className="case-submit__receipt-visibility">공개 범위&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;{visibility === 'community' ? '배심원 광장에 공개' : '나만 보기'}</p>
-        </div>
+          <p className="case-submit__receipt-visibility case-submit__receipt-visibility--split">
+            <span>공개 범위</span>
+            <strong>{visibility === 'community' ? '배심원 광장에 공개' : '나만 보기'}</strong>
+          </p>
+        </CaseFolderCard>
 
         <p className="case-submit__complete-reminder">공개 범위는 내 사건에서 변경할 수 있어요.</p>
       </div>

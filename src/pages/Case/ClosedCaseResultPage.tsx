@@ -1,8 +1,7 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import type { FormEvent } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 
-import chevronIcon from '../../assets/case/disagreement/vote-chevron.svg'
 import dislikeIcon from '../../assets/case/result/dislike.svg'
 import emojiIcon from '../../assets/case/result/emoji.svg'
 import likeIcon from '../../assets/case/result/like.svg'
@@ -10,8 +9,8 @@ import menuIcon from '../../assets/case/result/menu.svg'
 import quoteDivider from '../../assets/case/result/quote-divider.svg'
 import storyLinkIcon from '../../assets/case/result/story-link.svg'
 import submitIcon from '../../assets/case/result/submit.svg'
-import customProfileAvatar from '../../assets/my/custom-walgadak-avatar.svg'
 import ConfirmDialog from '../../components/common/ConfirmDialog'
+import CommentThread from '../../components/common/CommentThread'
 import { COMMENT_TOAST_MESSAGES } from '../../components/common/commentToastMessages'
 import Pagination from '../../components/common/Pagination'
 import { commentStickerById, type CommentStickerId } from '../../data/common/commentStickers'
@@ -21,6 +20,7 @@ import {
   jihoonSimilarReasonComparison,
   jihoonSimilarResult,
 } from '../../data/common/jihoonSimilarCaseContent'
+import { getPlazaCaseStory, getPlazaJuryBreakdown } from '../../data/common/plazaCaseStories'
 import type {
   JihoonSimilarComment,
   JihoonSimilarVoteId,
@@ -28,10 +28,12 @@ import type {
 import useSession from '../../hooks/useSession'
 import useToast from '../../hooks/useToast'
 import useLoginGate from '../../hooks/useLoginGate'
+import { PATHS } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
 import CommentStickerPicker from './components/CommentStickerPicker'
 import VerdictDisagreementHero from './components/VerdictDisagreementHero'
 import VerdictReasonComparison from './components/VerdictReasonComparison'
+import ResultBreakdown from './components/ResultBreakdown'
 import './CaseResultPage.css'
 import './ClosedCaseResultPage.css'
 
@@ -47,125 +49,6 @@ const voteDisplay: Record<JihoonSimilarVoteId, { tone: 'blue' | 'orange' | 'soli
   neither: { tone: 'orange' },
 }
 
-
-function ResultBreakdown() {
-  const [isExpanded, setIsExpanded] = useState(true)
-  const [animationProgress, setAnimationProgress] = useState(() => (
-    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 0
-  ))
-  const breakdownListRef = useRef<HTMLUListElement>(null)
-  const hasAnimatedRef = useRef(false)
-  const panelId = useId()
-
-  useEffect(() => {
-    const breakdownList = breakdownListRef.current
-    if (!breakdownList || hasAnimatedRef.current) return
-
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      hasAnimatedRef.current = true
-      return
-    }
-
-    const scrollRoot = breakdownList.closest<HTMLElement>('.main-layout__scroll')
-    if (!scrollRoot) return
-
-    let animationFrameId: number | null = null
-    let hasScrollIntent = false
-
-    const startAnimation = () => {
-      if (hasAnimatedRef.current) return
-      hasAnimatedRef.current = true
-
-      const duration = 1100
-      let startedAt: number | null = null
-
-      const animate = (timestamp: number) => {
-        startedAt ??= timestamp
-        const elapsed = Math.min((timestamp - startedAt) / duration, 1)
-        const easedProgress = 1 - Math.pow(1 - elapsed, 3)
-
-        setAnimationProgress(easedProgress)
-
-        if (elapsed < 1) {
-          animationFrameId = window.requestAnimationFrame(animate)
-        }
-      }
-
-      animationFrameId = window.requestAnimationFrame(animate)
-    }
-
-    const markScrollIntent = () => {
-      hasScrollIntent = true
-    }
-
-    const handleScroll = () => {
-      if (!hasScrollIntent || hasAnimatedRef.current) return
-
-      const rootRect = scrollRoot.getBoundingClientRect()
-      const listRect = breakdownList.getBoundingClientRect()
-      const triggerLine = rootRect.top + rootRect.height * 0.78
-
-      if (listRect.top <= triggerLine && listRect.bottom > rootRect.top) {
-        startAnimation()
-      }
-    }
-
-    scrollRoot.addEventListener('wheel', markScrollIntent, { passive: true })
-    scrollRoot.addEventListener('touchstart', markScrollIntent, { passive: true })
-    scrollRoot.addEventListener('pointerdown', markScrollIntent, { passive: true })
-    scrollRoot.addEventListener('scroll', handleScroll, { passive: true })
-    window.addEventListener('keydown', markScrollIntent)
-
-    return () => {
-      scrollRoot.removeEventListener('wheel', markScrollIntent)
-      scrollRoot.removeEventListener('touchstart', markScrollIntent)
-      scrollRoot.removeEventListener('pointerdown', markScrollIntent)
-      scrollRoot.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('keydown', markScrollIntent)
-      if (animationFrameId !== null) window.cancelAnimationFrame(animationFrameId)
-    }
-  }, [])
-
-  return (
-    <div className="result-breakdown">
-      <h2 id="vote-result-title" className="result-breakdown__heading">
-        <button
-          type="button"
-          className="result-breakdown__toggle"
-          onClick={() => setIsExpanded((value) => !value)}
-          aria-expanded={isExpanded}
-          aria-controls={panelId}
-        >
-          <span>2심 배심원 투표 결과</span>
-          <img className={isExpanded ? 'is-open' : ''} src={chevronIcon} alt="" />
-        </button>
-      </h2>
-
-      <div
-        id={panelId}
-        className={'result-breakdown__panel' + (isExpanded ? ' is-open' : '')}
-        aria-hidden={!isExpanded}
-        inert={!isExpanded}
-      >
-        <div className="result-breakdown__clip">
-          <ul ref={breakdownListRef} className="result-breakdown__list">
-            {jihoonSimilarResult.breakdown.map((item, index) => (
-              <li key={item.id} className={index === 0 ? 'is-leading' : undefined}>
-                <div>
-                  <span>{item.label}</span>
-                  <strong>{Math.round(item.percent * animationProgress)}%</strong>
-                </div>
-                <span className={'result-breakdown__track' + (index === 0 ? ' result-breakdown__track--leader' : '')}>
-                  <i style={{ width: `${item.percent * animationProgress}%` }} />
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
   comment: JihoonSimilarComment
@@ -199,7 +82,7 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
   return (
     <article className="result-comment">
       <div className="result-comment__head">
-        <div className={`result-comment__avatar${comment.avatarUrl === customProfileAvatar ? ' result-comment__avatar--custom' : ''}`} aria-hidden="true">
+        <div className="result-comment__avatar" aria-hidden="true">
           <img src={comment.avatarUrl ?? jihoonSimilarResult.comments[0].avatarUrl} alt="" />
         </div>
         <span>{comment.nickname} · {comment.createdAt}</span>
@@ -279,15 +162,24 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
 }
 
 function ClosedCaseResultPage() {
+  const { caseId } = useParams()
+  const plazaStory = getPlazaCaseStory(caseId)
   const { currentUser, sessionStatus, personaId } = useSession()
   const { showToast } = useToast()
   const { requireLogin } = useLoginGate()
   const location = useLocation()
+  const routeState = location.state as { fromPlaza?: boolean; returnTo?: string; homeCaseId?: string } | null
   const [draft, setDraft] = useState('')
   const [selectedStickerId, setSelectedStickerId] = useState<CommentStickerId | null>(null)
   const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false)
   const [addedComments, setAddedComments] = useState<JihoonSimilarComment[]>([])
   const [currentPage, setCurrentPage] = useState(1)
+  /*
+   * 댓글 정렬. 시안에는 `등록순 | 최신순`이 글자로만 있어 눌러도 반응이 없었다.
+   * 공용 댓글 컴포넌트(CommentThread)와 같은 규칙으로 실제 정렬을 붙인다.
+   * 기본값은 방금 쓴 댓글이 위로 오는 최신순이다.
+   */
+  const [sortKey, setSortKey] = useState<'latest' | 'registered'>('latest')
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const [commentReactions, setCommentReactions] = useState<Record<string, CommentReaction>>({})
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -304,15 +196,35 @@ function ClosedCaseResultPage() {
 
 
   const seededComments = Array.from(
-    { length: Math.min(jihoonSimilarResult.commentCount, MAX_PAGINATED_COMMENTS) },
+    { length: plazaStory ? 0 : Math.min(jihoonSimilarResult.commentCount, MAX_PAGINATED_COMMENTS) },
     (_, index) => createJihoonSimilarSeedComment(index),
   )
   const allComments = [...addedComments, ...seededComments]
+  /*
+   * seed 댓글은 먼저 쓴 순서의 역순(최신 → 과거)으로 만들어져 있고,
+   * 새로 쓴 댓글은 맨 앞에 붙는다. 등록순은 이 순서를 그대로 뒤집으면 된다.
+   */
+  const orderedComments = sortKey === 'latest' ? allComments : [...allComments].reverse()
   const totalPages = Math.min(
     MAX_COMMENT_PAGES,
     Math.max(1, Math.ceil(allComments.length / COMMENTS_PER_PAGE)),
   )
-  const visibleComments = allComments.slice((currentPage - 1) * COMMENTS_PER_PAGE, currentPage * COMMENTS_PER_PAGE)
+  const visibleComments = orderedComments.slice((currentPage - 1) * COMMENTS_PER_PAGE, currentPage * COMMENTS_PER_PAGE)
+  const juryBreakdown = plazaStory
+    ? getPlazaJuryBreakdown(plazaStory.id) ?? jihoonSimilarResult.breakdown
+    : jihoonSimilarResult.breakdown
+  const comparison = plazaStory ? {
+    eyebrow: plazaStory.aiSide === plazaStory.jurySide ? '왜 같은 판단이었을까요?' : '왜 달랐을까요?',
+    title: plazaStory.aiSide === plazaStory.jurySide ? '같은 쟁점에\n주목했어요' : '서로 주목한\n점이 달랐어요',
+    criteria: [
+      { id: 'ai' as const, label: '판멍이가 본 기준', keyword: plazaStory.summary[0].title, description: plazaStory.summary[0].body },
+      { id: 'jury' as const, label: '배심원 댓글의 기준', keyword: plazaStory.summary[1].title, description: plazaStory.summary[1].body },
+    ],
+  } : jihoonSimilarReasonComparison
+  const aiVerdict = plazaStory ? {
+    summary: plazaStory.aiReason,
+    comparisonReasons: [plazaStory.summary[0].body, plazaStory.summary[2].body],
+  } : jihoonSimilarResult.aiVerdict
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -355,36 +267,52 @@ function ClosedCaseResultPage() {
     })
   }
 
+  /** 정렬을 바꾸면 첫 페이지부터 다시 본다. */
+  const changeCommentSort = (nextSort: 'latest' | 'registered') => {
+    if (nextSort === sortKey) return
+    setSortKey(nextSort)
+    setCurrentPage(1)
+  }
+
   return (
     <main className="case-result case-result--closed">
-      <CaseHeader title="투표 결과" />
+      <CaseHeader title="투표 결과" backTo={routeState?.returnTo === PATHS.home ? PATHS.home : plazaStory || routeState?.fromPlaza ? PATHS.plaza : undefined} />
 
       <div className="case-result__body case-result__body--closed">
         <section className="result-overview" aria-labelledby="result-case-title">
-          <p className="result-overview__number">사건 번호 · {jihoonSimilarCase.caseNumber}</p>
-          <h2 id="result-case-title">{jihoonSimilarCase.resultTitle}</h2>
+          <p className="result-overview__number">사건 번호 · {plazaStory ? plazaStory.caseNumber.replace(/^#/, '') : jihoonSimilarCase.caseNumber}</p>
+          <h2 id="result-case-title">{plazaStory?.title ?? jihoonSimilarCase.resultTitle}</h2>
           <div className="result-overview__author">
-            <p>{jihoonSimilarCase.author.nickname} · {jihoonSimilarCase.age}</p>
+            <p>{plazaStory?.author.nickname ?? jihoonSimilarCase.author.nickname} · {plazaStory?.age ?? jihoonSimilarCase.age}</p>
           </div>
         </section>
 
-        <VerdictDisagreementHero juryPercent={jihoonSimilarResult.breakdown[0].percent} />
+        <VerdictDisagreementHero juryPercent={juryBreakdown[0].percent} aiSide={plazaStory?.aiSide} jurySide={plazaStory?.jurySide} />
 
         <VerdictReasonComparison
-          comparison={jihoonSimilarReasonComparison}
-          verdict={jihoonSimilarResult.aiVerdict}
+          comparison={comparison}
+          verdict={aiVerdict}
         />
 
         <section className="vote-result" aria-labelledby="vote-result-title">
-          <ResultBreakdown />
+          <ResultBreakdown
+            key={plazaStory?.id ?? jihoonSimilarCase.id}
+            breakdown={juryBreakdown}
+          />
         </section>
 
         <div className="case-result__section-divider case-result__section-divider--closed" />
 
-        <section ref={commentSectionRef} className="comment-section" aria-labelledby="comments-title">
+        {plazaStory ? (
+          <CommentThread key={plazaStory.id} comments={plazaStory.comments} headingId="comments-title" plazaCaseId={plazaStory.id} />
+        ) : <section ref={commentSectionRef} className="comment-section" aria-labelledby="comments-title">
           <div className="comment-section__heading">
             <h2 id="comments-title">댓글 ({allComments.length})</h2>
-            <span>등록순 <i /> 최신순</span>
+            <span className="comment-section__sort">
+              <button type="button" aria-pressed={sortKey === 'registered'} onClick={() => changeCommentSort('registered')}>등록순</button>
+              <i />
+              <button type="button" aria-pressed={sortKey === 'latest'} onClick={() => changeCommentSort('latest')}>최신순</button>
+            </span>
           </div>
 
           <form className="comment-composer" onSubmit={handleSubmit}>
@@ -465,9 +393,9 @@ function ClosedCaseResultPage() {
           <div className="comment-pagination">
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handleCommentPageChange} ariaLabel="댓글 페이지" />
           </div>
-        </section>
+        </section>}
 
-        <section className="after-story" aria-labelledby="after-story-title">
+        {!plazaStory && <section className="after-story" aria-labelledby="after-story-title">
           <h2 id="after-story-title">이 사건의 후일담</h2>
           <article>
             <blockquote>{jihoonSimilarResult.afterStory.quote}</blockquote>
@@ -477,7 +405,7 @@ function ClosedCaseResultPage() {
               <span><img src={storyLinkIcon} alt="" /></span>
             </div>
           </article>
-        </section>
+        </section>}
       </div>
       {pendingDeleteId && (
         <ConfirmDialog

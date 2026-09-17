@@ -1,4 +1,4 @@
-/* 사건 접수 5단계(지훈05) 전용 스타일. */
+/* 서아·지훈 사건 접수 완료 화면. */
 
 .case-submit__complete-spacer {
     flex: none;
@@ -88,6 +88,10 @@
     text-align: center;
 }
 
+.case-submit__complete-hero {
+    display: contents;
+}
+
 .case-submit__receipt {
     width: 100%;
     display: flex;
@@ -117,6 +121,119 @@
     color: var(--neutral-600);
 }
 
+/* 완료 메시지를 먼저 보여준 뒤 접수한 사건 폴더가 아래에서 올라온다. */
+.case-submit--complete .case-submit__complete-body {
+    gap: 0;
+    padding-top: 32px;
+}
+
+.case-submit--complete .case-submit__complete-hero {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+    max-width: 350px;
+    animation: case-complete-hero-lift 500ms cubic-bezier(.22, 1, .36, 1) 650ms both;
+}
+
+.case-submit--complete .case-submit__complete-art-stage {
+    width: 130px;
+    height: 106px;
+}
+
+.case-submit--complete .case-submit__complete-art {
+    width: 130px;
+    height: 106px;
+}
+
+.case-submit--complete .case-submit__complete-check {
+    top: -5px;
+    right: -2px;
+    width: 27px;
+    height: 27px;
+    border-width: 2px;
+    font-size: 14px;
+}
+
+.case-submit--complete .case-submit__complete-message {
+    align-items: center;
+    min-width: 0;
+    text-align: center;
+}
+
+.case-submit--complete .case-submit__complete-message .case-submit__heading,
+.case-submit--complete .case-submit__complete-message .case-submit__description {
+    text-align: center;
+}
+
+.case-submit--complete .case-submit__complete-message .case-submit__heading {
+    font-size: 26px;
+}
+
+.case-submit--complete .case-submit__complete-reminder {
+    margin-top: 16px;
+    animation: case-complete-rise 400ms cubic-bezier(.22, 1, .36, 1) 1740ms both;
+}
+
+.case-submit--complete .case-submit__receipt--folder {
+    display: block;
+    width: calc(100% + 16px);
+    max-width: 360px;
+    margin-top: 34px;
+    overflow: visible;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    animation: case-complete-folder-rise 700ms cubic-bezier(.22, 1, .36, 1) 1100ms both;
+}
+
+.case-submit__receipt-paper {
+    justify-content: space-between;
+}
+
+.case-submit--complete .case-submit__receipt-title {
+    font-size: clamp(15px, 5.13cqw, 20px);
+    line-height: 1.4;
+    letter-spacing: -0.025em;
+    overflow-wrap: anywhere;
+}
+
+.case-submit--seoa .case-submit__receipt-title {
+    font-size: clamp(15px, 4.65cqw, 18px);
+    line-height: 1.35;
+}
+
+.case-submit--complete .case-submit__receipt-visibility--split {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid #dbe3f2;
+    font-size: clamp(11px, 3.08cqw, 12px);
+    line-height: 1.3;
+}
+
+.case-submit__receipt-visibility--split strong {
+    flex: none;
+    padding: 4px 9px;
+    border-radius: 12px;
+    color: var(--blue-700);
+    background: #e8f2ff;
+    font-weight: 700;
+}
+
+@media (max-width: 360px) {
+    .case-submit--complete .case-submit__complete-hero { gap: 14px; }
+    .case-submit--complete .case-submit__complete-art-stage,
+    .case-submit--complete .case-submit__complete-art { width: 116px; height: 95px; }
+    .case-submit--complete .case-submit__complete-message .case-submit__heading { font-size: 24px; }
+    .case-submit--complete .case-submit__receipt--folder { margin-top: 28px; }
+}
+
 .case-submit__complete-reminder {
     margin: 0;
     text-align: center;
@@ -128,7 +245,17 @@
 }
 
 .case-submit--complete .case-submit__footer {
-    animation: case-complete-footer 440ms cubic-bezier(.22, 1, .36, 1) 580ms both;
+    animation: case-complete-footer 440ms cubic-bezier(.22, 1, .36, 1) 1600ms both;
+}
+
+@keyframes case-complete-hero-lift {
+    from { transform: translateY(84px); }
+    to { transform: none; }
+}
+
+@keyframes case-complete-folder-rise {
+    from { opacity: 0; transform: translateY(76px); }
+    to { opacity: 1; transform: none; }
 }
 
 @keyframes case-complete-character {
@@ -159,6 +286,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .case-submit--complete .case-submit__complete-hero,
     .case-submit__complete-art-stage,
     .case-submit__complete-art-stage::before,
     .case-submit__complete-check,

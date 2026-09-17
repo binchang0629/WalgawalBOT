@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
 import type { RefObject } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import useDetailSlide from '../../hooks/useDetailSlide'
 import { PATHS } from '../../routes/paths'
 import { MY_CASES } from '../../data/personas/myCases'
 import { SUBMIT_SCENARIOS } from '../Submit/caseSubmitContent'
@@ -88,6 +89,8 @@ function useResultProgress(targetRef: RefObject<HTMLElement | null>, waitForScro
 
 function MyCaseResultPage() {
   const navigate = useNavigate()
+  // 내 사건 목록과 같은 좌우 슬라이드를 쓴다. 돌아가기는 왼쪽 → 오른쪽으로 빠진다.
+  const slide = useDetailSlide()
   const { caseId } = useParams()
   const aiCardRef = useRef<HTMLElement>(null)
   const juryCardRef = useRef<HTMLElement>(null)
@@ -99,9 +102,9 @@ function MyCaseResultPage() {
   const isJihoon = caseId === MY_CASES.B.id
   if (!isSeoa && !isJihoon) {
     return (
-      <main className="my-case-result-page my-case-result-page--empty my-detail-slide-enter">
+      <main className={`my-case-result-page my-case-result-page--empty ${slide.className}`}>
         <p>해당 사건 결과를 찾을 수 없습니다.</p>
-        <button type="button" onClick={() => navigate(PATHS.myCases)}>내 사건으로 돌아가기</button>
+        <button type="button" onClick={() => slide.leave(PATHS.myCases)}>내 사건으로 돌아가기</button>
       </main>
     )
   }
@@ -110,9 +113,9 @@ function MyCaseResultPage() {
   const actionGuides = isSeoa ? seoaActionGuides : jihoonActionGuides
 
   return (
-    <main className="my-case-result-page my-detail-slide-enter">
+    <main className={`my-case-result-page ${slide.className}`}>
       <header className="my-sub-header">
-        <button type="button" onClick={() => navigate(PATHS.my)} aria-label="마이페이지로 이동">
+        <button type="button" onClick={() => slide.leave(PATHS.my)} aria-label="마이페이지로 이동">
           <img src={backIcon} alt="" />
         </button>
         <h1>결과 확인하기</h1>

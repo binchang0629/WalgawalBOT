@@ -86,17 +86,7 @@
 }
 
 .case-author__avatar img {
-    position: absolute;
-    width: 146.46%;
-    height: 146.46%;
-    max-width: none;
-    left: -22.91%;
-    top: -17.63%;
-}
-
-/* 가족 사건은 댓글과 같은 완성형 아바타를 사용하므로 확대 크롭하지 않는다. */
-.case-detail--family .case-author__avatar img {
-    position: static;
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -238,13 +228,17 @@
     gap: 12px;
 }
 
-/* 두 사건 상세의 요약 박스가 화면 중앙을 지나면 숫자와 내용이 1 → 2 → 3 순서로 등장한다. */
+/*
+ * 두 사건 상세의 요약 박스가 화면 중앙을 지나면 숫자와 내용이 1 → 2 → 3 순서로 등장한다.
+ * 단계는 그대로 두고 전체 재생 시간만 약 1.9초 → 1.1초로 줄였다.
+ * 발표에서 세 번째 항목을 기다리는 시간이 길다는 피드백을 반영한 값이다.
+ */
 .ai-summary--reveal li::before,
 .ai-summary--reveal li::after {
     content: '';
     transform: translateX(-50%) scaleY(0);
     transform-origin: top;
-    transition: transform 300ms linear;
+    transition: transform 200ms linear;
 }
 
 .ai-summary--reveal li:first-child::before,
@@ -253,7 +247,7 @@
 .ai-summary--reveal li > span,
 .ai-summary--reveal li > div {
     opacity: 0;
-    transition: opacity 420ms ease, transform 520ms cubic-bezier(.22, 1, .36, 1);
+    transition: opacity 260ms ease, transform 340ms cubic-bezier(.22, 1, .36, 1);
 }
 
 .ai-summary--reveal li > span { transform: scale(.78); }
@@ -265,10 +259,10 @@
 }
 
 /* 1→2, 2→3 연결선을 실제 행 높이별로 나눠 그려 양 끝 아이콘 밖으로 넘치지 않게 한다. */
-.ai-summary--reveal.is-visible li:nth-child(1)::after { transition-delay: 80ms; }
-.ai-summary--reveal.is-visible li:nth-child(2)::before { transition-delay: 350ms; }
-.ai-summary--reveal.is-visible li:nth-child(2)::after { transition-delay: 740ms; }
-.ai-summary--reveal.is-visible li:nth-child(3)::before { transition-delay: 1.01s; }
+.ai-summary--reveal.is-visible li:nth-child(1)::after { transition-delay: 50ms; }
+.ai-summary--reveal.is-visible li:nth-child(2)::before { transition-delay: 200ms; }
+.ai-summary--reveal.is-visible li:nth-child(2)::after { transition-delay: 430ms; }
+.ai-summary--reveal.is-visible li:nth-child(3)::before { transition-delay: 580ms; }
 
 .ai-summary--reveal.is-visible li > span,
 .ai-summary--reveal.is-visible li > div {
@@ -276,11 +270,11 @@
     transform: none;
 }
 
-.ai-summary--reveal.is-visible li:nth-child(1) > div { transition-delay: 90ms; }
-.ai-summary--reveal.is-visible li:nth-child(2) > span { transition-delay: 650ms; }
-.ai-summary--reveal.is-visible li:nth-child(2) > div { transition-delay: 740ms; }
-.ai-summary--reveal.is-visible li:nth-child(3) > span { transition-delay: 1.3s; }
-.ai-summary--reveal.is-visible li:nth-child(3) > div { transition-delay: 1.39s; }
+.ai-summary--reveal.is-visible li:nth-child(1) > div { transition-delay: 60ms; }
+.ai-summary--reveal.is-visible li:nth-child(2) > span { transition-delay: 370ms; }
+.ai-summary--reveal.is-visible li:nth-child(2) > div { transition-delay: 430ms; }
+.ai-summary--reveal.is-visible li:nth-child(3) > span { transition-delay: 740ms; }
+.ai-summary--reveal.is-visible li:nth-child(3) > div { transition-delay: 800ms; }
 
 @media (prefers-reduced-motion: reduce) {
     .ai-summary {

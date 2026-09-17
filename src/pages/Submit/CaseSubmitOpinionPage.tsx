@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { PATHS } from '../../routes/paths'
 import CaseSubmitHeader from './components/CaseSubmitHeader'
 import CaseSubmitProgress from './components/CaseSubmitProgress'
+import CaseSubmitDemoFill from './components/CaseSubmitDemoFill'
 import CaseSubmitFooter from './components/CaseSubmitFooter'
 import useCaseSubmitDraft from './useCaseSubmitDraft'
 import useWizardBack from '../../hooks/useWizardBack'
@@ -61,6 +62,12 @@ function CaseSubmitOpinionPage() {
         <div className="case-submit__intro">
           <h2 className="case-submit__heading">접수 전 마지막 확인</h2>
           <p className="case-submit__description">판멍이의 1심과 공개 범위를 확인해 주세요.</p>
+          {/* 발표 시연용. 이 계정 시나리오에서 고를 수 있는 공개 범위를 바로 선택한다. */}
+          <CaseSubmitDemoFill
+            personaId={personaId}
+            done={canSubmit}
+            onFill={() => setVisibility(scenario.allowedVisibility)}
+          />
         </div>
 
         <div className="case-submit__ai-opinion">

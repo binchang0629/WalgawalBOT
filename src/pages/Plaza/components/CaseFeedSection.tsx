@@ -17,27 +17,13 @@ import {
   savePlazaReturnState,
   type PlazaReturnState,
 } from '../../../utils/plazaReturnState'
+import { readPlazaComments } from '../../../utils/plazaComments'
 import searchIcon from '../../../assets/plaza/search-field.svg'
 import chevronDown from '../../../assets/icons/chevron-down.svg'
 
 type CategoryFilter = CaseCategory | '전체'
 
 const CASES_PER_PAGE = 4
-const DEMO_SEARCH_RESULT_IDS = [
-  'case-friend-loan',
-  'case-dating-phone',
-  'case-company-874',
-  'case-family-care',
-  'case-school-ai-report',
-  'case-invite-ex',
-  'case-work-new-hire',
-  'case-secret-told',
-  'case-family-moving',
-  'case-group-project-credit',
-  'case-dating-anniversary',
-  'case-work-after-hours',
-] as const
-
 function CaseFeedSection({ restoreState }: { restoreState?: PlazaReturnState | null }) {
   const [searchParams] = useSearchParams()
   const [category, setCategory] = useState<CategoryFilter>(restoreState?.category ?? '전체')
@@ -65,13 +51,18 @@ function CaseFeedSection({ restoreState }: { restoreState?: PlazaReturnState | n
   const viewedCases = useMemo(() => {
     switch (view) {
       case 'popular':
-        return [...plazaCases].sort((a, b) => b.viewCount - a.viewCount)
+        return [...plazaCases].sort((a, b) => b.viewCount - a.viewCount
+          || latestPlazaCaseIds.indexOf(a.id as typeof latestPlazaCaseIds[number])
+          - latestPlazaCaseIds.indexOf(b.id as typeof latestPlazaCaseIds[number]))
       case 'voting':
-        return plazaCases.filter((item) => item.status === 'voting')
+        return latestPlazaCaseIds.map((id) => plazaCases.find((item) => item.id === id))
+          .filter((item): item is (typeof plazaCases)[number] => Boolean(item && item.status === 'voting'))
       case 'closed':
-        return plazaCases.filter((item) => item.status === 'closed')
+        return latestPlazaCaseIds.map((id) => plazaCases.find((item) => item.id === id))
+          .filter((item): item is (typeof plazaCases)[number] => Boolean(item && item.status === 'closed'))
       case 'recommended':
-        return plazaCases.filter((item) => item.category === myCategory)
+        return latestPlazaCaseIds.map((id) => plazaCases.find((item) => item.id === id))
+          .filter((item): item is (typeof plazaCases)[number] => Boolean(item && item.category === myCategory))
       default:
         return [...plazaCases].sort(
           (a, b) => latestPlazaCaseIds.indexOf(a.id as typeof latestPlazaCaseIds[number])
@@ -93,18 +84,14 @@ function CaseFeedSection({ restoreState }: { restoreState?: PlazaReturnState | n
         : viewedCases.filter((item) => item.category === exactSearchCategory)
     }
 
-    const resultCases = DEMO_SEARCH_RESULT_IDS.map((id) => (
-      plazaCases.find((item) => item.id === id)
-    )).filter((item): item is (typeof plazaCases)[number] => Boolean(item))
-    if (resultCases.length === 0) return []
-
-    const offset = Array.from(normalizedSearchQuery).reduce(
-      (sum, character) => sum + (character.codePointAt(0) ?? 0),
-      0,
-    ) % resultCases.length
-
-    return [...resultCases.slice(offset), ...resultCases.slice(0, offset)]
-  }, [exactSearchCategory, normalizedSearchQuery, viewedCases])
+    const query = normalizedSearchQuery.replace(/\s+/g, ' ').toLocaleLowerCase()
+    return filteredCases.filter((item) => (
+      `${item.title} ${item.summary} ${item.category} ${item.tag}`
+        .replace(/\s+/g, ' ')
+        .toLocaleLowerCase()
+        .includes(query)
+    ))
+  }, [exactSearchCategory, filteredCases, normalizedSearchQuery, viewedCases])
   const activeCategory = exactSearchCategory ?? category
   const displayedCases = normalizedSearchQuery ? searchCases : filteredCases
   const totalPages = Math.max(1, Math.ceil(displayedCases.length / CASES_PER_PAGE))
@@ -305,7 +292,7 @@ function CaseFeedSection({ restoreState }: { restoreState?: PlazaReturnState | n
 
                   <div className="case-card__info">
                     <span>조회수 {item.viewCount}</span>
-                    <span>댓글 {item.commentCount}</span>
+                    <span>댓글 {(item.commentCount ?? 0) + readPlazaComments(item.id).length}</span>
                   </div>
                 </>
               )
@@ -317,38 +304,34 @@ function CaseFeedSection({ restoreState }: { restoreState?: PlazaReturnState | n
                   data-case-id={item.id}
                   style={{ animationDelay: `${index * 90}ms` }}
                 >
-                  {item.id === 'case-company-874' || item.id === 'case-parents-interfere' ? (
-                    <Link
-                      className="case-card__link"
-                      to={item.id === 'case-company-874' ? PATHS.jihoonCaseDetail : toCaseDetail(item.id)}
-                      state={{ fromPlaza: true }}
-                      aria-label={item.title.replace('\n', ' ') + ' 사건 상세 보기'}
-                      onClick={(event) => {
-                        if (
-                          event.button !== 0
-                          || event.metaKey
-                          || event.ctrlKey
-                          || event.shiftKey
-                          || event.altKey
-                        ) return
+                  <Link
+                    className="case-card__link"
+                    to={item.id === 'case-company-874' ? PATHS.jihoonCaseDetail : toCaseDetail(item.id)}
+                    state={{ fromPlaza: true }}
+                    aria-label={item.title.replace('\n', ' ') + ' 사건 상세 보기'}
+                    onClick={(event) => {
+                      if (
+                        event.button !== 0
+                        || event.metaKey
+                        || event.ctrlKey
+                        || event.shiftKey
+                        || event.altKey
+                      ) return
 
-                        const scrollContainer = caseFeedRef.current
-                          ?.closest<HTMLElement>('.main-layout__scroll')
-                        savePlazaReturnState({
-                          cardId: item.id,
-                          category,
-                          currentPage,
-                          searchQuery,
-                          scrollTop: scrollContainer?.scrollTop ?? 0,
-                          view,
-                        })
-                      }}
-                    >
-                      {cardContent}
-                    </Link>
-                  ) : (
-                    <div className="case-card__link">{cardContent}</div>
-                  )}
+                      const scrollContainer = caseFeedRef.current
+                        ?.closest<HTMLElement>('.main-layout__scroll')
+                      savePlazaReturnState({
+                        cardId: item.id,
+                        category,
+                        currentPage,
+                        searchQuery,
+                        scrollTop: scrollContainer?.scrollTop ?? 0,
+                        view,
+                      })
+                    }}
+                  >
+                    {cardContent}
+                  </Link>
                 </li>
               )
             })}

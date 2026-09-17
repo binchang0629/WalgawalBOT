@@ -1,8 +1,4 @@
-import avatar1 from '../../assets/case/result/comment-avatar-1.png'
-import avatar2 from '../../assets/case/result/comment-avatar-2.png'
-import avatar3 from '../../assets/case/result/comment-avatar-3.png'
-import avatar4 from '../../assets/case/result/comment-avatar-4.png'
-import avatar5 from '../../assets/case/result/comment-avatar-5.png'
+import { profileAvatars } from './profileAvatars'
 import type { ThreadComment } from '../../components/common/CommentThread'
 
 /** 홈 카드와 다른 후일담 메모지에 쓰는 시연용 댓글. 한 페이지에 다섯 개씩 보인다. */
@@ -140,7 +136,7 @@ const secretSeeds: CommentSeed[] = [
   ['다시쓰는일기', '천천히 관계를 다시 정해 가는 모습이 현실적이라 공감돼요.'],
 ]
 
-const avatars = [avatar1, avatar2, avatar3, avatar4, avatar5]
+const avatars = profileAvatars
 
 function toComments(seeds: CommentSeed[], idPrefix: string): ThreadComment[] {
   return seeds.map(([nickname, body], index) => ({

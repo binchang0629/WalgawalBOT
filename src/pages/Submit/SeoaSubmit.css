@@ -18,7 +18,8 @@
 }
 
 .case-submit--seoa .case-submit__body > *,
-.case-submit--seoa .case-submit__complete-body > * {
+.case-submit--seoa .case-submit__complete-body > *,
+.case-submit--seoa .case-submit__complete-hero > * {
   flex-shrink: 0;
   min-width: 0;
 }

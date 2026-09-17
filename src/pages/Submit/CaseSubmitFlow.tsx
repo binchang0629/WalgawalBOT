@@ -25,14 +25,14 @@ function CaseSubmitFlow() {
   return <CaseSubmitDraftProvider key={`${personaId}:${sessionStatus}`} personaId={personaId} />
 }
 
-/** Figma 시안 기준 초기 선택값 — 서아는 친구, 지훈은 직장이 처음부터 눌려 있다. */
-const DEFAULT_RELATIONSHIP: Record<PersonaId, Relationship> = {
-  A: '친구',
-  B: '직장',
-}
-
 function CaseSubmitDraftProvider({ personaId }: { personaId: PersonaId }) {
-  const [relationship, setRelationship] = useState<Relationship | null>(DEFAULT_RELATIONSHIP[personaId])
+  /*
+   * 관계는 아무것도 고르지 않은 상태에서 시작한다.
+   * 예전에는 시안 값(서아 친구 / 지훈 직장)이 처음부터 눌려 있어,
+   * 사용자가 고르지 않았는데 고른 것처럼 보였다.
+   * 발표용 선택은 단계별 `예시 한번에 채우기` 버튼이 대신한다.
+   */
+  const [relationship, setRelationship] = useState<Relationship | null>(null)
   const [photoNames, setPhotoNames] = useState<string[]>([])
   const [fileNames, setFileNames] = useState<string[]>([])
   const [content, setContent] = useState('')

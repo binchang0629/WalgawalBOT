@@ -1,10 +1,5 @@
-import authorAvatar from '../../assets/case/result/comment-avatar-3.png'
-import avatar1 from '../../assets/case/result/comment-avatar-1.png'
-import avatar2 from '../../assets/case/result/comment-avatar-2.png'
-import avatar3 from '../../assets/case/result/comment-avatar-3.png'
-import avatar4 from '../../assets/case/result/comment-avatar-4.png'
-import avatar5 from '../../assets/case/result/comment-avatar-5.png'
-import resultArtwork from '../../assets/case/result/verdict-artwork.png'
+import { profileAvatars } from './profileAvatars'
+import resultArtwork from '../../assets/case/result/panmung-scale-first-frame.png'
 import { weddingGiftCase } from './caseDetailContent'
 import { voteDisplayById, type CaseResultComment } from './caseResultContent'
 
@@ -15,7 +10,7 @@ export const parentsCase = {
   author: {
     nickname: '익명의 다람쥐',
     createdAt: '26/09/08 · 06:40',
-    avatarUrl: authorAvatar,
+    avatarUrl: profileAvatars[5],
   },
   title: '부모님이 자꾸만 제 결정에 간섭하는데 해결 방안을 알려주세요.',
   cardSummary: '내 삶의 선택을 존중받고 싶은데 계속 설득하려 하세요.',
@@ -81,7 +76,7 @@ export function createParentsSeedComment(index: number): CaseResultComment {
   const minutes = index * 2 + 1
   return {
     id: `parents-seed-comment-${index + 1}`,
-    avatarUrl: [avatar1, avatar2, avatar3, avatar4, avatar5][index % 5],
+    avatarUrl: profileAvatars[index % profileAvatars.length],
     nickname: nicknames[index],
     createdAt: `${minutes}분 전`,
     voteId,

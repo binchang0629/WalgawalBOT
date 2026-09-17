@@ -55,7 +55,7 @@ export const plazaViewOptions: { key: PlazaViewKey; label: string; description: 
 ]
 
 /**
- * 최신사건의 시연용 게시 순서. 조회·댓글 수와 무관하게 최근에 접수된 진행 사건이 먼저 보인다.
+ * 최신사건의 시연용 게시 순서. 조회·댓글 수와 무관하게 접수된 시각이 최근인 사건부터 보인다.
  * 실제 서버 연결 시에는 이 목록 대신 게시 시각으로 정렬한다.
  */
 export const latestPlazaCaseIds = [
@@ -81,7 +81,7 @@ export const latestPlazaCaseIds = [
   'case-company-874',
 ] as const
 
-type PlazaCase = CaseSummary & {
+export type PlazaCase = CaseSummary & {
   category: CaseCategory
   summary: string
   viewCount: number

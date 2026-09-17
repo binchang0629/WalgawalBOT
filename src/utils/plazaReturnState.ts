@@ -26,14 +26,11 @@ export function markPlazaReturnReady() {
   }
 }
 
-/** 복원 상태는 한 번만 사용해 하단 내비게이션으로 새로 들어올 때 남지 않게 한다. */
-export function consumePlazaReturnState(): PlazaReturnState | null {
+/** 렌더 중 여러 번 읽혀도 같은 상태를 돌려준다. */
+export function readPlazaReturnState(): PlazaReturnState | null {
   if (window.sessionStorage.getItem(PLAZA_RETURN_READY_KEY) !== 'true') return null
 
   const serializedState = window.sessionStorage.getItem(PLAZA_RETURN_STATE_KEY)
-  window.sessionStorage.removeItem(PLAZA_RETURN_READY_KEY)
-  window.sessionStorage.removeItem(PLAZA_RETURN_STATE_KEY)
-
   if (!serializedState) return null
 
   try {
@@ -41,4 +38,10 @@ export function consumePlazaReturnState(): PlazaReturnState | null {
   } catch {
     return null
   }
+}
+
+/** 화면이 복원 상태를 받은 뒤 지워 다음 광장 진입에는 남기지 않는다. */
+export function clearPlazaReturnState() {
+  window.sessionStorage.removeItem(PLAZA_RETURN_READY_KEY)
+  window.sessionStorage.removeItem(PLAZA_RETURN_STATE_KEY)
 }

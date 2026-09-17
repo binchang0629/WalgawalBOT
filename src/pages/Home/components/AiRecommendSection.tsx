@@ -3,8 +3,8 @@ import SectionTitle from '../../../components/common/SectionTitle'
 import useSession from '../../../hooks/useSession'
 import mascot from '../../../assets/home/figma/chat-mascot.png'
 import { personalizedRecommendation, homeSectionTitles } from '../../../data/common/homeContent'
-import { plazaCases } from '../../../data/common/plazaContent'
-import { PATHS } from '../../../routes/paths'
+import { getRecommendationCase } from '../../../data/common/plazaCaseStories'
+import { PATHS, toCaseDetail } from '../../../routes/paths'
 import './AiRecommendSection.css'
 
 /** 개발 > 홈/로그인 후 > Section (1473:8571). 실제 추천 API가 아닌 시안용 데이터. */
@@ -33,9 +33,7 @@ function AiRecommendSection() {
       <div className="ai-recommendation__card">
         <ul className="ai-recommendation__list">
           {recommendation.cases.map((item) => {
-            const linkedCase = 'plazaCaseId' in item
-              ? plazaCases.find((plazaCase) => plazaCase.id === item.plazaCaseId)
-              : undefined
+            const linkedCase = getRecommendationCase(item.plazaCaseId)
             const agrees = linkedCase?.isVerdictAligned ?? ('agrees' in item && item.agrees)
             const isVoting = linkedCase?.status === 'voting'
             const caseContent = (
@@ -58,15 +56,15 @@ function AiRecommendSection() {
 
             return (
               <li key={item.id} className="ai-recommendation__item">
-                {item.id === 'recommend-work-balance' ? (
-                  <Link
-                    className="ai-recommendation__case-link"
-                    to={PATHS.jihoonCaseDetail}
-                    aria-label={`${item.title.replace('\n', ' ')} 상세 보기`}
-                  >
-                    {caseContent}
-                  </Link>
-                ) : caseContent}
+                <Link
+                  className="ai-recommendation__case-link"
+                  to={toCaseDetail(item.plazaCaseId)}
+                  state={{ returnTo: PATHS.home, homeCaseId: item.plazaCaseId }}
+                  data-home-case-id={item.plazaCaseId}
+                  aria-label={`${item.title.replace('\n', ' ')} 상세 보기`}
+                >
+                  {caseContent}
+                </Link>
               </li>
             )
           })}

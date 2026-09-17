@@ -128,11 +128,100 @@
     border-radius: 12px;
 }
 
-.vote-result__artwork>img {
+.vote-result__artwork>video {
     width: 100%;
     height: 100%;
     display: block;
     object-fit: cover;
+}
+
+.vote-result__first-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    transition: opacity 240ms ease-out;
+}
+
+.vote-result__first-frame--hidden {
+    opacity: 0;
+}
+
+.vote-result__last-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.vote-result__last-frame--visible {
+    opacity: 1;
+}
+
+.vote-result__speech {
+    position: absolute;
+    top: 55%;
+    left: 65%;
+    z-index: 1;
+    width: 84px;
+    height: 48px;
+    transform: translateY(-100%);
+    transform-origin: 16px bottom;
+    color: var(--blue-700);
+    font: 800 17px/1.15 var(--font-title);
+    pointer-events: none;
+    animation: vote-result-speech 380ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.vote-result__speech svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 2px 4px rgb(55 75 255 / 9%));
+}
+
+.vote-result__speech path {
+    fill: #fff;
+    stroke: var(--blue-700);
+    stroke-width: 2;
+    stroke-linejoin: round;
+}
+
+.vote-result__speech > span {
+    position: absolute;
+    inset: 0 0 7px;
+    display: grid;
+    place-items: center;
+    white-space: nowrap;
+}
+
+.vote-result__speech--other {
+    left: 5%;
+    color: var(--orange-700);
+    transform-origin: 68px bottom;
+}
+
+.vote-result__speech--other svg {
+    transform: scaleX(-1);
+}
+
+.vote-result__speech--other path {
+    stroke: var(--orange-700);
+}
+
+@keyframes vote-result-speech {
+    from { opacity: 0; transform: translateY(-85%) scale(.85); }
+    to { opacity: 1; transform: translateY(-100%) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vote-result__first-frame { transition: none; }
+    .vote-result__speech { animation: none; }
 }
 
 .vote-result__summary {
@@ -269,7 +358,6 @@
 .result-breakdown__track--writer i {
     background: var(--orange-700);
 }
-
 
 /* AI 판결 */
 .vote-result__artwork,
