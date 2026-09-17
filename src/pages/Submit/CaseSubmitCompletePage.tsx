@@ -12,7 +12,7 @@ import './CaseSubmitCompletePage.css'
  * 계정별 제목·공개 범위를 표시하며 헤더는 뒤로가기만 남긴다.
  */
 function CaseSubmitCompletePage() {
-  const { personaId, isSubmitted, summary, visibility } = useCaseSubmitDraft()
+  const { personaId, isSubmitted, summary, visibility, returnHistoryIndex } = useCaseSubmitDraft()
   const navigate = useNavigate()
 
   // 실제로 접수를 마치지 않고 URL로 바로 들어온 경우 완료 화면을 보여주지 않는다.
@@ -20,7 +20,14 @@ function CaseSubmitCompletePage() {
     return <Navigate to={PATHS.caseSubmit} replace />
   }
 
-  const handleBack = () => navigate(PATHS.home, { replace: true })
+  const handleBack = () => {
+    const currentIndex = (window.history.state as { idx?: unknown } | null)?.idx
+    if (returnHistoryIndex !== null && typeof currentIndex === 'number' && currentIndex > returnHistoryIndex) {
+      navigate(returnHistoryIndex - currentIndex)
+      return
+    }
+    navigate(PATHS.home, { replace: true })
+  }
   const handlePrimaryClick = () => {
     navigate(PATHS.myCases, { replace: true })
   }

@@ -2,6 +2,7 @@ import type { PersonaId } from '../../types'
 import { demoTimeline } from '../common/demoTimeline'
 
 const demoReceivedAt = demoTimeline.now.slice(0, 10).replaceAll('-', '.')
+export const SEOA_JURY_PARTICIPANTS = 611
 
 export type MyCaseFilter = 'all' | 'progress' | 'complete' | 'private'
 
@@ -24,7 +25,7 @@ export const MY_CASES: Record<PersonaId, MyCase> = {
     titleLines: ['조별 과제에서 친구를 공개적으로 지적한', '제가 너무 예민했던 걸까요?'],
     receivedAt: demoReceivedAt,
     visibility: 'AI 1심 · 배심원 2심',
-    participation: '배심원 611명',
+    participation: `배심원 ${SEOA_JURY_PARTICIPANTS}명`,
     status: 'complete',
     resultAvailable: true,
   },

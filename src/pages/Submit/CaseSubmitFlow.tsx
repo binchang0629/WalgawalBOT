@@ -26,6 +26,10 @@ function CaseSubmitFlow() {
 }
 
 function CaseSubmitDraftProvider({ personaId }: { personaId: PersonaId }) {
+  const [returnHistoryIndex] = useState<number | null>(() => {
+    const entryIndex = (window.history.state as { idx?: unknown } | null)?.idx
+    return typeof entryIndex === 'number' && entryIndex > 0 ? entryIndex - 1 : null
+  })
   /*
    * 관계는 아무것도 고르지 않은 상태에서 시작한다.
    * 예전에는 시안 값(서아 친구 / 지훈 직장)이 처음부터 눌려 있어,
@@ -45,6 +49,7 @@ function CaseSubmitDraftProvider({ personaId }: { personaId: PersonaId }) {
     <CaseSubmitDraftContext.Provider
       value={{
         personaId,
+        returnHistoryIndex,
         relationship,
         setRelationship,
         photoNames,

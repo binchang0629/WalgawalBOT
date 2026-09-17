@@ -18,6 +18,7 @@ import CommentThread from '../../components/common/CommentThread'
 import Pagination from '../../components/common/Pagination'
 import { afterStoryAuthor, afterStoryComments, afterStoryLetter } from '../../data/common/afterStoryDetailContent'
 import { afterStoryCardComments, parseElapsedMinutes, retimeComments } from '../../data/common/afterStoryCardComments'
+import { SEOA_JURY_PARTICIPANTS } from '../../data/personas/myCases'
 import scrollBackground from '../../assets/afterstory/figma/scroll-background.png'
 import letterPaper from '../../assets/afterstory/figma/letter-paper.png'
 import detailBackground from '../../assets/afterstory/figma/detail-background.png'
@@ -134,7 +135,7 @@ const MY_CLOSED_CASES = [
     category: '친구',
     tone: 'friend',
     titleLines: ['조별 과제에서 친구를 공개적으로 지적한', '제가 너무 예민했던 걸까요?'],
-    opinionCount: 88,
+    opinionCount: SEOA_JURY_PARTICIPANTS,
     commentCount: 44,
   },
   {

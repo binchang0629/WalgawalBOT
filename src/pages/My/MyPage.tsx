@@ -15,7 +15,6 @@ import LogoutConfirmDialog from './components/LogoutConfirmDialog'
 import useToast from '../../hooks/useToast'
 import switchIcon from '../../assets/my/switch.svg'
 import chevronBrownIcon from '../../assets/my/chevron-brown.svg'
-import collapseIcon from '../../assets/my/collapse.svg'
 import achievementIcon from '../../assets/my/achievement.svg'
 import justiceIcon from '../../assets/my/justice.svg'
 import bookmarkIcon from '../../assets/my/bookmark.svg'
@@ -37,6 +36,7 @@ interface MenuItem {
   label: string
   icon: string
   iconSize?: number
+  className?: string
   disabled?: boolean
   onClick?: () => void
 }
@@ -46,11 +46,11 @@ function MenuIcon({ icon, iconSize = 20 }: { icon: string; iconSize?: number }) 
   return <span className="my-menu__icon" aria-hidden="true" style={{ '--my-menu-icon': `url("${icon}")`, '--my-menu-icon-size': `${iconSize}px` } as CSSProperties} />
 }
 
-function MenuRow({ label, icon, iconSize, disabled = false, onClick }: MenuItem) {
+function MenuRow({ label, icon, iconSize, className = '', disabled = false, onClick }: MenuItem) {
   return (
     <button
       type="button"
-      className={`my-menu__row${disabled ? ' is-disabled' : ''}`}
+      className={`my-menu__row${className ? ` ${className}` : ''}${disabled ? ' is-disabled' : ''}`}
       disabled={disabled}
       onClick={onClick}
     >
@@ -220,12 +220,11 @@ function MyPage() {
         <section className="my-menu">
           <button type="button" className="my-menu__header" onClick={() => setActivityOpen((open) => !open)} aria-expanded={activityOpen}>
             <span>나의 활동</span>
-            <img className={activityOpen ? '' : 'is-closed'} src={collapseIcon} alt="" />
           </button>
           {activityOpen && (
             <div>
               <MenuRow label="업적 · 미션" icon={isSeoa ? seoaAchievementIcon : achievementIcon} iconSize={isSeoa ? 17 : 20} disabled />
-              <MenuRow label="내가 참여한 사건" icon={isSeoa ? seoaJusticeIcon : justiceIcon} iconSize={isSeoa ? 17.67 : 20} onClick={() => navigate(PATHS.myCases)} />
+              <MenuRow label="내가 접수한 사건" icon={isSeoa ? seoaJusticeIcon : justiceIcon} iconSize={isSeoa ? 17.67 : 20} onClick={() => navigate(PATHS.myCases)} />
               {/*
                 댓글을 한 번도 안 썼으면 열 것이 없으므로 비활성으로 둔다.
                 기록은 로그인한 계정으로 등록한 댓글만 쌓인다. (utils/myComments.ts)
@@ -233,6 +232,8 @@ function MyPage() {
               <MenuRow
                 label="내가 쓴 댓글"
                 icon={commentIcon}
+                iconSize={16}
+                className="my-menu__row--comments"
                 disabled={myCommentCount === 0}
                 onClick={() => navigate(PATHS.myComments)}
               />
@@ -244,7 +245,6 @@ function MyPage() {
         <section className="my-menu">
           <button type="button" className="my-menu__header" onClick={() => setSettingsOpen((open) => !open)} aria-expanded={settingsOpen}>
             <span>설정</span>
-            <img className={settingsOpen ? '' : 'is-closed'} src={collapseIcon} alt="" />
           </button>
           {settingsOpen && (
             <div>
