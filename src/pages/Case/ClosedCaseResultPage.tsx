@@ -10,6 +10,7 @@ import menuIcon from '../../assets/case/result/menu.svg'
 import quoteDivider from '../../assets/case/result/quote-divider.svg'
 import storyLinkIcon from '../../assets/case/result/story-link.svg'
 import submitIcon from '../../assets/case/result/submit.svg'
+import customProfileAvatar from '../../assets/my/custom-walgadak-avatar.svg'
 import ConfirmDialog from '../../components/common/ConfirmDialog'
 import Pagination from '../../components/common/Pagination'
 import { commentStickerById, type CommentStickerId } from '../../data/common/commentStickers'
@@ -196,7 +197,7 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
   return (
     <article className="result-comment">
       <div className="result-comment__head">
-        <div className="result-comment__avatar" aria-hidden="true">
+        <div className={`result-comment__avatar${comment.avatarUrl === customProfileAvatar ? ' result-comment__avatar--custom' : ''}`} aria-hidden="true">
           <img src={comment.avatarUrl ?? jihoonSimilarResult.comments[0].avatarUrl} alt="" />
         </div>
         <span>{comment.nickname} · {comment.createdAt}</span>

@@ -12,7 +12,7 @@ import type { CaseCategory } from '../../../types'
 import useSession from '../../../hooks/useSession'
 import { MY_CASES } from '../../../data/personas/myCases'
 import Pagination from '../../../components/common/Pagination'
-import { PATHS } from '../../../routes/paths'
+import { PATHS, toCaseDetail } from '../../../routes/paths'
 import {
   savePlazaReturnState,
   type PlazaReturnState,
@@ -286,12 +286,13 @@ function CaseFeedSection({ restoreState }: { restoreState?: PlazaReturnState | n
                     </span>
                     <span
                       className={
-                        (item.verdictTone ?? (item.isVerdictAligned ? 'blue' : 'orange')) === 'blue'
-                          ? 'case-card__verdict is-blue'
+                        item.status === 'voting' || (item.verdictTone ?? (item.isVerdictAligned ? 'blue' : 'orange')) === 'blue'
+                          ? `case-card__verdict is-blue${item.status === 'voting' ? ' is-voting' : ''}`
                           : 'case-card__verdict'
                       }
                     >
-                      AI와 배심원 의견 {item.isVerdictAligned ? '일치' : '불일치'}
+                      {item.status === 'voting' && <i className="case-card__live-dot" aria-hidden="true" />}
+                      {item.status === 'voting' ? '투표 중' : `AI와 배심원 의견 ${item.isVerdictAligned ? '일치' : '불일치'}`}
                     </span>
                   </div>
 
@@ -316,34 +317,38 @@ function CaseFeedSection({ restoreState }: { restoreState?: PlazaReturnState | n
                   data-case-id={item.id}
                   style={{ animationDelay: `${index * 90}ms` }}
                 >
-                  <Link
-                    className="case-card__link"
-                    to={PATHS.jihoonCaseDetail}
-                    state={{ fromPlaza: true }}
-                    aria-label={item.title.replace('\n', ' ') + ' 지난 사건 상세 보기'}
-                    onClick={(event) => {
-                      if (
-                        event.button !== 0
-                        || event.metaKey
-                        || event.ctrlKey
-                        || event.shiftKey
-                        || event.altKey
-                      ) return
+                  {item.id === 'case-company-874' || item.id === 'case-parents-interfere' ? (
+                    <Link
+                      className="case-card__link"
+                      to={item.id === 'case-company-874' ? PATHS.jihoonCaseDetail : toCaseDetail(item.id)}
+                      state={{ fromPlaza: true }}
+                      aria-label={item.title.replace('\n', ' ') + ' 사건 상세 보기'}
+                      onClick={(event) => {
+                        if (
+                          event.button !== 0
+                          || event.metaKey
+                          || event.ctrlKey
+                          || event.shiftKey
+                          || event.altKey
+                        ) return
 
-                      const scrollContainer = caseFeedRef.current
-                        ?.closest<HTMLElement>('.main-layout__scroll')
-                      savePlazaReturnState({
-                        cardId: item.id,
-                        category,
-                        currentPage,
-                        searchQuery,
-                        scrollTop: scrollContainer?.scrollTop ?? 0,
-                        view,
-                      })
-                    }}
-                  >
-                    {cardContent}
-                  </Link>
+                        const scrollContainer = caseFeedRef.current
+                          ?.closest<HTMLElement>('.main-layout__scroll')
+                        savePlazaReturnState({
+                          cardId: item.id,
+                          category,
+                          currentPage,
+                          searchQuery,
+                          scrollTop: scrollContainer?.scrollTop ?? 0,
+                          view,
+                        })
+                      }}
+                    >
+                      {cardContent}
+                    </Link>
+                  ) : (
+                    <div className="case-card__link">{cardContent}</div>
+                  )}
                 </li>
               )
             })}

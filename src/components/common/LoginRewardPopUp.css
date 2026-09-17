@@ -98,15 +98,31 @@
 .loginRewardHeader img { display: block; width: 24px; height: 24px; }
 
 .loginRewardGreeting {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: .3em;
+    max-width: 100%;
     margin: 0;
     color: var(--neutral-800);
     font-size: 20px;
     font-weight: 700;
     line-height: 1.2;
-    white-space: nowrap;
+    text-align: center;
 }
 
-.loginRewardGreeting b { color: var(--orange-700); font-weight: 700; }
+.loginRewardGreetingNameGroup,
+.loginRewardGreetingMessage { white-space: nowrap; }
+
+.loginRewardGreetingName {
+    color: var(--orange-700);
+    font-family: var(--font-title);
+    font-weight: 700;
+}
+
+@media (max-width: 370px) {
+    .loginRewardHeader { top: 12px; }
+}
 
 /* ---------- 포인트 그릇 ---------- */
 

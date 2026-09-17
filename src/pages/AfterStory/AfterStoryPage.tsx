@@ -231,9 +231,10 @@ export function AfterStoryHomePage() {
  */
 export function MyPublishedAfterStoryPage() {
   const navigate = useNavigate()
-  const { publishedAfterStoryIds } = useSession()
+  const { publishedAfterStoryIds, activityStats } = useSession()
   const storyCount = publishedAfterStoryIds.length
   const hasStory = storyCount > 0
+  const hasSubmittedCase = activityStats.submittedCases > 0
 
   return (
     <main className={`afterstory-home afterstory-my-stories${hasStory ? '' : ' afterstory-my-stories--empty'}`}>
@@ -267,10 +268,12 @@ export function MyPublishedAfterStoryPage() {
         ) : (
           <EmptyCaseState
             titleId="afterstory-my-stories-empty-title"
-            title="아직 쓴 후일담이 없어요"
-            description="판결이 끝난 사건에 후일담을 남기면 여기에 모여요."
-            actionLabel="내 이야기 남기기"
-            actionTo={PATHS.afterStoryMine}
+            title={hasSubmittedCase ? '아직 쓴 후일담이 없어요' : '아직 남길 후일담이 없어요'}
+            description={hasSubmittedCase
+              ? '판결이 끝난 사건에 후일담을 남기면 여기에 모여요.'
+              : '사건을 접수하고 판결이 끝나면 이야기를 남길 수 있어요.'}
+            actionLabel={hasSubmittedCase ? '내 이야기 남기기' : '사건 접수하기'}
+            actionTo={hasSubmittedCase ? PATHS.afterStoryMine : PATHS.caseSubmit}
           />
         )}
       </div>

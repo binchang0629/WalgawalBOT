@@ -1,7 +1,9 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import type { MouseEvent, PointerEvent, ReactNode } from 'react'
+import { useLocation } from 'react-router-dom'
 import FloatingChatButton from '../common/FloatingChatButton'
 import ClickSpark from '../common/ClickSpark'
+import { PATHS } from '../../routes/paths'
 import './AppViewport.css'
 
 interface AppViewportProps {
@@ -16,6 +18,10 @@ interface AppViewportProps {
  * 스크롤은 이 안의 콘텐츠 컨테이너가 담당한다. window를 스크롤하지 않는다.
  */
 function AppViewport({ children }: AppViewportProps) {
+  const location = useLocation()
+  const routeContentRef = useRef<HTMLDivElement>(null)
+  const previousPathRef = useRef(location.pathname)
+  const backIntentRef = useRef<{ from: string; at: number } | null>(null)
   const pendingActionsRef = useRef(new WeakSet<HTMLElement>())
   const replayingActionsRef = useRef(new WeakSet<HTMLElement>())
   const timersRef = useRef(new Set<number>())
@@ -27,6 +33,35 @@ function AppViewport({ children }: AppViewportProps) {
       timers.clear()
     }
   }, [])
+
+  useLayoutEffect(() => {
+    const previousPath = previousPathRef.current
+    previousPathRef.current = location.pathname
+    const intent = backIntentRef.current
+    backIntentRef.current = null
+    const routeContent = routeContentRef.current
+    if (!routeContent) return
+
+    routeContent.classList.remove('app-route-content--back-enter')
+    if (!intent || intent.from !== previousPath || previousPath === location.pathname
+      || location.pathname === PATHS.home || performance.now() - intent.at > 600
+      || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    // 뒤로 가기는 방향만 느껴지도록 작게 이동한다. 전체 화면을 왕복시키면 어지럽다.
+    routeContent.classList.add('app-route-content--back-enter')
+    const animation = routeContent.animate(
+      [
+        { transform: 'translate3d(-14px, 0, 0)', opacity: 0.92 },
+        { transform: 'translate3d(0, 0, 0)', opacity: 1 },
+      ],
+      { duration: 180, easing: 'ease-out' },
+    )
+    void animation.finished.then(() => routeContent.classList.remove('app-route-content--back-enter')).catch(() => {})
+    return () => {
+      animation.cancel()
+      routeContent.classList.remove('app-route-content--back-enter')
+    }
+  }, [location.pathname])
 
   const getOrangePrimaryAction = (target: EventTarget | null) => {
     if (!(target instanceof Element)) return null
@@ -62,6 +97,13 @@ function AppViewport({ children }: AppViewportProps) {
 
   const handlePrimaryClick = (event: MouseEvent<HTMLDivElement>) => {
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+
+    const backButton = event.target instanceof Element
+      ? event.target.closest<HTMLButtonElement>('button[aria-label]')
+      : null
+    if (backButton && ['뒤로 가기', '이전 화면으로 돌아가기', '마이페이지로 돌아가기'].includes(backButton.getAttribute('aria-label') ?? '')) {
+      backIntentRef.current = { from: location.pathname, at: performance.now() }
+    }
 
     const action = getOrangePrimaryAction(event.target)
     if (!action) return
@@ -105,7 +147,7 @@ function AppViewport({ children }: AppViewportProps) {
       onPointerCancelCapture={clearPrimaryPress}
       onClickCapture={handlePrimaryClick}
     >
-      <ClickSpark>{children}</ClickSpark>
+      <ClickSpark><div ref={routeContentRef} className="app-route-content">{children}</div></ClickSpark>
       <FloatingChatButton />
       {/* 모달·바텀시트 portal 대상. 스크롤 콘텐츠 바깥이면서 기기 내부에 있다. */}
       <div id="app-overlay-root" />

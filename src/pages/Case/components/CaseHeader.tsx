@@ -25,6 +25,9 @@ function CaseHeader({ title = '오늘의 사건', backTo }: { title?: string; ba
 
   const handleBack = () => {
     if (backTo) {
+      if (backTo === PATHS.plaza && (location.state as { fromPlaza?: boolean } | null)?.fromPlaza) {
+        markPlazaReturnReady()
+      }
       if (backTo === PATHS.home) {
         headerRef.current
           ?.closest<HTMLElement>('.main-layout__scroll')

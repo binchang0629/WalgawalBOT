@@ -9,10 +9,12 @@ import menuIcon from '../../assets/case/result/menu.svg'
 import quoteDivider from '../../assets/case/result/quote-divider.svg'
 import storyLinkIcon from '../../assets/case/result/story-link.svg'
 import submitIcon from '../../assets/case/result/submit.svg'
+import customProfileAvatar from '../../assets/my/custom-walgadak-avatar.svg'
 import ConfirmDialog from '../../components/common/ConfirmDialog'
 import Pagination from '../../components/common/Pagination'
 import { commentStickerById, type CommentStickerId } from '../../data/common/commentStickers'
 import { weddingGiftCase } from '../../data/common/caseDetailContent'
+import { createParentsSeedComment, parentsCase, parentsResult } from '../../data/common/parentsCaseContent'
 import type { WeddingGiftVoteId } from '../../data/common/caseDetailContent'
 import {
   createWeddingGiftSeedComment,
@@ -83,7 +85,7 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
   return (
     <article className="result-comment">
       <div className="result-comment__head">
-        <div className="result-comment__avatar">
+        <div className={`result-comment__avatar${comment.avatarUrl === customProfileAvatar ? ' result-comment__avatar--custom' : ''}`}>
           <img src={comment.avatarUrl} alt="" />
         </div>
         <span>{comment.nickname} · {comment.createdAt}</span>
@@ -175,9 +177,12 @@ function CaseResultPage() {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const commentSectionRef = useRef<HTMLElement>(null)
   const nextCommentId = useRef(1)
-  const countdown = useDemoCountdown(weddingGiftResult.deadline, weddingGiftCase.id)
+  const caseContent = caseId === parentsCase.id ? parentsCase : weddingGiftCase
+  const resultContent = caseId === parentsCase.id ? parentsResult : weddingGiftResult
+  const isParentsCase = caseId === parentsCase.id
+  const countdown = useDemoCountdown(resultContent.deadline, caseContent.id)
 
-  if (caseId !== weddingGiftCase.id) return <MissingCase />
+  if (caseId !== weddingGiftCase.id && !isParentsCase) return <MissingCase />
 
   const loginPath = `${PATHS.login}?from=${encodeURIComponent(location.pathname)}`
   if (sessionStatus !== 'authenticated') return <Navigate to={loginPath} replace />
@@ -185,8 +190,8 @@ function CaseResultPage() {
   const routeState = location.state as ResultRouteState | null
   const selectedVote = isVoteId(routeState?.selectedVote) ? routeState.selectedVote : 'writer'
   const seededComments = Array.from(
-    { length: Math.min(weddingGiftResult.commentCount, MAX_PAGINATED_COMMENTS) },
-    (_, index) => createWeddingGiftSeedComment(index),
+    { length: Math.min(resultContent.commentCount, MAX_PAGINATED_COMMENTS) },
+    (_, index) => isParentsCase ? createParentsSeedComment(index) : createWeddingGiftSeedComment(index),
   )
   const allComments = [...addedComments, ...seededComments]
   const totalPages = Math.min(
@@ -237,14 +242,14 @@ function CaseResultPage() {
 
   return (
     <main className="case-result case-result--wedding">
-      <CaseHeader backTo={PATHS.home} />
+      <CaseHeader title={isParentsCase ? '사건 결과' : undefined} backTo={isParentsCase ? PATHS.plaza : PATHS.home} />
 
       <div className="case-result__body">
         <section className="result-overview" aria-labelledby="result-case-title">
-          <p className="result-overview__number">사건 번호 · {weddingGiftCase.caseNumber.replace('#', '')}</p>
-          <h2 id="result-case-title">{weddingGiftCase.title}</h2>
+          <p className="result-overview__number">사건 번호 · {caseContent.caseNumber.replace('#', '')}</p>
+          <h2 id="result-case-title">{caseContent.title}</h2>
           <div className="result-overview__author">
-            <p>{weddingGiftCase.author.nickname} · {weddingGiftCase.age}</p>
+            <p>{caseContent.author.nickname} · {caseContent.age}</p>
           </div>
         </section>
 
@@ -261,21 +266,21 @@ function CaseResultPage() {
             <h2 id="vote-result-title">1심 · 판멍이의 판단</h2>
           </div>
           <div className="vote-result__artwork">
-            <img src={weddingGiftResult.artworkUrl} alt="판멍이가 판결 결과를 발표하는 모습" />
+            <img src={resultContent.artworkUrl} alt="판멍이가 판결 결과를 발표하는 모습" />
             <div className="vote-result__summary">
-              <span>{weddingGiftResult.verdict.label}</span>
-              <h3>{weddingGiftResult.verdict.title}</h3>
-              <p>{weddingGiftResult.verdict.description}</p>
+              <span>{resultContent.verdict.label}</span>
+              <h3>{resultContent.verdict.title}</h3>
+              <p>{resultContent.verdict.description}</p>
             </div>
           </div>
         </section>
 
         <section className="ai-verdict ai-verdict--wedding" aria-labelledby="ai-verdict-title">
-          <h2 id="ai-verdict-title">{weddingGiftResult.aiVerdictLabel}</h2>
+          <h2 id="ai-verdict-title">{resultContent.aiVerdictLabel}</h2>
           <div className="ai-verdict__card">
-            <h3>{weddingGiftResult.aiVerdictTitle}</h3>
+            <h3>{resultContent.aiVerdictTitle}</h3>
             <div>
-              {weddingGiftResult.aiReasons.map((reason) => (
+              {resultContent.aiReasons.map((reason) => (
                 <p key={reason}>
                   {reason.split('\n').map((line, index) => (
                     <Fragment key={`${line}-${index}`}>
@@ -379,7 +384,7 @@ function CaseResultPage() {
           </div>
         </section>
 
-        <section className="after-story" aria-labelledby="after-story-title">
+        {!isParentsCase && <section className="after-story" aria-labelledby="after-story-title">
           <h2 id="after-story-title">비슷한 사건의 후일담</h2>
           <article>
             <blockquote>{weddingGiftResult.afterStory.quote}</blockquote>
@@ -389,7 +394,7 @@ function CaseResultPage() {
               <span><img src={storyLinkIcon} alt="" /></span>
             </div>
           </article>
-        </section>
+        </section>}
       </div>
       {pendingDeleteId && (
         <ConfirmDialog

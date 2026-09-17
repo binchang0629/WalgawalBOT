@@ -35,6 +35,19 @@
     pointer-events: none;
 }
 
+.app-route-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+}
+
+/* 뒤로 갈 때 기존 상세 화면의 오른쪽 진입 모션이 역방향 이동과 겹치지 않도록 한다. */
+.app-route-content--back-enter .my-detail-slide-enter,
+.app-route-content--back-enter .case-detail--slide-forward {
+    animation: none;
+}
+
 /* 넓은 주황색 주요 CTA 공통 클릭 피드백. 호버 상태는 만들지 않는다. */
 .app-primary-action {
     transform-origin: center;

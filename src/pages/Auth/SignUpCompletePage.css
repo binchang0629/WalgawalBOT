@@ -53,13 +53,26 @@
 }
 
 .signUpCompleteTitle {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: .3em;
     margin: 58px 0 0;
     width: 252px;
-    color: var(--blue-700);
-    font-family: var(--font-title);
+    max-width: calc(100% - 48px);
+    color: var(--neutral-800);
     font-size: 22px;
     font-weight: 700;
     line-height: 1.2;
+}
+
+.signUpCompleteTitleNameGroup,
+.signUpCompleteTitleMessage { white-space: nowrap; }
+
+.signUpCompleteTitleName {
+    color: var(--orange-700);
+    font-family: var(--font-title);
+    font-weight: 700;
 }
 
 .signUpCompleteLead {

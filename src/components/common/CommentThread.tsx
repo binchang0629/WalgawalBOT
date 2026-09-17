@@ -7,6 +7,7 @@ import emojiIcon from '../../assets/case/result/emoji.svg'
 import likeIcon from '../../assets/case/result/like.svg'
 import menuIcon from '../../assets/case/result/menu.svg'
 import submitIcon from '../../assets/case/result/submit.svg'
+import customProfileAvatar from '../../assets/my/custom-walgadak-avatar.svg'
 import { commentStickerById, type CommentStickerId } from '../../data/common/commentStickers'
 import useLoginGate from '../../hooks/useLoginGate'
 import useSession from '../../hooks/useSession'
@@ -98,7 +99,7 @@ function CommentRow({ comment, reaction, showReply, showVoteBadge, onReact, onEd
   return (
     <article className="result-comment">
       <div className="result-comment__head">
-        <div className="result-comment__avatar" aria-hidden="true">
+        <div className={`result-comment__avatar${comment.avatarUrl === customProfileAvatar ? ' result-comment__avatar--custom' : ''}`} aria-hidden="true">
           <img src={comment.avatarUrl} alt="" />
         </div>
         <span>{comment.nickname} · {comment.createdAtLabel ?? elapsedLabel(comment.minutesAgo)}</span>

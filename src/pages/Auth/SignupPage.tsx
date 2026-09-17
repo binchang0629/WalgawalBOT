@@ -167,7 +167,7 @@ function SignupPage() {
           >
             {hasNicknameSpecialCharacter
               ? '특수기호 없이 적어주세요.'
-              : isNicknameValid ? '사용 가능한 닉네임이에요.' : '특수기호(!, @, # 등) 없이 적어주세요.'}
+              : isNicknameValid ? '멋진 닉네임이네요!' : '특수기호(!, @, # 등) 없이 적어주세요.'}
           </p>
         </div>
 

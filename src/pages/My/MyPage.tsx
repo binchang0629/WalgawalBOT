@@ -99,6 +99,7 @@ function MyPage() {
   const closeLogoutDialog = useCallback(() => setLogoutDialogOpen(false), [])
   const displayName = currentUser?.name ?? (personaId === 'A' ? '윤서아' : '곽지훈')
   const displayNickname = currentUser?.isCustomProfile ? null : currentUser?.nickname ?? DEMO_ACCOUNTS[personaId].nickname
+  const activityCount = activityStats.submittedCases + activityStats.juryParticipations
 
   const handleSwitchAccount = () => {
     setAccountSheetOpen(true)
@@ -151,7 +152,7 @@ function MyPage() {
                   <strong>{displayName}</strong>
                   {displayNickname && <span className="profile-card__nickname">{displayNickname}</span>}
                 </span>
-                <small>AI 배심원단 활동 중 · 611명 소통</small>
+                <small>{activityCount === 0 ? '아직 활동 기록이 없어요' : `접수·배심 활동 ${activityCount}건`}</small>
               </span>
             </div>
             <button type="button" className="profile-card__switch" onClick={handleSwitchAccount} aria-haspopup="dialog" aria-expanded={accountSheetOpen}>

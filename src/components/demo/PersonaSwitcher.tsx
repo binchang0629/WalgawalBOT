@@ -22,7 +22,7 @@ const PROFILE_IMAGES = {
  */
 function PersonaSwitcher() {
   const navigate = useNavigate()
-  const { personaId, sessionStatus, switchPersona, signIn, signOut } = useSession()
+  const { personaId, sessionStatus, currentUser, switchPersona, signIn, signOut } = useSession()
 
   if (sessionStatus === 'restoring') return null
 
@@ -35,8 +35,8 @@ function PersonaSwitcher() {
       <div className="persona-switcher__list">
         {PERSONA_ORDER.map((id) => {
           const persona = PERSONAS[id]
-          // 첫 비로그인 화면에서는 어느 시연 계정도 선택된 것처럼 보이지 않는다.
-          const isCurrent = isAuthenticated && id === personaId
+          // 직접 가입한 계정은 서아의 사건 흐름을 쓰지만 서아 시연 계정은 아니다.
+          const isCurrent = isAuthenticated && !currentUser?.isCustomProfile && id === personaId
 
           return (
             <button
@@ -83,7 +83,9 @@ function PersonaSwitcher() {
         <button
           type="button"
           className={isAuthenticated ? 'persona-switcher__auth-item persona-switcher__auth-item--current' : 'persona-switcher__auth-item'}
-          onClick={() => signIn(personaId)}
+          onClick={() => {
+            if (!isAuthenticated) signIn(personaId)
+          }}
           aria-pressed={isAuthenticated}
         >
           로그인 후
@@ -92,7 +94,9 @@ function PersonaSwitcher() {
 
       <p className="persona-switcher__status">
         {isAuthenticated
-          ? `${PERSONAS[personaId].name} 계정으로 보는 중`
+          ? currentUser?.isCustomProfile
+            ? `${currentUser.name} 계정으로 보는 중`
+            : `${PERSONAS[personaId].name} 계정으로 보는 중`
           : '아직 로그인하지 않은 상태'}
       </p>
 

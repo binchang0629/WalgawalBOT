@@ -88,20 +88,20 @@ export function CaseVoteForm({
  * 로그인 안내가 선택지 위에 얹히는 구조라 두 상태가 같은 `.case-vote` 안에 있어야 한다.
  */
 function CaseVoteSection({
+  choices = weddingGiftCase.choices,
   isAuthenticated,
   loginPath,
   selectedVote,
   onSelect,
   onSubmit,
 }: {
+  choices?: readonly Choice[]
   isAuthenticated: boolean
   loginPath: string
   selectedVote: WeddingGiftVoteId | null
   onSelect: (choiceId: WeddingGiftVoteId) => void
   onSubmit: () => void
 }) {
-  const choices = weddingGiftCase.choices
-
   return (
     <section className="case-vote" aria-labelledby="case-vote-title">
       <div className="case-vote__heading">

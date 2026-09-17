@@ -173,7 +173,7 @@ export const personalizedRecommendation = {
     topic: '관계 갈등 사건',
     total: 3,
     cases: [
-      { id: 'recommend-friend-secret', categoryKey: 'friend', category: '친구', agrees: false,
+      { id: 'recommend-friend-secret', plazaCaseId: 'case-secret-told', categoryKey: 'friend', category: '친구',
         title: '친한 친구가 학교에서 저의 비밀을 다른 친구에게 말했어요' },
       { id: 'recommend-study-presentation', categoryKey: 'study', category: '학업', agrees: true,
         title: '조별 과제에서 제 의견은 무시하고 팀원이\n발표 자료를 바꿨어요' },
@@ -186,11 +186,11 @@ export const personalizedRecommendation = {
     topic: '직장 갈등 사건',
     total: 3,
     cases: [
-      { id: 'recommend-work-balance', categoryKey: 'work', category: '직장', agrees: false,
+      { id: 'recommend-work-balance', plazaCaseId: 'case-company-874', categoryKey: 'work', category: '직장',
         title: jihoonSimilarCase.recommendationTitle },
-      { id: 'recommend-work-credit', categoryKey: 'work', category: '직장', agrees: true,
+      { id: 'recommend-work-credit', plazaCaseId: 'case-work-credit', categoryKey: 'work', category: '직장',
         title: '직장 상사가 제 아이디어를 자신의 공로인 것처럼\n발표했어요.' },
-      { id: 'recommend-work-after-hours', categoryKey: 'work', category: '직장', agrees: false,
+      { id: 'recommend-work-after-hours', plazaCaseId: 'case-work-after-hours', categoryKey: 'work', category: '직장',
         title: '퇴근 뒤 단체 대화방으로 온 업무 지시에 답하지 않았어요. 제가 잘못한 건가요?' },
     ],
   },

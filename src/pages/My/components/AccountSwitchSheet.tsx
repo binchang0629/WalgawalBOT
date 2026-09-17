@@ -25,10 +25,12 @@ interface Props {
 function AccountSwitchSheet({ currentPersona, currentUser, onClose, onConfirm, onLogout }: Props) {
   const [selected, setSelected] = useState<PersonaId | null>(null)
   const [confirming, setConfirming] = useState(false)
+  const [logoutConfirming, setLogoutConfirming] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
   const closingRef = useRef(false)
   const exitAnimations = useRef<Animation[]>([])
   const dialogRef = useRef<HTMLDivElement>(null)
+  const logoutTriggerRef = useRef<HTMLButtonElement>(null)
   const current = currentUser.isCustomProfile ? currentUser : DEMO_ACCOUNTS[currentPersona]
   const currentPhoto = currentUser.isCustomProfile ? currentUser.anonymousAvatarUrl : accountPhotos[currentPersona]
   const otherId = currentPersona === 'A' ? 'B' : 'A'
@@ -69,7 +71,17 @@ function AccountSwitchSheet({ currentPersona, currentUser, onClose, onConfirm, o
   }, [])
 
   useEffect(() => {
-    if (confirming) dialogRef.current?.querySelector<HTMLButtonElement>('button')?.focus()
+    if (confirming || logoutConfirming) dialogRef.current?.querySelector<HTMLButtonElement>('button')?.focus()
+  }, [confirming, logoutConfirming])
+
+  const cancelLogout = useCallback(() => {
+    setLogoutConfirming(false)
+    window.requestAnimationFrame(() => {
+      const trigger = confirming
+        ? dialogRef.current?.querySelector<HTMLButtonElement>('.profile-switch-confirm__logout')
+        : logoutTriggerRef.current
+      trigger?.focus()
+    })
   }, [confirming])
 
   useEffect(() => {
@@ -88,7 +100,8 @@ function AccountSwitchSheet({ currentPersona, currentUser, onClose, onConfirm, o
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault()
-        dismiss()
+        if (logoutConfirming) cancelLogout()
+        else dismiss()
       }
       if (closingRef.current) return
       if (event.key !== 'Tab') return
@@ -110,14 +123,24 @@ function AccountSwitchSheet({ currentPersona, currentUser, onClose, onConfirm, o
       if (scroll) scroll.style.overflowY = previousOverflow
       previousFocus?.focus()
     }
-  }, [dismiss, portalRoot])
+  }, [cancelLogout, dismiss, logoutConfirming, portalRoot])
 
   if (!portalRoot) return null
 
   return createPortal(
-    <div className={`account-switch-overlay${confirming ? ' account-switch-overlay--center' : ''}`} onClick={(event) => { if (event.target === event.currentTarget) dismiss() }}>
-      <div ref={dialogRef} className={confirming ? 'profile-switch-confirm' : 'account-switch-sheet'} inert={isClosing} role="dialog" aria-modal="true" aria-labelledby="account-switch-title">
-        {confirming && selected ? (
+    <div className={`account-switch-overlay${confirming || logoutConfirming ? ' account-switch-overlay--center' : ''}`} onClick={(event) => { if (event.target === event.currentTarget) { if (logoutConfirming) cancelLogout(); else dismiss() } }}>
+      <div ref={dialogRef} className={logoutConfirming ? 'profile-switch-confirm profile-switch-confirm--message' : confirming ? 'profile-switch-confirm' : 'account-switch-sheet'} inert={isClosing} role="dialog" aria-modal="true" aria-labelledby="account-switch-title">
+        {logoutConfirming ? (
+          <>
+            <header className="profile-switch-confirm__header">
+              <h2 id="account-switch-title">로그아웃 하시겠습니까?</h2>
+            </header>
+            <div className="profile-switch-confirm__actions">
+              <button type="button" className="profile-switch-confirm__submit" onClick={() => dismiss(onLogout)}>확인</button>
+              <button type="button" className="profile-switch-confirm__logout" onClick={cancelLogout}>취소</button>
+            </div>
+          </>
+        ) : confirming && selected ? (
           <>
             <header className="profile-switch-confirm__header">
               <h2 id="account-switch-title">프로필</h2>
@@ -131,7 +154,7 @@ function AccountSwitchSheet({ currentPersona, currentUser, onClose, onConfirm, o
             </div>
             <div className="profile-switch-confirm__actions">
               <button type="button" className="profile-switch-confirm__submit" onClick={() => dismiss(() => onConfirm(selected))}>확인</button>
-              <button type="button" className="profile-switch-confirm__logout" onClick={() => dismiss(onLogout)}>로그아웃</button>
+              <button type="button" className="profile-switch-confirm__logout" onClick={() => setLogoutConfirming(true)}>로그아웃</button>
             </div>
           </>
         ) : (
@@ -184,6 +207,7 @@ function AccountSwitchSheet({ currentPersona, currentUser, onClose, onConfirm, o
             if (selected) setConfirming(true)
             else dialogRef.current?.querySelector<HTMLInputElement>('input')?.focus()
           }}>프로필 전환하기</button>
+          <button ref={logoutTriggerRef} type="button" className="account-switch-sheet__logout" onClick={() => setLogoutConfirming(true)}>로그아웃</button>
         </footer>
           </>
         )}

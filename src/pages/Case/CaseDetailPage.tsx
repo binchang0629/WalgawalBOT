@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import useSession from '../../hooks/useSession'
 import { weddingGiftCase } from '../../data/common/caseDetailContent'
+import { parentsCase } from '../../data/common/parentsCaseContent'
 import type { WeddingGiftVoteId } from '../../data/common/caseDetailContent'
 import { PATHS, toCaseResult } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
@@ -44,57 +46,71 @@ function CaseDetailPage() {
   const { sessionStatus, recordJuryVote } = useSession()
   const { showToast } = useToast()
   const [selectedVote, setSelectedVote] = useState<WeddingGiftVoteId | null>(null)
+  const [confirmedVote, setConfirmedVote] = useState<WeddingGiftVoteId | null>(null)
+  const caseContent = caseId === parentsCase.id ? parentsCase : weddingGiftCase
   const [participantCount] = useState(() => getRememberedCaseParticipantCount(
-    weddingGiftCase.id,
-    weddingGiftCase.participantCount,
+    caseContent.id,
+    caseContent.participantCount,
   ))
-
-  if (caseId !== weddingGiftCase.id) return <MissingCase />
 
   const isAuthenticated = sessionStatus === 'authenticated'
   const loginPath = `${PATHS.login}?from=${encodeURIComponent(location.pathname)}`
   const shouldSlideIn = (location.state as { entryMotion?: string } | null)?.entryMotion === 'slide-forward'
+  const overlayRoot = document.getElementById('app-overlay-root')
+
+  useEffect(() => {
+    if (!confirmedVote) return
+    const timer = window.setTimeout(() => {
+      navigate(toCaseResult(caseContent.id), {
+        state: { selectedVote: confirmedVote, fromPlaza: caseContent.id === parentsCase.id },
+      })
+    }, 1000)
+    return () => window.clearTimeout(timer)
+  }, [caseContent.id, confirmedVote, navigate])
+
+  if (caseId !== weddingGiftCase.id && caseId !== parentsCase.id) return <MissingCase />
 
   const handleVoteChoice = (choiceId: WeddingGiftVoteId) => {
     setSelectedVote(choiceId)
   }
 
   const handleVoteSubmit = () => {
+    if (confirmedVote) return
     if (!selectedVote) {
       showToast('투표를 먼저 해주세요.')
       return
     }
 
-    recordJuryVote(weddingGiftCase.id)
-    navigate(toCaseResult(weddingGiftCase.id), { state: { selectedVote } })
+    recordJuryVote(caseContent.id)
+    setConfirmedVote(selectedVote)
   }
 
   return (
-    <main className={`case-detail${shouldSlideIn ? ' case-detail--slide-forward' : ''}`}>
-      <CaseHeader />
+    <main className={`case-detail${caseContent.id === parentsCase.id ? ' case-detail--family' : ''}${shouldSlideIn ? ' case-detail--slide-forward' : ''}`}>
+      <CaseHeader title={caseContent.id === parentsCase.id ? '사건 상세' : undefined} />
 
       <div className="case-detail__body">
         <section className="case-overview" aria-labelledby="case-title">
-          <VoteDeadline value={weddingGiftCase.deadline} caseId={weddingGiftCase.id} />
+          <VoteDeadline value={caseContent.deadline} caseId={caseContent.id} />
 
           <div className="case-overview__category">
             <i aria-hidden="true" />
-            {weddingGiftCase.category}
+            {caseContent.category}
           </div>
 
           <div className="case-author">
             <span className="case-author__avatar">
-              <img src={weddingGiftCase.author.avatarUrl} alt="" />
+              <img src={caseContent.author.avatarUrl} alt="" />
             </span>
             <div>
-              <strong>{weddingGiftCase.author.nickname}</strong>
-              <time>{weddingGiftCase.author.createdAt}</time>
+              <strong>{caseContent.author.nickname}</strong>
+              <time>{caseContent.author.createdAt}</time>
             </div>
           </div>
 
-          <h2 id="case-title" className="case-overview__title">{weddingGiftCase.title}</h2>
+          <h2 id="case-title" className="case-overview__title">{caseContent.title}</h2>
           <p className="case-overview__meta">
-            사건 번호 · {weddingGiftCase.caseNumber} · {weddingGiftCase.age} · 배심원{' '}
+            사건 번호 · {caseContent.caseNumber} · {caseContent.age} · 배심원{' '}
             {participantCount.toLocaleString()}명 참여
           </p>
         </section>
@@ -102,12 +118,13 @@ function CaseDetailPage() {
         <div className="case-detail__divider" />
 
         <section className="case-story" aria-label="사건 내용">
-          {weddingGiftCase.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+          {caseContent.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
         </section>
 
-        <AiSummary items={weddingGiftCase.summary} />
+        <AiSummary items={caseContent.summary} />
 
         <CaseVoteSection
+          choices={caseContent.choices}
           isAuthenticated={isAuthenticated}
           loginPath={loginPath}
           selectedVote={selectedVote}
@@ -115,6 +132,16 @@ function CaseDetailPage() {
           onSubmit={handleVoteSubmit}
         />
       </div>
+      {confirmedVote && overlayRoot && createPortal(
+        <div className="case-vote-confirmation" role="status" aria-live="polite" aria-atomic="true">
+          <div className="case-vote-confirmation__card">
+            <span className="case-vote-confirmation__check" aria-hidden="true">✓</span>
+            <strong>투표 완료!</strong>
+            <p>결과를 보여드릴게요.</p>
+          </div>
+        </div>,
+        overlayRoot,
+      )}
     </main>
   )
 }

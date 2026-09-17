@@ -94,6 +94,22 @@
     top: -17.63%;
 }
 
+/* 가족 사건은 댓글과 같은 완성형 아바타를 사용하므로 확대 크롭하지 않는다. */
+.case-detail--family .case-author__avatar img {
+    position: static;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.case-detail--family .case-overview__category {
+    color: var(--green);
+}
+
+.case-detail--family .case-overview__category i {
+    background: var(--green);
+}
+
 .case-author strong,
 .case-author time {
     display: block;
@@ -574,6 +590,72 @@
     font-size: 16px;
     font-weight: 700;
     line-height: 1.3;
+}
+
+/* 투표 직후의 짧은 확인 상태. 실제 서버 집계 대기처럼 보이지 않게 완료만 알린다. */
+.case-vote-confirmation {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgb(37 37 37 / 22%);
+    pointer-events: auto;
+    animation: case-vote-confirmation-in 180ms ease-out both;
+}
+
+.case-vote-confirmation__card {
+    width: min(100%, 280px);
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 12px 36px rgb(37 37 37 / 14%);
+    text-align: center;
+    animation: case-vote-confirmation-pop 300ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.case-vote-confirmation__check {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 14px;
+    border-radius: 50%;
+    background: var(--orange-100);
+    color: var(--orange-900);
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.case-vote-confirmation__card strong {
+    font-size: 20px;
+    line-height: 1.2;
+}
+
+.case-vote-confirmation__card p {
+    margin: 8px 0 0;
+    color: var(--neutral-600);
+    font-size: 14px;
+    line-height: 1.3;
+}
+
+@keyframes case-vote-confirmation-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes case-vote-confirmation-pop {
+    from { opacity: 0; transform: translateY(8px) scale(.96); }
+    to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .case-vote-confirmation,
+    .case-vote-confirmation__card { animation: none; }
 }
 
 .case-missing {

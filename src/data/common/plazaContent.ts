@@ -1,5 +1,6 @@
 import type { CaseCategory, CaseSummary, JurorRank } from '../../types'
 import { jihoonSimilarCase, jihoonSimilarResult } from './jihoonSimilarCaseContent'
+import { parentsCase, parentsResult } from './parentsCaseContent'
 
 export const rankingTabs = [
   { key: 'juror', label: '명판관 배심원' },
@@ -122,10 +123,10 @@ export const plazaCases: PlazaCase[] = [
     id: 'case-parents-interfere',
     category: '가족',
     tag: '가족',
-    title: '부모님이 자꾸만 제 결정에 간섭하는데 해결 방안을 알려주세요.',
-    summary: '내 삶의 선택을 존중받고 싶은데 계속 설득하려 하세요.',
+    title: parentsCase.title,
+    summary: parentsCase.cardSummary,
     viewCount: 125,
-    commentCount: 14,
+    commentCount: parentsResult.commentCount,
     isVerdictAligned: true,
     status: 'voting',
   },
@@ -274,7 +275,7 @@ export const plazaCases: PlazaCase[] = [
     viewCount: 257,
     commentCount: 33,
     isVerdictAligned: true,
-    status: 'closed',
+    status: 'voting',
   },
   {
     id: 'case-work-new-hire',

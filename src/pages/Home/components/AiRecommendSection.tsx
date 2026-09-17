@@ -3,6 +3,7 @@ import SectionTitle from '../../../components/common/SectionTitle'
 import useSession from '../../../hooks/useSession'
 import mascot from '../../../assets/home/figma/chat-mascot.png'
 import { personalizedRecommendation, homeSectionTitles } from '../../../data/common/homeContent'
+import { plazaCases } from '../../../data/common/plazaContent'
 import { PATHS } from '../../../routes/paths'
 import './AiRecommendSection.css'
 
@@ -32,17 +33,26 @@ function AiRecommendSection() {
       <div className="ai-recommendation__card">
         <ul className="ai-recommendation__list">
           {recommendation.cases.map((item) => {
+            const linkedCase = 'plazaCaseId' in item
+              ? plazaCases.find((plazaCase) => plazaCase.id === item.plazaCaseId)
+              : undefined
+            const agrees = linkedCase?.isVerdictAligned ?? ('agrees' in item && item.agrees)
+            const isVoting = linkedCase?.status === 'voting'
             const caseContent = (
               <article className="ai-recommendation__case">
                 <div className="ai-recommendation__meta">
                   <span className={`ai-recommendation__category ai-recommendation__category--${item.categoryKey}`}>
                     {item.category}
                   </span>
-                  <span className={`ai-recommendation__agreement${item.agrees ? ' is-agreed' : ''}`}>
-                    AI와 배심원 의견 {item.agrees ? '일치' : '불일치'}
+                  <span className={`ai-recommendation__agreement${isVoting ? ' is-voting' : agrees ? ' is-agreed' : ''}`}>
+                    {isVoting ? '투표 중' : `AI와 배심원 의견 ${agrees ? '일치' : '불일치'}`}
                   </span>
                 </div>
                 <h4>{item.title}</h4>
+                <p className="ai-recommendation__details">
+                  {!isVoting && <span>판결 완료</span>}
+                  {linkedCase?.commentCount !== undefined && <span>댓글 {linkedCase.commentCount}개</span>}
+                </p>
               </article>
             )
 

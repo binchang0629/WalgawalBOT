@@ -124,7 +124,6 @@ function LoginRewardPopUp({ kind, name, startPoint, onSettled, onClose }: Props)
 
   if (!portalRoot) return null
 
-  const greeting = kind === 'signup' ? '처음을 환영해요!' : '오늘도 어서오세요!'
   return createPortal(
     <div
       className={`loginRewardOverlay${isClosing ? ' isClosing' : ''}`}
@@ -147,7 +146,16 @@ function LoginRewardPopUp({ kind, name, startPoint, onSettled, onClose }: Props)
             <img src={closeIcon} alt="" aria-hidden="true" />
           </button>
           <p className="loginRewardGreeting" id="loginRewardGreeting">
-            <b>{name}님,</b> {greeting}
+            {kind === 'signup' ? (
+              <span className="loginRewardGreetingMessage">가입 선물이 도착했어요!</span>
+            ) : (
+              <>
+                <span className="loginRewardGreetingNameGroup">
+                  <strong className="loginRewardGreetingName">{name}</strong>님,
+                </span>
+                <span className="loginRewardGreetingMessage">오늘도 반가워요!</span>
+              </>
+            )}
           </p>
         </div>
 

@@ -5,7 +5,7 @@ import { DEMO_ACCOUNTS, PERSONAS } from '../data/personas'
 import { DEMO } from '../config/app'
 import { SessionContext } from './sessionContext'
 import type { SessionUser, SignupProfile } from './sessionContext'
-import customProfileAvatar from '../assets/case/result/comment-avatar-2.png'
+import customProfileAvatar from '../assets/my/custom-walgadak-avatar.svg'
 import { clearDemoDeadlines } from '../hooks/useCountdown'
 import { clearLoginReward } from './loginRewardSignal'
 

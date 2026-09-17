@@ -87,11 +87,16 @@ function SignUpCompletePage() {
         {prefersReducedMotion ? <SignUpCompleteFallback /> : <SignUpCompleteMotion />}
       </div>
 
-      <p className="signUpCompleteTitle">{name}님, 가입을 환영해요!</p>
+      <p className="signUpCompleteTitle">
+        <span className="signUpCompleteTitleNameGroup">
+          <strong className="signUpCompleteTitleName">{name}</strong>님,
+        </span>
+        <span className="signUpCompleteTitleMessage">만나서 반가워요!</span>
+      </p>
       <p className="signUpCompleteLead">
-        자유롭게 글을 쓰거나,
+        내 고민을 이야기하거나,
         <br />
-        배심원으로서 참여해보세요
+        다른 사건의 배심원이 되어보세요
       </p>
 
       <div className="signUpCompleteFooter">
