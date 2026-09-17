@@ -1128,13 +1128,16 @@
 /* 열리면 편지지가 올라올 자리까지 카드가 자란다. */
 .letter.is-open {
     height: 362px;
-    /* 열린 편지지의 위쪽 drop-shadow는 카드 밖으로 자연스럽게 보여야 한다. */
-    overflow: visible;
 }
 
 /* 닫을 때 편지지가 봉투 아래로 내려가므로 카드 밖으로 삐져나오지 않게 자른다. */
 .letter {
     overflow: hidden;
+}
+
+/* 열리는 동안에는 아래 카드가 봉투 속으로 비치지 않게 자른다. */
+.letter--open {
+    overflow: visible;
 }
 
 .letter__back {
@@ -2171,16 +2174,20 @@ img.ai-card__mascot {
 }
 .letter .letter__paper {
   opacity: .96;
-  transform: translateX(-50%) translateY(175px) scale(.96);
-  /* 봉투 안에 들어간 종이의 아랫부분은 열리는 동안에도 앞면 뒤에 남긴다. */
-  clip-path: inset(-24px 0 39px);
-  transition: transform 680ms cubic-bezier(.22, 1, .36, 1), opacity 260ms ease;
+  transform: translateX(-50%) translateY(175px);
+  /* 닫힌 봉투 밖으로 밀려난 종이 하단은 보이지 않게 가린다. */
+  clip-path: inset(-24px 0 190px);
+  transition:
+    transform 680ms cubic-bezier(.22, 1, .36, 1),
+    opacity 260ms ease,
+    clip-path 680ms cubic-bezier(.22, 1, .36, 1);
 }
 .letter.is-open .letter__paper {
   opacity: 1;
-  transform: translateX(-50%) translateY(0) scale(1);
-  /* 앞면이 불투명해진 뒤, 그 뒤쪽에서 편지지가 빠져나온다. */
-  transition-delay: 400ms;
+  transform: translateX(-50%) translateY(0);
+  /* 앞면이 불투명해진 뒤, 종이와 가림 영역이 함께 위로 열린다. */
+  clip-path: inset(-24px 0 39px);
+  transition-delay: 400ms, 400ms, 400ms;
 }
 .letter .letter__content {
     opacity: 0;
