@@ -1,17 +1,19 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
-import type { FormEvent } from 'react'
+import type { FormEvent, Ref } from 'react'
 import useLoginGate from '../../hooks/useLoginGate'
 import useSession from '../../hooks/useSession'
 import EmptyCaseState from '../../components/common/EmptyCaseState'
 import CaseFolderCard from '../../components/common/CaseFolderCard'
+import CompletionScene from '../../components/common/CompletionScene'
+import IconCloseButton from '../../components/common/IconCloseButton'
 import { PATHS, toAfterStoryDetail } from '../../routes/paths'
 import CaseSubmitProgress from '../Submit/components/CaseSubmitProgress'
 import CaseSubmitDemoFill from '../Submit/components/CaseSubmitDemoFill'
 import backIcon from '../../assets/my/back.svg'
 import walgadakEmpathy from '../../assets/case/stickers/walgadak-empathy.png'
 import { profileAvatars } from '../../data/common/profileAvatars'
-import panMungyeeJudge from '../../assets/submit/panmung-judge-hq.png'
 import CommentThread from '../../components/common/CommentThread'
 import Pagination from '../../components/common/Pagination'
 import { afterStoryAuthor, afterStoryComments, afterStoryLetter } from '../../data/common/afterStoryDetailContent'
@@ -22,6 +24,7 @@ import detailBackground from '../../assets/afterstory/figma/detail-background.pn
 import writePencil from '../../assets/afterstory/figma/write-pencil.png'
 import readBook from '../../assets/afterstory/figma/read-book.png'
 import walgadakFace from '../../assets/home/figma/close-call-mascot.svg'
+import clickTapIcon from '../../assets/afterstory/figma/icon-park-click-tap.svg'
 import searchIcon from '../../assets/plaza/search-field.svg'
 import './AfterStoryPage.css'
 import './AfterStoryDetailPage.css'
@@ -38,11 +41,11 @@ const CONNECTED_CASE = {
  * `후일담 예시 한번에 채우기`를 누르면 본문 칸이 이 글로 채워진다.
  * 무대에서 타이핑할 시간이 없어서 넣은 장치다.
  */
-const DEMO_STORY = [
-  '처음에는 제가 사과하면 모든 잘못을 인정하는 것처럼 느껴졌어요. 그런데 친구의 이야기를 차분히 듣고 보니, 저도 모르게 사람들 앞에서 친구를 곤란하게 했더라고요.',
-  '',
-  '그날 이후 먼저 연락해서 사과했고, 지금은 서로의 의견을 묻는 방식으로 조별 과제를 하고 있어요.',
-].map((paragraph) => paragraph.trimStart()).join('\n')
+// 좁은 편지 미리보기에서도 '가끔 어색하지만'이 서로 떨어지지 않게 줄을 나눈다.
+const DEMO_STORY = afterStoryLetter.lines.join('\n').replace(
+  ' 아직 가끔\n어색하지만, ',
+  '\n아직 가끔\u00a0어색하지만, ',
+)
 
 const AFTER_STORY_DETAILS = {
   'afterstory-birthday-gift': {
@@ -215,7 +218,12 @@ const AFTER_STORY_CATEGORIES = ['전체', '연인', '친구', '가족', '직장'
 type AfterStoryCategory = (typeof AFTER_STORY_CATEGORIES)[number]
 const AFTER_STORIES_PER_PAGE = 5
 
-interface AfterStoryLocationState { content?: string; from?: string }
+interface AfterStoryLocationState {
+  content?: string
+  from?: string
+  caseResultState?: Record<string, unknown> | null
+  caseResultScrollTop?: number
+}
 
 /**
  * 왈가왈후 공통 헤더.
@@ -247,15 +255,36 @@ function CaseContextCard() {
   )
 }
 
-function CaseContextFolder() {
+function CaseContextFolder({ onOpen, isOpen, triggerRef }: {
+  onOpen: () => void
+  isOpen: boolean
+  triggerRef: Ref<HTMLDivElement>
+}) {
   return (
-    <CaseFolderCard className="afterstory-case-folder" paperClassName="afterstory-case-folder__paper">
-      <h2>{CONNECTED_CASE.title.split('\n').map((line) => <span key={line}>{line}</span>)}</h2>
-      <div className="afterstory-case-folder__status">
-        <span>후일담 연결 사건</span>
-        <strong>투표 종료</strong>
-      </div>
-    </CaseFolderCard>
+    <div
+      ref={triggerRef}
+      className="afterstory-case-folder-trigger"
+      role="button"
+      tabIndex={0}
+      aria-label="작성한 후일담 편지 미리보기"
+      aria-haspopup="dialog"
+      aria-expanded={isOpen}
+      onClick={onOpen}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          onOpen()
+        }
+      }}
+    >
+      <CaseFolderCard className="afterstory-case-folder" paperClassName="afterstory-case-folder__paper">
+        <h2>{CONNECTED_CASE.title.split('\n').map((line) => <span key={line}>{line}</span>)}</h2>
+        <div className="afterstory-case-folder__status">
+          <span>후일담 연결 사건</span>
+          <strong>투표 종료</strong>
+        </div>
+      </CaseFolderCard>
+    </div>
   )
 }
 
@@ -599,13 +628,22 @@ export function AfterStoryDetailPage() {
    * 어느 화면에서 들어왔는지는 넘겨받은 state로만 판단한다.
    * history.length만 보고 앱 안에 이전 화면이 있다고 가정하지 않는다. (PROJECT_SPEC.md §7-7)
    */
-  const backTo = (location.state as AfterStoryLocationState | null)?.from ?? PATHS.afterStory
+  const detailState = location.state as AfterStoryLocationState | null
+  const backTo = detailState?.from ?? PATHS.afterStory
+  const backState = backTo === PATHS.home
+    ? { restoreHomeScroll: true }
+    : backTo.startsWith('/cases/') && backTo.endsWith('/result')
+      ? {
+          ...detailState?.caseResultState,
+          restoreCaseResultScrollTop: detailState?.caseResultScrollTop,
+        }
+      : undefined
 
   return (
     <main className="afterstory-detail">
       <AfterStoryHeader
         title="왈가왈후~"
-        onBack={() => navigate(backTo, { state: backTo === PATHS.home ? { restoreHomeScroll: true } : undefined })}
+        onBack={() => navigate(backTo, { state: backState })}
       />
       <div className="afterstory-detail__scroll">
         <section
@@ -730,12 +768,13 @@ export function WriteAfterStoryPage() {
 
   /* 예시 본문을 채우고 커서를 글 끝에 둔다. 발표 중 바로 이어서 고칠 수 있게. */
   function handleDemoFill() {
-    setContent(DEMO_STORY)
+    const shouldClear = content === DEMO_STORY
+    setContent(shouldClear ? '' : DEMO_STORY)
     window.requestAnimationFrame(() => {
       const field = document.getElementById('afterstory-content')
       if (field instanceof HTMLTextAreaElement) {
         field.focus()
-        field.setSelectionRange(DEMO_STORY.length, DEMO_STORY.length)
+        if (!shouldClear) field.setSelectionRange(DEMO_STORY.length, DEMO_STORY.length)
         field.scrollTop = 0
       }
     })
@@ -756,7 +795,7 @@ export function WriteAfterStoryPage() {
           <div className="afterstory-field__head">
             <label htmlFor="afterstory-content">후일담 내용 <b>*</b></label>
           </div>
-          <div className="afterstory-field__box"><textarea id="afterstory-content" value={content} maxLength={1000} placeholder={'예) 요청 내용을 정리해 보낸 뒤,\n일주일 안에 잔금을 받았어요.\n\n내가 해 본 행동과 그 후의 변화를 적어주세요.'} onChange={(event) => setContent(event.target.value)} /><small>{content.length.toLocaleString()} / 1,000</small></div>
+          <div className="afterstory-field__box"><textarea id="afterstory-content" value={content} maxLength={1000} placeholder={'예) 팀원에게 먼저 연락해 공개적으로 지적한 점을 사과했어요.\n\n서로의 사정을 듣고, 다음부터는 마감이 어려우면 미리 이야기하기로 했어요.'} onChange={(event) => setContent(event.target.value)} /><small>{content.length.toLocaleString()} / 1,000</small></div>
         </section>
         <aside className="afterstory-privacy"><img src={walgadakEmpathy} alt="" />이름·연락처 같은 개인정보는 빼주세요.</aside>
       </div>
@@ -770,6 +809,33 @@ export function PreviewAfterStoryPage() {
   const location = useLocation()
   const { recordAfterStory } = useSession()
   const content = (location.state as AfterStoryLocationState | null)?.content ?? ''
+  const [isLetterOpen, setIsLetterOpen] = useState(false)
+  const folderRef = useRef<HTMLDivElement>(null)
+  const closeRef = useRef<HTMLButtonElement>(null)
+  const overlayRoot = document.getElementById('app-overlay-root')
+
+  useEffect(() => {
+    if (!isLetterOpen) return
+    closeRef.current?.focus()
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        closeLetter()
+      } else if (event.key === 'Tab') {
+        event.preventDefault()
+        closeRef.current?.focus()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isLetterOpen])
+
+  function closeLetter() {
+    setIsLetterOpen(false)
+    window.requestAnimationFrame(() => folderRef.current?.focus())
+  }
 
   /*
    * 게시가 실제로 일어나는 지점은 여기다. 기록해 둬야 `내가 쓴 후일담`에 글이 생긴다.
@@ -783,14 +849,35 @@ export function PreviewAfterStoryPage() {
 
   return (
     <main className="afterstory-flow">
-      <AfterStoryHeader title="후일담 작성" onBack={() => navigate('/afterstory/write/friend')} />
-      <div className="afterstory-flow__body afterstory-flow__body--with-progress">
+      <div className="afterstory-preview__header" inert={isLetterOpen}>
+        <AfterStoryHeader title="후일담 작성" onBack={() => navigate('/afterstory/write/friend')} />
+      </div>
+      <div className="afterstory-flow__body afterstory-flow__body--with-progress" inert={isLetterOpen}>
         <CaseSubmitProgress step={2} totalSteps={2} label="게시 확인" />
         <section className="afterstory-preview-intro"><h1>이 이야기로 게시할까요?</h1><p>게시될 내용과 연결된 사건을 확인해주세요.</p></section>
-        <CaseContextFolder />
+        <CaseContextFolder onOpen={() => setIsLetterOpen(true)} isOpen={isLetterOpen} triggerRef={folderRef} />
+        <button type="button" className="afterstory-preview-hint" onClick={() => setIsLetterOpen(true)} aria-haspopup="dialog" aria-expanded={isLetterOpen}><img src={clickTapIcon} alt="" aria-hidden="true" />파일을 누르면 후일담을 미리 볼 수 있어요.</button>
         <aside className="afterstory-publish-notice"><img src={walgadakEmpathy} alt="" />게시하면 다른 사용자에게 공개돼요.<br />이름·연락처 등 개인정보를 다시 확인해주세요.</aside>
       </div>
-      <footer className="afterstory-flow__footer"><button type="button" onClick={handlePublish}>후일담 게시하기</button><small>게시 후에도 MY에서 공개 범위를 바꿀 수 있어요.</small></footer>
+      <footer className="afterstory-flow__footer" inert={isLetterOpen}><button type="button" onClick={handlePublish}>후일담 게시하기</button><small>게시 후에도 MY에서 공개 범위를 바꿀 수 있어요.</small></footer>
+      {isLetterOpen && overlayRoot && createPortal(
+        <div className="afterstory-letter-preview" onClick={(event) => {
+          if (event.target === event.currentTarget) closeLetter()
+        }}>
+          <section className="afterstory-letter-preview__dialog" role="dialog" aria-modal="true" aria-labelledby="afterstory-letter-preview-title">
+            <div className="afterstory-letter-preview__sheet">
+              <img className="afterstory-letter-preview__paper" src={letterPaper} alt="" aria-hidden="true" />
+              <div className="afterstory-letter-preview__contents">
+                <span className="afterstory-letter-preview__eyebrow">게시할 후일담</span>
+                <h2 id="afterstory-letter-preview-title">{CONNECTED_CASE.storyTitle.replace('\n', ' ')}</h2>
+                <div className="afterstory-letter-preview__body">{content || '작성한 후일담이 없습니다.'}</div>
+              </div>
+            </div>
+            <IconCloseButton ref={closeRef} className="afterstory-letter-preview__close" onClick={closeLetter} aria-label="편지 미리보기 닫기" />
+          </section>
+        </div>,
+        overlayRoot,
+      )}
     </main>
   )
 }
@@ -801,18 +888,13 @@ export function CompleteAfterStoryPage() {
     <main className="afterstory-flow afterstory-complete">
       <AfterStoryHeader title="후일담 작성" onBack={() => navigate(PATHS.afterStory)} />
       <div className="afterstory-complete__spacer" aria-hidden="true" />
-      <div className="afterstory-complete__body">
-        <div className="afterstory-complete__art-stage">
-          <span className="afterstory-complete__check" aria-hidden="true">✓</span>
-          <img src={panMungyeeJudge} alt="판사 옷을 입은 판멍이 캐릭터" />
-        </div>
-        <div className="afterstory-complete__message">
-          <h1>후일담 작성 완료!</h1>
-          <p>이제 내 사건에서 내용을 다시 확인할 수 있어요.</p>
-        </div>
-        <section><small>친구 · 내 후일담</small><h2>{CONNECTED_CASE.storyTitle.split('\n').map((line) => <span key={line}>{line}</span>)}</h2><p>{CONNECTED_CASE.context}</p></section>
-        <em>공개 범위는 내 사건에서 변경할 수 있어요.</em>
-      </div>
+      <CompletionScene
+        title="후일담 작성 완료!"
+        folderTitle={CONNECTED_CASE.storyTitle}
+        detailLabel="공개 범위"
+        detailValue="배심원 광장에 공개"
+        reminder="공개 범위는 MY에서 변경할 수 있어요."
+      />
       {/*
         방금 남긴 글을 바로 보여주는 쪽이 자연스러워서 홈 대신 `내가 쓴 후일담`으로 보낸다.
         replace를 써서 뒤로가기가 작성 완료 화면으로 되돌아오지 않게 한다. (PROJECT_SPEC.md §7-6)

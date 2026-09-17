@@ -7,6 +7,7 @@ import CaseSubmitFooter from './components/CaseSubmitFooter'
 import CaseSubmitDemoFill from './components/CaseSubmitDemoFill'
 import useCaseSubmitDraft from './useCaseSubmitDraft'
 import useWizardBack from '../../hooks/useWizardBack'
+import { INITIAL_ANSWERS } from './types'
 import type { TriAnswer } from './types'
 import walgadakEmpathy from '../../assets/case/stickers/walgadak-empathy.png'
 import './CaseSubmit.css'
@@ -75,10 +76,15 @@ function CaseSubmitQuestionsPage() {
 
   const canProceed =
     answers.deliveryRecord !== null && answers.contractTerms !== null && answers.revisionScope !== null
+  const isDemoFilled =
+    answers.deliveryRecord === 'yes' &&
+    answers.deliveryDetail === '이메일로 최종 파일을 보낸 내역이 있어요.' &&
+    answers.contractTerms === 'yes' &&
+    answers.revisionScope === 'no'
 
   /** 이 단계의 세 문항을 지훈 시나리오(전달 기록 있음 · 지급일 명시 · 수정 범위 미정)로 채운다. */
   const handleStepDemoFill = () => {
-    setAnswers({
+    setAnswers(isDemoFilled ? INITIAL_ANSWERS : {
       deliveryRecord: 'yes',
       deliveryDetail: '이메일로 최종 파일을 보낸 내역이 있어요.',
       contractTerms: 'yes',
@@ -103,7 +109,7 @@ function CaseSubmitQuestionsPage() {
           <h2 className="case-submit__heading">몇 가지만 더 알려주세요</h2>
           <p className="case-submit__description">작성한 내용에서 빠진 정보만 확인해요.</p>
           {/* 발표 시연용. 세 문항의 답을 한 번에 채운다. */}
-          <CaseSubmitDemoFill personaId={personaId} done={canProceed} onFill={handleStepDemoFill} />
+          <CaseSubmitDemoFill personaId={personaId} done={isDemoFilled} onFill={handleStepDemoFill} />
         </div>
 
         <div className="case-submit__field">

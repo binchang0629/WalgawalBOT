@@ -66,7 +66,7 @@ function CaseSubmitOpinionPage() {
           <CaseSubmitDemoFill
             personaId={personaId}
             done={canSubmit}
-            onFill={() => setVisibility(scenario.allowedVisibility)}
+            onFill={() => setVisibility(canSubmit ? null : scenario.allowedVisibility)}
           />
         </div>
 

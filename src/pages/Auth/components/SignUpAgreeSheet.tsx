@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Dispatch, KeyboardEvent, SetStateAction } from 'react'
 import { createPortal } from 'react-dom'
 import InfoNotice from '../../../components/common/InfoNotice'
-import closeIcon from '../../../assets/auth/loginPopUpClose.svg'
+import IconCloseButton from '../../../components/common/IconCloseButton'
 import type { AgreeState } from './signUpAgreeState'
 import './SignUpAgreeSheet.css'
 
@@ -114,9 +114,7 @@ function SignUpAgreeSheet({ value, openReason, onChange, onClose, onSubmit }: Pr
 
         <div className="signUpAgreeHeader">
           <h2 id="signUpAgreeTitle">{TITLE[openReason]}</h2>
-          <button type="button" onClick={onClose} aria-label="닫기">
-            <img src={closeIcon} alt="" aria-hidden="true" />
-          </button>
+          <IconCloseButton onClick={onClose} aria-label="닫기" />
         </div>
 
         <ul className="signUpAgreeList">

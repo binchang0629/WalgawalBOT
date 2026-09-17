@@ -44,7 +44,7 @@ function CaseDetailPage() {
   const { caseId } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
-  const { sessionStatus, recordJuryVote } = useSession()
+  const { sessionStatus, votedCaseIds, juryVotes, recordJuryVote } = useSession()
   const { showToast } = useToast()
   const [selectedVote, setSelectedVote] = useState<WeddingGiftVoteId | null>(null)
   const [confirmedVote, setConfirmedVote] = useState<WeddingGiftVoteId | null>(null)
@@ -57,6 +57,9 @@ function CaseDetailPage() {
   ))
 
   const isAuthenticated = sessionStatus === 'authenticated'
+  const hasVoted = isAuthenticated && votedCaseIds.includes(caseContent.id)
+  const savedVote = juryVotes[caseContent.id]
+  const savedChoice = caseContent.choices.find((choice) => choice.id === savedVote)
   const loginPath = `${PATHS.login}?from=${encodeURIComponent(location.pathname)}`
   const entryState = location.state as { entryMotion?: string; returnTo?: string; fromPlaza?: boolean; homeCaseId?: string } | null
   const shouldSlideIn = entryState?.entryMotion === 'slide-forward'
@@ -84,13 +87,13 @@ function CaseDetailPage() {
   }
 
   const handleVoteSubmit = () => {
-    if (confirmedVote) return
+    if (confirmedVote || hasVoted) return
     if (!selectedVote) {
       showToast('투표를 먼저 해주세요.')
       return
     }
 
-    recordJuryVote(caseContent.id)
+    recordJuryVote(caseContent.id, selectedVote)
     setConfirmedVote(selectedVote)
   }
 
@@ -139,6 +142,20 @@ function CaseDetailPage() {
           <Link className="closed-case-result-link" to={toCaseResult(caseContent.id)} state={{ fromPlaza: entryState?.fromPlaza, returnTo: entryState?.returnTo, homeCaseId: entryState?.homeCaseId }}>
             투표 결과보기
           </Link>
+        ) : hasVoted ? (
+          <section className="case-vote-complete" aria-labelledby="case-vote-complete-title">
+            <span className="case-vote-complete__check" aria-hidden="true">✓</span>
+            <div>
+              <h2 id="case-vote-complete-title">이미 투표했어요</h2>
+              <p>{savedChoice ? `나의 선택 · ${savedChoice.label.join(' ')}` : '이 사건에 투표한 기록이 있어요.'}</p>
+            </div>
+            <Link
+              to={toCaseResult(caseContent.id)}
+              state={{ selectedVote: savedVote, fromPlaza: entryState?.fromPlaza, returnTo: entryState?.returnTo, homeCaseId: entryState?.homeCaseId }}
+            >
+              투표 결과 보기
+            </Link>
+          </section>
         ) : <CaseVoteSection
           choices={caseContent.choices}
           isAuthenticated={isAuthenticated}

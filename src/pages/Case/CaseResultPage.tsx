@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import juryStatusCharacter from '../../assets/case/vote-other-updated.svg'
 import verdictVideo from '../../assets/case/result/panmung-scale-once.mp4'
 import otherVerdictVideo from '../../assets/case/result/panmung-scale-left-once.mp4'
@@ -29,7 +29,7 @@ import {
 import type { CaseResultComment } from '../../data/common/caseResultContent'
 import useSession from '../../hooks/useSession'
 import useToast from '../../hooks/useToast'
-import { PATHS } from '../../routes/paths'
+import { PATHS, toAfterStoryDetail } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
 import CommentStickerPicker from './components/CommentStickerPicker'
 import ResultBreakdown from './components/ResultBreakdown'
@@ -44,6 +44,7 @@ interface ResultRouteState {
   returnTo?: string
   fromPlaza?: boolean
   homeCaseId?: string
+  restoreCaseResultScrollTop?: number
 }
 
 const COMMENTS_PER_PAGE = 5
@@ -177,13 +178,14 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
 function CaseResultPage() {
   const { caseId } = useParams()
   const location = useLocation()
+  const navigate = useNavigate()
   /*
    * MY의 `참여한 사건`에서 들어온 경우에만 MY 상세 화면과 같은 좌우 슬라이드를 쓴다.
    * 광장이나 홈에서 들어올 때는 원래대로 전환 없이 뜬다.
    */
   const fromMy = (location.state as ResultRouteState | null)?.returnTo === PATHS.my
   const slide = useDetailSlide(fromMy)
-  const { sessionStatus, currentUser, personaId } = useSession()
+  const { sessionStatus, currentUser, personaId, juryVotes } = useSession()
   const { showToast } = useToast()
   const [draft, setDraft] = useState('')
   const [selectedStickerId, setSelectedStickerId] = useState<CommentStickerId | null>(null)
@@ -230,6 +232,17 @@ function CaseResultPage() {
     }
   }, [caseId])
 
+  useEffect(() => {
+    const scrollTop = (location.state as ResultRouteState | null)?.restoreCaseResultScrollTop
+    if (typeof scrollTop !== 'number' || !Number.isFinite(scrollTop)) return
+
+    const frame = window.requestAnimationFrame(() => {
+      document.querySelector<HTMLElement>('.app-viewport .main-layout__scroll')
+        ?.scrollTo({ top: scrollTop, behavior: 'instant' })
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [location.state])
+
   if (caseId !== weddingGiftCase.id && !isParentsCase && !plazaStory) return <MissingCase />
 
   const loginPath = `${PATHS.login}?from=${encodeURIComponent(location.pathname)}`
@@ -237,7 +250,8 @@ function CaseResultPage() {
 
   const routeState = location.state as ResultRouteState | null
   const returnTo = routeState?.returnTo === PATHS.my ? PATHS.my : routeState?.returnTo === PATHS.home ? PATHS.home : isParentsCase || plazaStory ? PATHS.plaza : PATHS.home
-  const selectedVote = isVoteId(routeState?.selectedVote) ? routeState.selectedVote : 'writer'
+  const rememberedVote = caseId ? juryVotes[caseId] : undefined
+  const selectedVote = isVoteId(routeState?.selectedVote) ? routeState.selectedVote : rememberedVote ?? 'writer'
   const seededComments = Array.from(
     { length: plazaStory ? 0 : Math.min(resultContent.commentCount, MAX_PAGINATED_COMMENTS) },
     (_, index) => isParentsCase ? createParentsSeedComment(index) : createWeddingGiftSeedComment(index),
@@ -292,6 +306,7 @@ function CaseResultPage() {
         caseId: caseContent.id,
         caseTitle: caseContent.title.replace(/\n/g, ' '),
         href: location.pathname,
+        body,
       })
     }
 
@@ -525,14 +540,29 @@ function CaseResultPage() {
 
         {!isParentsCase && !plazaStory && <section className="after-story" aria-labelledby="after-story-title">
           <h2 id="after-story-title">비슷한 사건의 후일담</h2>
-          <article>
-            <blockquote>{weddingGiftResult.afterStory.quote}</blockquote>
-            <img className="after-story__divider" src={quoteDivider} alt="" />
-            <div>
-              <p>{weddingGiftResult.afterStory.title}</p>
-              <span><img src={storyLinkIcon} alt="" /></span>
-            </div>
-          </article>
+          <Link
+            className="after-story__link"
+            to={toAfterStoryDetail('afterstory-birthday-gift')}
+            state={{ from: location.pathname, caseResultState: routeState }}
+            aria-label="친구와 오해를 푼 후일담 보기"
+            onClick={(event) => {
+              if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+              event.preventDefault()
+              const scrollTop = event.currentTarget.closest<HTMLElement>('.main-layout__scroll')?.scrollTop ?? 0
+              navigate(toAfterStoryDetail('afterstory-birthday-gift'), {
+                state: { from: location.pathname, caseResultState: routeState, caseResultScrollTop: scrollTop },
+              })
+            }}
+          >
+            <article>
+              <blockquote>{weddingGiftResult.afterStory.quote}</blockquote>
+              <img className="after-story__divider" src={quoteDivider} alt="" />
+              <div>
+                <p>{weddingGiftResult.afterStory.title}</p>
+                <span><img src={storyLinkIcon} alt="" /></span>
+              </div>
+            </article>
+          </Link>
         </section>}
       </div>
       {pendingDeleteId && (

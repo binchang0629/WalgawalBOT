@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import useToast from '../../../hooks/useToast'
 import {
   jurorRanking,
   rankingPanel,
@@ -15,6 +16,7 @@ import heroTrophy from '../../../assets/plaza/ranking-trophy.png'
 const PODIUM_ORDER = [2, 1, 3] as const
 
 function RankingHeroSection() {
+  const { showToast } = useToast()
   const [activeTab, setActiveTab] = useState<(typeof rankingTabs)[number]['key']>(rankingTabs[0].key)
   const currentPanel = activeTab === 'voter' ? voterRankingPanel : rankingPanel
   const currentRanking = activeTab === 'voter' ? voterRanking : jurorRanking
@@ -78,7 +80,7 @@ function RankingHeroSection() {
           </div>
         </div>
       </div>
-      <button type="button" className="ranking-hero__link" aria-disabled="true" title="전체 랭킹은 준비 중이에요">
+      <button type="button" className="ranking-hero__link" onClick={() => showToast('랭킹 전체보기는 업데이트 예정입니다.')}>
         랭킹 전체 보기
         <img src={rankingArrow} alt="" width={14} height={14} />
       </button>

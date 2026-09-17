@@ -89,12 +89,14 @@ function CaseSubmitPage() {
    * 손댈 수가 없었다. 그래서 버튼으로 떼어내 누를 때만 채운다.
    */
   const handleDemoFill = () => {
-    setContent(isSeoa ? SEOA_CONTENT : JIHUN_CONTENT)
+    const exampleContent = isSeoa ? SEOA_CONTENT : JIHUN_CONTENT
+    const shouldClear = content === exampleContent
+    setContent(shouldClear ? '' : exampleContent)
     window.requestAnimationFrame(() => {
       const field = contentInputRef.current
       if (field) {
         field.focus()
-        field.setSelectionRange(field.value.length, field.value.length)
+        if (!shouldClear) field.setSelectionRange(field.value.length, field.value.length)
         field.scrollTop = 0
       }
     })
@@ -108,8 +110,8 @@ function CaseSubmitPage() {
   const isDemoFilled = relationship === demoValues.relationship && content === demoValues.content
 
   const handleStepDemoFill = () => {
-    setRelationship(demoValues.relationship)
-    setContent(demoValues.content)
+    setRelationship(isDemoFilled ? null : demoValues.relationship)
+    setContent(isDemoFilled ? '' : demoValues.content)
   }
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -202,7 +204,7 @@ function CaseSubmitPage() {
               사건 내용 <span className="case-submit__required">*</span>
             </label>
             {/* 발표 시연용. 누르면 예시 사건이 본문 칸에 바로 들어간다. */}
-            <button type="button" className="case-submit__demo" onClick={handleDemoFill}>내용 작성하기</button>
+            <button type="button" className="case-submit__demo" onClick={handleDemoFill}>{content === demoValues.content ? '예시 내용 지우기' : '내용 작성하기'}</button>
           </div>
           <div className={`case-submit__textarea-box${content ? ' has-content' : ''}`}>
             <textarea

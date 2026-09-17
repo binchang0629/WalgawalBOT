@@ -1,0 +1,17 @@
+.icon-close-button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--neutral-100);
+  cursor: pointer;
+}
+
+.icon-close-button img {
+  display: block;
+  width: 24px;
+  height: 24px;
+}

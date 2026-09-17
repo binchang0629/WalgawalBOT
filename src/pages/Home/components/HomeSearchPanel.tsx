@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import searchIcon from '../../../assets/icons/search-primary.svg'
+import IconCloseButton from '../../../components/common/IconCloseButton'
 import useSession from '../../../hooks/useSession'
 import { PATHS } from '../../../routes/paths'
 
@@ -105,9 +106,7 @@ function HomeSearchPanel({ onClose }: HomeSearchPanelProps) {
             if (event.key === 'Escape') onClose()
           }}
         />
-        <button type="button" className="home-search__close" aria-label="검색창 닫기" onClick={onClose}>
-          <span className="search-close-mark" aria-hidden="true" />
-        </button>
+        <IconCloseButton className="home-search__close" aria-label="검색창 닫기" onClick={onClose} />
       </form>
       {recentSearches.length > 0 && (
         <div className="home-search__recent" aria-label="최근 검색어">

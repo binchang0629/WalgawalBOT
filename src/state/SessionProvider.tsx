@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { PersonaId, SessionStatus } from '../types'
+import type { WeddingGiftVoteId } from '../data/common/caseDetailContent'
 import { DEMO_ACCOUNTS, PERSONAS } from '../data/personas'
 import { DEMO } from '../config/app'
 import { SessionContext } from './sessionContext'
@@ -32,6 +33,7 @@ const MAX_SUBMITTED_CASES = 1
 interface ActivityRecord {
   submittedCaseIds: string[]
   votedCaseIds: string[]
+  juryVotes: Partial<Record<string, WeddingGiftVoteId>>
   /** 후일담을 게시한 사건 id. 게시 전에는 비어 있어서 `내가 쓴 후일담`이 빈 화면으로 나온다. */
   publishedAfterStoryIds: string[]
 }
@@ -42,7 +44,7 @@ type ActivityRecords = Record<PersonaId, ActivityRecord>
 const activityStorageKey = (personaId: PersonaId) => `${DEMO.storagePrefix}:${personaId}:activity:v3`
 
 function emptyActivity(): ActivityRecord {
-  return { submittedCaseIds: [], votedCaseIds: [], publishedAfterStoryIds: [] }
+  return { submittedCaseIds: [], votedCaseIds: [], juryVotes: {}, publishedAfterStoryIds: [] }
 }
 
 function isIdList(value: unknown): value is string[] {
@@ -65,9 +67,15 @@ function parseActivity(raw: string | null): ActivityRecord {
     if (typeof parsed !== 'object' || parsed === null) return emptyActivity()
     const value = parsed as Partial<ActivityRecord>
     if (!isIdList(value.submittedCaseIds) || !isIdList(value.votedCaseIds)) return emptyActivity()
+    const juryVotes = Object.fromEntries(
+      Object.entries(value.juryVotes ?? {}).filter(([caseId, voteId]) =>
+        value.votedCaseIds?.includes(caseId)
+        && (voteId === 'writer' || voteId === 'other' || voteId === 'both' || voteId === 'neither')),
+    ) as ActivityRecord['juryVotes']
     return {
       submittedCaseIds: [...new Set(value.submittedCaseIds)].slice(0, MAX_SUBMITTED_CASES),
       votedCaseIds: [...new Set(value.votedCaseIds)],
+      juryVotes,
       /*
        * 후일담 기록은 나중에 추가한 항목이다. 예전에 저장된 값에는 없으므로
        * 없으면 빈 목록으로 본다. 이것 때문에 앞의 두 기록까지 버리지는 않는다.
@@ -296,7 +304,7 @@ function SessionProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
-  const recordActivity = useCallback((field: keyof ActivityRecord, id: string) => {
+  const recordActivity = useCallback((field: 'submittedCaseIds' | 'publishedAfterStoryIds', id: string) => {
     // 서버 연결 전 데모 집계. 로그인한 현재 계정에만 기록하고 같은 사건은 중복 집계하지 않는다.
     if (session.sessionStatus !== 'authenticated' || !id.trim()) return
     if (session.signupProfile) {
@@ -325,9 +333,26 @@ function SessionProvider({ children }: { children: ReactNode }) {
     recordActivity('submittedCaseIds', submissionId)
   }, [recordActivity])
 
-  const recordJuryVote = useCallback((caseId: string) => {
-    recordActivity('votedCaseIds', caseId)
-  }, [recordActivity])
+  const recordJuryVote = useCallback((caseId: string, voteId: WeddingGiftVoteId) => {
+    if (session.sessionStatus !== 'authenticated' || !caseId.trim()) return
+    const recordVote = (current: ActivityRecord): ActivityRecord => {
+      if (current.votedCaseIds.includes(caseId)) return current
+      return {
+        ...current,
+        votedCaseIds: [...current.votedCaseIds, caseId],
+        juryVotes: { ...current.juryVotes, [caseId]: voteId },
+      }
+    }
+    if (session.signupProfile) {
+      setCustomActivity(recordVote)
+    } else {
+      const personaId = session.personaId
+      setActivityRecords((current) => ({
+        ...current,
+        [personaId]: recordVote(current[personaId]),
+      }))
+    }
+  }, [session.personaId, session.sessionStatus, session.signupProfile])
 
   const recordAfterStory = useCallback((storyId: string) => {
     recordActivity('publishedAfterStoryIds', storyId)
@@ -383,6 +408,12 @@ function SessionProvider({ children }: { children: ReactNode }) {
       currentUser:
         session.sessionStatus === 'authenticated' ? toUser(session.personaId, session.signupProfile) : null,
       activityStats,
+      votedCaseIds: session.signupProfile
+        ? customActivity.votedCaseIds
+        : activityRecords[session.personaId].votedCaseIds,
+      juryVotes: session.signupProfile
+        ? customActivity.juryVotes
+        : activityRecords[session.personaId].juryVotes,
       publishedAfterStoryIds: session.signupProfile
         ? customActivity.publishedAfterStoryIds
         : activityRecords[session.personaId].publishedAfterStoryIds,

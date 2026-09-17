@@ -888,3 +888,177 @@
   background: #e8f2ff;
   font-weight: 700;
 }
+
+/* 완료 화면의 하단 버튼도 폴더가 나타난 뒤에 보여준다. */
+.afterstory-complete__footer {
+  animation: afterstory-complete-footer 440ms cubic-bezier(.22, 1, .36, 1) 1600ms both;
+}
+
+.afterstory-preview__header { flex: none; }
+
+.afterstory-case-folder-trigger {
+  width: 100%;
+  max-width: 330px;
+  margin-inline: auto;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: transform 180ms ease;
+}
+
+@media (hover: hover) {
+  .afterstory-case-folder-trigger:hover { transform: translateY(-2px); }
+}
+
+.afterstory-case-folder-trigger:active {
+  transform: translateY(1px) scale(.99);
+}
+
+.afterstory-case-folder-trigger:focus-visible {
+  outline: 3px solid var(--blue-700);
+  outline-offset: 3px;
+}
+
+.afterstory-preview-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  max-width: 330px;
+  margin: 10px auto 0;
+  padding: 0;
+  border: 0;
+  color: var(--neutral-600);
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.afterstory-preview-hint:focus-visible {
+  outline: 2px solid var(--blue-700);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.afterstory-preview-hint img {
+  display: block;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  animation: afterstory-preview-float 3.4s ease-in-out infinite;
+}
+
+@keyframes afterstory-preview-float {
+  0%, 100% { transform: translateY(1px); }
+  50% { transform: translateY(-2px); }
+}
+
+.afterstory-preview-hint + .afterstory-publish-notice {
+  margin-top: 16px;
+}
+
+.afterstory-letter-preview {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background: rgb(0 0 0 / 68%);
+  pointer-events: auto;
+  animation: afterstory-letter-backdrop 220ms ease-out both;
+}
+
+.afterstory-letter-preview__dialog {
+  position: relative;
+  width: min(100%, 354px);
+  height: min(500px, 100%);
+  min-height: 0;
+  animation: afterstory-letter-open 420ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.afterstory-letter-preview__sheet {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  filter: drop-shadow(0 16px 28px rgb(0 0 0 / 22%));
+}
+
+.afterstory-letter-preview__paper {
+  position: absolute;
+  top: -3.35%;
+  left: -16.79%;
+  width: 133.57%;
+  max-width: none;
+  height: 106.01%;
+  pointer-events: none;
+}
+
+.afterstory-letter-preview__contents {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 38px 28px 34px;
+}
+
+.afterstory-letter-preview__eyebrow {
+  color: var(--orange-700);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.afterstory-letter-preview__contents h2 {
+  margin: 10px 32px 18px 0;
+  color: var(--neutral-900);
+  font-size: 19px;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.afterstory-letter-preview__body {
+  min-height: 0;
+  overflow-y: auto;
+  color: var(--neutral-800);
+  font-size: 14px;
+  line-height: 1.65;
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  scrollbar-width: thin;
+}
+
+.afterstory-letter-preview__close {
+  position: absolute;
+  z-index: 2;
+  top: 20px;
+  right: 18px;
+}
+
+.afterstory-letter-preview__close:focus-visible {
+  outline: 2px solid var(--blue-700);
+  outline-offset: 2px;
+}
+
+@keyframes afterstory-letter-backdrop {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes afterstory-letter-open {
+  from { opacity: 0; transform: translateY(70px) scale(.96); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .afterstory-letter-preview,
+  .afterstory-letter-preview__dialog,
+  .afterstory-preview-hint img { animation: none; }
+
+  .afterstory-case-folder-trigger { transition: none; }
+}

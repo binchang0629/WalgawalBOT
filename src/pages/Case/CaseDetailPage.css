@@ -586,6 +586,62 @@
     line-height: 1.3;
 }
 
+.case-vote-complete {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
+    align-items: center;
+    gap: 8px 12px;
+    padding: 20px;
+    border: 1px solid var(--blue-100);
+    border-radius: 16px;
+    background: var(--blue-050);
+}
+
+.case-vote-complete__check {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--blue-700);
+    color: #fff;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.case-vote-complete h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.case-vote-complete p {
+    margin: 4px 0 0;
+    color: var(--neutral-600);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.case-vote-complete a {
+    grid-column: 1 / -1;
+    min-height: 52px;
+    margin-top: 12px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: var(--orange-700);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.case-vote-complete a:focus-visible {
+    outline: 3px solid var(--blue-700);
+    outline-offset: 3px;
+}
+
 /* 투표 직후의 짧은 확인 상태. 실제 서버 집계 대기처럼 보이지 않게 완료만 알린다. */
 .case-vote-confirmation {
     position: absolute;

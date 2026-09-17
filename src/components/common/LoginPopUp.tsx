@@ -7,7 +7,7 @@ import myImage from '../../assets/auth/loginPopUpMy.webp'
 import aiImage from '../../assets/auth/loginPopUpAi.webp'
 import defaultImage from '../../assets/auth/loginPopUpDefault.webp'
 import defaultKeyImage from '../../assets/auth/loginPopUpDefaultKey.webp'
-import closeIcon from '../../assets/auth/loginPopUpClose.svg'
+import IconCloseButton from './IconCloseButton'
 import './LoginPopUp.css'
 
 /**
@@ -193,9 +193,7 @@ function LoginPopUp({ reason, onLogin, onClose }: Props) {
         <div className="loginPopUpHandle" aria-hidden="true" />
 
         <div className="loginPopUpHeader">
-          <button type="button" onClick={() => dismiss()} aria-label="닫기">
-            <img src={closeIcon} alt="" aria-hidden="true" />
-          </button>
+          <IconCloseButton onClick={() => dismiss()} aria-label="닫기" />
         </div>
 
         <h2 className="loginPopUpTitle" id="loginPopUpTitle">

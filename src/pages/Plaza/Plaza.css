@@ -366,8 +366,10 @@
     font-size: 16px;
     font-weight: 600;
     line-height: 1;
+    cursor: pointer;
 }
 .ranking-hero__link img { display: block; width: 14px; height: 14px; }
+.ranking-hero__link:focus-visible { outline: 2px solid var(--blue-700); outline-offset: 3px; }
 
 .case-feed {
     /*

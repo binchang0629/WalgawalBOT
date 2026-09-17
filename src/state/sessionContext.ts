@@ -1,5 +1,6 @@
 import { createContext } from 'react'
 import type { PersonaId, SessionStatus } from '../types'
+import type { WeddingGiftVoteId } from '../data/common/caseDetailContent'
 
 /**
  * 퍼소나 선택과 로그인 여부는 다른 값이다. 같은 상태로 합치지 않는다. (PROJECT_SPEC.md §7-5)
@@ -35,8 +36,11 @@ export interface SessionValue {
   currentUser: SessionUser | null
   /** 현재 계정의 데모 활동 집계. 실제 서버 기록이나 결제 포인트가 아니다. */
   activityStats: ActivityStats
+  /** 현재 계정이 이미 참여한 사건과, 저장된 경우 해당 선택지. */
+  votedCaseIds: string[]
+  juryVotes: Partial<Record<string, WeddingGiftVoteId>>
   recordCaseSubmission: (submissionId: string) => void
-  recordJuryVote: (caseId: string) => void
+  recordJuryVote: (caseId: string, voteId: WeddingGiftVoteId) => void
   /**
    * 후일담을 게시한 사건의 id 목록. 아직 쓰지 않았으면 빈 배열이다.
    * `내가 쓴 후일담` 화면은 이 목록으로 보여줄 글이 있는지 판단한다.

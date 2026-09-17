@@ -7,7 +7,7 @@ import mascotBaseImage from '../../assets/auth/loginRewardMascotBase.webp'
 import mascotArmImage from '../../assets/auth/loginRewardMascotArm.webp'
 import mascotEarImage from '../../assets/auth/loginRewardMascotEar.webp'
 import mascotHandImage from '../../assets/auth/loginRewardMascotHand.webp'
-import closeIcon from '../../assets/auth/loginPopUpClose.svg'
+import IconCloseButton from './IconCloseButton'
 import './LoginRewardPopUp.css'
 
 /**
@@ -142,9 +142,7 @@ function LoginRewardPopUp({ kind, name, startPoint, onSettled, onClose }: Props)
         onClick={(event) => event.stopPropagation()}
       >
         <div className="loginRewardHeader">
-          <button type="button" onClick={dismiss} aria-label="닫기">
-            <img src={closeIcon} alt="" aria-hidden="true" />
-          </button>
+          <IconCloseButton onClick={dismiss} aria-label="닫기" />
           <p className="loginRewardGreeting" id="loginRewardGreeting">
             {kind === 'signup' ? (
               <span className="loginRewardGreetingMessage">가입 선물이 도착했어요!</span>

@@ -258,6 +258,7 @@ function ClosedCaseResultPage() {
         caseId: plazaStory?.id ?? jihoonSimilarCase.id,
         caseTitle: (plazaStory?.title ?? jihoonSimilarCase.resultTitle).replace(/\n/g, ' '),
         href: location.pathname,
+        body,
       })
     }
 

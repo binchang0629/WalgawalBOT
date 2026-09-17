@@ -4,11 +4,10 @@ import { DEMO_ACCOUNTS } from '../../../data/personas'
 import type { PersonaId } from '../../../types'
 import type { SessionUser } from '../../../state/sessionContext'
 import InfoNotice from '../../../components/common/InfoNotice'
+import IconCloseButton from '../../../components/common/IconCloseButton'
 import seoaPhoto from '../../../assets/my/account-seoa.png'
 import jihunPhoto from '../../../assets/my/account-jihun.png'
-import closeIcon from '../../../assets/my/account-close.svg'
 import selectedIcon from '../../../assets/my/account-selected.svg'
-import profileCloseIcon from '../../../assets/my/profile-close.svg'
 import './AccountSwitchSheet.css'
 
 const accountPhotos = { A: seoaPhoto, B: jihunPhoto }
@@ -144,7 +143,7 @@ function AccountSwitchSheet({ currentPersona, currentUser, onClose, onConfirm, o
           <>
             <header className="profile-switch-confirm__header">
               <h2 id="account-switch-title">프로필</h2>
-              <button type="button" onClick={() => dismiss()} aria-label="프로필 전환 팝업 닫기"><img src={profileCloseIcon} alt="" width={14} height={14} /></button>
+              <IconCloseButton onClick={() => dismiss()} aria-label="프로필 전환 팝업 닫기" />
             </header>
             <div className="profile-switch-confirm__profile">
               <p>프로필을 전환하시겠습니까?</p>
@@ -162,7 +161,7 @@ function AccountSwitchSheet({ currentPersona, currentUser, onClose, onConfirm, o
         <div className="account-switch-sheet__handle" aria-hidden="true" />
         <header className="account-switch-sheet__header">
           <h2 id="account-switch-title">계정 전환</h2>
-          <button type="button" onClick={() => dismiss()} aria-label="계정 전환 팝업 닫기"><img src={closeIcon} alt="" width={24} height={24} /></button>
+          <IconCloseButton onClick={() => dismiss()} aria-label="계정 전환 팝업 닫기" />
         </header>
         <div className="account-switch-sheet__body">
           <section aria-labelledby="current-account-label">

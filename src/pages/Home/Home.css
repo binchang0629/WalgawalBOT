@@ -109,9 +109,10 @@
 }
 
 .home-search__close {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
+    background: var(--neutral-100);
 }
 
 .home-search__recent {

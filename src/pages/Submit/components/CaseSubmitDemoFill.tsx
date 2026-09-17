@@ -20,7 +20,7 @@ interface Props {
   personaId: PersonaId
   /** 계정 이름 대신 단계 이름을 보여줄 때 사용한다. */
   label?: string
-  /** 이미 그 단계 값이 다 채워져 있으면 눌렀다는 표시로 바꾼다. */
+  /** 이 단계의 예시 값이 채워져 있으면 취소 동작을 안내한다. */
   done: boolean
   onFill: () => void
 }
@@ -36,8 +36,9 @@ function CaseSubmitDemoFill({ personaId, label, done, onFill }: Props) {
       type="button"
       className={`case-submit__autofill${done ? ' is-done' : ''}`}
       onClick={onFill}
+      aria-pressed={done}
     >
-      {done ? `${name} 예시 입력됨` : `${name} 예시 한번에 채우기`}
+      {done ? `${name} 예시 입력 취소` : `${name} 예시 한번에 채우기`}
     </button>
   )
 }
