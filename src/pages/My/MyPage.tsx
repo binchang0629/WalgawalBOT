@@ -69,8 +69,8 @@ function MyPage() {
   const { showToast } = useToast()
   const { personaId, currentUser, activityStats, signIn, signOut } = useSession()
   const isSeoa = personaId === 'A'
-  const [activityOpen, setActivityOpen] = useState(true)
-  const [settingsOpen, setSettingsOpen] = useState(true)
+  const [activityOpen, /*setActivityOpen*/] = useState(true)
+  const [settingsOpen, /*setSettingsOpen*/] = useState(true)
   const [accountSheetOpen, setAccountSheetOpen] = useState(false)
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false)
   const pointValueRef = useRef<HTMLElement>(null)
@@ -215,7 +215,7 @@ function MyPage() {
         )}
 
         <section className="my-menu">
-          <button type="button" className="my-menu__header" onClick={() => setActivityOpen((open) => !open)} aria-expanded={activityOpen}>
+          <button type="button" className="my-menu__header" /*onClick={() => setActivityOpen((open) => !open)}*/ aria-expanded={activityOpen}>
             <span>나의 활동</span>
           </button>
           {activityOpen && (
@@ -240,7 +240,7 @@ function MyPage() {
         </section>
 
         <section className="my-menu">
-          <button type="button" className="my-menu__header" onClick={() => setSettingsOpen((open) => !open)} aria-expanded={settingsOpen}>
+          <button type="button" className="my-menu__header" /*onClick={() => setSettingsOpen((open) => !open)}*/ aria-expanded={settingsOpen}>
             <span>설정</span>
           </button>
           {settingsOpen && (

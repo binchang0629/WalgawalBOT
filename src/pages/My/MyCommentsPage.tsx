@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { PATHS } from '../../routes/paths'
 import backIcon from '../../assets/my/back.svg'
 import chevronIcon from '../../assets/my/chevron.svg'
@@ -19,7 +19,11 @@ function CommentCard({ record }: { record: MyCommentRecord }) {
         카드 전체가 링크다. 내가 어디에 단 댓글인지 확인하려면 결국 그 사건으로 가게 되므로,
         제목만 누르게 두지 않고 카드를 통째로 누를 수 있게 한다.
       */}
-      <Link className="my-comment-card" to={record.href}>
+      <Link
+        className="my-comment-card"
+        to={record.href}
+        state={{ from: PATHS.myComments }}
+      >
         <span className="my-comment-card__case">
           <span>{record.caseTitle}</span>
           <img src={chevronIcon} alt="" aria-hidden="true" />
@@ -32,8 +36,12 @@ function CommentCard({ record }: { record: MyCommentRecord }) {
 }
 
 function MyCommentsContent({ records }: { records: MyCommentRecord[] }) {
-  // 마이페이지에서 오른쪽 → 왼쪽으로 들어오고, 돌아갈 때 왼쪽 → 오른쪽으로 빠진다.
-  const slide = useDetailSlide()
+  const location = useLocation()
+
+  const skipEnter =
+    (location.state as { skipDetailSlideEnter?: boolean } | null)?.skipDetailSlideEnter === true
+
+  const slide = useDetailSlide(!skipEnter)
 
   return (
     <main className={`my-cases-page ${slide.className}`}>

@@ -177,7 +177,13 @@ function ClosedCaseResultPage() {
   const { requireLogin } = useLoginGate()
   const location = useLocation()
   const navigate = useNavigate()
-  const routeState = location.state as { fromPlaza?: boolean; returnTo?: string; homeCaseId?: string } | null
+  const routeState = location.state as {
+    from?: string
+    fromPlaza?: boolean
+    returnTo?: string
+    homeCaseId?: string
+  } | null
+  console.log('ClosedCaseResultPage routeState:', routeState)
   const [draft, setDraft] = useState('')
   const [selectedStickerId, setSelectedStickerId] = useState<CommentStickerId | null>(null)
   const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false)
@@ -300,7 +306,20 @@ function ClosedCaseResultPage() {
 
   return (
     <main className="case-result case-result--closed">
-      <CaseHeader title="투표 결과" backTo={routeState?.returnTo === PATHS.myJury ? PATHS.myJury : routeState?.returnTo === PATHS.home ? PATHS.home : plazaStory || routeState?.fromPlaza ? PATHS.plaza : undefined} />
+      <CaseHeader
+        title="투표 결과"
+        backTo={
+          routeState?.from === PATHS.myComments
+            ? PATHS.myComments
+            : routeState?.returnTo === PATHS.myJury
+              ? PATHS.myJury
+              : routeState?.returnTo === PATHS.home
+                ? PATHS.home
+                : plazaStory || routeState?.fromPlaza
+                  ? PATHS.plaza
+                  : undefined
+        }
+      />
 
       <div className="case-result__body case-result__body--closed">
         <section className="result-overview" aria-labelledby="result-case-title">

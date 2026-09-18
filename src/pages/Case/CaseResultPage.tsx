@@ -45,6 +45,7 @@ import './WeddingGiftResultPage.css'
 interface ResultRouteState {
   selectedVote?: WeddingGiftVoteId
   returnTo?: string
+  from?: string
   fromPlaza?: boolean
   homeCaseId?: string
   restoreCaseResultScrollTop?: number
@@ -186,7 +187,9 @@ function CaseResultPage() {
    * MY의 `참여한 사건`에서 들어온 경우에만 MY 상세 화면과 같은 좌우 슬라이드를 쓴다.
    * 광장이나 홈에서 들어올 때는 원래대로 전환 없이 뜬다.
    */
-  const fromMy = (location.state as ResultRouteState | null)?.returnTo === PATHS.my
+  const fromMy =
+    (location.state as ResultRouteState | null)?.returnTo === PATHS.my ||
+    (location.state as ResultRouteState | null)?.from === PATHS.myComments
   const slide = useDetailSlide(fromMy)
   const { sessionStatus, currentUser, personaId, juryVotes } = useSession()
   const { showToast } = useToast()
@@ -228,7 +231,7 @@ function CaseResultPage() {
     video.load()
     video.playbackRate = 0.8
     const timer = window.setTimeout(() => {
-      void video.play().catch(() => {})
+      void video.play().catch(() => { })
     }, 1000)
 
     return () => {
@@ -254,7 +257,19 @@ function CaseResultPage() {
   if (sessionStatus !== 'authenticated' && !isClosedPlazaCase) return <Navigate to={loginPath} replace />
 
   const routeState = location.state as ResultRouteState | null
-  const returnTo = routeState?.returnTo === PATHS.myJury ? PATHS.myJury : routeState?.returnTo === PATHS.my ? PATHS.my : routeState?.returnTo === PATHS.home ? PATHS.home : isParentsCase || plazaStory ? PATHS.plaza : PATHS.home
+
+  const returnTo =
+    routeState?.from === PATHS.myComments
+      ? PATHS.myComments
+      : routeState?.returnTo === PATHS.myJury
+        ? PATHS.myJury
+        : routeState?.returnTo === PATHS.my
+          ? PATHS.my
+          : routeState?.returnTo === PATHS.home
+            ? PATHS.home
+            : isParentsCase || plazaStory
+              ? PATHS.plaza
+              : PATHS.home
   const rememberedVote = caseId ? juryVotes[caseId] : undefined
   const selectedVote = isVoteId(routeState?.selectedVote) ? routeState.selectedVote : rememberedVote ?? 'writer'
   const seededComments = Array.from(
@@ -347,7 +362,13 @@ function CaseResultPage() {
       <CaseHeader
         title={isParentsCase || plazaStory ? '사건 결과' : undefined}
         backTo={returnTo}
-        onBack={fromMy ? () => slide.leave(returnTo) : undefined}
+        onBack={
+          fromMy
+            ? () => slide.leave(returnTo, {
+              state: { skipDetailSlideEnter: true },
+            })
+            : undefined
+        }
       />
 
       <div className="case-result__body">

@@ -11,7 +11,15 @@ import './CaseHeader.css'
  * `onBack`을 주면 뒤로 가기를 그쪽에 맡긴다.
  * MY에서 들어온 화면처럼 나가는 애니메이션을 재생한 뒤 이동해야 하는 경우에 쓴다.
  */
-function CaseHeader({ title = '오늘의 사건', backTo, onBack }: { title?: string; backTo?: string; onBack?: () => void }) {
+function CaseHeader({
+  title = '오늘의 사건',
+  backTo,
+  onBack,
+}: {
+  title?: string
+  backTo?: string
+  onBack?: () => void
+}) {
   const navigate = useNavigate()
   const location = useLocation()
   const headerRef = useRef<HTMLElement>(null)
