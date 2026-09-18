@@ -35,6 +35,26 @@ function AppViewport({ children }: AppViewportProps) {
     }
   }, [])
 
+  /*
+   * 온보딩을 마치고 홈에 들어올 때(`appLaunch`) 앱을 여는 듯한 진입.
+   * 살짝 작은 상태에서 제자리로 커지며 나타난다. 온보딩 쪽은 반대로 커지며 사라진다.
+   */
+  useLayoutEffect(() => {
+    const routeContent = routeContentRef.current
+    const routeState = location.state as { appLaunch?: boolean } | null
+    if (!routeContent || !routeState?.appLaunch) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const animation = routeContent.animate(
+      [
+        { transform: 'scale(0.96)', opacity: 0 },
+        { transform: 'scale(1)', opacity: 1 },
+      ],
+      { duration: 420, easing: 'cubic-bezier(.22, 1, .36, 1)' },
+    )
+    return () => animation.cancel()
+  }, [location.key, location.state])
+
   useLayoutEffect(() => {
     const previousPath = previousPathRef.current
     previousPathRef.current = location.pathname

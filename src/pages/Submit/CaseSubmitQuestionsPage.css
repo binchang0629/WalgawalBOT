@@ -3,6 +3,11 @@
  * 삼지선다 답변 스타일은 CaseSubmit.css의 .case-submit__choice*를 공유한다.
  */
 
+/* 삼지선다 줄이 연달아 붙으면 빼곡해 보여, 문항끼리만 본문 간격(28px)보다 넓은 40px로 띄운다. */
+.case-submit--questions .case-submit__field + .case-submit__field {
+    margin-top: 12px;
+}
+
 .case-submit__optional-detail {
     display: flex;
     flex-direction: column;

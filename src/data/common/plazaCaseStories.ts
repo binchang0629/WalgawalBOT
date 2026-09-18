@@ -5,7 +5,7 @@ import { weddingGiftCase, type WeddingGiftVoteId } from './caseDetailContent'
 import { jihoonSimilarCase } from './jihoonSimilarCaseContent'
 import { parentsCase } from './parentsCaseContent'
 import { latestPlazaCaseIds, plazaCaseAgeMinutes, plazaCases, type PlazaCase } from './plazaContent'
-import { findJihoonCommentSeed, jihoonCommentAuthor, jihoonCommentId, jihoonCommentMinutesAgo } from '../personas/jihoonComments'
+import { JIHOON_COMMENT_REACTIONS, findJihoonCommentSeed, jihoonCommentAuthor, jihoonCommentId, jihoonCommentMinutesAgo } from '../personas/jihoonComments'
 import type { ThreadComment } from '../../components/common/CommentThread'
 import { demoEventAt, formatDemoDateTime, formatElapsedMinutes, JURY_VOTE_DURATION } from './demoClock'
 import type { CaseCategory } from '../../types'
@@ -366,7 +366,13 @@ export function getPlazaJuryBreakdown(caseId: string | undefined) {
 }
 
 const avatarUrls = profileAvatars
-const nicknames = ['차분한 배심원', '오늘도 한 표', '다른 각도', '생각 정리 중', '익명의 왈가닥', '함께 고민해요', '꼼꼼한 기록']
+/*
+ * 다른 배심원들의 닉네임.
+ *
+ * 시연 계정의 닉네임(`익명의 왈가닥` · `익명의 왈랑이`)은 여기 넣지 않는다.
+ * 겹치면 남이 쓴 댓글이 내가 쓴 것처럼 보여서, 수정·삭제가 왜 안 뜨는지 알 수 없게 된다.
+ */
+const nicknames = ['김차분', '차카니', '날카로운시선', '하은하음', '조용한한표', '빈창', '꼼꼼한 기록']
 const voteLabels: Record<VoteId, string> = {
   writer: '투표 · 글쓴이 입장',
   other: '투표 · 상대방 입장',
@@ -445,8 +451,7 @@ function withJihoonComment(caseId: string, list: ThreadComment[]): ThreadComment
     voteId: seed.voteId,
     voteLabel: voteLabels[seed.voteId],
     body: seed.body,
-    likes: 4,
-    dislikes: 0,
+    ...JIHOON_COMMENT_REACTIONS,
   }
   return next
 }

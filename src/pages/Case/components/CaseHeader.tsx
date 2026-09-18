@@ -54,7 +54,16 @@ function CaseHeader({
         markPlazaReturnReady()
       }
       const homeCaseId = (location.state as { homeCaseId?: string } | null)?.homeCaseId
-      navigate(backTo, { state: backTo === PATHS.home ? { restoreHomeScroll: true, homeCaseId } : undefined })
+      /*
+       * 되돌아가는 길이라는 표시를 같이 넘긴다.
+       * MY 하위 화면은 이 표시를 보고 들어오는 슬라이드를 다시 재생하지 않는다.
+       * (hooks/useDetailSlide) 없으면 앞 화면이 빠진 뒤 도착 화면이 또 들어와 두 번 움직인다.
+       */
+      navigate(backTo, {
+        state: backTo === PATHS.home
+          ? { restoreHomeScroll: true, homeCaseId, skipEnterMotion: true }
+          : { skipEnterMotion: true },
+      })
       return
     }
 

@@ -23,6 +23,7 @@ import CaseSubmitFlow from '../pages/Submit/CaseSubmitFlow'
 import CaseSubmitPage from '../pages/Submit/CaseSubmitPage'
 import CaseSubmitQuestionsPage from '../pages/Submit/CaseSubmitQuestionsPage'
 import CaseSubmitSummaryPage from '../pages/Submit/CaseSubmitSummaryPage'
+import CaseSubmitJudgingPage from '../pages/Submit/CaseSubmitJudgingPage'
 import CaseSubmitOpinionPage from '../pages/Submit/CaseSubmitOpinionPage'
 import CaseSubmitCompletePage from '../pages/Submit/CaseSubmitCompletePage'
 import ChatbotPage from '../pages/Chatbot/ChatbotPage'
@@ -136,6 +137,7 @@ function AppRoutes() {
             <Route index element={<CaseSubmitPage />} />
             <Route path="questions" element={<CaseSubmitQuestionsPage />} />
             <Route path="summary" element={<CaseSubmitSummaryPage />} />
+            <Route path="judging" element={<CaseSubmitJudgingPage />} />
             <Route path="opinion" element={<CaseSubmitOpinionPage />} />
             <Route path="complete" element={<CaseSubmitCompletePage />} />
           </Route>

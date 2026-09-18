@@ -275,6 +275,66 @@
     border-bottom: 1px solid var(--neutral-250);
 }
 
+/*
+ * MY > 내가 쓴 댓글에서 눌러 찾아온 댓글.
+ *
+ * 화면만 그 자리로 옮겨 주면 위아래 댓글과 구분이 안 된다.
+ * 잠깐 배경을 밝혀 어느 것인지 알려 주고, 찾고 나면 걷어 낸다.
+ *
+ * 밝히는 자리는 ::before로 직접 그린다. 댓글 박스가 위아래로 비대칭이라
+ * (위 여백 0, 아래 padding 16px) 사방으로 똑같이 번지는 box-shadow를 쓰면
+ * 칸에서 어긋나 보인다.
+ *
+ * 위아래로 12px씩 남겨 구분선에 닿지 않게 한다.
+ *   위 -12px : 댓글 사이 간격 20px 중 12px만 덮는다.
+ *   아래 4px : 아래 padding 16px 중 12px만 덮는다.
+ * 구분선까지 꽉 채우면 `이 줄이 선택됨`처럼 보여 계속 켜져 있어야 할 것 같다.
+ * 2.6초만 켜졌다 사라지는 표시라, 여백을 남겨 잠깐 얹힌 표식으로 보이게 한다.
+ *
+ * ::before는 자리만 차지하지 않는 배경이라 레이아웃이 밀리지 않는다.
+ * 그래서 하이라이트가 켜져도 스크롤 위치가 어긋나지 않는다.
+ */
+.result-comment.is-focused {
+    position: relative;
+    /*
+     * isolation이 없으면 아래 ::before의 z-index: -1이 이 댓글 밖으로 빠져나가
+     * 화면 배경 뒤로 숨어 아무것도 안 보인다. 댓글 안에서만 뒤로 가게 가둔다.
+     */
+    isolation: isolate;
+}
+
+.result-comment.is-focused::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: -12px;
+    right: -12px;
+    bottom: 4px;
+    left: -12px;
+    border-radius: 10px;
+    /* 앱의 연한 하늘색. MY에서 `사건` 태그에 쓰는 색과 같다. */
+    background: var(--blue-050);
+    animation: comment-focus 2.6s ease-out both;
+}
+
+@keyframes comment-focus {
+    0%,
+    62% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .result-comment.is-focused::before {
+        animation: none;
+        opacity: 1;
+    }
+}
+
 .result-comment__head {
     display: flex;
     align-items: center;
@@ -333,6 +393,11 @@
 .result-comment__more {
     position: relative;
     flex: none;
+}
+
+/* 투표 배지와 더보기가 나란히 올 때는 사이를 조금 더 벌린다. 붙으면 한 덩어리로 읽힌다. */
+.result-comment__badge + .result-comment__more {
+    margin-left: 4px;
 }
 
 .result-comment__menu {

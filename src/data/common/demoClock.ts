@@ -59,3 +59,21 @@ export function formatDemoReceivedDate(timestamp = getDemoFirstVisit()): string 
   const value = (type: string) => parts.find((part) => part.type === type)?.value ?? '00'
   return `${value('year')}.${value('month')}.${value('day')}`
 }
+
+/**
+ * 첫 접속일(한국 시각) 기준으로 `months`개월 앞뒤 날짜를 `2026.09.25` 형식으로 낸다.
+ * 구독 결제일·결제 내역처럼 매달 같은 날짜가 반복되는 표기에 쓴다.
+ * 옮겨 간 달에 그 날짜가 없으면(예: 31일 → 30일까지인 달) 그 달의 마지막 날로 맞춘다.
+ */
+export function formatDemoMonthOffset(months: number, timestamp = getDemoFirstVisit()): string {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Seoul', year: 'numeric', month: 'numeric', day: 'numeric',
+  }).formatToParts(timestamp)
+  const value = (type: string) => Number(parts.find((part) => part.type === type)?.value ?? 1)
+  const monthIndex = value('year') * 12 + (value('month') - 1) + months
+  const year = Math.floor(monthIndex / 12)
+  const month = monthIndex - year * 12 + 1
+  const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate()
+  const day = Math.min(value('day'), lastDay)
+  return `${year}.${String(month).padStart(2, '0')}.${String(day).padStart(2, '0')}`
+}

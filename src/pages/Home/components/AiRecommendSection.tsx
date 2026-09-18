@@ -6,6 +6,7 @@ import mascot from '../../../assets/home/figma/chat-mascot.png'
 import { personalizedRecommendation, homeSectionTitles } from '../../../data/common/homeContent'
 import { getRecommendationCase } from '../../../data/common/plazaCaseStories'
 import { PATHS, toCaseDetail } from '../../../routes/paths'
+import { readThreadComments } from '../../../utils/plazaComments'
 import './AiRecommendSection.css'
 
 /** 개발 > 홈/로그인 후 > Section (1473:8571). 실제 추천 API가 아닌 시안용 데이터. */
@@ -52,8 +53,10 @@ function AiRecommendSection() {
                   <VotingStatusBadge />
                 </div>
                 <h4>{item.title}</h4>
+                {/* 광장 사건 카드(CaseFeedCard)와 같은 표기. 지금 계정이 직접 단 댓글도 광장처럼 함께 센다. */}
                 <p className="ai-recommendation__details">
-                  {item.commentCount !== undefined && <span>댓글 {item.commentCount}개</span>}
+                  <span>조회수 {item.viewCount}</span>
+                  <span>댓글 {(item.commentCount ?? 0) + readThreadComments(personaId, item.id).length}</span>
                 </p>
               </article>
             )

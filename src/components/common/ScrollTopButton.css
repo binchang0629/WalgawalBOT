@@ -29,6 +29,14 @@
     transition: opacity .18s ease, transform .18s ease;
 }
 
+/*
+ * 하단 내비게이션이 없는 화면(MY 하위 화면 등). 홈 인디케이터·모바일 안전 영역 위에 둔다.
+ * 챗봇은 FloatingChatButton.css에서 이 위치 + 46px(버튼 40 + 간격 6)에 쌓인다.
+ */
+.scroll-top-button--no-nav {
+    bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+}
+
 .scroll-top-button.is-visible {
     opacity: 1;
     transform: none;

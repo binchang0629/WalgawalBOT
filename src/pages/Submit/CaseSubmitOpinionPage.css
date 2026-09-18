@@ -1,12 +1,197 @@
 /* 사건 접수 4단계(지훈04) 전용 스타일. */
 
+/*
+ * 1심 대기 화면에서 넘어오는 순간.
+ *
+ * 화면 전체가 한 프레임에 나타나면 앞의 기다림이 무색해진다.
+ * 본문은 아래에서 살짝 올라오며 뜨고, 판결 카드만 도장을 찍듯 위에서 내려와 박힌다.
+ *
+ * ── 속도를 바꾸려면 ──────────────────────────────
+ *   · 본문이 뜨는 속도   → `.case-submit--opinion .case-submit__body` (지금 460ms)
+ *   · 도장 찍히는 속도   → `.case-submit--opinion .case-submit__ai-opinion` 의
+ *       첫 번째 animation (지금 560ms, 시작 지연 240ms)
+ *       지연을 키우면 본문이 자리 잡은 뒤에 쿵 하고 박힌다.
+ *   · 도장 찍히는 시점   → `.case-submit--opinion .case-submit__ai-opinion-stamp` (지금 920ms 지연)
+ *   · 먼지 퍼지는 정도   → `@keyframes case-opinion-dust-left` / `-right`
+ *       퍼지는 거리 26px · 떠오르는 높이 14px · 진하기 .5
+ * ──────────────────────────────────────────────
+ */
+@keyframes case-opinion-enter {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+}
+
+/* 위에서 크게 내려와 한 번 눌렸다가 제자리로. 도장이 찍히는 궤적이다. */
+@keyframes case-opinion-stamp {
+    0% { opacity: 0; transform: translateY(-34px) scale(1.18); }
+    55% { opacity: 1; transform: translateY(0) scale(.965); }
+    78% { transform: scale(1.012); }
+    100% { opacity: 1; transform: none; }
+}
+
+/*
+ * 판멍이 도장. 카드가 자리 잡은 뒤 위에서 크게 내려와 비스듬히 박힌다.
+ * 카드보다 짧고 깊게 눌러 도장 특유의 무게를 준다.
+ */
+@keyframes case-opinion-seal {
+    0% {
+        opacity: 0;
+        transform: rotate(-26deg) scale(2.1);
+        animation-timing-function: cubic-bezier(.5, 0, .8, .35);
+    }
+    52% {
+        opacity: 1;
+        transform: rotate(-9deg) scale(.9);
+        animation-timing-function: cubic-bezier(.2, .9, .3, 1);
+    }
+    74% { transform: rotate(-12deg) scale(1.03); }
+    100% { opacity: 1; transform: rotate(11deg) scale(1); }
+}
+
+/*
+ * 도장이 닿는 순간 카드 양옆 아래에서 피어오르는 먼지.
+ * 좌우가 서로 반대 방향으로 퍼지며 위로 살짝 떠올랐다가 사라진다.
+ */
+@keyframes case-opinion-dust-left {
+    0% { opacity: 0; transform: translate(0, 0) scale(.3); }
+    18% { opacity: .5; }
+    100% { opacity: 0; transform: translate(-26px, -14px) scale(1.5); }
+}
+
+@keyframes case-opinion-dust-right {
+    0% { opacity: 0; transform: translate(0, 0) scale(.3); }
+    18% { opacity: .5; }
+    100% { opacity: 0; transform: translate(26px, -14px) scale(1.5); }
+}
+
+/*
+ * 판멍이의 1심 판결 카드.
+ *
+ * 테두리를 따라 파란 빛이 한 바퀴 돈다. AI가 읽고 정리한 내용이라는 표시로,
+ * 사건 상세의 `AI 핵심요약`·홈의 `AI 맞춤 추천`과 같은 규칙을 쓴다.
+ * 내부 배경은 시안대로 옅은 파랑을 유지하고 테두리만 움직인다.
+ */
 .case-submit__ai-opinion {
+    --case-opinion-stroke-angle: 0deg;
     display: flex;
     flex-direction: column;
     gap: 12px;
     padding: 16px;
+    border: 1.5px solid transparent;
     border-radius: 8px;
-    background: var(--blue-050);
+    background:
+        linear-gradient(var(--blue-050), var(--blue-050)) padding-box,
+        conic-gradient(
+            from var(--case-opinion-stroke-angle),
+            var(--blue-100) 0deg 220deg,
+            var(--blue-200) 260deg,
+            var(--blue-400) 300deg,
+            var(--blue-200) 338deg,
+            var(--blue-100) 360deg
+        ) border-box;
+    animation: case-opinion-stroke-orbit 3.2s linear infinite;
+}
+
+/*
+ * 도장 모션과 테두리 회전을 함께 건다.
+ * 테두리 회전은 각도 변수만 바꾸고 transform은 건드리지 않아 서로 부딪히지 않는다.
+ */
+/*
+ * 먼지는 카드의 가상 요소 두 개로 그린다.
+ * 카드 아래 양쪽 모서리에서 피어오르므로 카드 바깥으로 나가도 잘리지 않게 overflow를 두지 않는다.
+ */
+.case-submit--opinion .case-submit__ai-opinion {
+    position: relative;
+}
+
+.case-submit--opinion .case-submit__ai-opinion::before,
+.case-submit--opinion .case-submit__ai-opinion::after {
+    position: absolute;
+    z-index: -1;
+    bottom: -6px;
+    width: 46px;
+    height: 20px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(120 150 255 / 55%) 0%, rgb(120 150 255 / 0%) 70%);
+    content: '';
+    pointer-events: none;
+    filter: blur(1px);
+    opacity: 0;
+}
+
+/*
+ * 도장 위치·크기.
+ *   · 자리를 옮기려면 top·right 값을, 크기는 width를 바꾼다.
+ *   · 찍히는 시점은 아래 animation의 지연값(920ms) — 카드가 멈춘 뒤다.
+ */
+.case-submit__ai-opinion-stamp {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    width: 77px;
+    height: auto;
+    opacity: .92;
+    pointer-events: none;
+    user-select: none;
+    transform: rotate(11deg);
+}
+
+.case-submit--opinion .case-submit__ai-opinion-stamp {
+    animation: case-opinion-seal 420ms linear 920ms both;
+}
+
+/* 도장이 제목 줄을 덮지 않게 오른쪽을 비워 둔다. */
+.case-submit__ai-opinion-eyebrow,
+.case-submit__ai-opinion-headline {
+    padding-right: 96px;
+}
+
+/* 카드가 바닥에 닿는 시점(0.24s + 0.48s × 0.46 ≒ 0.46s)에 맞춰 터뜨린다. */
+.case-submit--opinion .case-submit__ai-opinion::before {
+    left: 4px;
+    animation: case-opinion-dust-left 620ms ease-out 450ms both;
+}
+
+.case-submit--opinion .case-submit__ai-opinion::after {
+    right: 4px;
+    animation: case-opinion-dust-right 620ms ease-out 450ms both;
+}
+
+.case-submit--opinion .case-submit__ai-opinion {
+    animation:
+        case-opinion-stamp 560ms cubic-bezier(.34, 1.4, .5, 1) 240ms both,
+        case-opinion-stroke-orbit 3.2s linear infinite;
+}
+
+.case-submit--opinion .case-submit__body {
+    animation: case-opinion-enter 460ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@property --case-opinion-stroke-angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+}
+
+@keyframes case-opinion-stroke-orbit {
+    to { --case-opinion-stroke-angle: 360deg; }
+}
+
+/* 움직임을 줄이는 설정에서는 테두리를 한 가지 색으로 고정한다. */
+@media (prefers-reduced-motion: reduce) {
+    .case-submit__ai-opinion,
+    .case-submit--opinion .case-submit__ai-opinion {
+        border-color: var(--blue-150);
+        background: var(--blue-050);
+        animation: none;
+    }
+
+    .case-submit--opinion .case-submit__body { animation: none; }
+
+    .case-submit--opinion .case-submit__ai-opinion::before,
+    .case-submit--opinion .case-submit__ai-opinion::after { animation: none; opacity: 0; }
+
+    .case-submit--opinion .case-submit__ai-opinion-stamp { animation: none; }
 }
 
 .case-submit__ai-opinion-eyebrow {

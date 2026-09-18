@@ -158,7 +158,7 @@ export const jihoonSimilarResult = {
     {
       id: 'jihoon-comment-5',
       avatarUrl: profileAvatars[0],
-      nickname: '아아러버',
+      nickname: '아아가땡긴다',
       createdAt: '15분 전',
       voteId: 'both',
       voteLabel: '투표 · 양쪽 모두',
@@ -201,8 +201,8 @@ const companyCommentConclusions = [
 
 const companyCommentNicknames = [
   '계약서필수', '수정은두번', '프리랜서일기', '클라이언트입장', '영상쟁이', '잔금주세요',
-  '기록이살길', '회의록요정', '색감중요해', '납기지킴이', '현실조언', '작업범위체크',
-  '광고회사막내', '오늘도야근', '차분한배심원', '원본은별도',
+  '기록이살길', '회의록요정', '색감중요해', '납기지킴이', '현실조언폭격기', '작업범위체크',
+  '광고회사막냉이', '오늘도야근인가', '차분한배심원', '원본은별도',
 ] as const
 
 const companyStickerIds = [

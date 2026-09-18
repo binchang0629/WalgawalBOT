@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { PATHS } from '../../routes/paths'
 import SpinningMascot from './SpinningMascot'
+import { hasBottomNavigation } from './floatingButtonLayout'
 import './FloatingChatButton.css'
 
 /**
@@ -24,21 +25,8 @@ function FloatingChatButton() {
     return null
   }
 
-  /*
-   * 하단 내비게이션이 있는 화면에서는 버튼을 내비 위로 올린다.
-   * 빠뜨리면 버튼이 내비 위에 걸쳐 `MY` 같은 메뉴를 가린다. (`내가 쓴 후일담`에서 그랬다)
-   */
-  const sitsAboveNavigation = [
-    PATHS.home,
-    PATHS.plaza,
-    PATHS.afterStory,
-    PATHS.afterStoryMine,
-    PATHS.afterStoryMineStories,
-    PATHS.my,
-  ].some((route) => route === pathname)
-    // 공개 후일담 상세도 MainLayout의 하단 내비게이션을 사용한다.
-    || /^\/afterstory\/[^/]+$/.test(pathname)
-    || /^\/cases\/[^/]+(?:\/result)?$/.test(pathname)
+  // 하단 내비게이션이 있는 화면에서는 버튼을 내비 위로 올린다. (floatingButtonLayout.ts)
+  const sitsAboveNavigation = hasBottomNavigation(pathname)
 
   return (
     <Link

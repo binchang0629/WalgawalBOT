@@ -1,13 +1,13 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import type { FormEvent, Ref } from 'react'
 import useLoginGate from '../../hooks/useLoginGate'
+import useDetailSlide from '../../hooks/useDetailSlide'
 import useSession from '../../hooks/useSession'
 import EmptyCaseState from '../../components/common/EmptyCaseState'
 import CaseFolderCard from '../../components/common/CaseFolderCard'
 import CompletionScene from '../../components/common/CompletionScene'
-import IconCloseButton from '../../components/common/IconCloseButton'
+import LetterPreview from '../../components/common/LetterPreview'
 import { PATHS, toAfterStoryDetail, toCaseDetail } from '../../routes/paths'
 import CaseSubmitProgress from '../Submit/components/CaseSubmitProgress'
 import CaseSubmitDemoFill from '../Submit/components/CaseSubmitDemoFill'
@@ -19,6 +19,7 @@ import DemoRelativeTime from '../../components/common/DemoRelativeTime'
 import Pagination from '../../components/common/Pagination'
 import { afterStoryAuthor, afterStoryComments, afterStoryLetter } from '../../data/common/afterStoryDetailContent'
 import { COMMUNITY_AFTER_STORIES } from '../../data/common/afterStoryList'
+import { categoryDotColor } from '../../data/common/plazaContent'
 import { getDemoFirstVisit } from '../../data/common/demoClock'
 import { withJihoonAfterStoryComment } from '../../data/personas/jihoonComments'
 import { afterStoryCardComments, parseElapsedMinutes, retimeComments } from '../../data/common/afterStoryCardComments'
@@ -33,9 +34,11 @@ import clickTapIcon from '../../assets/afterstory/figma/icon-park-click-tap.svg'
 import searchIcon from '../../assets/plaza/search-field.svg'
 import './AfterStoryPage.css'
 import './AfterStoryDetailPage.css'
+import '../My/MyPageTransitions.css'
 
 const CONNECTED_CASE = {
-  category: '친구 · 투표 종료',
+  // 게시 확인·내가 올린 사건 카드와 같은 `판결 완료` 표기를 쓴다.
+  category: '친구 · 판결 완료',
   title: '조별 과제에서 친구를 공개적으로\n지적한 제가 너무 예민했던 걸까요?',
   storyTitle: '먼저 사과한 뒤,\n서로의 의견을 묻게 됐어요.',
   context: '조별 과제에서 친구를 공개적으로 지적한 사건',
@@ -171,6 +174,13 @@ type AfterStoryCategory = (typeof AFTER_STORY_CATEGORIES)[number]
  * 광장 목록도 4개 단위라 페이지 모양이 서로 맞는다. (PROJECT_SPEC.md §9-14)
  */
 const AFTER_STORIES_PER_PAGE = 4
+
+/*
+ * MY 안에서 들어온 경우에만 MY 상세 화면과 같은 좌우 슬라이드를 쓴다.
+ * 사건 결과 화면(CaseResultPage, ClosedCaseResultPage)과 같은 규칙이라,
+ * 내가 쓴 댓글에서 사건을 누르든 후일담을 누르든 들어오고 나가는 모습이 같다.
+ */
+const MY_DETAIL_PATHS: string[] = [PATHS.my, PATHS.myComments]
 
 interface AfterStoryLocationState {
   content?: string
@@ -437,7 +447,8 @@ export function AfterStoryHomePage() {
               >
                 <span className="afterstory-community-card__tape" aria-hidden="true" />
                 <header>
-                  <span className="afterstory-community-card__category">{story.category}</span>
+                  {/* 광장 사건 카드와 같은 분야별 색을 쓴다. (plazaContent.ts의 categoryDotColor) */}
+                  <span className="afterstory-community-card__category" style={{ color: categoryDotColor[story.category] }}>{story.category}</span>
                   <span><DemoRelativeTime label={story.updatedAt} /> · 공감 {story.reactions}</span>
                 </header>
                 <h3 title={story.title}>{story.title}</h3>
@@ -555,6 +566,8 @@ export function AfterStoryDetailPage() {
   const { storyId } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
+  const fromMy = MY_DETAIL_PATHS.includes((location.state as AfterStoryLocationState | null)?.from ?? '')
+  const slide = useDetailSlide(fromMy)
   const variant = storyId ? AFTER_STORY_DETAILS[storyId as keyof typeof AFTER_STORY_DETAILS] : undefined
   const communityStory = storyId
     ? COMMUNITY_AFTER_STORIES.find((story) => `afterstory-${story.id}` === storyId)
@@ -614,10 +627,17 @@ export function AfterStoryDetailPage() {
         : undefined
 
   return (
-    <main className="afterstory-detail">
+    <main className={`afterstory-detail${slide.className ? ` ${slide.className}` : ''}`}>
       <AfterStoryHeader
         title="왈가왈후~"
-        onBack={() => navigate(backTo, { state: backState })}
+        /*
+         * MY에서 들어왔으면 나가는 모션을 재생한 뒤 이동한다.
+         * `slide.leave`가 되돌아가는 길이라는 표시도 같이 넘겨서,
+         * 도착한 MY 화면이 들어오는 슬라이드를 다시 재생하지 않는다.
+         */
+        onBack={fromMy
+          ? () => slide.leave(backTo, { state: backState })
+          : () => navigate(backTo, { state: backState })}
       />
       <div className="afterstory-detail__scroll">
         <section
@@ -672,6 +692,8 @@ export function AfterStoryDetailPage() {
             showVoteBadge={false}
             actionsInHeader
             headingId="afterstory-comments-title"
+            /* 여기에 단 댓글도 저장해야 화면을 나갔다 와도 남는다. */
+            threadId={storyId ?? 'afterstory'}
             /* 후일담에 단 댓글도 MY > 내가 쓴 댓글에 모인다. */
             commentRecord={{
               caseId: storyId ?? 'afterstory',
@@ -799,27 +821,8 @@ export function PreviewAfterStoryPage() {
   const content = (location.state as AfterStoryLocationState | null)?.content ?? ''
   const [isLetterOpen, setIsLetterOpen] = useState(false)
   const folderRef = useRef<HTMLDivElement>(null)
-  const closeRef = useRef<HTMLButtonElement>(null)
-  const overlayRoot = document.getElementById('app-overlay-root')
 
-  useEffect(() => {
-    if (!isLetterOpen) return
-    closeRef.current?.focus()
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault()
-        closeLetter()
-      } else if (event.key === 'Tab') {
-        event.preventDefault()
-        closeRef.current?.focus()
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isLetterOpen])
-
+  // 편지 미리보기는 사건 접수 완료 화면과 같은 공통 컴포넌트(LetterPreview)를 쓴다.
   function closeLetter() {
     setIsLetterOpen(false)
     window.requestAnimationFrame(() => folderRef.current?.focus())
@@ -848,23 +851,15 @@ export function PreviewAfterStoryPage() {
         <aside className="afterstory-publish-notice"><img src={walgadakEmpathy} alt="" />게시하면 다른 사용자에게 공개돼요.<br />이름·연락처 등 개인정보를 다시 확인해주세요.</aside>
       </div>
       <footer className="afterstory-flow__footer" inert={isLetterOpen}><button type="button" onClick={handlePublish}>후일담 게시하기</button><small>게시 후에도 MY에서 공개 범위를 바꿀 수 있어요.</small></footer>
-      {isLetterOpen && overlayRoot && createPortal(
-        <div className="afterstory-letter-preview" onClick={(event) => {
-          if (event.target === event.currentTarget) closeLetter()
-        }}>
-          <section className="afterstory-letter-preview__dialog" role="dialog" aria-modal="true" aria-labelledby="afterstory-letter-preview-title">
-            <div className="afterstory-letter-preview__sheet">
-              <img className="afterstory-letter-preview__paper" src={letterPaper} alt="" aria-hidden="true" />
-              <div className="afterstory-letter-preview__contents">
-                <span className="afterstory-letter-preview__eyebrow">게시할 후일담</span>
-                <h2 id="afterstory-letter-preview-title">{CONNECTED_CASE.storyTitle.replace('\n', ' ')}</h2>
-                <div className="afterstory-letter-preview__body">{content || '작성한 후일담이 없습니다.'}</div>
-              </div>
-            </div>
-            <IconCloseButton ref={closeRef} className="afterstory-letter-preview__close" onClick={closeLetter} aria-label="편지 미리보기 닫기" />
-          </section>
-        </div>,
-        overlayRoot,
+      {isLetterOpen && (
+        <LetterPreview
+          eyebrow="게시할 후일담"
+          title={CONNECTED_CASE.storyTitle.replace('\n', ' ')}
+          body={content}
+          emptyText="작성한 후일담이 없습니다."
+          closeLabel="편지 미리보기 닫기"
+          onClose={closeLetter}
+        />
       )}
     </main>
   )

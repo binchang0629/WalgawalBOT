@@ -99,7 +99,7 @@ function CaseSubmitQuestionsPage() {
   }
 
   return (
-    <form className="case-submit" onSubmit={handleSubmit}>
+    <form className="case-submit case-submit--questions" onSubmit={handleSubmit}>
       <CaseSubmitHeader onBack={handleBack} />
 
       <div className="case-submit__body case-submit__body--with-progress">

@@ -22,7 +22,7 @@ import { commentStickerById, type CommentStickerId } from '../../data/common/com
 import { weddingGiftCase } from '../../data/common/caseDetailContent'
 import { createParentsSeedComment, parentsCase, parentsResult } from '../../data/common/parentsCaseContent'
 import { getPlazaCaseResultContent, getPlazaCaseStory } from '../../data/common/plazaCaseStories'
-import { addMyComment } from '../../utils/myComments'
+import { addMyComment, readMyCommentReactions, removeMyComment, setMyCommentReaction } from '../../utils/myComments'
 import type { WeddingGiftVoteId } from '../../data/common/caseDetailContent'
 import {
   createWeddingGiftSeedComment,
@@ -30,7 +30,10 @@ import {
   weddingGiftResult,
 } from '../../data/common/caseResultContent'
 import type { CaseResultComment } from '../../data/common/caseResultContent'
+import useFocusComment, { commentAnchorId } from '../../hooks/useFocusComment'
 import useSession from '../../hooks/useSession'
+import { applyCommentEdits, deleteComment, editComment, isOwnComment, readCommentEdits } from '../../utils/commentEdits'
+import { readThreadComments, saveThreadComments } from '../../utils/plazaComments'
 import useToast from '../../hooks/useToast'
 import { PATHS, toAfterStoryDetail } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
@@ -51,6 +54,17 @@ interface ResultRouteState {
   restoreCaseResultScrollTop?: number
 }
 
+/*
+ * 뒤로가기로 돌아갈 수 있는 화면.
+ *
+ * 넘겨받은 주소를 그대로 믿지 않고 이 목록 안의 것만 쓴다.
+ * MY > 내가 쓴 댓글도 여기 있어야, 그 목록에서 들어왔을 때 광장이 아니라 목록으로 돌아간다.
+ */
+const RETURNABLE_PATHS: string[] = [PATHS.myJury, PATHS.my, PATHS.myComments, PATHS.home]
+
+/** 그중 MY 안쪽 화면. 여기서 들어왔을 때만 MY와 같은 좌우 슬라이드를 쓴다. */
+const MY_DETAIL_PATHS: string[] = [PATHS.my, PATHS.myComments]
+
 const COMMENTS_PER_PAGE = 5
 const MAX_COMMENT_PAGES = 5
 const MAX_PAGINATED_COMMENTS = COMMENTS_PER_PAGE * MAX_COMMENT_PAGES
@@ -70,9 +84,11 @@ function MissingCase() {
   )
 }
 
-function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
+function CommentItem({ comment, reaction, isFocused, onReact, onEdit, onDelete }: {
   comment: CaseResultComment
   reaction: CommentReaction
+  /** MY > 내가 쓴 댓글에서 눌러 찾아온 댓글. 잠깐 배경을 밝혀 어느 것인지 알려준다. */
+  isFocused: boolean
   onReact: (reaction: Exclude<CommentReaction, null>) => void
   onEdit?: (body: string) => void
   onDelete?: () => void
@@ -100,7 +116,7 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
   }
 
   return (
-    <article className="result-comment">
+    <article id={commentAnchorId(comment.id)} className={'result-comment' + (isFocused ? ' is-focused' : '')}>
       <div className="result-comment__head">
         <div className="result-comment__avatar">
           <img src={comment.avatarUrl} alt="" />
@@ -187,16 +203,24 @@ function CaseResultPage() {
    * MY의 `참여한 사건`에서 들어온 경우에만 MY 상세 화면과 같은 좌우 슬라이드를 쓴다.
    * 광장이나 홈에서 들어올 때는 원래대로 전환 없이 뜬다.
    */
-  const fromMy =
-    (location.state as ResultRouteState | null)?.returnTo === PATHS.my ||
-    (location.state as ResultRouteState | null)?.from === PATHS.myComments
+  const fromMy = MY_DETAIL_PATHS.includes((location.state as ResultRouteState | null)?.returnTo ?? '')
   const slide = useDetailSlide(fromMy)
   const { sessionStatus, currentUser, personaId, juryVotes } = useSession()
   const { showToast } = useToast()
   const [draft, setDraft] = useState('')
   const [selectedStickerId, setSelectedStickerId] = useState<CommentStickerId | null>(null)
   const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false)
-  const [addedComments, setAddedComments] = useState<CaseResultComment[]>([])
+  /*
+   * 이 화면이 직접 들고 있는 댓글 목록.
+   *
+   * 공용 CommentThread를 쓰지 않는 사건이라 저장도 여기서 맡는다.
+   * 저장하지 않으면 화면을 나갔다 오는 순간 방금 단 댓글이 사라지는데,
+   * MY > 내가 쓴 댓글에는 남아 있어서 두 화면이 어긋난다.
+   */
+  const commentThreadId = caseId ?? 'case'
+  const [addedComments, setAddedComments] = useState<CaseResultComment[]>(
+    () => readThreadComments<CaseResultComment>(personaId, commentThreadId),
+  )
   const [currentPage, setCurrentPage] = useState(1)
   /*
    * 댓글 정렬. 시안에는 `등록순 | 최신순`이 글자로만 있어 눌러도 반응이 없었다.
@@ -207,8 +231,22 @@ function CaseResultPage() {
   const [playingCaseId, setPlayingCaseId] = useState<string | null>(null)
   const [speechCaseId, setSpeechCaseId] = useState<string | null>(null)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+  /*
+   * 수정·삭제 기록. 원본 댓글은 코드와 저장소에 그대로 두고 이 값을 덮어씌운다.
+   * (`utils/commentEdits` — 지훈의 예전 댓글은 코드에 있어서 직접 고칠 수 없다)
+   */
+  const [commentEdits, setCommentEdits] = useState(() => readCommentEdits(personaId))
+  const applyEdit = (run: () => void) => {
+    run()
+    setCommentEdits(readCommentEdits(personaId))
+  }
+
+  useEffect(() => {
+    saveThreadComments(personaId, commentThreadId, addedComments)
+  }, [addedComments, personaId, commentThreadId])
   // 페이지가 바뀌어 댓글이 언마운트되어도 공감/반대 선택을 유지한다.
-  const [commentReactions, setCommentReactions] = useState<Record<string, CommentReaction>>({})
+  // 내 댓글에 눌러 둔 것은 MY 기록에 남아 있어서 화면을 다시 들어와도 살아난다.
+  const [commentReactions, setCommentReactions] = useState<Record<string, CommentReaction>>(() => readMyCommentReactions(personaId))
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const commentSectionRef = useRef<HTMLElement>(null)
   const verdictVideoRef = useRef<HTMLVideoElement>(null)
@@ -222,6 +260,29 @@ function CaseResultPage() {
   const isOtherVerdict = plazaStory?.aiSide === 'other'
   const firstFrame = isOtherVerdict ? otherVerdictFirstFrame : verdictFirstFrame
   const countdown = useDemoCountdown(resultContent.deadline, caseContent.id)
+
+  /*
+   * 댓글 목록은 화면을 못 그리는 경우(사건 없음·비로그인)보다 위에서 만든다.
+   * 아래 `useFocusComment`가 훅이라서, 조기 return 뒤에 두면 렌더마다 훅 순서가 달라진다.
+   */
+  const seededComments = Array.from(
+    { length: plazaStory ? 0 : Math.min(resultContent.commentCount, MAX_PAGINATED_COMMENTS) },
+    (_, index) => isParentsCase ? createParentsSeedComment(index) : createWeddingGiftSeedComment(index),
+  )
+  // 고치거나 지운 댓글을 반영한 목록.
+  const allComments = applyCommentEdits(commentEdits, [...addedComments, ...seededComments])
+  /*
+   * seed 댓글은 먼저 쓴 순서의 역순(최신 → 과거)으로 만들어져 있고,
+   * 새로 쓴 댓글은 맨 앞에 붙는다. 등록순은 이 순서를 그대로 뒤집으면 된다.
+   */
+  const orderedComments = sortKey === 'latest' ? allComments : [...allComments].reverse()
+  const totalPages = Math.min(
+    MAX_COMMENT_PAGES,
+    Math.max(1, Math.ceil(allComments.length / COMMENTS_PER_PAGE)),
+  )
+  const visibleComments = orderedComments.slice((currentPage - 1) * COMMENTS_PER_PAGE, currentPage * COMMENTS_PER_PAGE)
+  /* MY에서 눌러 들어온 경우, 그 댓글이 있는 페이지로 넘기고 그 자리로 스크롤한다. */
+  const focusedCommentId = useFocusComment(orderedComments.map((comment) => comment.id), COMMENTS_PER_PAGE, setCurrentPage)
 
   useEffect(() => {
     const video = verdictVideoRef.current
@@ -257,37 +318,11 @@ function CaseResultPage() {
   if (sessionStatus !== 'authenticated' && !isClosedPlazaCase) return <Navigate to={loginPath} replace />
 
   const routeState = location.state as ResultRouteState | null
-  console.log('RESULT STATE:', location.state)
 
-  const returnTo =
-    routeState?.from === PATHS.myComments
-      ? PATHS.myComments
-      : routeState?.returnTo === PATHS.myJury
-        ? PATHS.myJury
-        : routeState?.returnTo === PATHS.my
-          ? PATHS.my
-          : routeState?.returnTo === PATHS.home
-            ? PATHS.home
-            : isParentsCase || plazaStory
-              ? PATHS.plaza
-              : PATHS.home
+  const returnTo = RETURNABLE_PATHS.find((path) => path === routeState?.returnTo)
+    ?? (isParentsCase || plazaStory ? PATHS.plaza : PATHS.home)
   const rememberedVote = caseId ? juryVotes[caseId] : undefined
   const selectedVote = isVoteId(routeState?.selectedVote) ? routeState.selectedVote : rememberedVote ?? 'writer'
-  const seededComments = Array.from(
-    { length: plazaStory ? 0 : Math.min(resultContent.commentCount, MAX_PAGINATED_COMMENTS) },
-    (_, index) => isParentsCase ? createParentsSeedComment(index) : createWeddingGiftSeedComment(index),
-  )
-  const allComments = [...addedComments, ...seededComments]
-  /*
-   * seed 댓글은 먼저 쓴 순서의 역순(최신 → 과거)으로 만들어져 있고,
-   * 새로 쓴 댓글은 맨 앞에 붙는다. 등록순은 이 순서를 그대로 뒤집으면 된다.
-   */
-  const orderedComments = sortKey === 'latest' ? allComments : [...allComments].reverse()
-  const totalPages = Math.min(
-    MAX_COMMENT_PAGES,
-    Math.max(1, Math.ceil(allComments.length / COMMENTS_PER_PAGE)),
-  )
-  const visibleComments = orderedComments.slice((currentPage - 1) * COMMENTS_PER_PAGE, currentPage * COMMENTS_PER_PAGE)
   const juryVoteIds: WeddingGiftVoteId[] = ['writer', 'other', 'both', 'neither']
   const juryBreakdown = plazaStory ? [plazaStory.jurySide, ...juryVoteIds.filter((id) => id !== plazaStory.jurySide)]
     .map((id, index) => ({
@@ -302,9 +337,11 @@ function CaseResultPage() {
     if ((!body && !selectedStickerId) || !currentUser) return
 
     const voteDisplay = voteDisplayById[selectedVote]
+    /* 댓글 화면과 MY가 같은 id를 써야 공감/반대 수가 두 화면에서 같아진다. */
+    const commentId = `new-comment-${Date.now()}-${nextCommentId.current++}`
     setAddedComments((comments) => [
       {
-        id: `new-comment-${nextCommentId.current++}`,
+        id: commentId,
         avatarUrl: currentUser.anonymousAvatarUrl,
         nickname: currentUser.nickname,
         createdAt: '방금 전',
@@ -313,6 +350,7 @@ function CaseResultPage() {
         voteLabel: voteDisplay.label,
         body,
         stickerId: selectedStickerId ?? undefined,
+        // 방금 쓴 댓글이라 아직 아무도 누르지 않았다.
         likes: 0,
         dislikes: 0,
       },
@@ -325,6 +363,7 @@ function CaseResultPage() {
      */
     if (body) {
       addMyComment(personaId, {
+        id: commentId,
         caseId: caseContent.id,
         caseTitle: caseContent.title.replace(/\n/g, ' '),
         href: location.pathname,
@@ -479,7 +518,7 @@ function CaseResultPage() {
             key={plazaStory.id}
             comments={plazaStory.comments}
             headingId="comments-title"
-            plazaCaseId={plazaStory.id}
+            threadId={plazaStory.id}
             /* 여기서 단 댓글은 MY > 내가 쓴 댓글에 사건 제목과 함께 남는다. */
             commentRecord={{ caseId: plazaStory.id, caseTitle: plazaStory.title, href: location.pathname }}
           />
@@ -545,18 +584,19 @@ function CaseResultPage() {
               <CommentItem
                 key={comment.id}
                 comment={comment}
+                isFocused={focusedCommentId === comment.id}
                 reaction={commentReactions[comment.id] ?? null}
-                onReact={(reaction) => setCommentReactions((previous) => ({
-                  ...previous,
-                  [comment.id]: previous[comment.id] === reaction ? null : reaction,
-                }))}
-                onEdit={comment.id.startsWith('new-comment-') ? (body) => {
-                  setAddedComments((comments) => comments.map((item) => (
-                    item.id === comment.id ? { ...item, body, editedAtMs: Date.now() } : item
-                  )))
+                onReact={(reaction) => {
+                  const next = commentReactions[comment.id] === reaction ? null : reaction
+                  // 내 댓글이면 MY 기록에도 남겨서 두 화면이 같은 상태를 보게 한다.
+                  setMyCommentReaction(personaId, comment.id, next)
+                  setCommentReactions((previous) => ({ ...previous, [comment.id]: next }))
+                }}
+                onEdit={isOwnComment(personaId, comment.id) ? (body) => {
+                  applyEdit(() => editComment(personaId, comment.id, body))
                   showToast(COMMENT_TOAST_MESSAGES.edited)
                 } : undefined}
-                onDelete={comment.id.startsWith('new-comment-') ? () => setPendingDeleteId(comment.id) : undefined}
+                onDelete={isOwnComment(personaId, comment.id) ? () => setPendingDeleteId(comment.id) : undefined}
               />
             ))}
           </div>
@@ -600,7 +640,9 @@ function CaseResultPage() {
           onClose={() => setPendingDeleteId(null)}
           onConfirm={() => {
             const commentId = pendingDeleteId
-            setAddedComments((comments) => comments.filter((item) => item.id !== commentId))
+            applyEdit(() => deleteComment(personaId, commentId))
+            // 지운 댓글이 MY > 내가 쓴 댓글에 남으면 눌러도 갈 곳이 없다.
+            removeMyComment(personaId, commentId)
             setCommentReactions((previous) => {
               const next = { ...previous }
               delete next[commentId]

@@ -35,7 +35,8 @@ function CaseSubmitSummaryPage() {
 
   const handleSubmit = () => {
     if (!canProceed) return
-    navigate(PATHS.caseSubmitOpinion)
+    // 판결문을 바로 보여주지 않고, 판멍이가 읽는 화면을 한 번 거친다.
+    navigate(PATHS.caseSubmitJudging)
   }
 
   return (

@@ -9,9 +9,11 @@ import likeIcon from '../../assets/case/result/like.svg'
 import menuIcon from '../../assets/case/result/menu.svg'
 import submitIcon from '../../assets/case/result/submit.svg'
 import { commentStickerById, type CommentStickerId } from '../../data/common/commentStickers'
+import { voteDisplayById } from '../../data/common/caseResultContent'
+import useFocusComment, { commentAnchorId } from '../../hooks/useFocusComment'
 import useLoginGate from '../../hooks/useLoginGate'
 import useSession from '../../hooks/useSession'
-import { addMyComment } from '../../utils/myComments'
+import { addMyComment, readMyCommentReactions, removeMyComment, setMyCommentReaction } from '../../utils/myComments'
 import useToast from '../../hooks/useToast'
 /*
  * 스티커 고르는 창은 사건 결과 화면에서 먼저 만들어 둔 것을 그대로 쓴다.
@@ -22,7 +24,8 @@ import CommentStickerPicker from '../../pages/Case/components/CommentStickerPick
 import Pagination from './Pagination'
 import ConfirmDialog from './ConfirmDialog'
 import { COMMENT_TOAST_MESSAGES } from './commentToastMessages'
-import { readPlazaComments, savePlazaComments } from '../../utils/plazaComments'
+import { applyCommentEdits, deleteComment, editComment, isOwnComment, readCommentEdits } from '../../utils/commentEdits'
+import { readThreadComments, saveThreadComments } from '../../utils/plazaComments'
 import './CommentThread.css'
 
 /** 댓글 한 건. 사건 결과 화면과 왈가왈후 후일담 상세 화면이 같은 모양을 쓴다. */
@@ -64,12 +67,14 @@ const badgeTone: Record<NonNullable<ThreadComment['voteId']>, 'blue' | 'orange' 
   neither: 'orange-solid',
 }
 
-function CommentRow({ comment, reaction, showReply, showVoteBadge, actionsInHeader, onReact, onEdit, onDelete }: {
+function CommentRow({ comment, reaction, showReply, showVoteBadge, actionsInHeader, isFocused, onReact, onEdit, onDelete }: {
   comment: ThreadComment
   reaction: CommentReaction
   showReply: boolean
   showVoteBadge: boolean
   actionsInHeader: boolean
+  /** MY > 내가 쓴 댓글에서 눌러 찾아온 댓글. 잠깐 배경을 밝혀 어느 것인지 알려준다. */
+  isFocused: boolean
   onReact: (reaction: Exclude<CommentReaction, null>) => void
   onEdit?: (body: string) => void
   onDelete?: () => void
@@ -119,7 +124,12 @@ function CommentRow({ comment, reaction, showReply, showVoteBadge, actionsInHead
   )
 
   return (
-    <article className={'result-comment' + (actionsInHeader ? ' result-comment--actions-in-head' : '')}>
+    <article
+      id={commentAnchorId(comment.id)}
+      className={'result-comment'
+        + (actionsInHeader ? ' result-comment--actions-in-head' : '')
+        + (isFocused ? ' is-focused' : '')}
+    >
       <div className="result-comment__head">
         <div className="result-comment__avatar" aria-hidden="true">
           <img src={comment.avatarUrl} alt="" />
@@ -200,7 +210,11 @@ interface CommentThreadProps {
   /** 스티커 창에서 처음 보여줄 캐릭터를 정할 때 쓰는 제목 id. */
   headingId?: string
   /** 광장 사건에서만 세션 동안 새 댓글을 보존한다. */
-  plazaCaseId?: string
+  /**
+   * 이 댓글 목록을 가리키는 id. 사건은 사건 id, 후일담은 후일담 id다.
+   * 주면 직접 단 댓글이 저장돼서 화면을 나갔다 와도 남는다.
+   */
+  threadId?: string
   /*
    * MY > 내가 쓴 댓글에 남길 정보. 넘기지 않으면 기록하지 않는다.
    * 어느 글에 단 댓글인지와, 눌렀을 때 돌아올 주소가 필요하다.
@@ -219,8 +233,8 @@ interface CommentThreadProps {
  * 같은 브라우저 세션에서만 보존한다.
  * (PROJECT_SPEC.md — mock 응답을 실제인 것처럼 표시하지 않는다)
  */
-function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge = true, actionsInHeader = false, headingId = 'comment-thread-title', plazaCaseId, commentRecord }: CommentThreadProps) {
-  const { currentUser, sessionStatus, personaId } = useSession()
+function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge = true, actionsInHeader = false, headingId = 'comment-thread-title', threadId, commentRecord }: CommentThreadProps) {
+  const { currentUser, sessionStatus, personaId, juryVotes } = useSession()
   const { requireLogin } = useLoginGate()
   const { showToast } = useToast()
   const location = useLocation()
@@ -228,11 +242,24 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
   const [draft, setDraft] = useState('')
   const [selectedStickerId, setSelectedStickerId] = useState<CommentStickerId | null>(null)
   const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false)
-  const [addedComments, setAddedComments] = useState<ThreadComment[]>(() => plazaCaseId ? readPlazaComments(plazaCaseId) : [])
+  const [addedComments, setAddedComments] = useState<ThreadComment[]>(() => (threadId ? readThreadComments<ThreadComment>(personaId, threadId) : []))
   const [currentPage, setCurrentPage] = useState(1)
   const [sortKey, setSortKey] = useState<SortKey>('latest')
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
-  const [reactions, setReactions] = useState<Record<string, CommentReaction>>({})
+  /*
+   * 수정·삭제 기록. 원본 댓글은 코드와 저장소에 그대로 두고 이 값을 덮어씌운다.
+   * (`utils/commentEdits` — 지훈의 예전 댓글은 코드에 있어서 직접 고칠 수 없다)
+   */
+  const [commentEdits, setCommentEdits] = useState(() => readCommentEdits(personaId))
+  const applyEdit = (run: () => void) => {
+    run()
+    setCommentEdits(readCommentEdits(personaId))
+  }
+  /*
+   * 내가 내 댓글에 눌러 둔 공감/반대는 MY 기록에 남아 있다.
+   * 화면을 다시 들어와도 눌린 상태가 유지되도록 그 값으로 시작한다.
+   */
+  const [reactions, setReactions] = useState<Record<string, CommentReaction>>(() => readMyCommentReactions(personaId))
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const sectionRef = useRef<HTMLElement>(null)
@@ -240,8 +267,8 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
   const isAuthenticated = sessionStatus === 'authenticated'
 
   useEffect(() => {
-    if (plazaCaseId) savePlazaComments(plazaCaseId, addedComments)
-  }, [addedComments, plazaCaseId])
+    if (threadId) saveThreadComments(personaId, threadId, addedComments)
+  }, [addedComments, personaId, threadId])
 
   const requestCommentLogin = () => {
     if (isAuthenticated) return true
@@ -250,7 +277,8 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
     return false
   }
 
-  const allComments = [...addedComments, ...comments]
+  // 고치거나 지운 댓글을 반영한 목록.
+  const allComments = applyCommentEdits(commentEdits, [...addedComments, ...comments])
   /*
    * 최신순은 방금 쓴 댓글이 위로, 등록순은 먼저 쓴 댓글이 위로 간다.
    * 원본 배열을 그대로 뒤집지 않고 minutesAgo로 정렬해야 새 댓글도 제자리에 들어간다.
@@ -259,6 +287,11 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
     sortKey === 'latest' ? a.minutesAgo - b.minutesAgo : b.minutesAgo - a.minutesAgo
   ))
   const totalPages = Math.max(1, Math.ceil(sortedComments.length / perPage))
+  /*
+   * MY > 내가 쓴 댓글에서 눌러 들어온 경우, 그 댓글이 있는 페이지로 넘기고 그 자리로 스크롤한다.
+   * 정렬이 끝난 목록을 넘겨야 화면에 보이는 순서와 페이지 계산이 어긋나지 않는다.
+   */
+  const focusedCommentId = useFocusComment(sortedComments.map((comment) => comment.id), perPage, setCurrentPage)
   const safePage = Math.min(currentPage, totalPages)
   const visibleComments = sortedComments.slice((safePage - 1) * perPage, safePage * perPage)
 
@@ -268,18 +301,31 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
     const body = draft.trim()
     if (!body && !selectedStickerId) return
 
+    /*
+     * 댓글 화면과 MY가 같은 id를 쓴다. 공감/반대 수는 그 id에서 계산하므로
+     * 두 화면에 같은 숫자가 나온다.
+     */
+    const commentId = `new-comment-${Date.now()}-${nextCommentId.current++}`
+    // 이 사건에 내가 어느 쪽으로 투표했는지. 투표하지 않았으면 배지를 달지 않는다.
+    const myVote = threadId ? juryVotes[threadId] : undefined
     setAddedComments((current) => [
       {
-        id: `new-comment-${Date.now()}-${nextCommentId.current++}`,
+        id: commentId,
         nickname: currentUser?.nickname ?? '익명의 배심원',
         avatarUrl: currentUser?.anonymousAvatarUrl ?? comments[0].avatarUrl,
         minutesAgo: 0,
         createdAtLabel: '방금 전',
         createdAtMs: Date.now(),
-        voteId: null,
-        voteLabel: null,
+        /*
+         * 이 사건에 내가 투표한 입장을 배지로 남긴다.
+         * 없으면 내 댓글만 `투표 · ~~ 입장` 없이 떠서 남의 댓글과 달라 보인다.
+         * 투표가 진행 중인 사건에서 투표한 뒤 댓글을 쓰면 그 입장이 그대로 붙는다.
+         */
+        voteId: myVote ?? null,
+        voteLabel: myVote ? voteDisplayById[myVote].label : null,
         body,
         ...(selectedStickerId ? { stickerId: selectedStickerId } : {}),
+        // 방금 쓴 댓글이라 아직 아무도 누르지 않았다.
         likes: 0,
         dislikes: 0,
       },
@@ -290,7 +336,7 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
      * (requestCommentLogin이 비로그인은 위에서 되돌린다).
      * 그래서 이 지점에서만 MY 기록에 남긴다. 스티커만 보낸 경우는 남길 글이 없어 건너뛴다.
      */
-    if (commentRecord && body) addMyComment(personaId, { ...commentRecord, body })
+    if (commentRecord && body) addMyComment(personaId, { ...commentRecord, body, id: commentId })
 
     setDraft('')
     setSelectedStickerId(null)
@@ -390,18 +436,19 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
             showReply={showReply}
             showVoteBadge={showVoteBadge}
             actionsInHeader={actionsInHeader}
+            isFocused={focusedCommentId === comment.id}
             reaction={reactions[comment.id] ?? null}
-            onReact={(reaction) => setReactions((previous) => ({
-              ...previous,
-              [comment.id]: previous[comment.id] === reaction ? null : reaction,
-            }))}
-            onEdit={comment.id.startsWith('new-comment-') ? (body) => {
-              setAddedComments((current) => current.map((item) => (
-                item.id === comment.id ? { ...item, body, editedAtMs: Date.now() } : item
-              )))
+            onReact={(reaction) => {
+              const next = reactions[comment.id] === reaction ? null : reaction
+              // 내 댓글이면 MY 기록에도 남겨서 두 화면이 같은 상태를 보게 한다.
+              setMyCommentReaction(personaId, comment.id, next)
+              setReactions((previous) => ({ ...previous, [comment.id]: next }))
+            }}
+            onEdit={isOwnComment(personaId, comment.id) ? (body) => {
+              applyEdit(() => editComment(personaId, comment.id, body))
               showToast(COMMENT_TOAST_MESSAGES.edited)
             } : undefined}
-            onDelete={comment.id.startsWith('new-comment-') ? () => setPendingDeleteId(comment.id) : undefined}
+            onDelete={isOwnComment(personaId, comment.id) ? () => setPendingDeleteId(comment.id) : undefined}
           />
         ))}
       </div>
@@ -417,7 +464,9 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
           onClose={() => setPendingDeleteId(null)}
           onConfirm={() => {
             const commentId = pendingDeleteId
-            setAddedComments((current) => current.filter((item) => item.id !== commentId))
+            applyEdit(() => deleteComment(personaId, commentId))
+            // 지운 댓글이 MY > 내가 쓴 댓글에 남으면 눌러도 갈 곳이 없다.
+            removeMyComment(personaId, commentId)
             setReactions((previous) => {
               const next = { ...previous }
               delete next[commentId]

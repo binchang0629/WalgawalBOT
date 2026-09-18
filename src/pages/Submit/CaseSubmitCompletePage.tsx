@@ -1,9 +1,11 @@
+import { useRef, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { PATHS } from '../../routes/paths'
 import CaseSubmitHeader from './components/CaseSubmitHeader'
 import CaseSubmitFooter from './components/CaseSubmitFooter'
 import useCaseSubmitDraft from './useCaseSubmitDraft'
 import CompletionScene from '../../components/common/CompletionScene'
+import LetterPreview from '../../components/common/LetterPreview'
 import './CaseSubmit.css'
 import './CaseSubmitCompletePage.css'
 
@@ -12,8 +14,16 @@ import './CaseSubmitCompletePage.css'
  * 계정별 제목·공개 범위를 표시하며 헤더는 뒤로가기만 남긴다.
  */
 function CaseSubmitCompletePage() {
-  const { personaId, isSubmitted, summary, visibility, returnHistoryIndex } = useCaseSubmitDraft()
+  const { personaId, isSubmitted, summary, visibility, content, returnHistoryIndex } = useCaseSubmitDraft()
   const navigate = useNavigate()
+  // 후일담 게시 확인 화면과 같은 방식으로, 파일을 누르면 접수한 글 전문을 띄운다.
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+  const folderRef = useRef<HTMLDivElement>(null)
+
+  const closePreview = () => {
+    setIsPreviewOpen(false)
+    window.requestAnimationFrame(() => folderRef.current?.focus())
+  }
 
   // 실제로 접수를 마치지 않고 URL로 바로 들어온 경우 완료 화면을 보여주지 않는다.
   if (!isSubmitted) {
@@ -43,6 +53,11 @@ function CaseSubmitCompletePage() {
         detailLabel="공개 범위"
         detailValue={visibility === 'community' ? '배심원 광장에 공개' : '나만 보기'}
         reminder="공개 범위는 내 사건에서 변경할 수 있어요."
+        onFolderOpen={() => setIsPreviewOpen(true)}
+        folderAriaLabel="접수한 사건 내용 미리보기"
+        folderHint="파일을 누르면 접수한 내용을 볼 수 있어요."
+        isPreviewOpen={isPreviewOpen}
+        folderRef={folderRef}
       />
 
       <CaseSubmitFooter
@@ -50,6 +65,17 @@ function CaseSubmitCompletePage() {
         primaryLabel="접수한 내용 확인하기"
         onPrimaryClick={handlePrimaryClick}
       />
+
+      {isPreviewOpen && (
+        <LetterPreview
+          eyebrow="접수한 사건"
+          title={summary.title.replace('\n', ' ')}
+          body={content.trim() || summary.facts}
+          emptyText="작성한 사건 내용이 없습니다."
+          closeLabel="사건 내용 미리보기 닫기"
+          onClose={closePreview}
+        />
+      )}
     </div>
   )
 }
