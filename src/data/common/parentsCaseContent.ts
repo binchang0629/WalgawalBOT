@@ -1,7 +1,7 @@
 import { profileAvatars } from './profileAvatars'
 import resultArtwork from '../../assets/case/result/panmung-scale-first-frame.png'
 import { weddingGiftCase } from './caseDetailContent'
-import { demoEventAt, formatDemoDateTime, formatElapsedMinutes } from './demoClock'
+import { demoEventAt, formatDemoDateTime, formatElapsedMinutes, JURY_VOTE_DURATION } from './demoClock'
 import { voteDisplayById, type CaseResultComment } from './caseResultContent'
 
 /** 광장 첫 카드와 상세·결과가 공유하는 시연 사건. */
@@ -19,7 +19,7 @@ export const parentsCase = {
   age: formatElapsedMinutes(28),
   ageMinutes: 28,
   participantCount: 84,
-  deadline: '18:24:00',
+  deadline: JURY_VOTE_DURATION,
   paragraphs: [
     '취업을 준비하면서 제가 관심 있는 분야의 회사에 지원하기로 했어요. 그런데 부모님은 안정적인 직장을 먼저 알아보라며 지원할 회사와 면접 일정까지 함께 정하려고 하세요.',
     '걱정해 주시는 마음은 알지만, 제가 다른 선택을 말할 때마다 “나중에 후회하면 어떡하니?”라는 대답이 돌아와요. 여러 번 제 계획과 준비한 이유를 설명했는데도 대화는 결국 부모님을 설득하는 자리가 됩니다.',

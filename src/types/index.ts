@@ -5,9 +5,9 @@
 
 /**
  * 사건 카드에 붙는 분류.
- * 광장 시안의 카테고리 칩(연인·친구·가족·직장·학업)과 IA 사례의 분류를 합친 값이다.
+ * 광장 시안의 카테고리 칩(연인·친구·가족·직장·학업)과 같은 다섯 분야다.
  */
-export type CaseCategory = '친구' | '연인' | '가족' | '직장' | '학업' | '금전' | '이웃'
+export type CaseCategory = '친구' | '연인' | '가족' | '직장' | '학업'
 
 /** 사건 상세의 관점 선택. 승패가 아니라 이해의 방향이다. (PROJECT_SPEC.md §0-6) */
 export type OpinionSide = 'writer' | 'other' | 'both'

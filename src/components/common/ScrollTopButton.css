@@ -1,11 +1,11 @@
 /*
- * 맨 위로 버튼. 내비 바로 위 오른쪽 — 예전 챗봇 버튼 자리다.
+ * 맨 위로 버튼. 내비 배경의 상단 돌출(19px) 위에 17px 간격을 둔다.
  * 챗봇 머리(원형)와 구분되도록 납작한 알약 모양으로 둔다.
  */
 .scroll-top-button {
     position: absolute;
     right: 18px;
-    bottom: calc(var(--device-bottom-nav) + 12px);
+    bottom: calc(var(--floating-nav-height) + 36px);
     z-index: 30;
     display: grid;
     place-items: center;

@@ -154,7 +154,7 @@ function CaseDetailPage() {
               to={toCaseResult(caseContent.id)}
               state={{ selectedVote: savedVote, fromPlaza: entryState?.fromPlaza, returnTo: entryState?.returnTo, homeCaseId: entryState?.homeCaseId }}
             >
-              결과 다시 보기
+              판결 다시 보기
             </Link>
           </section>
         ) : <CaseVoteSection

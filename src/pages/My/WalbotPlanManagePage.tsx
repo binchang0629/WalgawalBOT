@@ -61,7 +61,7 @@ export default function WalbotPlanManagePage() {
               type="button"
               className="walbot-plan-manage__payment"
               aria-label="카카오페이 결제수단 변경"
-              onClick={() => showToast('결제수단 변경 기능은 준비 중이에요. 현재 연결된 결제수단은 유지됩니다.')}
+              onClick={() => showToast('결제수단 변경은 준비 중이에요.')}
             >
               <KakaoPayLogo />
               <span className="walbot-plan-manage__payment-info">
@@ -76,7 +76,7 @@ export default function WalbotPlanManagePage() {
             <SectionTitle
               title="결제 내역"
               action="전체보기"
-              onActionClick={() => showToast('현재 확인할 수 있는 결제 내역 2건을 모두 표시하고 있어요.')}
+              onActionClick={() => showToast('결제 내역 2건을 모두 표시했어요.')}
             />
             <ul className="walbot-plan-manage__history">
               {paymentHistory.map((date) => (
@@ -96,7 +96,7 @@ export default function WalbotPlanManagePage() {
             <div className="walbot-plan-manage__actions">
               <button
                 type="button"
-                onClick={() => showToast('연간 플랜 변경 기능은 준비 중이에요. 현재 월간 플랜은 유지됩니다.')}
+                onClick={() => showToast('연간 플랜 변경은 준비 중이에요.')}
               >
                 <span>연간 플랜으로 변경</span>
                 <img src={chevron} width={6} height={10} alt="" />
@@ -104,7 +104,7 @@ export default function WalbotPlanManagePage() {
               <button
                 type="button"
                 className="walbot-plan-manage__cancel"
-                onClick={() => showToast('구독 해지 기능은 준비 중이에요. 현재 구독은 해지되지 않았어요.')}
+                onClick={() => showToast('구독 해지는 준비 중이에요.')}
               >
                 <span>구독 해지</span>
                 <img src={chevron} width={6} height={10} alt="" />

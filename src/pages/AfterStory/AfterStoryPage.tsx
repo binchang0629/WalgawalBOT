@@ -572,20 +572,20 @@ export function AfterStoryDetailPage() {
     : undefined
   const author = variant?.author ?? (communityStory
     ? {
-        ...afterStoryAuthor,
-        titleLines: [communityStory.summary],
-        lead: communityStory.title,
-        meta: `${communityStory.category} · 후일담`,
-      }
+      ...afterStoryAuthor,
+      titleLines: [communityStory.summary],
+      lead: communityStory.title,
+      meta: `${communityStory.category} · 후일담`,
+    }
     : afterStoryAuthor)
   const lines = variant?.lines ?? (communityStory
     ? [
-        '사건이 끝난 뒤 서로의 생각을 다시 이야기해 봤어요.',
-        '처음에는 쉽게 꺼내기 어려웠지만,',
-        '각자 어떤 점이 불편했는지 차분히 들었어요.',
-        '이번 일을 계기로 다음에는 먼저 확인하고',
-        '솔직하게 이야기하기로 했습니다.',
-      ]
+      '사건이 끝난 뒤 서로의 생각을 다시 이야기해 봤어요.',
+      '처음에는 쉽게 꺼내기 어려웠지만,',
+      '각자 어떤 점이 불편했는지 차분히 들었어요.',
+      '이번 일을 계기로 다음에는 먼저 확인하고',
+      '솔직하게 이야기하기로 했습니다.',
+    ]
     : afterStoryLetter.lines)
   /*
    * 댓글은 글이 올라온 뒤에 달린 것이어야 한다.
@@ -612,14 +612,17 @@ export function AfterStoryDetailPage() {
    */
   const detailState = location.state as AfterStoryLocationState | null
   const backTo = detailState?.from ?? PATHS.afterStory
-  const backState = backTo === PATHS.home
-    ? { restoreHomeScroll: true }
-    : backTo.startsWith('/cases/') && backTo.endsWith('/result')
-      ? {
+
+  const backState = backTo === PATHS.myComments
+    ? { skipDetailSlideEnter: true }
+    : backTo === PATHS.home
+      ? { restoreHomeScroll: true }
+      : backTo.startsWith('/cases/') && backTo.endsWith('/result')
+        ? {
           ...detailState?.caseResultState,
           restoreCaseResultScrollTop: detailState?.caseResultScrollTop,
         }
-      : undefined
+        : undefined
 
   return (
     <main className={`afterstory-detail${slide.className ? ` ${slide.className}` : ''}`}>

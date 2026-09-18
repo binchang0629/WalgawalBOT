@@ -69,8 +69,8 @@ export const latestPlazaCaseIds = [
   'case-invite-ex',
   'case-work-after-hours',
   'case-friend-loan',
-  'case-secret-told',
   'case-work-credit',
+  'case-secret-told',
   'case-dating-anniversary',
   'case-friend-trip-cancel',
   'case-family-care',
@@ -81,7 +81,7 @@ export const latestPlazaCaseIds = [
   'case-group-project-credit',
 ] as const
 
-/** 첫 방문 시점 기준 게시 나이. 후일담은 반드시 연결 사건의 판결 뒤에 놓인다. */
+/** 첫 방문 시점 기준 게시 나이. 해결 사건은 24시간 투표 뒤에 판결되며, 연결 후일담은 그 뒤에 올라온다. */
 export const plazaCaseAgeMinutes: Record<string, number> = {
   'case-parents-interfere': 28,
   'case-school-lab-data': 65,
@@ -92,19 +92,19 @@ export const plazaCaseAgeMinutes: Record<string, number> = {
   'case-family-moving': 250,
   'case-invite-ex': 287,
   'case-work-after-hours': 324,
-  'case-friend-loan': 390,
-  'case-secret-told': 420,
-  'case-work-credit': 480,
-  'case-dating-anniversary': 540,
-  'case-friend-trip-cancel': 720,
-  'case-family-care': 900,
-  'case-school-attendance': 1080,
-  'case-school-ai-report': 1500,
-  'case-family-living-expenses': 2160,
+  'case-friend-loan': 1500,
+  'case-work-credit': 1560,
+  'case-secret-told': 1620,
+  'case-dating-anniversary': 1740,
+  'case-friend-trip-cancel': 1920,
+  'case-family-care': 2220,
+  'case-school-attendance': 2460,
+  'case-school-ai-report': 2760,
+  'case-family-living-expenses': 3000,
   'case-company-874': 3475,
-  'case-group-project-credit': 4320,
-  'case-friend-mistake': 600,
-  'case-study-presentation': 4321,
+  'case-group-project-credit': 4380,
+  'case-friend-mistake': 1800,
+  'case-study-presentation': 4381,
 }
 
 export type PlazaCase = CaseSummary & {
@@ -355,8 +355,6 @@ export const categoryDotColor: Record<CaseCategory, string> = {
   친구: 'var(--blue-700)',
   가족: 'var(--green)',
   직장: 'var(--orange-700)',
-  금전: 'var(--orange-900)',
-  이웃: 'var(--blue-500)',
   학업: 'var(--blue-600)',
 }
 

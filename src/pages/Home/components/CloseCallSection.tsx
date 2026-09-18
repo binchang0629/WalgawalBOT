@@ -157,7 +157,7 @@ function CloseCallSection() {
       />
 
       <article ref={gaugeCardRef} className="close-card" aria-live="polite">
-        <button type="button" className="close-section__card-action" onClick={() => showToast('막상막하 사건 상세는 업데이트 예정입니다.')} aria-label={`${currentCase.titleLines.join(' ')} 상세 업데이트 예정 안내`} />
+        <button type="button" className="close-section__card-action" onClick={() => showToast('막상막하 사건 상세는 준비 중이에요.')} aria-label={`${currentCase.titleLines.join(' ')} 상세 업데이트 예정 안내`} />
         <h3 className="close-card__title">
           {currentCase.titleLines.map((line) => <span key={line}>{line}<br /></span>)}
         </h3>

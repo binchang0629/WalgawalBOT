@@ -10,8 +10,12 @@ import './AiRecommendSection.css'
 
 /** 개발 > 홈/로그인 후 > Section (1473:8571). 실제 추천 API가 아닌 시안용 데이터. */
 function AiRecommendSection() {
-  const { personaId, currentUser } = useSession()
+  const { personaId, currentUser, votedCaseIds } = useSession()
   const recommendation = personalizedRecommendation[personaId]
+  const cases = recommendation.caseIds
+    .map((caseId) => getRecommendationCase(caseId))
+    .filter((item) => item?.status === 'voting' && !votedCaseIds.includes(item.id))
+    .slice(0, 3)
 
   return (
     <section className="ai-recommendation" aria-label={homeSectionTitles.aiRecommend.title}>
@@ -24,7 +28,7 @@ function AiRecommendSection() {
           <p>
             {currentUser?.isCustomProfile ? currentUser.name : recommendation.displayName}님에게 맞는<br />
             <strong>{recommendation.topic} </strong>
-            <em>{recommendation.total}건</em>을 찾았어요!
+            <em>{cases.length}건</em>을 찾았어요!
           </p>
         </div>
         <span className="ai-recommendation__mascot-stage">
@@ -33,26 +37,23 @@ function AiRecommendSection() {
       </div>
       <div className="ai-recommendation__card">
         <ul className="ai-recommendation__list">
-          {recommendation.cases.map((item) => {
-            const linkedCase = getRecommendationCase(item.plazaCaseId)
-            const agrees = linkedCase?.isVerdictAligned ?? ('agrees' in item && item.agrees)
-            const isVoting = linkedCase?.status === 'voting'
+          {cases.map((item) => {
+            if (!item) return null
+            const categoryKey = item.category === '학업' ? 'study'
+              : item.category === '직장' ? 'work'
+                : item.category === '가족' ? 'family'
+                  : item.category === '연인' ? 'romance' : 'friend'
             const caseContent = (
               <article className="ai-recommendation__case">
                 <div className="ai-recommendation__meta">
-                  <span className={`ai-recommendation__category ai-recommendation__category--${item.categoryKey}`}>
-                    {item.category}
+                  <span className={`ai-recommendation__category ai-recommendation__category--${categoryKey}`}>
+                    {item.tag}
                   </span>
-                  {isVoting ? <VotingStatusBadge /> : (
-                    <span className={`ai-recommendation__agreement${agrees ? ' is-agreed' : ''}`}>
-                      AI와 배심원 의견 {agrees ? '일치' : '불일치'}
-                    </span>
-                  )}
+                  <VotingStatusBadge />
                 </div>
                 <h4>{item.title}</h4>
                 <p className="ai-recommendation__details">
-                  {!isVoting && <span>투표 완료</span>}
-                  {linkedCase?.commentCount !== undefined && <span>댓글 {linkedCase.commentCount}개</span>}
+                  {item.commentCount !== undefined && <span>댓글 {item.commentCount}개</span>}
                 </p>
               </article>
             )
@@ -61,10 +62,10 @@ function AiRecommendSection() {
               <li key={item.id} className="ai-recommendation__item">
                 <Link
                   className="ai-recommendation__case-link"
-                  to={toCaseDetail(item.plazaCaseId)}
-                  state={{ returnTo: PATHS.home, homeCaseId: item.plazaCaseId }}
-                  data-home-case-id={item.plazaCaseId}
-                  aria-label={`${item.title.replace('\n', ' ')} 상세 보기`}
+                  to={toCaseDetail(item.id)}
+                  state={{ returnTo: PATHS.home, homeCaseId: item.id }}
+                  data-home-case-id={item.id}
+                  aria-label={`${item.title.replace('\n', ' ')} 투표하러 가기`}
                 >
                   {caseContent}
                 </Link>
@@ -72,6 +73,7 @@ function AiRecommendSection() {
             )
           })}
         </ul>
+        {cases.length === 0 && <p className="ai-recommendation__empty">추천한 진행 사건에 모두 참여했어요.</p>}
       </div>
     </section>
   )

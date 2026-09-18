@@ -34,7 +34,7 @@ function WalbotPlanSelectionPage() {
     <main className="case-submit walbot-plan my-detail-slide-enter">
       <CaseSubmitHeader title="왈봇 플랜" showTempSave={false} onBack={handleBack} />
 
-      <form className="walbot-plan__form" onSubmit={(event) => { event.preventDefault(); showToast('무료체험 신청 기능은 준비 중이에요.') }}>
+      <form className="walbot-plan__form" onSubmit={(event) => { event.preventDefault(); showToast('무료체험 신청은 준비 중이에요.') }}>
         <div className="case-submit__body walbot-plan__body">
           <div className="case-submit__intro walbot-plan__intro">
             <h2 className="case-submit__heading">7일 무료체험으로<br />시작해보세요</h2>

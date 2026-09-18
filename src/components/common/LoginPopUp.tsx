@@ -52,13 +52,7 @@ const VARIANTS: Record<LoginGateReason, Variant> = {
     image: myImage,
     className: 'loginPopUpMy',
     title: '로그인이 필요해요',
-    body: (
-      <>
-        MY페이지에서 프로필, 기록 등
-        <br />
-        여러가지 설정을 확인하고 수정 가능해요.
-      </>
-    ),
+    body: '내 사건과 참여 기록을 한눈에 확인해요.',
   },
   aiRecommend: {
     image: aiImage,
@@ -76,7 +70,7 @@ const VARIANTS: Record<LoginGateReason, Variant> = {
     image: defaultImage,
     className: 'loginPopUpDefault',
     title: '로그인이 필요해요',
-    body: '해당 기능을 이용하려면 로그인을 해주세요.',
+    body: '내 생각을 남기고 다양한 사건에 참여해 보세요.',
   },
 }
 

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { PATHS } from '../../routes/paths'
 import backIcon from '../../assets/my/back.svg'
 import dislikeIcon from '../../assets/case/result/dislike.svg'
@@ -77,8 +77,12 @@ function CommentCard({ record }: { record: MyCommentRecord }) {
 }
 
 function MyCommentsContent({ records }: { records: MyCommentRecord[] }) {
-  // 마이페이지에서 오른쪽 → 왼쪽으로 들어오고, 돌아갈 때 왼쪽 → 오른쪽으로 빠진다.
-  const slide = useDetailSlide()
+  const location = useLocation()
+
+  const skipEnter =
+    (location.state as { skipDetailSlideEnter?: boolean } | null)?.skipDetailSlideEnter === true
+
+  const slide = useDetailSlide(!skipEnter)
 
   return (
     <main className={`my-cases-page ${slide.className}`}>

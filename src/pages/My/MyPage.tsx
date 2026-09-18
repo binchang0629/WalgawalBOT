@@ -69,8 +69,8 @@ function MyPage() {
   const { showToast } = useToast()
   const { personaId, currentUser, activityStats, signIn, signOut } = useSession()
   const isSeoa = personaId === 'A'
-  const [activityOpen, setActivityOpen] = useState(true)
-  const [settingsOpen, setSettingsOpen] = useState(true)
+  const [activityOpen, /*setActivityOpen*/] = useState(true)
+  const [settingsOpen, /*setSettingsOpen*/] = useState(true)
   const [accountSheetOpen, setAccountSheetOpen] = useState(false)
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false)
   const pointValueRef = useRef<HTMLElement>(null)
@@ -165,7 +165,7 @@ function MyPage() {
               className={`profile-card__stat profile-card__stat--action${activityStats.submittedCases === 0 ? ' is-empty' : ''}`}
               disabled={activityStats.submittedCases === 0}
               onClick={() => navigate(PATHS.myCases)}
-              aria-label={`접수한 사건 ${activityStats.submittedCases}건${activityStats.submittedCases > 0 ? ', 내 사건으로 이동' : ''}`}
+              aria-label={`접수한 사건 ${activityStats.submittedCases}건${activityStats.submittedCases > 0 ? ', 내가 접수한 사건 목록으로 이동' : ''}`}
             >
               <span className="profile-card__stat-label">접수한 사건</span>
               <span className="profile-card__stat-value"><strong>{activityStats.submittedCases}</strong>건</span>
@@ -215,13 +215,13 @@ function MyPage() {
         )}
 
         <section className="my-menu">
-          <button type="button" className="my-menu__header" onClick={() => setActivityOpen((open) => !open)} aria-expanded={activityOpen}>
+          <button type="button" className="my-menu__header" /*onClick={() => setActivityOpen((open) => !open)}*/ aria-expanded={activityOpen}>
             <span>나의 활동</span>
           </button>
           {activityOpen && (
             <div>
               <MenuRow label="업적 · 미션" icon={seoaAchievementIcon} iconSize={17} disabled />
-              <MenuRow label="내가 참여한 사건" icon={justiceIcon} iconSize={20} onClick={() => navigate(PATHS.myCases)} />
+              <MenuRow label="내가 접수한 사건" icon={justiceIcon} iconSize={20} onClick={() => navigate(PATHS.myCases)} />
               {/*
                 댓글을 한 번도 안 썼으면 열 것이 없으므로 비활성으로 둔다.
                 기록은 로그인한 계정으로 등록한 댓글만 쌓인다. (utils/myComments.ts)
@@ -240,7 +240,7 @@ function MyPage() {
         </section>
 
         <section className="my-menu">
-          <button type="button" className="my-menu__header" onClick={() => setSettingsOpen((open) => !open)} aria-expanded={settingsOpen}>
+          <button type="button" className="my-menu__header" /*onClick={() => setSettingsOpen((open) => !open)}*/ aria-expanded={settingsOpen}>
             <span>설정</span>
           </button>
           {settingsOpen && (

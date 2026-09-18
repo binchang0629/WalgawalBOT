@@ -23,10 +23,10 @@
 /*
  * 내비 바로 위 오른쪽은 이제 `맨 위로` 버튼(ScrollTopButton) 자리다.
  * 챗봇 머리는 그 위로 올라가 두 버튼이 세로로 쌓인다.
- * 46px = 맨 위로 버튼 높이(40px) + 사이 여백. 머리 스프라이트의 투명 여백까지 감안한 값이다.
+ * 맨 위로 버튼의 하단 위치(36px) + 높이(40px)보다 6px 위에 둔다.
  */
 .floating-chat-button--above-nav {
-    bottom: calc(var(--device-bottom-nav) + 46px);
+    bottom: calc(var(--floating-nav-height) + 82px);
 }
 
 .floating-chat-button span {

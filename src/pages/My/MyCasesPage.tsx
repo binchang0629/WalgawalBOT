@@ -28,9 +28,9 @@ function MyCasesContent({ caseInfo, hasSubmittedCase, receivedAt }: { caseInfo: 
         <span aria-hidden="true" />
       </header>
 
-      <div className={`my-cases-page__content${hasSubmittedCase ? '' : ' my-cases-page__content--empty'}`} role="region" aria-label="내 사건 목록" tabIndex={0}>
+      <div className={`my-cases-page__content${hasSubmittedCase ? '' : ' my-cases-page__content--empty'}`} role="region" aria-label="내가 접수한 사건 목록" tabIndex={0}>
         <p className="my-cases-page__breadcrumb">MY <span aria-hidden="true">&gt;</span><span>나의 활동</span></p>
-        <h2>내 사건</h2>
+        <h2>내가 접수한 사건</h2>
 
         {!hasSubmittedCase ? (
           <EmptyCaseState titleId="my-cases-empty-title" description="사건을 접수하면 여기에서 내용을 확인할 수 있어요." />

@@ -182,27 +182,31 @@ function CaseFeedSection({ restoreState }: { restoreState?: PlazaReturnState | n
             <img src={chevronDown} alt="" width={18} height={18} />
           </button>
 
-          {isViewOpen && (
-            <div className="case-feed__view-menu" role="listbox" aria-label="사건 보기 기준">
-              {plazaViewOptions.map((option) => (
-                <button
-                  key={option.key}
-                  type="button"
-                  role="option"
-                  aria-selected={option.key === view}
-                  className={
-                    option.key === view
-                      ? 'case-feed__view-item is-current'
-                      : 'case-feed__view-item'
-                  }
-                  onClick={() => handleViewChange(option.key)}
-                >
-                  <b>{option.label}</b>
-                  <small>{option.description}</small>
-                </button>
-              ))}
-            </div>
-          )}
+          <div
+            className={isViewOpen ? 'case-feed__view-menu is-open' : 'case-feed__view-menu'}
+            role="listbox"
+            aria-label="사건 보기 기준"
+            aria-hidden={!isViewOpen}
+          >
+            {plazaViewOptions.map((option) => (
+              <button
+                key={option.key}
+                type="button"
+                role="option"
+                aria-selected={option.key === view}
+                className={
+                  option.key === view
+                    ? 'case-feed__view-item is-current'
+                    : 'case-feed__view-item'
+                }
+                onClick={() => handleViewChange(option.key)}
+                tabIndex={isViewOpen ? 0 : -1}
+              >
+                <b>{option.label}</b>
+                <small>{option.description}</small>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

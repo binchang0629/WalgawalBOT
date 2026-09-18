@@ -496,7 +496,7 @@
   overflow: visible;
   text-overflow: clip;
   white-space: normal;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   font-size: 16px;
 }
 
@@ -1101,7 +1101,7 @@
   text-align: left;
   white-space: pre-wrap;
   word-break: keep-all;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   scrollbar-width: thin;
 }
 

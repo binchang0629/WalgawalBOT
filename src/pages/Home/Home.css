@@ -37,6 +37,10 @@
     animation: home-search-dim-in 220ms ease-out both;
 }
 
+.home-search.is-closing .home-search__backdrop {
+    animation: home-search-dim-out 180ms ease-in both;
+}
+
 .home-search__field {
     position: absolute;
     top: 20px;
@@ -56,6 +60,11 @@
     pointer-events: auto;
     transition: border-color 160ms ease, box-shadow 160ms ease;
     animation: home-search-drop-in 280ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.home-search.is-closing .home-search__field {
+    animation: home-search-drop-out 180ms ease-in both;
+    pointer-events: none;
 }
 
 .home-search__field:focus-within {
@@ -127,6 +136,11 @@
     box-shadow: 0 12px 30px rgb(15 27 65 / 20%);
     pointer-events: auto;
     animation: home-search-recent-in 320ms 60ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.home-search.is-closing .home-search__recent {
+    animation: home-search-recent-out 140ms ease-in both;
+    pointer-events: none;
 }
 
 .home-search__recent>span {
@@ -223,15 +237,30 @@
     }
 }
 
+@keyframes home-search-drop-out {
+    to { opacity: 0; transform: translateY(-8px); }
+}
+
+@keyframes home-search-dim-out {
+    to { opacity: 0; }
+}
+
+@keyframes home-search-recent-out {
+    to { opacity: 0; transform: translateY(-5px); }
+}
+
 @media (prefers-reduced-motion: reduce) {
 
     .home-search__backdrop,
+    .home-search.is-closing .home-search__backdrop,
     .home-search,
-    .home-search__recent {
+    .home-search__recent,
+    .home-search.is-closing .home-search__recent {
         animation: none;
     }
 
-    .home-search__field {
+    .home-search__field,
+    .home-search.is-closing .home-search__field {
         animation: none;
     }
 }

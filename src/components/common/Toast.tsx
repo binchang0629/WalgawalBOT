@@ -10,7 +10,12 @@ interface ToastState {
   duration: number
 }
 
-const DEFAULT_DURATION = 3000
+/*
+ * 토스트가 떠 있는 시간.
+ * 3초는 짧은 안내 문구를 읽고도 한참 남아 화면을 가린다는 피드백이 있어 1.8초로 줄였다.
+ * 한 줄 문구를 읽기에 충분하면서 다음 동작을 막지 않는 길이다.
+ */
+const DEFAULT_DURATION = 1800
 
 /**
  * 앱 전체에서 하나의 토스트만 관리한다.

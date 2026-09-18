@@ -4,6 +4,8 @@ import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-route
 import juryStatusCharacter from '../../assets/case/vote-other-updated.svg'
 import verdictVideo from '../../assets/case/result/panmung-scale-once.mp4'
 import otherVerdictVideo from '../../assets/case/result/panmung-scale-left-once.mp4'
+import verdictFirstFrame from '../../assets/case/result/panmung-scale-first-frame.png'
+import otherVerdictFirstFrame from '../../assets/case/result/panmung-scale-left-first-frame.png'
 import dislikeIcon from '../../assets/case/result/dislike.svg'
 import emojiIcon from '../../assets/case/result/emoji.svg'
 import likeIcon from '../../assets/case/result/like.svg'
@@ -44,6 +46,7 @@ import './WeddingGiftResultPage.css'
 interface ResultRouteState {
   selectedVote?: WeddingGiftVoteId
   returnTo?: string
+  from?: string
   fromPlaza?: boolean
   homeCaseId?: string
   restoreCaseResultScrollTop?: number
@@ -229,6 +232,8 @@ function CaseResultPage() {
   const resultContent = caseId === parentsCase.id ? parentsResult : plazaResult ?? weddingGiftResult
   const isParentsCase = caseId === parentsCase.id
   const isClosedPlazaCase = plazaStory?.status === 'closed'
+  const isOtherVerdict = plazaStory?.aiSide === 'other'
+  const firstFrame = isOtherVerdict ? otherVerdictFirstFrame : verdictFirstFrame
   const countdown = useDemoCountdown(resultContent.deadline, caseContent.id)
 
   /*
@@ -261,7 +266,7 @@ function CaseResultPage() {
     video.load()
     video.playbackRate = 0.8
     const timer = window.setTimeout(() => {
-      void video.play().catch(() => {})
+      void video.play().catch(() => { })
     }, 1000)
 
     return () => {
@@ -368,7 +373,13 @@ function CaseResultPage() {
       <CaseHeader
         title={isParentsCase || plazaStory ? '사건 결과' : undefined}
         backTo={returnTo}
-        onBack={fromMy ? () => slide.leave(returnTo) : undefined}
+        onBack={
+          fromMy
+            ? () => slide.leave(returnTo, {
+              state: { skipDetailSlideEnter: true },
+            })
+            : undefined
+        }
       />
 
       <div className="case-result__body">
@@ -395,8 +406,8 @@ function CaseResultPage() {
           <div className="vote-result__artwork">
             <video
               ref={verdictVideoRef}
-              src={plazaStory?.aiSide === 'other' ? otherVerdictVideo : verdictVideo}
-              poster={resultContent.artworkUrl}
+              src={isOtherVerdict ? otherVerdictVideo : verdictVideo}
+              poster={firstFrame}
               aria-label="판멍이가 저울 위에서 판결 결과를 발표하는 영상"
               muted
               playsInline
@@ -416,7 +427,7 @@ function CaseResultPage() {
             />
             <img
               className={`vote-result__first-frame${playingCaseId === caseId ? ' vote-result__first-frame--hidden' : ''}`}
-              src={resultContent.artworkUrl}
+              src={firstFrame}
               alt=""
               aria-hidden="true"
             />
@@ -426,7 +437,7 @@ function CaseResultPage() {
               <p>{resultContent.verdict.description}</p>
             </div>
             {speechCaseId === caseId && (
-              <div className={`vote-result__speech${plazaStory?.aiSide === 'other' ? ' vote-result__speech--other' : ''}`} aria-hidden="true">
+              <div className={`vote-result__speech${isOtherVerdict ? ' vote-result__speech--other' : ''}`} aria-hidden="true">
                 <svg viewBox="0 0 84 48" focusable="false">
                   <path d="M17 2h52q11 0 11 11v14q0 11-11 11H24L5 46l7-10q-7-3-7-9V13Q5 2 17 2Z" />
                 </svg>
