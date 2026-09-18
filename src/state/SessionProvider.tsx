@@ -9,6 +9,7 @@ import { SessionContext } from './sessionContext'
 import type { SessionUser, SignupProfile } from './sessionContext'
 import { accountProfileAvatars } from '../data/common/profileAvatars'
 import { clearDemoDeadlines } from '../hooks/useCountdown'
+import { DEMO_FIRST_VISIT_KEY } from '../data/common/demoClock'
 import { clearLoginReward } from './loginRewardSignal'
 
 /**
@@ -33,10 +34,12 @@ const MAX_SUBMITTED_CASES = 1
 
 interface ActivityRecord {
   submittedCaseIds: string[]
+  submittedCaseAt: Record<string, number>
   votedCaseIds: string[]
   juryVotes: Partial<Record<string, WeddingGiftVoteId>>
   /** 후일담을 게시한 사건 id. 게시 전에는 비어 있어서 `내가 쓴 후일담`이 빈 화면으로 나온다. */
   publishedAfterStoryIds: string[]
+  publishedAfterStoryAt: Record<string, number>
 }
 
 type ActivityRecords = Record<PersonaId, ActivityRecord>
@@ -45,7 +48,7 @@ type ActivityRecords = Record<PersonaId, ActivityRecord>
 const activityStorageKey = (personaId: PersonaId) => `${DEMO.storagePrefix}:${personaId}:activity:v3`
 
 function emptyActivity(): ActivityRecord {
-  return { submittedCaseIds: [], votedCaseIds: [], juryVotes: {}, publishedAfterStoryIds: [] }
+  return { submittedCaseIds: [], submittedCaseAt: {}, votedCaseIds: [], juryVotes: {}, publishedAfterStoryIds: [], publishedAfterStoryAt: {} }
 }
 
 function isIdList(value: unknown): value is string[] {
@@ -75,6 +78,8 @@ function parseActivity(raw: string | null): ActivityRecord {
     ) as ActivityRecord['juryVotes']
     return {
       submittedCaseIds: [...new Set(value.submittedCaseIds)].slice(0, MAX_SUBMITTED_CASES),
+      submittedCaseAt: Object.fromEntries(Object.entries(value.submittedCaseAt ?? {})
+        .filter(([id, at]) => typeof id === 'string' && typeof at === 'number' && Number.isFinite(at) && at > 0)),
       votedCaseIds: [...new Set(value.votedCaseIds)],
       juryVotes,
       /*
@@ -84,6 +89,8 @@ function parseActivity(raw: string | null): ActivityRecord {
       publishedAfterStoryIds: isIdList(value.publishedAfterStoryIds)
         ? [...new Set(value.publishedAfterStoryIds)]
         : [],
+      publishedAfterStoryAt: Object.fromEntries(Object.entries(value.publishedAfterStoryAt ?? {})
+        .filter(([id, at]) => typeof id === 'string' && typeof at === 'number' && Number.isFinite(at) && at > 0)),
     }
   } catch {
     return emptyActivity()
@@ -112,7 +119,7 @@ function clearStoredAppData() {
     const keys: string[] = []
     for (let index = 0; index < storage.length; index += 1) {
       const key = storage.key(index)
-      if (key && (key.startsWith('walgawalbot:')
+      if (key && key !== DEMO_FIRST_VISIT_KEY && (key.startsWith('walgawalbot:')
         || key.startsWith('wgwb:case-participant-count:v1:')
         || key === 'wgwb:jihoon-recent-searches')) keys.push(key)
     }
@@ -312,7 +319,11 @@ function SessionProvider({ children }: { children: ReactNode }) {
       setCustomActivity((current) => {
         if (current[field].includes(id)) return current
         if (field === 'submittedCaseIds' && current.submittedCaseIds.length >= MAX_SUBMITTED_CASES) return current
-        return { ...current, [field]: [...current[field], id] }
+        return {
+          ...current, [field]: [...current[field], id],
+          ...(field === 'publishedAfterStoryIds' ? { publishedAfterStoryAt: { ...current.publishedAfterStoryAt, [id]: Date.now() } } : {}),
+          ...(field === 'submittedCaseIds' ? { submittedCaseAt: { ...current.submittedCaseAt, [id]: Date.now() } } : {}),
+        }
       })
       return
     }
@@ -325,7 +336,11 @@ function SessionProvider({ children }: { children: ReactNode }) {
       }
       return {
         ...current,
-        [personaId]: { ...activity, [field]: [...activity[field], id] },
+        [personaId]: {
+          ...activity, [field]: [...activity[field], id],
+          ...(field === 'publishedAfterStoryIds' ? { publishedAfterStoryAt: { ...activity.publishedAfterStoryAt, [id]: Date.now() } } : {}),
+          ...(field === 'submittedCaseIds' ? { submittedCaseAt: { ...activity.submittedCaseAt, [id]: Date.now() } } : {}),
+        },
       }
     })
   }, [session.personaId, session.sessionStatus, session.signupProfile])
@@ -412,6 +427,9 @@ function SessionProvider({ children }: { children: ReactNode }) {
       currentUser:
         session.sessionStatus === 'authenticated' ? toUser(session.personaId, session.signupProfile) : null,
       activityStats,
+      submittedCaseAt: session.signupProfile
+        ? customActivity.submittedCaseAt
+        : activityRecords[session.personaId].submittedCaseAt,
       votedCaseIds: session.signupProfile
         ? customActivity.votedCaseIds
         : session.personaId === 'B'
@@ -425,6 +443,9 @@ function SessionProvider({ children }: { children: ReactNode }) {
       publishedAfterStoryIds: session.signupProfile
         ? customActivity.publishedAfterStoryIds
         : activityRecords[session.personaId].publishedAfterStoryIds,
+      publishedAfterStoryAt: session.signupProfile
+        ? customActivity.publishedAfterStoryAt
+        : activityRecords[session.personaId].publishedAfterStoryAt,
       recordCaseSubmission,
       recordJuryVote,
       recordAfterStory,

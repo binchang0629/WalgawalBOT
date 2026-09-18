@@ -2,7 +2,8 @@ import type { ThreadComment } from '../../components/common/CommentThread'
 import { toAfterStoryDetail, toCaseResult } from '../../routes/paths'
 import type { WeddingGiftVoteId } from '../common/caseDetailContent'
 import { COMMUNITY_AFTER_STORIES } from '../common/afterStoryList'
-import { latestPlazaCaseIds, plazaCases } from '../common/plazaContent'
+import { demoEventAt } from '../common/demoClock'
+import { plazaCaseAgeMinutes, plazaCases } from '../common/plazaContent'
 import { accountProfileAvatars } from '../common/profileAvatars'
 import { DEMO_ACCOUNTS } from './index'
 
@@ -176,8 +177,7 @@ export const jihoonCommentId = (caseId: string) => `${caseId}-jihoon-comment`
  */
 export function jihoonCommentMinutesAgo(caseId: string): number {
   const seed = findJihoonCommentSeed(caseId)
-  const position = latestPlazaCaseIds.findIndex((id) => id === caseId)
-  const caseAgeMinutes = 28 + Math.max(0, position) * 37
+  const caseAgeMinutes = plazaCaseAgeMinutes[caseId] ?? 28
   // 사건 직후가 아니라 조금 지난 시점에 둬야 위아래로 다른 배심원 댓글이 함께 보인다.
   const fallback = Math.round(caseAgeMinutes * 0.45)
   return Math.max(1, Math.min(seed?.minutesAgo ?? fallback, caseAgeMinutes - 1))
@@ -205,10 +205,10 @@ export interface JihoonCommentRecord {
 /**
  * MY > 내가 쓴 댓글에 넣을 형태로 바꾼다.
  *
- * 시각은 화면을 연 시점에서 거꾸로 센다. 고정 날짜를 박아두면 시연을 며칠 뒤에 다시 열었을 때
- * `9월 8일`처럼 지난 날짜로 굳어 버린다.
+ * 댓글 시각은 사건 목록과 같은 첫 접속 시점에 고정한다.
+ * MY 화면을 다시 열어도 작성 시각이 새로 바뀌지 않는다.
  */
-export function jihoonCommentRecords(now = Date.now()): JihoonCommentRecord[] {
+export function jihoonCommentRecords(): JihoonCommentRecord[] {
   const caseRecords = seeds.flatMap((seed) => {
     const card = plazaCases.find((item) => item.id === seed.caseId)
     if (!card) return []
@@ -220,7 +220,7 @@ export function jihoonCommentRecords(now = Date.now()): JihoonCommentRecord[] {
       caseTitle: card.title.replace('\n', ' '),
       href: toCaseResult(seed.caseId),
       body: seed.body,
-      createdAt: now - jihoonCommentMinutesAgo(seed.caseId) * 60_000,
+      createdAt: demoEventAt(jihoonCommentMinutesAgo(seed.caseId)),
     }]
   })
 
@@ -234,7 +234,7 @@ export function jihoonCommentRecords(now = Date.now()): JihoonCommentRecord[] {
       caseTitle: story.title,
       href: toAfterStoryDetail(seed.storyId),
       body: seed.body,
-      createdAt: now - seed.minutesAgo * 60_000,
+      createdAt: demoEventAt(seed.minutesAgo),
     }]
   })
 

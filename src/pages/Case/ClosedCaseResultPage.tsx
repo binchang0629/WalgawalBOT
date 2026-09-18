@@ -11,6 +11,7 @@ import storyLinkIcon from '../../assets/case/result/story-link.svg'
 import submitIcon from '../../assets/case/result/submit.svg'
 import ConfirmDialog from '../../components/common/ConfirmDialog'
 import CommentThread from '../../components/common/CommentThread'
+import DemoRelativeTime from '../../components/common/DemoRelativeTime'
 import { COMMENT_TOAST_MESSAGES } from '../../components/common/commentToastMessages'
 import Pagination from '../../components/common/Pagination'
 import { commentStickerById, type CommentStickerId } from '../../data/common/commentStickers'
@@ -90,7 +91,7 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
         <div className="result-comment__avatar" aria-hidden="true">
           <img src={comment.avatarUrl ?? jihoonSimilarResult.comments[0].avatarUrl} alt="" />
         </div>
-        <span>{comment.nickname} · {comment.createdAt}</span>
+        <span>{comment.nickname} · {comment.editedAtMs ? <><DemoRelativeTime timestamp={comment.editedAtMs} /> · 수정됨</> : comment.createdAtMs ? <DemoRelativeTime timestamp={comment.createdAtMs} /> : <DemoRelativeTime label={comment.createdAt} />}</span>
         {tone && comment.voteLabel && (
           <strong className={'result-comment__badge is-' + tone}>{comment.voteLabel}</strong>
         )}
@@ -246,6 +247,7 @@ function ClosedCaseResultPage() {
         nickname: currentUser?.nickname ?? '익명의 배심원',
         avatarUrl: currentUser?.anonymousAvatarUrl ?? jihoonSimilarResult.comments[0].avatarUrl,
         createdAt: '방금 전',
+        createdAtMs: Date.now(),
         voteId: null,
         voteLabel: null,
         body,
@@ -305,7 +307,7 @@ function ClosedCaseResultPage() {
           <p className="result-overview__number">사건 번호 · {plazaStory ? plazaStory.caseNumber.replace(/^#/, '') : jihoonSimilarCase.caseNumber}</p>
           <h2 id="result-case-title">{plazaStory?.title ?? jihoonSimilarCase.resultTitle}</h2>
           <div className="result-overview__author">
-            <p>{plazaStory?.author.nickname ?? jihoonSimilarCase.author.nickname} · {plazaStory?.age ?? jihoonSimilarCase.age}</p>
+            <p>{plazaStory?.author.nickname ?? jihoonSimilarCase.author.nickname} · <DemoRelativeTime minutesAgo={plazaStory?.ageMinutes ?? jihoonSimilarCase.ageMinutes} /></p>
           </div>
         </section>
 
@@ -410,7 +412,7 @@ function ClosedCaseResultPage() {
                 }))}
                 onEdit={comment.id.startsWith('new-comment-') ? (body) => {
                   setAddedComments((comments) => comments.map((item) => (
-                    item.id === comment.id ? { ...item, body, createdAt: '방금 전 · 수정됨' } : item
+                    item.id === comment.id ? { ...item, body, editedAtMs: Date.now() } : item
                   )))
                   showToast(COMMENT_TOAST_MESSAGES.edited)
                 } : undefined}

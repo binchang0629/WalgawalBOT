@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useLocation } from 'react-router-dom'
+import DemoRelativeTime from './DemoRelativeTime'
 
 import dislikeIcon from '../../assets/case/result/dislike.svg'
 import emojiIcon from '../../assets/case/result/emoji.svg'
@@ -40,6 +41,8 @@ export interface ThreadComment {
   avatarUrl: string
   /** `방금 전`처럼 문구를 직접 정해야 하는 경우에만 쓴다. */
   createdAtLabel?: string
+  createdAtMs?: number
+  editedAtMs?: number
 }
 
 type CommentReaction = 'like' | 'dislike' | null
@@ -59,13 +62,6 @@ const badgeTone: Record<NonNullable<ThreadComment['voteId']>, 'blue' | 'orange' 
   other: 'orange',
   both: 'orange-solid',
   neither: 'orange-solid',
-}
-
-function elapsedLabel(minutesAgo: number) {
-  if (minutesAgo <= 0) return '방금 전'
-  if (minutesAgo <= 59) return `${minutesAgo}분 전`
-  if (minutesAgo < 1440) return `${Math.floor(minutesAgo / 60)}시간 전`
-  return `${Math.floor(minutesAgo / 1440)}일 전`
 }
 
 function CommentRow({ comment, reaction, showReply, showVoteBadge, actionsInHeader, onReact, onEdit, onDelete }: {
@@ -128,7 +124,7 @@ function CommentRow({ comment, reaction, showReply, showVoteBadge, actionsInHead
         <div className="result-comment__avatar" aria-hidden="true">
           <img src={comment.avatarUrl} alt="" />
         </div>
-        <span>{comment.nickname} · {comment.createdAtLabel ?? elapsedLabel(comment.minutesAgo)}</span>
+        <span>{comment.nickname} · {comment.editedAtMs ? <><DemoRelativeTime timestamp={comment.editedAtMs} /> · 수정됨</> : comment.createdAtMs ? <DemoRelativeTime timestamp={comment.createdAtMs} /> : comment.createdAtLabel ?? <DemoRelativeTime minutesAgo={comment.minutesAgo} />}</span>
         {showVoteBadge && tone && comment.voteLabel && (
           <strong className={'result-comment__badge is-' + tone}>{comment.voteLabel}</strong>
         )}
@@ -279,6 +275,7 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
         avatarUrl: currentUser?.anonymousAvatarUrl ?? comments[0].avatarUrl,
         minutesAgo: 0,
         createdAtLabel: '방금 전',
+        createdAtMs: Date.now(),
         voteId: null,
         voteLabel: null,
         body,
@@ -400,7 +397,7 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
             }))}
             onEdit={comment.id.startsWith('new-comment-') ? (body) => {
               setAddedComments((current) => current.map((item) => (
-                item.id === comment.id ? { ...item, body, createdAtLabel: '방금 전 · 수정됨' } : item
+                item.id === comment.id ? { ...item, body, editedAtMs: Date.now() } : item
               )))
               showToast(COMMENT_TOAST_MESSAGES.edited)
             } : undefined}

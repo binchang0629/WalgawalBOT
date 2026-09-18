@@ -1,7 +1,7 @@
 import type { PersonaId } from '../../types'
-import { demoTimeline } from '../common/demoTimeline'
+import { formatDemoReceivedDate } from '../common/demoClock'
 
-const demoReceivedAt = demoTimeline.now.slice(0, 10).replaceAll('-', '.')
+const demoReceivedAt = formatDemoReceivedDate()
 export const SEOA_JURY_PARTICIPANTS = 611
 
 export type MyCaseFilter = 'all' | 'progress' | 'complete' | 'private'

@@ -6,11 +6,12 @@ import EmptyCaseState from '../../components/common/EmptyCaseState'
 import useSession from '../../hooks/useSession'
 import useDetailSlide from '../../hooks/useDetailSlide'
 import { getMyCaseFilters, MY_CASES } from '../../data/personas/myCases'
+import { formatDemoReceivedDate } from '../../data/common/demoClock'
 import type { MyCase, MyCaseFilter } from '../../data/personas/myCases'
 import './MyCases.css'
 import './MyPageTransitions.css'
 
-function MyCasesContent({ caseInfo, hasSubmittedCase }: { caseInfo: MyCase; hasSubmittedCase: boolean }) {
+function MyCasesContent({ caseInfo, hasSubmittedCase, receivedAt }: { caseInfo: MyCase; hasSubmittedCase: boolean; receivedAt: string }) {
   // 마이페이지에서 오른쪽 → 왼쪽으로 들어오고, 돌아갈 때 왼쪽 → 오른쪽으로 빠진다.
   const slide = useDetailSlide()
   const [filter, setFilter] = useState<MyCaseFilter>('all')
@@ -58,7 +59,7 @@ function MyCasesContent({ caseInfo, hasSubmittedCase }: { caseInfo: MyCase; hasS
             </div>
             <h3>{caseInfo.titleLines.map((line, index) => <Fragment key={line}>{index > 0 && <br />}{line}</Fragment>)}</h3>
             <dl>
-              <div><dt>접수일</dt><dd>{caseInfo.receivedAt}</dd></div>
+              <div><dt>접수일</dt><dd>{receivedAt}</dd></div>
               <div><dt>사건번호</dt><dd>{caseInfo.id}</dd></div>
               <div><dt>공개 범위</dt><dd>{caseInfo.visibility}</dd></div>
               <div><dt>참여</dt><dd className={isPrivate ? 'is-private' : 'is-blue'}>{caseInfo.participation}</dd></div>
@@ -88,9 +89,10 @@ function MyCasesContent({ caseInfo, hasSubmittedCase }: { caseInfo: MyCase; hasS
 }
 
 function MyCasesPage() {
-  const { personaId, activityStats } = useSession()
+  const { personaId, activityStats, submittedCaseAt } = useSession()
+  const submittedAt = Object.values(submittedCaseAt)[0]
   // 목록을 연 채 계정이 전환되어도 이전 계정의 필터를 남기지 않는다.
-  return <MyCasesContent key={personaId} caseInfo={MY_CASES[personaId]} hasSubmittedCase={activityStats.submittedCases > 0} />
+  return <MyCasesContent key={personaId} caseInfo={MY_CASES[personaId]} hasSubmittedCase={activityStats.submittedCases > 0} receivedAt={submittedAt ? formatDemoReceivedDate(submittedAt) : MY_CASES[personaId].receivedAt} />
 }
 
 export default MyCasesPage

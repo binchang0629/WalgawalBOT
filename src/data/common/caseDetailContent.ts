@@ -21,6 +21,7 @@ export const weddingGiftCase = {
   title: '10년 지기 친구 결혼식에 축의금 10만 원을 냈는데, 적은 건가요?',
   caseNumber: '#CASE-FRIEND-87',
   age: demoTimeline.weddingGift.age,
+  ageMinutes: demoTimeline.weddingGift.ageMinutes,
   participantCount: 1245,
   /**
    * 투표 마감까지 남은 시간 `hh:mm:ss`.

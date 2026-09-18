@@ -13,6 +13,7 @@ import storyLinkIcon from '../../assets/case/result/story-link.svg'
 import submitIcon from '../../assets/case/result/submit.svg'
 import ConfirmDialog from '../../components/common/ConfirmDialog'
 import CommentThread from '../../components/common/CommentThread'
+import DemoRelativeTime from '../../components/common/DemoRelativeTime'
 import { COMMENT_TOAST_MESSAGES } from '../../components/common/commentToastMessages'
 import Pagination from '../../components/common/Pagination'
 import { commentStickerById, type CommentStickerId } from '../../data/common/commentStickers'
@@ -101,7 +102,7 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
         <div className="result-comment__avatar">
           <img src={comment.avatarUrl} alt="" />
         </div>
-        <span>{comment.nickname} · {comment.createdAt}</span>
+        <span>{comment.nickname} · {comment.editedAtMs ? <><DemoRelativeTime timestamp={comment.editedAtMs} /> · 수정됨</> : comment.createdAtMs ? <DemoRelativeTime timestamp={comment.createdAtMs} /> : <DemoRelativeTime label={comment.createdAt} />}</span>
         <strong className={`result-comment__badge is-${badge.tone}`}>{comment.voteLabel}</strong>
         {onDelete && (
           <div className="result-comment__more">
@@ -287,6 +288,7 @@ function CaseResultPage() {
         avatarUrl: currentUser.anonymousAvatarUrl,
         nickname: currentUser.nickname,
         createdAt: '방금 전',
+        createdAtMs: Date.now(),
         voteId: selectedVote,
         voteLabel: voteDisplay.label,
         body,
@@ -349,7 +351,7 @@ function CaseResultPage() {
           <p className="result-overview__number">사건 번호 · {caseContent.caseNumber.replace('#', '')}</p>
           <h2 id="result-case-title">{caseContent.title}</h2>
           <div className="result-overview__author">
-            <p>{caseContent.author.nickname} · {caseContent.age}</p>
+            <p>{caseContent.author.nickname} · <DemoRelativeTime minutesAgo={caseContent.ageMinutes} /></p>
           </div>
         </section>
 
@@ -524,7 +526,7 @@ function CaseResultPage() {
                 }))}
                 onEdit={comment.id.startsWith('new-comment-') ? (body) => {
                   setAddedComments((comments) => comments.map((item) => (
-                    item.id === comment.id ? { ...item, body, createdAt: '방금 전 · 수정됨' } : item
+                    item.id === comment.id ? { ...item, body, editedAtMs: Date.now() } : item
                   )))
                   showToast(COMMENT_TOAST_MESSAGES.edited)
                 } : undefined}

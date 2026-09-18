@@ -36,6 +36,7 @@ export interface SessionValue {
   currentUser: SessionUser | null
   /** 현재 계정의 데모 활동 집계. 실제 서버 기록이나 결제 포인트가 아니다. */
   activityStats: ActivityStats
+  submittedCaseAt: Record<string, number>
   /** 현재 계정이 이미 참여한 사건과, 저장된 경우 해당 선택지. */
   votedCaseIds: string[]
   juryVotes: Partial<Record<string, WeddingGiftVoteId>>
@@ -46,6 +47,7 @@ export interface SessionValue {
    * `내가 쓴 후일담` 화면은 이 목록으로 보여줄 글이 있는지 판단한다.
    */
   publishedAfterStoryIds: string[]
+  publishedAfterStoryAt: Record<string, number>
   /** 후일담 게시 완료. 미리보기에서 `후일담 게시하기`를 누른 시점에 기록한다. */
   recordAfterStory: (storyId: string) => void
   /** 리워드 팝업의 최종 숫자와 MY의 포인트 합계를 같은 시점에 맞춘다. */

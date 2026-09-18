@@ -9,6 +9,8 @@ export interface CaseResultComment {
   avatarUrl: string
   nickname: string
   createdAt: string
+  createdAtMs?: number
+  editedAtMs?: number
   voteId: WeddingGiftVoteId
   voteLabel: string
   body: string

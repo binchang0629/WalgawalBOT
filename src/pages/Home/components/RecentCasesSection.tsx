@@ -1,4 +1,5 @@
 import SectionTitle from '../../../components/common/SectionTitle'
+import DemoRelativeTime from '../../../components/common/DemoRelativeTime'
 import { homeIcons } from '../homeAssets'
 import { homeSectionTitles, recentCases } from '../../../data/common/homeContent'
 
@@ -35,7 +36,7 @@ function RecentCasesSection() {
             <p className="paper-card__summary">{item.summary}</p>
             <p className="paper-card__viewed">
               <img src={homeIcons.clockMini} alt="" aria-hidden="true" />
-              {item.viewedAt}
+              <DemoRelativeTime label={item.viewedAt} />
             </p>
           </article>
         ))}

@@ -5,6 +5,7 @@ import useSession from '../../hooks/useSession'
 import { weddingGiftCase } from '../../data/common/caseDetailContent'
 import { parentsCase } from '../../data/common/parentsCaseContent'
 import { getPlazaCaseStory } from '../../data/common/plazaCaseStories'
+import DemoRelativeTime from '../../components/common/DemoRelativeTime'
 import type { WeddingGiftVoteId } from '../../data/common/caseDetailContent'
 import { PATHS, toCaseResult } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
@@ -125,7 +126,7 @@ function CaseDetailPage() {
 
           <h2 id="case-title" className="case-overview__title">{caseContent.title}</h2>
           <p className="case-overview__meta">
-            사건 번호 · {caseContent.caseNumber} · {caseContent.age} · 배심원{' '}
+            사건 번호 · {caseContent.caseNumber} · <DemoRelativeTime minutesAgo={caseContent.ageMinutes} /> · 배심원{' '}
             {participantCount.toLocaleString()}명 참여
           </p>
         </section>

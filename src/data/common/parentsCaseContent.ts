@@ -1,21 +1,23 @@
 import { profileAvatars } from './profileAvatars'
 import resultArtwork from '../../assets/case/result/panmung-scale-first-frame.png'
 import { weddingGiftCase } from './caseDetailContent'
+import { demoEventAt, formatDemoDateTime, formatElapsedMinutes } from './demoClock'
 import { voteDisplayById, type CaseResultComment } from './caseResultContent'
 
-/** 광장 첫 카드와 상세·결과가 공유하는 시연 사건. 앱 내부 기준일은 2026-09-08. */
+/** 광장 첫 카드와 상세·결과가 공유하는 시연 사건. */
 export const parentsCase = {
   id: 'case-parents-interfere',
   category: '가족',
   author: {
     nickname: '익명의 다람쥐',
-    createdAt: '26/09/08 · 06:40',
+    createdAt: formatDemoDateTime(demoEventAt(28)),
     avatarUrl: profileAvatars[5],
   },
   title: '부모님이 자꾸만 제 결정에 간섭하는데 해결 방안을 알려주세요.',
   cardSummary: '내 삶의 선택을 존중받고 싶은데 계속 설득하려 하세요.',
   caseNumber: '#CASE-FAMILY-125',
-  age: '28분 전',
+  age: formatElapsedMinutes(28),
+  ageMinutes: 28,
   participantCount: 84,
   deadline: '18:24:00',
   paragraphs: [

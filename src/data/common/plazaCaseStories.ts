@@ -2,9 +2,10 @@ import { profileAvatars } from './profileAvatars'
 import writerArtwork from '../../assets/case/result/panmung-scale-first-frame.png'
 import otherArtwork from '../../assets/case/result/panmung-scale-left-first-frame.png'
 import { weddingGiftCase, type WeddingGiftVoteId } from './caseDetailContent'
-import { latestPlazaCaseIds, plazaCases, type PlazaCase } from './plazaContent'
+import { latestPlazaCaseIds, plazaCaseAgeMinutes, plazaCases, type PlazaCase } from './plazaContent'
 import { findJihoonCommentSeed, jihoonCommentAuthor, jihoonCommentId, jihoonCommentMinutesAgo } from '../personas/jihoonComments'
 import type { ThreadComment } from '../../components/common/CommentThread'
+import { demoEventAt, formatDemoDateTime, formatElapsedMinutes } from './demoClock'
 
 type VoteId = WeddingGiftVoteId
 type Viewpoints = Record<VoteId, string>
@@ -469,16 +470,15 @@ export function getPlazaCaseStory(caseId: string | undefined) {
 
   const latestPosition = latestPlazaCaseIds.findIndex((id) => id === caseId)
   const displayPosition = latestPosition < 0 ? latestPlazaCaseIds.length + recommendationOnlyCases.findIndex((item) => item.id === caseId) : latestPosition
-  const minutesAgo = 28 + displayPosition * 37
-  // 다른 시연 사건과 같은 2026-09-08 07:08 KST 기준 시각을 쓴다.
-  const createdAtKst = new Date(Date.UTC(2026, 8, 8, 7, 8) - minutesAgo * 60_000)
-  const createdAtLabel = `${String(createdAtKst.getUTCFullYear()).slice(2)}/${String(createdAtKst.getUTCMonth() + 1).padStart(2, '0')}/${String(createdAtKst.getUTCDate()).padStart(2, '0')} · ${String(createdAtKst.getUTCHours()).padStart(2, '0')}:${String(createdAtKst.getUTCMinutes()).padStart(2, '0')}`
+  const minutesAgo = plazaCaseAgeMinutes[caseId]
+  const createdAtLabel = formatDemoDateTime(demoEventAt(minutesAgo))
 
   return {
     ...card,
     title: card.title.replace('\n', ' '),
     author: { nickname: `익명의 ${['고양이', '토끼', '다람쥐', '햄스터', '여우'][displayPosition % 5]}`, createdAt: createdAtLabel, avatarUrl: avatarUrls[displayPosition % avatarUrls.length] },
-    age: minutesAgo < 60 ? `${minutesAgo}분 전` : `${Math.floor(minutesAgo / 60)}시간 전`,
+    age: formatElapsedMinutes(minutesAgo),
+    ageMinutes: minutesAgo,
     caseNumber: `#CASE-${categoryCode[card.category]}-${String(101 + displayPosition).padStart(3, '0')}`,
     participantCount: juryVoteCount ?? Math.max(commentCount + 10, Math.round(card.viewCount * .35)),
     deadline: '18:24:00',

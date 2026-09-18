@@ -3,9 +3,10 @@ import { PATHS } from '../../routes/paths'
 import backIcon from '../../assets/my/back.svg'
 import chevronIcon from '../../assets/my/chevron.svg'
 import EmptyCaseState from '../../components/common/EmptyCaseState'
+import DemoRelativeTime from '../../components/common/DemoRelativeTime'
 import useSession from '../../hooks/useSession'
 import useDetailSlide from '../../hooks/useDetailSlide'
-import { formatCommentTime, readMyComments } from '../../utils/myComments'
+import { readMyComments } from '../../utils/myComments'
 import type { MyCommentRecord } from '../../utils/myComments'
 import './MyCases.css'
 import './MyComments.css'
@@ -24,7 +25,7 @@ function CommentCard({ record }: { record: MyCommentRecord }) {
           <img src={chevronIcon} alt="" aria-hidden="true" />
         </span>
         <p className="my-comment-card__body">{record.body}</p>
-        <span className="my-comment-card__time">{formatCommentTime(record.createdAt)}</span>
+        <span className="my-comment-card__time"><DemoRelativeTime timestamp={record.createdAt} /></span>
       </Link>
     </li>
   )

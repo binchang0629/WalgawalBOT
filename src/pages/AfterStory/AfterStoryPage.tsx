@@ -15,9 +15,11 @@ import backIcon from '../../assets/my/back.svg'
 import walgadakEmpathy from '../../assets/case/stickers/walgadak-empathy.png'
 import { profileAvatars } from '../../data/common/profileAvatars'
 import CommentThread from '../../components/common/CommentThread'
+import DemoRelativeTime from '../../components/common/DemoRelativeTime'
 import Pagination from '../../components/common/Pagination'
 import { afterStoryAuthor, afterStoryComments, afterStoryLetter } from '../../data/common/afterStoryDetailContent'
 import { COMMUNITY_AFTER_STORIES } from '../../data/common/afterStoryList'
+import { getDemoFirstVisit } from '../../data/common/demoClock'
 import { withJihoonAfterStoryComment } from '../../data/personas/jihoonComments'
 import { afterStoryCardComments, parseElapsedMinutes, retimeComments } from '../../data/common/afterStoryCardComments'
 import { SEOA_JURY_PARTICIPANTS } from '../../data/personas/myCases'
@@ -436,7 +438,7 @@ export function AfterStoryHomePage() {
                 <span className="afterstory-community-card__tape" aria-hidden="true" />
                 <header>
                   <span className="afterstory-community-card__category">{story.category}</span>
-                  <span>{story.updatedAt} · 공감 {story.reactions}</span>
+                  <span><DemoRelativeTime label={story.updatedAt} /> · 공감 {story.reactions}</span>
                 </header>
                 <h3 title={story.title}>{story.title}</h3>
                 <p className="afterstory-community-card__outcome">{story.summary}</p>
@@ -470,7 +472,7 @@ export function AfterStoryHomePage() {
  */
 export function MyPublishedAfterStoryPage() {
   const navigate = useNavigate()
-  const { publishedAfterStoryIds, activityStats } = useSession()
+  const { publishedAfterStoryIds, publishedAfterStoryAt, activityStats } = useSession()
   const storyCount = publishedAfterStoryIds.length
   const hasStory = storyCount > 0
   const hasSubmittedCase = activityStats.submittedCases > 0
@@ -520,7 +522,7 @@ export function MyPublishedAfterStoryPage() {
               aria-label={CONNECTED_CASE.context + ' 후일담 전문 읽기'}
             >
               <span className="afterstory-my-stories__tape" aria-hidden="true" />
-              <header><span>친구 · 내 후일담</span><time>방금 전</time></header>
+              <header><span>친구 · 내 후일담</span><time><DemoRelativeTime timestamp={publishedAfterStoryAt.friend ?? getDemoFirstVisit()} /></time></header>
               <h3>{CONNECTED_CASE.context}</h3>
               <p>{CONNECTED_CASE.storyTitle.replace('\n', ' ')}</p>
               <small>공개 범위 · 전체 공개</small>

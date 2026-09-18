@@ -1,6 +1,7 @@
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { jihoonSimilarCase } from '../../data/common/jihoonSimilarCaseContent'
 import { getPlazaCaseStory } from '../../data/common/plazaCaseStories'
+import DemoRelativeTime from '../../components/common/DemoRelativeTime'
 import { PATHS, toCaseResult } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
 import AiSummary from './components/AiSummary'
@@ -37,7 +38,7 @@ function ClosedCaseDetailPage() {
 
           <h2 id="case-title" className="case-overview__title">{plazaStory?.title ?? jihoonSimilarCase.detailTitle}</h2>
           <p className="case-overview__meta">
-            사건 번호 · #{caseContent.caseNumber.replace(/^#/, '')} · {caseContent.age} · 배심원{' '}
+            사건 번호 · #{caseContent.caseNumber.replace(/^#/, '')} · <DemoRelativeTime minutesAgo={caseContent.ageMinutes} /> · 배심원{' '}
             {caseContent.participantCount.toLocaleString()}명 참여
           </p>
         </section>

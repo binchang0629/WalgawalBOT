@@ -9,6 +9,8 @@ export interface JihoonSimilarComment {
   id: string
   nickname: string
   createdAt: string
+  createdAtMs?: number
+  editedAtMs?: number
   voteId: JihoonSimilarVoteId | null
   voteLabel: string | null
   body: string
@@ -33,6 +35,7 @@ export const jihoonSimilarCase = {
   cardSummary: '카페 홍보영상을 180만 원에 제작했습니다. 수정 2회를 마쳤지만 의뢰인은 요청한 색감이 반영되지 않았다며 추가 수정과 원본 파일을 요구하고 있어요.',
   caseNumber: 'CASE-COMPANY-874',
   age: demoTimeline.company.age,
+  ageMinutes: demoTimeline.company.ageMinutes,
   participantCount: 450,
   paragraphs: [
     '카페 홍보영상을 180만 원에 제작했습니다.\n계약에는 수정 2회와 원본 파일 제공이 포함됐고,\n최종 승인 후 잔금 90만 원을 받기로 했어요.',
@@ -133,7 +136,7 @@ export const jihoonSimilarResult = {
       id: 'jihoon-comment-3',
       avatarUrl: profileAvatars[6],
       nickname: '월요병말기',
-      createdAt: '12분 전',
+      createdAt: '9분 전',
       voteId: 'both',
       voteLabel: '투표 · 양쪽 모두',
       body: '작업자는 수정 횟수를 지켰고 의뢰인은 원하는 결과를 받지 못했으니까 어느 한쪽만의 잘못으로 보긴 어려움',
