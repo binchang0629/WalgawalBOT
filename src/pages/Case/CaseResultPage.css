@@ -128,10 +128,67 @@
     object-fit: cover;
 }
 
+.vote-result__artwork>video,
+.vote-result__artwork>.vote-result__first-frame {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.vote-result__artwork>.vote-result__first-frame {
+    z-index: 1;
+    opacity: 1;
+    transition: opacity 450ms ease;
+    pointer-events: none;
+}
+
+.vote-result__artwork>.vote-result__first-frame--hidden {
+    opacity: 0;
+}
+
 .vote-result__summary {
     position: absolute;
     inset: 0;
+    z-index: 2;
     padding: 20px;
+    pointer-events: none;
+}
+
+.vote-result__speech {
+    position: absolute;
+    z-index: 3;
+    right: 13%;
+    bottom: 38%;
+    width: 74px;
+    height: 44px;
+    color: var(--blue-700);
+    filter: drop-shadow(0 3px 5px rgb(31 62 148 / 12%));
+}
+
+.vote-result__speech--other {
+    right: auto;
+    left: 13%;
+    color: var(--orange-700);
+}
+
+.vote-result__speech svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    fill: #fff;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+}
+
+.vote-result__speech span {
+    position: absolute;
+    inset: 7px 0 auto;
+    font: 700 15px/1.3 var(--font-body);
+    text-align: center;
 }
 
 .vote-result__summary>span {
@@ -290,6 +347,7 @@
     font-weight: 700;
     line-height: 1.2;
     white-space: pre-line;
+    text-wrap: pretty;
 }
 
 .ai-verdict__card>div {
@@ -304,6 +362,7 @@
     font-weight: 400;
     line-height: 1.3;
     white-space: pre-line;
+    text-wrap: pretty;
 }
 
 .ai-verdict__card footer {
@@ -754,7 +813,7 @@
     font-size: 14px;
     line-height: 1.3;
     white-space: pre-wrap;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
 }
 
 .result-comment__sticker {

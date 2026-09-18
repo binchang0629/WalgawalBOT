@@ -98,7 +98,7 @@
   line-height: 1.35;
   letter-spacing: -.025em;
   white-space: pre-line;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .completion-scene__detail {

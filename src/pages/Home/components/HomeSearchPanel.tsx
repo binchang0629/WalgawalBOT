@@ -7,6 +7,7 @@ import useSession from '../../../hooks/useSession'
 import { PATHS } from '../../../routes/paths'
 
 interface HomeSearchPanelProps {
+  isClosing: boolean
   onClose: () => void
 }
 
@@ -40,7 +41,7 @@ function saveRecentSearches(key: string, searches: string[]) {
 }
 
 /** 홈 상단에서 펼쳐지는 큰 사건 검색창. 결과는 광장의 기존 데모 검색으로 연결한다. */
-function HomeSearchPanel({ onClose }: HomeSearchPanelProps) {
+function HomeSearchPanel({ isClosing, onClose }: HomeSearchPanelProps) {
   const navigate = useNavigate()
   const { personaId, currentUser } = useSession()
   const accountId = currentUser?.isCustomProfile ? 'custom' : currentUser ? personaId : 'guest'
@@ -88,9 +89,22 @@ function HomeSearchPanel({ onClose }: HomeSearchPanelProps) {
     setRecentSearches(nextSearches)
   }
 
+  const handleClose = () => {
+    inputRef.current?.blur()
+    onClose()
+  }
+
   return (
-    <section ref={panelRef} id="home-global-search" className="home-search" aria-label="사건 검색">
-      <button type="button" className="home-search__backdrop" aria-label="검색창 닫기" onClick={onClose} />
+    <section
+      ref={panelRef}
+      id="home-global-search"
+      className={`home-search${isClosing ? ' is-closing' : ''}`}
+      aria-label="사건 검색"
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') handleClose()
+      }}
+    >
+      <button type="button" className="home-search__backdrop" aria-label="검색창 닫기" onClick={handleClose} />
       <form className="home-search__field" role="search" onSubmit={handleSubmit}>
         <button type="submit" className="home-search__submit" aria-label="검색 실행">
           <img src={searchIcon} alt="" width={24} height={24} />
@@ -102,11 +116,8 @@ function HomeSearchPanel({ onClose }: HomeSearchPanelProps) {
           placeholder="사연, 사건 키워드 또는 AI 추천 검색..."
           aria-label="사연이나 사건 키워드 검색"
           onChange={(event) => setQuery(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Escape') onClose()
-          }}
         />
-        <IconCloseButton className="home-search__close" aria-label="검색창 닫기" onClick={onClose} />
+        <IconCloseButton className="home-search__close" aria-label="검색창 닫기" onClick={handleClose} />
       </form>
       {recentSearches.length > 0 && (
         <div className="home-search__recent" aria-label="최근 검색어">

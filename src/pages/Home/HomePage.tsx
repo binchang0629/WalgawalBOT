@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import TopBar from '../../components/common/TopBar'
 import useSession from '../../hooks/useSession'
 import useLoginGate from '../../hooks/useLoginGate'
@@ -37,18 +37,37 @@ function HomePage() {
   const { showToast } = useToast()
   const isAuthenticated = sessionStatus === 'authenticated'
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [isSearchClosing, setIsSearchClosing] = useState(false)
   const [isAccountSwitchOpen, setIsAccountSwitchOpen] = useState(false)
+
+  useEffect(() => {
+    if (!isSearchClosing) return
+    const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 180
+    const timer = window.setTimeout(() => {
+      setIsSearchOpen(false)
+      setIsSearchClosing(false)
+    }, duration)
+    return () => window.clearTimeout(timer)
+  }, [isSearchClosing])
+
+  const closeSearch = () => {
+    if (isSearchOpen && !isSearchClosing) setIsSearchClosing(true)
+  }
 
   return (
     <main className="home-screen">
       <TopBar
         isSearchOpen={isSearchOpen}
-        onSearch={() => setIsSearchOpen((isOpen) => !isOpen)}
+        onSearch={() => {
+          if (isSearchOpen) closeSearch()
+          else setIsSearchOpen(true)
+        }}
         accountAvatar={currentUser?.isCustomProfile ? currentUser.anonymousAvatarUrl : isAuthenticated ? (personaId === 'A' ? seoaProfileImage : jihunProfileImage) : guestProfileIcon}
         accountPersona={currentUser?.isCustomProfile ? 'custom' : isAuthenticated ? personaId : undefined}
         isAccountSwitchOpen={isAccountSwitchOpen}
         onAccountSwitch={() => {
           setIsSearchOpen(false)
+          setIsSearchClosing(false)
           if (isAuthenticated) {
             setIsAccountSwitchOpen(true)
             return
@@ -56,7 +75,7 @@ function HomePage() {
           requireLogin('my', PATHS.my)
         }}
       />
-      {isSearchOpen && <HomeSearchPanel onClose={() => setIsSearchOpen(false)} />}
+      {isSearchOpen && <HomeSearchPanel isClosing={isSearchClosing} onClose={closeSearch} />}
       <PopularCaseSection />
       {isAuthenticated && <RecentCasesSection />}
       <AdBanner />

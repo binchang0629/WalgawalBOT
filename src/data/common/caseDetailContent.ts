@@ -4,6 +4,7 @@ import voteOther from '../../assets/case/vote-other-updated.svg'
 import voteBoth from '../../assets/case/vote-both-updated.svg'
 import voteNeither from '../../assets/case/vote-neither-updated.svg'
 import { demoTimeline } from './demoTimeline'
+import { JURY_VOTE_DURATION } from './demoClock'
 
 /**
  * 축의금 사건 상세의 화면 데이터.
@@ -23,12 +24,8 @@ export const weddingGiftCase = {
   age: demoTimeline.weddingGift.age,
   ageMinutes: demoTimeline.weddingGift.ageMinutes,
   participantCount: 1245,
-  /**
-   * 투표 마감까지 남은 시간 `hh:mm:ss`.
-   * 이 사건의 마감 시각은 여기 한 곳에만 둔다. 결과 화면(`caseResultContent.ts`)도 이 값을 쓴다.
-   * 예전에는 `'01:01'`이라 1분 1초로 읽혔다. (2026-09-14 수정)
-   */
-  deadline: '01:32:47',
+  /** 투표 기간. 실제 남은 시간은 작성 시각에서 24시간 뒤를 기준으로 계산한다. */
+  deadline: JURY_VOTE_DURATION,
   paragraphs: [
     '대학 때부터 10년간 알고 지낸 친구의 결혼식에 참석했습니다. 예전에는 자주 만났지만 졸업 후 서로 바빠지면서 최근 2년 동안은 일 년에 한두 번 연락하는 정도였어요.',
     '저는 현재 관계와 제 형편을 고려해 축의금 10만 원을 냈습니다. 그런데 친구가 “오래된 사이인데 조금 더 생각할 줄 알았다”며 서운함을 드러냈어요.',

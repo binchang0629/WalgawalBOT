@@ -2,10 +2,13 @@ import { profileAvatars } from './profileAvatars'
 import writerArtwork from '../../assets/case/result/panmung-scale-first-frame.png'
 import otherArtwork from '../../assets/case/result/panmung-scale-left-first-frame.png'
 import { weddingGiftCase, type WeddingGiftVoteId } from './caseDetailContent'
+import { jihoonSimilarCase } from './jihoonSimilarCaseContent'
+import { parentsCase } from './parentsCaseContent'
 import { latestPlazaCaseIds, plazaCaseAgeMinutes, plazaCases, type PlazaCase } from './plazaContent'
 import { findJihoonCommentSeed, jihoonCommentAuthor, jihoonCommentId, jihoonCommentMinutesAgo } from '../personas/jihoonComments'
 import type { ThreadComment } from '../../components/common/CommentThread'
-import { demoEventAt, formatDemoDateTime, formatElapsedMinutes } from './demoClock'
+import { demoEventAt, formatDemoDateTime, formatElapsedMinutes, JURY_VOTE_DURATION } from './demoClock'
+import type { CaseCategory } from '../../types'
 
 type VoteId = WeddingGiftVoteId
 type Viewpoints = Record<VoteId, string>
@@ -448,7 +451,9 @@ function withJihoonComment(caseId: string, list: ThreadComment[]): ThreadComment
   return next
 }
 
-const categoryCode: Record<string, string> = { 연인: 'LOVE', 친구: 'FRIEND', 가족: 'FAMILY', 직장: 'WORK', 학업: 'SCHOOL' }
+const categoryCode: Record<CaseCategory, string> = {
+  연인: 'LOVE', 친구: 'FRIEND', 가족: 'FAMILY', 직장: 'COMPANY', 학업: 'SCHOOL',
+}
 
 /** 광장 20건의 목록 수를 유지하면서 홈의 개인화 추천에만 노출되는 사건. */
 export const recommendationOnlyCases: PlazaCase[] = [
@@ -479,9 +484,11 @@ export function getPlazaCaseStory(caseId: string | undefined) {
     author: { nickname: `익명의 ${['고양이', '토끼', '다람쥐', '햄스터', '여우'][displayPosition % 5]}`, createdAt: createdAtLabel, avatarUrl: avatarUrls[displayPosition % avatarUrls.length] },
     age: formatElapsedMinutes(minutesAgo),
     ageMinutes: minutesAgo,
-    caseNumber: `#CASE-${categoryCode[card.category]}-${String(101 + displayPosition).padStart(3, '0')}`,
+    caseNumber: caseId === jihoonSimilarCase.id ? `#${jihoonSimilarCase.caseNumber}`
+      : caseId === parentsCase.id ? parentsCase.caseNumber
+        : `#CASE-${categoryCode[card.category]}-${String(101 + displayPosition).padStart(3, '0')}`,
     participantCount: juryVoteCount ?? Math.max(commentCount + 10, Math.round(card.viewCount * .35)),
-    deadline: '18:24:00',
+    deadline: JURY_VOTE_DURATION,
     paragraphs: narrative.paragraphs,
     summary: [
       { title: '확인된 상황', body: narrative.evidence[0] },

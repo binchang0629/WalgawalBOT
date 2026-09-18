@@ -198,7 +198,7 @@
     font-size: clamp(15px, 5.13cqw, 20px);
     line-height: 1.4;
     letter-spacing: -0.025em;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
 }
 
 .case-submit--seoa .case-submit__receipt-title {

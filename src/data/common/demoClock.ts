@@ -4,6 +4,8 @@
  */
 export const DEMO_FIRST_VISIT_KEY = 'walgawalbot:demo:first-visit:v1'
 const MINUTE = 60_000
+export const JURY_VOTE_DURATION_MINUTES = 24 * 60
+export const JURY_VOTE_DURATION = '24:00:00'
 let firstVisit: number | undefined
 
 export function getDemoFirstVisit(): number {

@@ -80,7 +80,7 @@ function RankingHeroSection() {
           </div>
         </div>
       </div>
-      <button type="button" className="ranking-hero__link" onClick={() => showToast('랭킹 전체보기는 업데이트 예정입니다.')}>
+      <button type="button" className="ranking-hero__link" onClick={() => showToast('랭킹 전체보기는 준비 중이에요.')}>
         랭킹 전체 보기
         <img src={rankingArrow} alt="" width={14} height={14} />
       </button>

@@ -1,6 +1,5 @@
 import type { CaseSummary } from '../../types'
 import { weddingGiftCase } from './caseDetailContent'
-import { jihoonSimilarCase } from './jihoonSimilarCaseContent'
 
 /**
  * 홈 화면 정적 데이터.
@@ -170,28 +169,28 @@ export const aiRecommendation = {
 export const personalizedRecommendation = {
   A: {
     displayName: '서아',
-    topic: '관계 갈등 사건',
-    total: 3,
-    cases: [
-      { id: 'recommend-friend-secret', plazaCaseId: 'case-secret-told', categoryKey: 'friend', category: '친구',
-        title: '친한 친구가 학교에서 저의 비밀을 다른 친구에게 말했어요.' },
-      { id: 'recommend-study-presentation', plazaCaseId: 'case-study-presentation', categoryKey: 'study', category: '학업', agrees: true,
-        title: '조별 과제에서 제 의견은 무시하고 팀원이\n발표 자료를 바꿨어요.' },
-      { id: 'recommend-friend-mistake', plazaCaseId: 'case-friend-mistake', categoryKey: 'friend', category: '친구', agrees: false,
-        title: '오랜 친구가 다른 친구들이 있는 자리에서\n제 실수를 계속 이야기해요.' },
+    topic: '관계·학업 갈등 사건',
+    caseIds: [
+      'case-friend-group-chat',
+      'case-school-lab-data',
+      'case-dating-phone',
+      'case-invite-ex',
+      'case-dating-travel-cost',
+      'case-family-moving',
+      'case-parents-interfere',
+      'case-work-new-hire',
+      'case-work-after-hours',
     ],
   },
   B: {
     displayName: '지훈',
-    topic: '직장 갈등 사건',
-    total: 3,
-    cases: [
-      { id: 'recommend-work-balance', plazaCaseId: 'case-company-874', categoryKey: 'work', category: '직장',
-        title: jihoonSimilarCase.recommendationTitle },
-      { id: 'recommend-work-credit', plazaCaseId: 'case-work-credit', categoryKey: 'work', category: '직장',
-        title: '직장 상사가 제 아이디어를 자신의 공로인 것처럼\n발표했어요.' },
-      { id: 'recommend-work-after-hours', plazaCaseId: 'case-work-after-hours', categoryKey: 'work', category: '직장',
-        title: '퇴근 뒤 단체 대화방으로 온 업무 지시에 답하지 않았어요. 제가 잘못한 건가요?' },
+    topic: '일·관계 갈등 사건',
+    caseIds: [
+      'case-work-new-hire',
+      'case-friend-group-chat',
+      'case-parents-interfere',
+      'case-dating-phone',
+      'case-invite-ex',
     ],
   },
 } as const

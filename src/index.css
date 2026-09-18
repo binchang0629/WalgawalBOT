@@ -33,6 +33,8 @@ body {
     color: var(--ink);
     font-family: var(--font-body);
     -webkit-text-size-adjust: 100%;
+    word-break: keep-all;
+    overflow-wrap: break-word;
 }
 
 button {

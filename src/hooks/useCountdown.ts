@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react'
+import { demoEventAt, JURY_VOTE_DURATION_MINUTES } from '../data/common/demoClock'
+import { demoTimeline } from '../data/common/demoTimeline'
+import { plazaCaseAgeMinutes } from '../data/common/plazaContent'
 
 const demoDeadlines = new Map<string, number>()
 
@@ -33,6 +36,15 @@ function getDemoDeadline(key: string, duration: number | string): number {
   const cached = demoDeadlines.get(key)
   if (cached) return cached
 
+  const caseAgeMinutes = key === 'case-wedding-gift'
+    ? demoTimeline.weddingGift.ageMinutes
+    : plazaCaseAgeMinutes[key]
+  if (caseAgeMinutes !== undefined) {
+    const deadline = demoEventAt(caseAgeMinutes) + JURY_VOTE_DURATION_MINUTES * 60_000
+    demoDeadlines.set(key, deadline)
+    return deadline
+  }
+
   const storageKey = `walgawalbot:deadline:${key}`
   let deadline = 0
   try {
@@ -58,8 +70,9 @@ function getDemoDeadline(key: string, duration: number | string): number {
 /**
  * 남은 시간을 세는 타이머.
  *
- * 서버가 없어서 사건별 마감 일시를 받아올 수 없다. 그래서 화면을 처음 그린 시점부터
- * 주어진 만큼을 마감으로 잡고 거꾸로 센다. 새로고침하면 다시 시작한다.
+ * 시연 사건은 첫 방문 기준 게시 시각부터 24시간을 투표 기간으로 쓴다.
+ * 새로고침하거나 다른 페이지에서 다시 열어도 마감 시각은 같다.
+ * 사건 정보가 없는 일반 호출은 전달받은 기간을 사용한다.
  *
  * `duration`은 `'01:32:47'` 같은 문자열이 기본이다.
  * 숫자를 넘기면 시간 단위로 해석한다.
