@@ -1135,3 +1135,29 @@
 
   .afterstory-case-folder-trigger { transition: none; }
 }
+
+/*
+ * 왈가왈후 홈 진입 카드(내 이야기 남기기 · 내가 쓴 후일담 보러가기)의 눌림.
+ * 누르고 있는 동안 살짝 작아지며 아래로 눌리고 그림자가 줄어든다.
+ * 손을 떼면 AfterStoryHomePage의 handleEntryCardClick이 짧게 튀어 돌아오게 한 뒤 이동한다.
+ */
+.afterstory-entry-card {
+  transition: transform 120ms ease-out, box-shadow 120ms ease-out;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.afterstory-entry-card:active {
+  transform: translateY(2px) scale(0.95);
+  box-shadow: 0 2px 3px rgba(32, 35, 43, .1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .afterstory-entry-card {
+    transition: none;
+  }
+
+  .afterstory-entry-card:active {
+    transform: none;
+  }
+}

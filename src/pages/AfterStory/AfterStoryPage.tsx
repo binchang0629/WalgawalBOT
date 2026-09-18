@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
-import type { FormEvent, Ref } from 'react'
+import type { FormEvent, MouseEvent, Ref } from 'react'
 import useLoginGate from '../../hooks/useLoginGate'
 import useDetailSlide from '../../hooks/useDetailSlide'
 import useSession from '../../hooks/useSession'
@@ -256,9 +256,44 @@ function CaseContextFolder({ onOpen, isOpen, triggerRef }: {
   )
 }
 
+/** 진입 카드를 누른 뒤 튀어 돌아오는 시간. 이 시간이 지난 뒤 화면이 넘어간다. */
+const ENTRY_CARD_PRESS_MS = 200
+
 export function AfterStoryHomePage() {
   const { requireLogin } = useLoginGate()
   const navigate = useNavigate()
+  const entryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => () => {
+    if (entryTimerRef.current) clearTimeout(entryTimerRef.current)
+  }, [])
+
+  /*
+   * 진입 카드는 누르자마자 이동하면 눌린 모습을 볼 틈이 없다.
+   * 누르고 있는 동안은 CSS(:active)가 카드를 누르고, 손을 떼면 짧게 튀어 돌아온 뒤 이동한다.
+   * 로그인이 필요하면 튀는 반응만 보여주고 안내 팝업을 띄운다.
+   */
+  const handleEntryCardClick = (event: MouseEvent<HTMLAnchorElement>, destination: string) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    event.preventDefault()
+    const card = event.currentTarget
+    const canEnter = requireLogin('default', destination)
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      if (canEnter) navigate(destination)
+      return
+    }
+    card.animate(
+      [
+        { transform: 'translateY(2px) scale(0.95)' },
+        { transform: 'translateY(-1px) scale(1.03)', offset: 0.55 },
+        { transform: 'none' },
+      ],
+      { duration: ENTRY_CARD_PRESS_MS, easing: 'cubic-bezier(.3, 1.4, .5, 1)' },
+    )
+    if (!canEnter) return
+    if (entryTimerRef.current) clearTimeout(entryTimerRef.current)
+    entryTimerRef.current = setTimeout(() => navigate(destination), ENTRY_CARD_PRESS_MS)
+  }
   const communitySectionRef = useRef<HTMLElement>(null)
   const communityListRef = useRef<HTMLDivElement>(null)
   const peelTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -356,11 +391,7 @@ export function AfterStoryHomePage() {
           <Link
             className="afterstory-entry-card afterstory-entry-card--write"
             to={PATHS.afterStoryMine}
-            onClick={(event) => {
-              if (!requireLogin('default', PATHS.afterStoryMine)) {
-                event.preventDefault()
-              }
-            }}
+            onClick={(event) => handleEntryCardClick(event, PATHS.afterStoryMine)}
           >
             <img className="afterstory-entry-card__art" src={writePencil} alt="" />
             <strong>내 이야기<br />남기기</strong>
@@ -369,11 +400,7 @@ export function AfterStoryHomePage() {
           <Link
             className="afterstory-entry-card afterstory-entry-card--read"
             to={PATHS.afterStoryMineStories}
-            onClick={(event) => {
-              if (!requireLogin('default', PATHS.afterStoryMineStories)) {
-                event.preventDefault()
-              }
-            }}
+            onClick={(event) => handleEntryCardClick(event, PATHS.afterStoryMineStories)}
           >
             <img className="afterstory-entry-card__art" src={readBook} alt="" />
             <strong>내가 쓴 후일담<br />보러가기</strong>
