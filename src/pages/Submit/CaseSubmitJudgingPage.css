@@ -1,0 +1,186 @@
+/*
+ * AI 1심 대기 화면.
+ * 링과 체크 색은 다른 AI 화면(핵심요약·맞춤 추천)과 같은 파란 계열을 쓴다.
+ *
+ * ── 속도·크기를 바꾸고 싶다면 여기만 보면 된다 ─────────────────
+ *   · 판멍이 주위 링이 도는 속도  → `.case-judging__ring` 의 animation 시간 (지금 2.6s)
+ *       숫자가 클수록 느리다. 1.4s면 급하게, 3.5s면 아주 느긋하게 돈다.
+ *   · 진행 중인 줄의 동그라미 속도 → `.case-judging__step.is-current .case-judging__step-mark` (지금 1.6s)
+ *       링보다 살짝 빠르게 두면 "작은 것이 더 바쁘게 도는" 느낌이 난다.
+ *   · 원 크기        → `.case-judging__stage` 의 width·height (지금 240px)
+ *   · 판멍이 크기    → `.case-judging__mascot` 의 width (지금 176px)
+ *   · 화면에 머무는 전체 시간 → CSS가 아니라 CaseSubmitJudgingPage.tsx 의
+ *       `STEP_INTERVAL`(한 줄씩 체크되는 간격)과 `TAIL_DELAY`(마지막 줄 뒤 여운)
+ * ────────────────────────────────────────────────────────
+ */
+
+.case-judging {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 24px var(--content-gutter) 48px;
+    text-align: center;
+}
+
+/* ---------- 판멍이와 링 ---------- */
+
+.case-judging__stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 240px;
+    height: 240px;
+}
+
+.case-judging__ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    /* 원 둘레의 일부만 진한 파랑이라, 회전하면 한 조각이 도는 것처럼 보인다. */
+    background: conic-gradient(
+        var(--blue-600) 0deg 70deg,
+        var(--blue-150) 70deg 150deg,
+        var(--blue-050) 150deg 360deg
+    );
+    /* 느리게 돌수록 차분해 보인다. 급해 보이면 숫자를 줄이면 된다. */
+    animation: case-judging-spin 2.6s linear infinite;
+}
+
+/* 링 가운데를 파내 테두리만 남긴다. */
+.case-judging__ring::after {
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    background: #fff;
+    content: '';
+}
+
+.case-judging__mascot {
+    position: relative;
+    z-index: 1;
+    width: 176px;
+    height: auto;
+    animation: case-judging-float 2.4s ease-in-out infinite;
+}
+
+@keyframes case-judging-spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes case-judging-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+/* ---------- 문구 ---------- */
+
+.case-judging__copy {
+    margin-top: 28px;
+}
+
+.case-judging__title {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--neutral-900);
+}
+
+.case-judging__description {
+    margin: 8px 0 0;
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--neutral-600);
+}
+
+/* ---------- 단계 목록 ---------- */
+
+.case-judging__steps {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 300px;
+    margin: 32px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.case-judging__step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: var(--neutral-100, #f4f5f7);
+    color: var(--neutral-500);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+    transition: background 240ms ease, color 240ms ease;
+}
+
+.case-judging__step.is-current {
+    background: var(--blue-050);
+    color: var(--neutral-800);
+}
+
+.case-judging__step.is-done {
+    background: var(--blue-050);
+    color: var(--neutral-900);
+    font-weight: 600;
+}
+
+/* 아직인 줄은 빈 원, 진행 중인 줄은 도는 원, 끝난 줄은 체크. */
+.case-judging__step-mark {
+    position: relative;
+    flex: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--neutral-300);
+    border-radius: 50%;
+    transition: border-color 240ms ease, background 240ms ease;
+}
+
+.case-judging__step.is-current .case-judging__step-mark {
+    border-color: var(--blue-150);
+    border-top-color: var(--blue-600);
+    /* 링(2.6s)보다 조금 빠르게 둔다. 너무 빠르면 초조해 보인다. */
+    animation: case-judging-spin 1.6s linear infinite;
+}
+
+.case-judging__step.is-done .case-judging__step-mark {
+    border-color: var(--blue);
+    background: var(--blue);
+}
+
+.case-judging__step.is-done .case-judging__step-mark::after {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    content: '✓';
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+    animation: case-judging-check 300ms cubic-bezier(.34, 1.56, .64, 1) both;
+}
+
+@keyframes case-judging-check {
+    from { opacity: 0; transform: scale(.4); }
+    to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .case-judging__ring,
+    .case-judging__mascot,
+    .case-judging__step.is-current .case-judging__step-mark,
+    .case-judging__step.is-done .case-judging__step-mark::after { animation: none; }
+}

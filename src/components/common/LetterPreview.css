@@ -1,0 +1,105 @@
+/*
+ * 편지지 미리보기. 후일담 게시 확인과 사건 접수 완료가 함께 쓴다.
+ * 치수는 후일담 시안에서 쓰던 값을 그대로 옮겼다.
+ */
+
+.letter-preview {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    background: rgb(0 0 0 / 68%);
+    pointer-events: auto;
+    animation: letter-preview-backdrop 220ms ease-out both;
+}
+
+.letter-preview__dialog {
+    position: relative;
+    width: min(100%, 354px);
+    height: min(500px, 100%);
+    min-height: 0;
+    animation: letter-preview-open 420ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.letter-preview__sheet {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    filter: drop-shadow(0 16px 28px rgb(0 0 0 / 22%));
+}
+
+.letter-preview__paper {
+    position: absolute;
+    top: -3.35%;
+    left: -16.79%;
+    width: 133.57%;
+    max-width: none;
+    height: 106.01%;
+    pointer-events: none;
+}
+
+.letter-preview__contents {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 38px 28px 34px;
+}
+
+.letter-preview__eyebrow {
+    color: var(--orange-700);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.letter-preview__contents h2 {
+    margin: 10px 32px 18px 0;
+    color: var(--neutral-900);
+    font-size: 19px;
+    line-height: 1.35;
+    word-break: keep-all;
+}
+
+.letter-preview__body {
+    min-height: 0;
+    overflow-y: auto;
+    color: var(--neutral-800);
+    font-size: 14px;
+    line-height: 1.65;
+    text-align: left;
+    white-space: pre-wrap;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    scrollbar-width: thin;
+}
+
+.letter-preview__close {
+    position: absolute;
+    z-index: 2;
+    top: 20px;
+    right: 18px;
+}
+
+.letter-preview__close:focus-visible {
+    outline: 2px solid var(--blue-700);
+    outline-offset: 2px;
+}
+
+@keyframes letter-preview-backdrop {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes letter-preview-open {
+    from { opacity: 0; transform: translateY(70px) scale(.96); }
+    to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .letter-preview,
+    .letter-preview__dialog { animation: none; }
+}

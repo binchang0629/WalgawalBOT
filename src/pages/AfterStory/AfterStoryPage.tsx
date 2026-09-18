@@ -1,5 +1,4 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import type { FormEvent, Ref } from 'react'
 import useLoginGate from '../../hooks/useLoginGate'
@@ -8,7 +7,7 @@ import useSession from '../../hooks/useSession'
 import EmptyCaseState from '../../components/common/EmptyCaseState'
 import CaseFolderCard from '../../components/common/CaseFolderCard'
 import CompletionScene from '../../components/common/CompletionScene'
-import IconCloseButton from '../../components/common/IconCloseButton'
+import LetterPreview from '../../components/common/LetterPreview'
 import { PATHS, toAfterStoryDetail, toCaseDetail } from '../../routes/paths'
 import CaseSubmitProgress from '../Submit/components/CaseSubmitProgress'
 import CaseSubmitDemoFill from '../Submit/components/CaseSubmitDemoFill'
@@ -816,27 +815,8 @@ export function PreviewAfterStoryPage() {
   const content = (location.state as AfterStoryLocationState | null)?.content ?? ''
   const [isLetterOpen, setIsLetterOpen] = useState(false)
   const folderRef = useRef<HTMLDivElement>(null)
-  const closeRef = useRef<HTMLButtonElement>(null)
-  const overlayRoot = document.getElementById('app-overlay-root')
 
-  useEffect(() => {
-    if (!isLetterOpen) return
-    closeRef.current?.focus()
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault()
-        closeLetter()
-      } else if (event.key === 'Tab') {
-        event.preventDefault()
-        closeRef.current?.focus()
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isLetterOpen])
-
+  // 편지 미리보기는 사건 접수 완료 화면과 같은 공통 컴포넌트(LetterPreview)를 쓴다.
   function closeLetter() {
     setIsLetterOpen(false)
     window.requestAnimationFrame(() => folderRef.current?.focus())
@@ -865,23 +845,15 @@ export function PreviewAfterStoryPage() {
         <aside className="afterstory-publish-notice"><img src={walgadakEmpathy} alt="" />게시하면 다른 사용자에게 공개돼요.<br />이름·연락처 등 개인정보를 다시 확인해주세요.</aside>
       </div>
       <footer className="afterstory-flow__footer" inert={isLetterOpen}><button type="button" onClick={handlePublish}>후일담 게시하기</button><small>게시 후에도 MY에서 공개 범위를 바꿀 수 있어요.</small></footer>
-      {isLetterOpen && overlayRoot && createPortal(
-        <div className="afterstory-letter-preview" onClick={(event) => {
-          if (event.target === event.currentTarget) closeLetter()
-        }}>
-          <section className="afterstory-letter-preview__dialog" role="dialog" aria-modal="true" aria-labelledby="afterstory-letter-preview-title">
-            <div className="afterstory-letter-preview__sheet">
-              <img className="afterstory-letter-preview__paper" src={letterPaper} alt="" aria-hidden="true" />
-              <div className="afterstory-letter-preview__contents">
-                <span className="afterstory-letter-preview__eyebrow">게시할 후일담</span>
-                <h2 id="afterstory-letter-preview-title">{CONNECTED_CASE.storyTitle.replace('\n', ' ')}</h2>
-                <div className="afterstory-letter-preview__body">{content || '작성한 후일담이 없습니다.'}</div>
-              </div>
-            </div>
-            <IconCloseButton ref={closeRef} className="afterstory-letter-preview__close" onClick={closeLetter} aria-label="편지 미리보기 닫기" />
-          </section>
-        </div>,
-        overlayRoot,
+      {isLetterOpen && (
+        <LetterPreview
+          eyebrow="게시할 후일담"
+          title={CONNECTED_CASE.storyTitle.replace('\n', ' ')}
+          body={content}
+          emptyText="작성한 후일담이 없습니다."
+          closeLabel="편지 미리보기 닫기"
+          onClose={closeLetter}
+        />
       )}
     </main>
   )

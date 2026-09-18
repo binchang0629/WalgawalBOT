@@ -114,7 +114,7 @@ export const balanceQuestions = [
 export const closeCallCases = [
   {
     id: 'case-dog-bite',
-    titleLines: ['반려견 개물림 사고,', '견주 구속 합당한가?'],
+    titleLines: ['반려견 개물림 사고', '견주 구속 합당한가?'],
     leftLabel: '구속 합당',
     leftPercent: 48,
     rightLabel: '구속 과도',
@@ -122,7 +122,7 @@ export const closeCallCases = [
   },
   {
     id: 'case-secondhand-fraud',
-    titleLines: ['중고거래 사기,', '플랫폼의 책임은 어디까지인가?'],
+    titleLines: ['중고거래 사기', '플랫폼의 책임은 어디까지인가?'],
     leftLabel: '플랫폼 책임 O',
     leftPercent: 53,
     rightLabel: '플랫폼 책임 X',

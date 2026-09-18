@@ -23,6 +23,8 @@ export const PATHS = {
   caseSubmit: '/cases/new',
   caseSubmitQuestions: '/cases/new/questions',
   caseSubmitSummary: '/cases/new/summary',
+  /** AI 1심 대기. 요약 확인과 참고 의견 사이를 잇는 연출 화면이다. */
+  caseSubmitJudging: '/cases/new/judging',
   caseSubmitOpinion: '/cases/new/opinion',
   caseSubmitComplete: '/cases/new/complete',
   afterStory: '/afterstory',

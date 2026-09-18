@@ -128,7 +128,11 @@
   color: var(--neutral-600);
   font-size: 12px;
   line-height: 1.4;
-  animation: completion-rise 400ms cubic-bezier(.22, 1, .36, 1) 1740ms both;
+  /*
+   * 파일(1.1s 시작 + 0.7s)이 완전히 자리 잡은 뒤에 뜬다.
+   * 파일 아래 안내(`__hint`)와 같은 시점이라 두 문구가 한 덩어리로 나타난다.
+   */
+  animation: completion-rise 420ms cubic-bezier(.22, 1, .36, 1) var(--completion-caption-delay, 1860ms) both;
 }
 
 @keyframes completion-hero-lift { from { transform: translateY(84px); } to { transform: none; } }
@@ -148,5 +152,89 @@
 @media (prefers-reduced-motion: reduce) {
   .completion-scene__hero, .completion-scene__art-stage, .completion-scene__art-stage::before,
   .completion-scene__check, .completion-scene__title, .completion-scene__folder,
-  .completion-scene__reminder { animation: none; }
+  .completion-scene__reminder, .completion-scene__hint { animation: none; }
+}
+
+
+/*
+ * 파일을 눌러 글 전문을 여는 경우의 표시. 후일담 게시 확인 화면과 같은 규칙이다.
+ * 누를 수 있다는 것을 손가락 아이콘과 안내 문구로 알린다.
+ */
+.completion-scene__folder-trigger {
+    width: 100%;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: transform 180ms ease;
+}
+
+.completion-scene__folder-trigger:active {
+    transform: translateY(1px) scale(.99);
+}
+
+.completion-scene__folder-trigger:focus-visible {
+    outline: 3px solid var(--blue-700);
+    outline-offset: 3px;
+}
+
+.completion-scene__hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    margin: 5px auto 0;
+    padding: 0;
+    border: 0;
+    color: var(--neutral-600);
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 12px;
+    line-height: 1.4;
+    cursor: pointer;
+    /* 리마인더 문구와 같은 시점에 함께 뜬다. */
+    animation: completion-rise 420ms cubic-bezier(.22, 1, .36, 1) var(--completion-caption-delay, 1860ms) both;
+}
+
+.completion-scene__hint-gesture {
+    position: relative;
+    display: inline-flex;
+    width: 22px;
+    height: 22px;
+}
+
+.completion-scene__hint-gesture img {
+    width: 22px;
+    height: 22px;
+    animation: completion-scene-tap 3s ease-out var(--completion-caption-delay, 1860ms) infinite;
+}
+
+.completion-scene__hint-gesture::after {
+    position: absolute;
+    top: 0;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--blue-700);
+    border-radius: 50%;
+    content: '';
+    pointer-events: none;
+    opacity: 0;
+    animation: completion-scene-tap-ring 3s ease-out var(--completion-caption-delay, 1860ms) infinite;
+}
+
+@keyframes completion-scene-tap {
+    0%, 8%, 22%, 36%, 100% { transform: translateY(-2px) scale(1); }
+    14%, 28% { transform: translateY(3px) scale(.92); }
+}
+
+@keyframes completion-scene-tap-ring {
+    0%, 12%, 26%, 100% { opacity: 0; transform: scale(.4); }
+    15%, 29% { opacity: .5; transform: scale(.65); }
+    22%, 36% { opacity: 0; transform: scale(1.3); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .completion-scene__folder-trigger { transition: none; }
+    .completion-scene__hint-gesture img,
+    .completion-scene__hint-gesture::after { animation: none; }
 }

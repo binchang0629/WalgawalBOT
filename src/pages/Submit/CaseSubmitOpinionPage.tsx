@@ -9,6 +9,7 @@ import useCaseSubmitDraft from './useCaseSubmitDraft'
 import useWizardBack from '../../hooks/useWizardBack'
 import useSession from '../../hooks/useSession'
 import { SUBMIT_SCENARIOS } from './caseSubmitContent'
+import panmungStamp from '../../assets/submit/panmung-stamp.png'
 import radioSelected from '../../assets/submit/figma/imgRadioSelected.svg'
 import radioDefault from '../../assets/submit/figma/imgRadioDefault.svg'
 import './CaseSubmit.css'
@@ -53,15 +54,15 @@ function CaseSubmitOpinionPage() {
   }
 
   return (
-    <div className={`case-submit${isSeoa ? ' case-submit--seoa' : ''}`}>
+    <div className={`case-submit case-submit--opinion${isSeoa ? ' case-submit--seoa' : ''}`}>
       <CaseSubmitHeader onBack={handleBack} />
 
       <div className="case-submit__body case-submit__body--with-progress">
-        <CaseSubmitProgress step={isSeoa ? 3 : 4} totalSteps={scenario.totalSteps} label="접수" />
+        <CaseSubmitProgress step={isSeoa ? 3 : 4} totalSteps={scenario.totalSteps} label="AI 1심" />
 
         <div className="case-submit__intro">
-          <h2 className="case-submit__heading">접수 전 마지막 확인</h2>
-          <p className="case-submit__description">판멍이의 1심과 공개 범위를 확인해 주세요.</p>
+          <h2 className="case-submit__heading">판멍이는 이렇게 봤어요</h2>
+          <p className="case-submit__description">1심 의견을 확인하고 공개 범위를 정해주세요.</p>
           {/* 발표 시연용. 이 계정 시나리오에서 고를 수 있는 공개 범위를 바로 선택한다. */}
           <CaseSubmitDemoFill
             personaId={personaId}
@@ -71,6 +72,8 @@ function CaseSubmitOpinionPage() {
         </div>
 
         <div className="case-submit__ai-opinion">
+          {/* 카드가 놓인 뒤 판멍이 도장이 한 번 더 찍힌다. 판결이 확정됐다는 표시다. */}
+          <img className="case-submit__ai-opinion-stamp" src={panmungStamp} alt="" aria-hidden="true" />
           <p className="case-submit__ai-opinion-eyebrow">{opinion.eyebrow}</p>
           <p className="case-submit__ai-opinion-headline">{opinion.headline}</p>
           <ul className="case-submit__ai-opinion-reasons">

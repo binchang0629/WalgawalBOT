@@ -1,5 +1,6 @@
 import { profileAvatars } from './profileAvatars'
 import type { ThreadComment } from '../../components/common/CommentThread'
+import type { CommentStickerId } from './commentStickers'
 
 /** 홈 카드와 다른 후일담 메모지에 쓰는 시연용 댓글. 한 페이지에 다섯 개씩 보인다. */
 type CommentSeed = readonly [nickname: string, body: string]
@@ -114,11 +115,11 @@ const creditSeeds: CommentSeed[] = [
 ]
 
 const secretSeeds: CommentSeed[] = [
-  ['잠금장치달빛', '어떤 이야기였는지 공개하지 않고도 상처받은 이유를 충분히 전할 수 있어요.'],
-  ['말의무게', '친구가 허락 없이 말한 게 문제였다는 점을 분명히 짚으셨네요.'],
-  ['조용한책갈피', '사과를 받아도 바로 전처럼 믿기 어려운 마음이 자연스러워요.'],
-  ['파란색일기', '들은 친구들에게도 더 퍼뜨리지 말아 달라고 전한 건 필요한 행동이었어요.'],
-  ['한걸음거리', '관계를 끊거나 무조건 용서하는 것 사이에도 여러 선택이 있죠.'],
+  ['인프피모드', '친구 관계는 항상 어려운 거 같네요..'],
+  ['이구역공감왕', '친구가 허락 없이 말한 게 문제였다는 점을 분명히 짚으셨네요.'],
+  ['왈가닥파', '사과를 받아도 바로 전처럼 믿기 어렵죠.'],
+  ['나는다좋아', '들은 친구들에게도 더 퍼뜨리지 말아 달라고 전한 건 필요한 행동이었어요.'],
+  ['왈랑이파', '관계를 끊거나 무조건 용서하는 것 사이에도 여러 선택이 있죠.'],
   ['귓속말지킴이', '다음부터는 서로에게 말해도 되는 범위를 먼저 확인하면 좋겠어요.'],
   ['천천히믿기', '신뢰는 한 번의 사과보다 이후 행동으로 다시 쌓이는 것 같아요.'],
   ['작은열쇠', '친구가 변명만 하지 않고 직접 수습하려 한 점은 다행이에요.'],
@@ -175,19 +176,49 @@ export function retimeComments(comments: ThreadComment[], storyMinutesAgo: numbe
   }))
 }
 
+/*
+ * 댓글에 섞는 스티커.
+ *
+ * 후일담 상세는 글 아래가 전부 댓글이라 글자만 길게 이어지면 읽기 지친다.
+ * 사건 상세의 댓글처럼 몇 개에만 스티커를 붙여 화면에 쉼표를 만든다.
+ *
+ * 후일담은 대체로 일이 풀린 뒤의 이야기라 공감·기쁨·경청 쪽 표정을 주로 쓰고,
+ * 아직 진행 중인 사연에 달릴 만한 궁금·생각도 섞는다.
+ */
+const commentStickerRotation: CommentStickerId[] = [
+  'wallang-empathy',
+  'walgadak-joy',
+  'wallang-listen',
+  'walgadak-empathy',
+  'wallang-joy',
+  'walgadak-thinking',
+  'wallang-curious',
+  'walgadak-listen',
+]
+
+/** 네 번째 댓글마다 하나씩. 너무 자주 나오면 스티커가 배경처럼 묻힌다. */
+const STICKER_EVERY = 4
+
 function toComments(seeds: CommentSeed[], idPrefix: string): ThreadComment[] {
-  return seeds.map(([nickname, body], index) => ({
-    id: `${idPrefix}-comment-${index + 1}`,
-    nickname,
-    body,
-    // 실제로 보이는 시각은 retimeComments가 글 나이에 맞춰 다시 정한다.
-    minutesAgo: 4 + index * 17,
-    voteId: null,
-    voteLabel: null,
-    likes: (index * 7 + 3) % 29,
-    dislikes: index % 6 === 0 ? 1 : 0,
-    avatarUrl: avatars[index % avatars.length],
-  }))
+  return seeds.map(([nickname, body], index) => {
+    const stickerId = index % STICKER_EVERY === 1
+      ? commentStickerRotation[Math.floor(index / STICKER_EVERY) % commentStickerRotation.length]
+      : undefined
+
+    return {
+      id: `${idPrefix}-comment-${index + 1}`,
+      nickname,
+      body,
+      // 실제로 보이는 시각은 retimeComments가 글 나이에 맞춰 다시 정한다.
+      minutesAgo: 4 + index * 17,
+      voteId: null,
+      voteLabel: null,
+      ...(stickerId ? { stickerId } : {}),
+      likes: (index * 7 + 3) % 29,
+      dislikes: index % 6 === 0 ? 1 : 0,
+      avatarUrl: avatars[index % avatars.length],
+    }
+  })
 }
 
 export const afterStoryCardComments: Record<'afterstory-birthday-gift' | 'afterstory-video-payment' | 'afterstory-friend-loan' | 'afterstory-idea-credit-card' | 'afterstory-secret-told', ThreadComment[]> = {

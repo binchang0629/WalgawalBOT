@@ -366,7 +366,7 @@ export function getPlazaJuryBreakdown(caseId: string | undefined) {
 }
 
 const avatarUrls = profileAvatars
-const nicknames = ['차분한 배심원', '오늘도 한 표', '다른 각도', '생각 정리 중', '익명의 왈가닥', '함께 고민해요', '꼼꼼한 기록']
+const nicknames = ['김차분', '차카니', '날카로운시선', '하은하음', '익명의 왈가닥', '빈창', '꼼꼼한 기록']
 const voteLabels: Record<VoteId, string> = {
   writer: '투표 · 글쓴이 입장',
   other: '투표 · 상대방 입장',
