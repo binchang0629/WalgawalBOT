@@ -366,7 +366,13 @@ export function getPlazaJuryBreakdown(caseId: string | undefined) {
 }
 
 const avatarUrls = profileAvatars
-const nicknames = ['김차분', '차카니', '날카로운시선', '하은하음', '익명의 왈가닥', '빈창', '꼼꼼한 기록']
+/*
+ * 다른 배심원들의 닉네임.
+ *
+ * 시연 계정의 닉네임(`익명의 왈가닥` · `익명의 왈랑이`)은 여기 넣지 않는다.
+ * 겹치면 남이 쓴 댓글이 내가 쓴 것처럼 보여서, 수정·삭제가 왜 안 뜨는지 알 수 없게 된다.
+ */
+const nicknames = ['김차분', '차카니', '날카로운시선', '하은하음', '조용한한표', '빈창', '꼼꼼한 기록']
 const voteLabels: Record<VoteId, string> = {
   writer: '투표 · 글쓴이 입장',
   other: '투표 · 상대방 입장',

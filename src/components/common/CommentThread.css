@@ -395,6 +395,11 @@
     flex: none;
 }
 
+/* 투표 배지와 더보기가 나란히 올 때는 사이를 조금 더 벌린다. 붙으면 한 덩어리로 읽힌다. */
+.result-comment__badge + .result-comment__more {
+    margin-left: 4px;
+}
+
 .result-comment__menu {
     display: grid;
     place-items: center;

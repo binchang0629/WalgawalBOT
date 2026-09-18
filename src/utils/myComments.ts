@@ -1,4 +1,5 @@
 import { DEMO } from '../config/app'
+import { applyCommentEdits, readCommentEdits } from './commentEdits'
 import { JIHOON_COMMENT_REACTIONS, jihoonCommentRecords } from '../data/personas/jihoonComments'
 import type { PersonaId } from '../types'
 
@@ -89,11 +90,13 @@ function readStoredComments(personaId: PersonaId): MyCommentRecord[] {
  */
 function seededComments(personaId: PersonaId): MyCommentRecord[] {
   if (personaId !== 'B') return []
-  return jihoonCommentRecords().map((record) => ({
+  const records = jihoonCommentRecords().map((record) => ({
     ...record,
     reaction: null,
     ...JIHOON_COMMENT_REACTIONS,
   }))
+  // 댓글 화면에서 고치거나 지운 것을 여기에도 그대로 반영한다. 두 화면이 어긋나면 안 된다.
+  return applyCommentEdits(readCommentEdits(personaId), records)
 }
 
 /** 최신 댓글이 앞에 온다. 심어 둔 댓글과 직접 쓴 댓글을 한 목록으로 합친다. */

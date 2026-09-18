@@ -30,6 +30,7 @@ import type {
 import useDetailSlide from '../../hooks/useDetailSlide'
 import useFocusComment, { commentAnchorId } from '../../hooks/useFocusComment'
 import useSession from '../../hooks/useSession'
+import { applyCommentEdits, deleteComment, editComment, isOwnComment, readCommentEdits } from '../../utils/commentEdits'
 import { readThreadComments, saveThreadComments } from '../../utils/plazaComments'
 import { addMyComment, readMyCommentReactions, removeMyComment, setMyCommentReaction } from '../../utils/myComments'
 import useToast from '../../hooks/useToast'
@@ -223,6 +224,15 @@ function ClosedCaseResultPage() {
    */
   const [sortKey, setSortKey] = useState<'latest' | 'registered'>('latest')
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+  /*
+   * 수정·삭제 기록. 원본 댓글은 코드와 저장소에 그대로 두고 이 값을 덮어씌운다.
+   * (`utils/commentEdits` — 지훈의 예전 댓글은 코드에 있어서 직접 고칠 수 없다)
+   */
+  const [commentEdits, setCommentEdits] = useState(() => readCommentEdits(personaId))
+  const applyEdit = (run: () => void) => {
+    run()
+    setCommentEdits(readCommentEdits(personaId))
+  }
 
   useEffect(() => {
     saveThreadComments(personaId, commentThreadId, addedComments)
@@ -246,7 +256,8 @@ function ClosedCaseResultPage() {
     { length: plazaStory ? 0 : Math.min(jihoonSimilarResult.commentCount, MAX_PAGINATED_COMMENTS) },
     (_, index) => createJihoonSimilarSeedComment(index),
   )
-  const allComments = [...addedComments, ...seededComments]
+  // 고치거나 지운 댓글을 반영한 목록.
+  const allComments = applyCommentEdits(commentEdits, [...addedComments, ...seededComments])
   /*
    * seed 댓글은 먼저 쓴 순서의 역순(최신 → 과거)으로 만들어져 있고,
    * 새로 쓴 댓글은 맨 앞에 붙는다. 등록순은 이 순서를 그대로 뒤집으면 된다.
@@ -465,13 +476,11 @@ function ClosedCaseResultPage() {
                   setMyCommentReaction(personaId, comment.id, next)
                   setCommentReactions((previous) => ({ ...previous, [comment.id]: next }))
                 }}
-                onEdit={comment.id.startsWith('new-comment-') ? (body) => {
-                  setAddedComments((comments) => comments.map((item) => (
-                    item.id === comment.id ? { ...item, body, editedAtMs: Date.now() } : item
-                  )))
+                onEdit={isOwnComment(personaId, comment.id) ? (body) => {
+                  applyEdit(() => editComment(personaId, comment.id, body))
                   showToast(COMMENT_TOAST_MESSAGES.edited)
                 } : undefined}
-                onDelete={comment.id.startsWith('new-comment-') ? () => setPendingDeleteId(comment.id) : undefined}
+                onDelete={isOwnComment(personaId, comment.id) ? () => setPendingDeleteId(comment.id) : undefined}
               />
             ))}
           </div>
@@ -552,7 +561,7 @@ function ClosedCaseResultPage() {
           onClose={() => setPendingDeleteId(null)}
           onConfirm={() => {
             const commentId = pendingDeleteId
-            setAddedComments((comments) => comments.filter((item) => item.id !== commentId))
+            applyEdit(() => deleteComment(personaId, commentId))
             // 지운 댓글이 MY > 내가 쓴 댓글에 남으면 눌러도 갈 곳이 없다.
             removeMyComment(personaId, commentId)
             setCommentReactions((previous) => {
