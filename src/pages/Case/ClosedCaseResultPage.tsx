@@ -31,7 +31,7 @@ import useDetailSlide from '../../hooks/useDetailSlide'
 import useFocusComment, { commentAnchorId } from '../../hooks/useFocusComment'
 import useSession from '../../hooks/useSession'
 import { readThreadComments, saveThreadComments } from '../../utils/plazaComments'
-import { addMyComment, readMyCommentReactions, removeMyComment, seedCommentReactions, setMyCommentReaction } from '../../utils/myComments'
+import { addMyComment, readMyCommentReactions, removeMyComment, setMyCommentReaction } from '../../utils/myComments'
 import useToast from '../../hooks/useToast'
 import useLoginGate from '../../hooks/useLoginGate'
 import { PATHS, toAfterStoryDetail } from '../../routes/paths'
@@ -294,7 +294,9 @@ function ClosedCaseResultPage() {
         voteLabel: null,
         body,
         stickerId: selectedStickerId ?? undefined,
-        ...seedCommentReactions(commentId),
+        // 방금 쓴 댓글이라 아직 아무도 누르지 않았다.
+        likes: 0,
+        dislikes: 0,
       },
       ...comments,
     ])

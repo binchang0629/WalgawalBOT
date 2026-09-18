@@ -7,6 +7,7 @@ import EmptyCaseState from '../../components/common/EmptyCaseState'
 import DemoRelativeTime from '../../components/common/DemoRelativeTime'
 import useSession from '../../hooks/useSession'
 import useDetailSlide from '../../hooks/useDetailSlide'
+import useListScrollMemory from '../../hooks/useListScrollMemory'
 import { commentReactionCounts, readMyComments } from '../../utils/myComments'
 import type { MyCommentRecord } from '../../utils/myComments'
 import './MyCases.css'
@@ -83,6 +84,11 @@ function MyCommentsContent({ records }: { records: MyCommentRecord[] }) {
     (location.state as { skipDetailSlideEnter?: boolean } | null)?.skipDetailSlideEnter === true
 
   const slide = useDetailSlide(!skipEnter)
+  /*
+   * 목록에서 사건을 열었다가 돌아오면 보고 있던 자리로 되돌린다.
+   * 없으면 돌아올 때마다 맨 위로 튀어서, 아래쪽 댓글을 볼 때마다 다시 내려야 한다.
+   */
+  const listRef = useListScrollMemory('my-comments', records.length > 0)
 
   return (
     <main className={`my-cases-page ${slide.className}`}>
@@ -95,6 +101,7 @@ function MyCommentsContent({ records }: { records: MyCommentRecord[] }) {
       </header>
 
       <div
+        ref={listRef}
         className={`my-cases-page__content${records.length === 0 ? ' my-cases-page__content--empty' : ''}`}
         role="region"
         aria-label="내가 쓴 댓글 목록"

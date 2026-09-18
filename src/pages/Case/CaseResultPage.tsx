@@ -22,7 +22,7 @@ import { commentStickerById, type CommentStickerId } from '../../data/common/com
 import { weddingGiftCase } from '../../data/common/caseDetailContent'
 import { createParentsSeedComment, parentsCase, parentsResult } from '../../data/common/parentsCaseContent'
 import { getPlazaCaseResultContent, getPlazaCaseStory } from '../../data/common/plazaCaseStories'
-import { addMyComment, readMyCommentReactions, removeMyComment, seedCommentReactions, setMyCommentReaction } from '../../utils/myComments'
+import { addMyComment, readMyCommentReactions, removeMyComment, setMyCommentReaction } from '../../utils/myComments'
 import type { WeddingGiftVoteId } from '../../data/common/caseDetailContent'
 import {
   createWeddingGiftSeedComment,
@@ -338,7 +338,9 @@ function CaseResultPage() {
         voteLabel: voteDisplay.label,
         body,
         stickerId: selectedStickerId ?? undefined,
-        ...seedCommentReactions(commentId),
+        // 방금 쓴 댓글이라 아직 아무도 누르지 않았다.
+        likes: 0,
+        dislikes: 0,
       },
       ...comments,
     ])

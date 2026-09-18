@@ -36,43 +36,21 @@ export interface MyCommentRecord {
   reaction: CommentReactionValue
   /**
    * 받은 공감/반대. 미리 심어 둔 지훈의 댓글만 값을 갖는다.
-   * 직접 쓴 댓글은 값이 없고 id에서 계산한다(`seedCommentReactions`).
+   * 방금 직접 쓴 댓글은 아직 아무도 누르지 않았으므로 0에서 시작한다.
    */
   likes?: number
   dislikes?: number
 }
 
-/** 화면에 보여 줄 공감/반대 수. 심어 둔 값이 있으면 그걸 쓰고, 없으면 id에서 만든다. */
+/** 화면에 보여 줄 공감/반대 수. 심어 둔 값이 없으면 0이다. */
 export function commentReactionCounts(record: MyCommentRecord): { likes: number; dislikes: number } {
-  if (record.likes !== undefined && record.dislikes !== undefined) {
-    return { likes: record.likes, dislikes: record.dislikes }
-  }
-  return seedCommentReactions(record.id)
+  return { likes: record.likes ?? 0, dislikes: record.dislikes ?? 0 }
 }
 
 /** 시연용이라 무한정 쌓을 필요가 없다. 최근 것부터 이만큼만 남긴다. */
 const MAX_RECORDS = 30
 
 const storageKey = (personaId: PersonaId) => `${DEMO.storagePrefix}:${personaId}:my-comments:v1`
-
-/**
- * 다른 배심원이 눌러 준 공감/반대 수. 서버가 없어서 실제 집계가 아니라,
- * 댓글 id에서 계산해 낸 시연용 고정 수치다. 랜덤이 아니라 순수 함수라서
- * 댓글 화면에서 보든 MY에서 보든, 새로고침을 해도 같은 숫자가 나온다.
- * 값은 발표용으로 낮게 잡는다. (공감 1~2 / 반대 0~2)
- */
-const SEED_PAIRS: ReadonlyArray<readonly [number, number]> = [
-  [1, 0], [2, 0], [1, 1], [2, 1], [1, 2],
-]
-
-export function seedCommentReactions(id: string): { likes: number; dislikes: number } {
-  let hash = 0
-  for (let index = 0; index < id.length; index += 1) {
-    hash = (hash * 31 + id.charCodeAt(index)) >>> 0
-  }
-  const [likes, dislikes] = SEED_PAIRS[hash % SEED_PAIRS.length]
-  return { likes, dislikes }
-}
 
 function isRecord(value: unknown): value is MyCommentRecord {
   if (typeof value !== 'object' || value === null) return false

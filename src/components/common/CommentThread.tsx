@@ -12,7 +12,7 @@ import { commentStickerById, type CommentStickerId } from '../../data/common/com
 import useFocusComment, { commentAnchorId } from '../../hooks/useFocusComment'
 import useLoginGate from '../../hooks/useLoginGate'
 import useSession from '../../hooks/useSession'
-import { addMyComment, readMyCommentReactions, removeMyComment, seedCommentReactions, setMyCommentReaction } from '../../utils/myComments'
+import { addMyComment, readMyCommentReactions, removeMyComment, setMyCommentReaction } from '../../utils/myComments'
 import useToast from '../../hooks/useToast'
 /*
  * 스티커 고르는 창은 사건 결과 화면에서 먼저 만들어 둔 것을 그대로 쓴다.
@@ -306,7 +306,9 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
         voteLabel: null,
         body,
         ...(selectedStickerId ? { stickerId: selectedStickerId } : {}),
-        ...seedCommentReactions(commentId),
+        // 방금 쓴 댓글이라 아직 아무도 누르지 않았다.
+        likes: 0,
+        dislikes: 0,
       },
       ...current,
     ])
