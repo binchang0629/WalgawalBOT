@@ -12,7 +12,7 @@ import { commentStickerById, type CommentStickerId } from '../../data/common/com
 import useFocusComment, { commentAnchorId } from '../../hooks/useFocusComment'
 import useLoginGate from '../../hooks/useLoginGate'
 import useSession from '../../hooks/useSession'
-import { addMyComment, readMyCommentReactions, seedCommentReactions, setMyCommentReaction } from '../../utils/myComments'
+import { addMyComment, readMyCommentReactions, removeMyComment, seedCommentReactions, setMyCommentReaction } from '../../utils/myComments'
 import useToast from '../../hooks/useToast'
 /*
  * 스티커 고르는 창은 사건 결과 화면에서 먼저 만들어 둔 것을 그대로 쓴다.
@@ -23,7 +23,7 @@ import CommentStickerPicker from '../../pages/Case/components/CommentStickerPick
 import Pagination from './Pagination'
 import ConfirmDialog from './ConfirmDialog'
 import { COMMENT_TOAST_MESSAGES } from './commentToastMessages'
-import { readPlazaComments, savePlazaComments } from '../../utils/plazaComments'
+import { readThreadComments, saveThreadComments } from '../../utils/plazaComments'
 import './CommentThread.css'
 
 /** 댓글 한 건. 사건 결과 화면과 왈가왈후 후일담 상세 화면이 같은 모양을 쓴다. */
@@ -208,7 +208,11 @@ interface CommentThreadProps {
   /** 스티커 창에서 처음 보여줄 캐릭터를 정할 때 쓰는 제목 id. */
   headingId?: string
   /** 광장 사건에서만 세션 동안 새 댓글을 보존한다. */
-  plazaCaseId?: string
+  /**
+   * 이 댓글 목록을 가리키는 id. 사건은 사건 id, 후일담은 후일담 id다.
+   * 주면 직접 단 댓글이 저장돼서 화면을 나갔다 와도 남는다.
+   */
+  threadId?: string
   /*
    * MY > 내가 쓴 댓글에 남길 정보. 넘기지 않으면 기록하지 않는다.
    * 어느 글에 단 댓글인지와, 눌렀을 때 돌아올 주소가 필요하다.
@@ -227,7 +231,7 @@ interface CommentThreadProps {
  * 같은 브라우저 세션에서만 보존한다.
  * (PROJECT_SPEC.md — mock 응답을 실제인 것처럼 표시하지 않는다)
  */
-function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge = true, actionsInHeader = false, headingId = 'comment-thread-title', plazaCaseId, commentRecord }: CommentThreadProps) {
+function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge = true, actionsInHeader = false, headingId = 'comment-thread-title', threadId, commentRecord }: CommentThreadProps) {
   const { currentUser, sessionStatus, personaId } = useSession()
   const { requireLogin } = useLoginGate()
   const { showToast } = useToast()
@@ -236,7 +240,7 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
   const [draft, setDraft] = useState('')
   const [selectedStickerId, setSelectedStickerId] = useState<CommentStickerId | null>(null)
   const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false)
-  const [addedComments, setAddedComments] = useState<ThreadComment[]>(() => plazaCaseId ? readPlazaComments(plazaCaseId) : [])
+  const [addedComments, setAddedComments] = useState<ThreadComment[]>(() => (threadId ? readThreadComments<ThreadComment>(personaId, threadId) : []))
   const [currentPage, setCurrentPage] = useState(1)
   const [sortKey, setSortKey] = useState<SortKey>('latest')
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
@@ -252,8 +256,8 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
   const isAuthenticated = sessionStatus === 'authenticated'
 
   useEffect(() => {
-    if (plazaCaseId) savePlazaComments(plazaCaseId, addedComments)
-  }, [addedComments, plazaCaseId])
+    if (threadId) saveThreadComments(personaId, threadId, addedComments)
+  }, [addedComments, personaId, threadId])
 
   const requestCommentLogin = () => {
     if (isAuthenticated) return true
@@ -442,6 +446,8 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
           onConfirm={() => {
             const commentId = pendingDeleteId
             setAddedComments((current) => current.filter((item) => item.id !== commentId))
+            // 지운 댓글이 MY > 내가 쓴 댓글에 남으면 눌러도 갈 곳이 없다.
+            removeMyComment(personaId, commentId)
             setReactions((previous) => {
               const next = { ...previous }
               delete next[commentId]

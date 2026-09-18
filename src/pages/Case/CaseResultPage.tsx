@@ -22,7 +22,7 @@ import { commentStickerById, type CommentStickerId } from '../../data/common/com
 import { weddingGiftCase } from '../../data/common/caseDetailContent'
 import { createParentsSeedComment, parentsCase, parentsResult } from '../../data/common/parentsCaseContent'
 import { getPlazaCaseResultContent, getPlazaCaseStory } from '../../data/common/plazaCaseStories'
-import { addMyComment, readMyCommentReactions, seedCommentReactions, setMyCommentReaction } from '../../utils/myComments'
+import { addMyComment, readMyCommentReactions, removeMyComment, seedCommentReactions, setMyCommentReaction } from '../../utils/myComments'
 import type { WeddingGiftVoteId } from '../../data/common/caseDetailContent'
 import {
   createWeddingGiftSeedComment,
@@ -32,6 +32,7 @@ import {
 import type { CaseResultComment } from '../../data/common/caseResultContent'
 import useFocusComment, { commentAnchorId } from '../../hooks/useFocusComment'
 import useSession from '../../hooks/useSession'
+import { readThreadComments, saveThreadComments } from '../../utils/plazaComments'
 import useToast from '../../hooks/useToast'
 import { PATHS, toAfterStoryDetail } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
@@ -208,7 +209,17 @@ function CaseResultPage() {
   const [draft, setDraft] = useState('')
   const [selectedStickerId, setSelectedStickerId] = useState<CommentStickerId | null>(null)
   const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false)
-  const [addedComments, setAddedComments] = useState<CaseResultComment[]>([])
+  /*
+   * 이 화면이 직접 들고 있는 댓글 목록.
+   *
+   * 공용 CommentThread를 쓰지 않는 사건이라 저장도 여기서 맡는다.
+   * 저장하지 않으면 화면을 나갔다 오는 순간 방금 단 댓글이 사라지는데,
+   * MY > 내가 쓴 댓글에는 남아 있어서 두 화면이 어긋난다.
+   */
+  const commentThreadId = caseId ?? 'case'
+  const [addedComments, setAddedComments] = useState<CaseResultComment[]>(
+    () => readThreadComments<CaseResultComment>(personaId, commentThreadId),
+  )
   const [currentPage, setCurrentPage] = useState(1)
   /*
    * 댓글 정렬. 시안에는 `등록순 | 최신순`이 글자로만 있어 눌러도 반응이 없었다.
@@ -219,6 +230,10 @@ function CaseResultPage() {
   const [playingCaseId, setPlayingCaseId] = useState<string | null>(null)
   const [speechCaseId, setSpeechCaseId] = useState<string | null>(null)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+
+  useEffect(() => {
+    saveThreadComments(personaId, commentThreadId, addedComments)
+  }, [addedComments, personaId, commentThreadId])
   // 페이지가 바뀌어 댓글이 언마운트되어도 공감/반대 선택을 유지한다.
   // 내 댓글에 눌러 둔 것은 MY 기록에 남아 있어서 화면을 다시 들어와도 살아난다.
   const [commentReactions, setCommentReactions] = useState<Record<string, CommentReaction>>(() => readMyCommentReactions(personaId))
@@ -489,7 +504,7 @@ function CaseResultPage() {
             key={plazaStory.id}
             comments={plazaStory.comments}
             headingId="comments-title"
-            plazaCaseId={plazaStory.id}
+            threadId={plazaStory.id}
             /* 여기서 단 댓글은 MY > 내가 쓴 댓글에 사건 제목과 함께 남는다. */
             commentRecord={{ caseId: plazaStory.id, caseTitle: plazaStory.title, href: location.pathname }}
           />
@@ -614,6 +629,8 @@ function CaseResultPage() {
           onConfirm={() => {
             const commentId = pendingDeleteId
             setAddedComments((comments) => comments.filter((item) => item.id !== commentId))
+            // 지운 댓글이 MY > 내가 쓴 댓글에 남으면 눌러도 갈 곳이 없다.
+            removeMyComment(personaId, commentId)
             setCommentReactions((previous) => {
               const next = { ...previous }
               delete next[commentId]

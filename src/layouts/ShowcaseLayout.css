@@ -163,6 +163,41 @@
 }
 
 /*
+ * 시연 초기화. 되돌릴 수 없는 동작이라 위 버튼과 한눈에 구분되어야 한다.
+ * 그렇다고 빨간 경고색을 쓰면 발표 화면에서 너무 튀어서, 테두리만 또렷하게 둔다.
+ */
+.showcase__reset {
+    margin-top: 10px;
+    display: block;
+    padding: 10px 16px;
+    border: 1px solid var(--neutral-400);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--neutral-700);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.showcase__reset:hover {
+    border-color: var(--negative);
+    color: var(--negative);
+}
+
+.showcase__reset:focus-visible {
+    outline: 2px solid var(--blue-700);
+    outline-offset: 2px;
+}
+
+/* 무엇이 지워지는지 미리 알려 준다. 누르고 나서 알면 늦다. */
+.showcase__reset-note {
+    margin: 8px 0 0;
+    max-width: 200px;
+    color: var(--neutral-600);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+/*
  * 양쪽 패널이 들어가려면 (240 + 40) × 2 + 426 + 48 ≈ 1034px가 필요하다.
  * 그보다 좁으면 둘 다 감춘다. 좌우를 함께 감추므로 기기는 계속 중앙에 있다.
  */

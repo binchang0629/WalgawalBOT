@@ -13,6 +13,10 @@ import type { PersonaId } from '../types'
  *
  * 서버가 없으므로 이 브라우저 안에서만 유지된다. 실제로 저장된 것처럼 보이게 하지 않는다.
  * (PROJECT_SPEC.md — mock 데이터를 실제 응답처럼 표시하지 않는다)
+ *
+ * 각 글에 달린 댓글(`plazaComments`)과 같은 sessionStorage에 둔다.
+ * 한쪽만 남으면 MY에는 보이는데 그 글에는 없는 댓글이 생겨 두 화면이 어긋난다.
+ * 앱이 뜰 때 `demoReset`이 둘을 함께 비운다.
  */
 
 export type CommentReactionValue = 'like' | 'dislike' | null
@@ -84,7 +88,7 @@ function isRecord(value: unknown): value is MyCommentRecord {
 /** 이 브라우저에 실제로 저장된 것만. 미리 심어 둔 지훈 댓글은 포함하지 않는다. */
 function readStoredComments(personaId: PersonaId): MyCommentRecord[] {
   try {
-    const raw = window.localStorage.getItem(storageKey(personaId))
+    const raw = window.sessionStorage.getItem(storageKey(personaId))
     if (!raw) return []
     const parsed: unknown = JSON.parse(raw)
     if (!Array.isArray(parsed)) return []
@@ -134,7 +138,7 @@ export function readMyCommentReactions(personaId: PersonaId): Record<string, Com
 
 function writeMyComments(personaId: PersonaId, records: MyCommentRecord[]) {
   try {
-    window.localStorage.setItem(storageKey(personaId), JSON.stringify(records.slice(0, MAX_RECORDS)))
+    window.sessionStorage.setItem(storageKey(personaId), JSON.stringify(records.slice(0, MAX_RECORDS)))
   } catch {
     // 저장에 실패해도 댓글 자체는 화면에 그대로 달린다.
   }
@@ -154,6 +158,18 @@ export function addMyComment(
   const created: MyCommentRecord = { ...record, body, createdAt: Date.now(), reaction: null }
   writeMyComments(personaId, [created, ...readStoredComments(personaId).filter((item) => item.id !== created.id)])
   return created
+}
+
+/**
+ * 댓글을 지웠을 때 MY 기록에서도 뺀다.
+ *
+ * 안 빼면 지운 댓글이 목록에 남아, 눌러도 그 글에 없는 댓글을 찾게 된다.
+ * 미리 심어 둔 지훈 댓글은 지울 수 없으니 저장된 것만 본다.
+ */
+export function removeMyComment(personaId: PersonaId, id: string) {
+  const stored = readStoredComments(personaId)
+  if (!stored.some((record) => record.id === id)) return
+  writeMyComments(personaId, stored.filter((record) => record.id !== id))
 }
 
 /** 내가 내 댓글에 공감/반대를 눌렀을 때. 한 번 더 누르면 null이 들어와 취소된다. */

@@ -7,6 +7,7 @@ import wgwbLogo from '../assets/brand/wgwb-logo.svg'
 import onboardingQr from '../assets/brand/onboarding-qr.svg'
 import useIsDesktop from '../hooks/useIsDesktop'
 import { DEVICE_FRAME, SERVICE, SHOWCASE_BACKGROUND } from '../config/app'
+import { resetDemoSession } from '../utils/demoReset'
 import './ShowcaseLayout.css'
 
 /**
@@ -125,6 +126,25 @@ function ShowcaseLayout() {
           >
             {fitToScreen ? '원본 크기 보기' : '화면에 맞추기'}
           </button>
+
+          {/*
+            다음 사람에게 넘기기 전에 누른다. 같은 브라우저로 여러 명이 돌아가며 볼 때,
+            앞사람이 단 댓글과 배심 참여 기록이 남아 있으면 시연이 처음 상태가 아니게 된다.
+            지우고 첫 화면(스플래시)부터 다시 시작한다.
+            서비스 UI가 아니라 시연 도구라서 기기 바깥에 둔다. (PROJECT_SPEC.md §4)
+          */}
+          <button
+            type="button"
+            className="showcase__reset"
+            onClick={() => {
+              resetDemoSession()
+              // 지운 상태로 새로 띄운다. replace라 뒤로 가기로 되돌아오지 않는다.
+              window.location.replace('/')
+            }}
+          >
+            시연 초기화
+          </button>
+          <p className="showcase__reset-note">댓글 · 로그인 · 배심 기록을 모두 지우고 처음부터 시작해요</p>
         </aside>
       </div>
     </div>

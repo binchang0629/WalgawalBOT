@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 
@@ -30,7 +30,8 @@ import type {
 import useDetailSlide from '../../hooks/useDetailSlide'
 import useFocusComment, { commentAnchorId } from '../../hooks/useFocusComment'
 import useSession from '../../hooks/useSession'
-import { addMyComment, readMyCommentReactions, seedCommentReactions, setMyCommentReaction } from '../../utils/myComments'
+import { readThreadComments, saveThreadComments } from '../../utils/plazaComments'
+import { addMyComment, readMyCommentReactions, removeMyComment, seedCommentReactions, setMyCommentReaction } from '../../utils/myComments'
 import useToast from '../../hooks/useToast'
 import useLoginGate from '../../hooks/useLoginGate'
 import { PATHS, toAfterStoryDetail } from '../../routes/paths'
@@ -203,7 +204,17 @@ function ClosedCaseResultPage() {
   const [draft, setDraft] = useState('')
   const [selectedStickerId, setSelectedStickerId] = useState<CommentStickerId | null>(null)
   const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false)
-  const [addedComments, setAddedComments] = useState<JihoonSimilarComment[]>([])
+  /*
+   * 이 화면이 직접 들고 있는 댓글 목록.
+   *
+   * 공용 CommentThread를 쓰지 않는 사건이라 저장도 여기서 맡는다.
+   * 저장하지 않으면 화면을 나갔다 오는 순간 방금 단 댓글이 사라지는데,
+   * MY > 내가 쓴 댓글에는 남아 있어서 두 화면이 어긋난다.
+   */
+  const commentThreadId = caseId ?? 'case'
+  const [addedComments, setAddedComments] = useState<JihoonSimilarComment[]>(
+    () => readThreadComments<JihoonSimilarComment>(personaId, commentThreadId),
+  )
   const [currentPage, setCurrentPage] = useState(1)
   /*
    * 댓글 정렬. 시안에는 `등록순 | 최신순`이 글자로만 있어 눌러도 반응이 없었다.
@@ -212,6 +223,10 @@ function ClosedCaseResultPage() {
    */
   const [sortKey, setSortKey] = useState<'latest' | 'registered'>('latest')
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+
+  useEffect(() => {
+    saveThreadComments(personaId, commentThreadId, addedComments)
+  }, [addedComments, personaId, commentThreadId])
   // 내 댓글에 눌러 둔 공감/반대는 MY 기록에 남아 있어서 화면을 다시 들어와도 살아난다.
   const [commentReactions, setCommentReactions] = useState<Record<string, CommentReaction>>(() => readMyCommentReactions(personaId))
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -367,7 +382,7 @@ function ClosedCaseResultPage() {
             key={plazaStory.id}
             comments={plazaStory.comments}
             headingId="comments-title"
-            plazaCaseId={plazaStory.id}
+            threadId={plazaStory.id}
             /* 이 화면의 인라인 댓글과 마찬가지로 MY > 내가 쓴 댓글에 남긴다. */
             commentRecord={{ caseId: plazaStory.id, caseTitle: plazaStory.title, href: location.pathname }}
           />
@@ -536,6 +551,8 @@ function ClosedCaseResultPage() {
           onConfirm={() => {
             const commentId = pendingDeleteId
             setAddedComments((comments) => comments.filter((item) => item.id !== commentId))
+            // 지운 댓글이 MY > 내가 쓴 댓글에 남으면 눌러도 갈 곳이 없다.
+            removeMyComment(personaId, commentId)
             setCommentReactions((previous) => {
               const next = { ...previous }
               delete next[commentId]
