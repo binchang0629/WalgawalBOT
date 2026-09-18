@@ -1,6 +1,6 @@
 import type React from 'react'
 import { useEffect, useRef, useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import useLoginGate from '../../hooks/useLoginGate'
 import type { LoginGateReason } from '../../state/loginGateContext'
 import { PATHS } from '../../routes/paths'
@@ -19,7 +19,11 @@ import navBackground from '../../assets/home/figma/imgDownNav.svg'
  * 자료 IA에는 `알림`이 하단 메뉴로 적혀 있으나, 시안에서 알림은 상단 헤더 아이콘이다.
  * (PROJECT_SPEC.md §1-1, §9 정리된 것 4)
  *
- * 활성 상태는 별도 state가 아니라 현재 URL에서 판단한다. (PROJECT_SPEC.md §7-7)
+ * 활성 상태는 현재 URL 또는 사건 진입 경로를 기준으로 판단한다.
+ * 사건 상세/결과처럼 공통 라우트를 사용하는 화면에서는
+ * `location.state.returnTo` 또는 `location.state.from`을 사용해
+ * 사용자가 원래 들어왔던 하단 메뉴를 활성화한다.
+ *
  * 홈 인디케이터 막대는 여기서 그리지 않는다. 목업의 HomeIndicator가 담당한다.
  *
  * 아이콘은 Figma에서 내보낸 SVG를 CSS mask로 얹는다.
@@ -71,6 +75,7 @@ function NavIcon({ src, isCta }: { src: string; isCta?: boolean }) {
 function BottomNavigation() {
   const { requireLogin } = useLoginGate()
   const navigate = useNavigate()
+  const location = useLocation()
   const ctaTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [ctaPressed, setCtaPressed] = useState(false)
 
@@ -78,11 +83,44 @@ function BottomNavigation() {
     if (ctaTimer.current) clearTimeout(ctaTimer.current)
   }, [])
 
+  /*
+   * 사건 상세/결과처럼 여러 메뉴에서 공통으로 사용하는 페이지에서는
+   * 현재 pathname만으로는 어떤 하단 메뉴에서 들어왔는지 알 수 없다.
+   *
+   * 따라서:
+   * 1. returnTo가 있으면 returnTo를 사용
+   * 2. 없으면 from을 사용
+   * 3. 둘 다 없으면 현재 pathname을 사용
+   */
+  const routeState = location.state as {
+    returnTo?: string
+    from?: string
+    fromPlaza?: boolean
+  } | null
+
+  const activePath =
+    routeState?.returnTo ??
+    routeState?.from ??
+    location.pathname
+
   return (
     <nav className="bottom-nav" aria-label="주요 메뉴">
       <img className="bottom-nav__background" src={navBackground} alt="" aria-hidden="true" />
+
       {NAV_ITEMS.map((item) => {
-        const className = item.isCta ? 'bottom-nav__item case-nav' : 'bottom-nav__item'
+        const className = item.isCta
+          ? 'bottom-nav__item case-nav'
+          : 'bottom-nav__item'
+
+        /*
+         * 일반 메뉴는 정확히 일치하는 경우 활성화한다.
+         *
+         * MY는 /my/comments 같은 하위 페이지에서도
+         * MY 메뉴가 활성화되어야 하므로 startsWith를 사용한다.
+         */
+        const isOriginActive =
+          activePath === item.to ||
+          (item.to === PATHS.my && activePath.startsWith(`${PATHS.my}/`))
 
         if (!item.enabled) {
           return (
@@ -104,7 +142,8 @@ function BottomNavigation() {
           <NavLink
             key={item.label}
             to={item.to}
-            className={({ isActive }) => `${className}${isActive ? ' active' : ''}${item.isCta && ctaPressed ? ' case-nav--pressed' : ''}`}
+            end
+            className={`${className}${isOriginActive ? ' active' : ''}${item.isCta && ctaPressed ? ' case-nav--pressed' : ''}`}
             aria-label={item.isCta ? item.label : undefined}
             onClick={(event) => {
               if (item.isCta && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)) return
@@ -118,10 +157,12 @@ function BottomNavigation() {
               if (item.isCta) {
                 event.preventDefault()
                 if (ctaTimer.current) return
+
                 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
                   navigate(item.to)
                   return
                 }
+
                 setCtaPressed(true)
                 ctaTimer.current = setTimeout(() => {
                   ctaTimer.current = null

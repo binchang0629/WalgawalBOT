@@ -257,6 +257,7 @@ function CaseResultPage() {
   if (sessionStatus !== 'authenticated' && !isClosedPlazaCase) return <Navigate to={loginPath} replace />
 
   const routeState = location.state as ResultRouteState | null
+  console.log('RESULT STATE:', location.state)
 
   const returnTo =
     routeState?.from === PATHS.myComments

@@ -18,6 +18,7 @@ import {
 } from '../../../utils/plazaReturnState'
 import searchIcon from '../../../assets/plaza/search-field.svg'
 import chevronDown from '../../../assets/icons/chevron-down.svg'
+import { PATHS } from '../../../routes/paths'
 
 type CategoryFilter = CaseCategory | '전체'
 
@@ -271,6 +272,7 @@ function CaseFeedSection({ restoreState }: { restoreState?: PlazaReturnState | n
                 item={item}
                 index={index}
                 fromPlaza
+                returnTo={PATHS.plaza}
                 onOpen={() => {
                   const scrollContainer = caseFeedRef.current
                     ?.closest<HTMLElement>('.main-layout__scroll')

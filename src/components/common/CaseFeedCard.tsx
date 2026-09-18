@@ -4,6 +4,7 @@ import { categoryDotColor } from '../../data/common/plazaContent'
 import { toCaseDetail } from '../../routes/paths'
 import { readPlazaComments } from '../../utils/plazaComments'
 import VotingStatusBadge from './VotingStatusBadge'
+
 import './CaseFeedCard.css'
 
 interface CaseFeedCardProps {

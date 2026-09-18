@@ -646,6 +646,7 @@ export function AfterStoryDetailPage() {
               <Link
                 className="afterstory-detail__case-link"
                 to={toCaseDetail(communityStory.caseId)}
+                state={{ returnTo: PATHS.afterStory }}
                 aria-label={`${communityStory.title} 사건 상세로 이동`}
               >
                 그날의 사건 보기<span aria-hidden="true">›</span>
