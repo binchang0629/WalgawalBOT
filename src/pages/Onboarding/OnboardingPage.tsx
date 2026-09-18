@@ -74,17 +74,66 @@ function FirstScene() {
   )
 }
 
+/*
+ * 2번째 온보딩 영상에서 보여줄 구간(초). 파일은 그대로 두고 이 구간만 재생한다.
+ * 주소 끝의 `#t=시작,끝`(미디어 프래그먼트)으로 브라우저가 시작 지점부터 틀고 끝 지점에서 멈춘다.
+ * 구간이 확정되면 영상 파일 자체를 잘라 교체해도 된다(그때는 이 값을 지운다).
+ */
+const ONBOARDING_VIDEO_START = 2
+const ONBOARDING_VIDEO_END = 5
+/** 평소 재생 속도. */
+const ONBOARDING_VIDEO_RATE = 0.8
+/*
+ * 끝에서 뚝 멈추지 않도록, 끝나기 전 이만큼(영상 기준 초)은 속도를 서서히 줄인다.
+ * 마지막 순간 속도는 ONBOARDING_VIDEO_END_RATE까지 내려간다.
+ */
+const ONBOARDING_VIDEO_EASE_SECONDS = 0.5
+const ONBOARDING_VIDEO_END_RATE = 0.4
+
 function SecondScene() {
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    let frame = 0
+    // 재생 중 매 프레임 남은 구간을 보고 속도를 정한다. 끝에 가까울수록 느려진다.
+    const tick = () => {
+      const remaining = ONBOARDING_VIDEO_END - video.currentTime
+      if (remaining < ONBOARDING_VIDEO_EASE_SECONDS) {
+        const t = Math.max(0, remaining) / ONBOARDING_VIDEO_EASE_SECONDS // 1 → 0
+        const eased = t * t * (3 - 2 * t) // 부드러운 감속 곡선
+        video.playbackRate = ONBOARDING_VIDEO_END_RATE + (ONBOARDING_VIDEO_RATE - ONBOARDING_VIDEO_END_RATE) * eased
+      } else if (video.playbackRate !== ONBOARDING_VIDEO_RATE) {
+        video.playbackRate = ONBOARDING_VIDEO_RATE
+      }
+      if (!video.paused && !video.ended) frame = window.requestAnimationFrame(tick)
+    }
+    const handlePlay = () => {
+      window.cancelAnimationFrame(frame)
+      frame = window.requestAnimationFrame(tick)
+    }
+
+    video.addEventListener('play', handlePlay)
+    if (!video.paused) handlePlay()
+    return () => {
+      window.cancelAnimationFrame(frame)
+      video.removeEventListener('play', handlePlay)
+    }
+  }, [])
+
   return (
     <div className="onboarding-page__scene onboarding-page__scene--video" aria-hidden="true">
       <video
+        ref={videoRef}
         autoPlay
         muted
         playsInline
         preload="auto"
-        src={onboardingVideo}
+        src={`${onboardingVideo}#t=${ONBOARDING_VIDEO_START},${ONBOARDING_VIDEO_END}`}
         onLoadedMetadata={(event) => {
-          event.currentTarget.playbackRate = 0.9
+          event.currentTarget.playbackRate = ONBOARDING_VIDEO_RATE
         }}
       />
     </div>

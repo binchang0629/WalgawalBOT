@@ -1840,3 +1840,8 @@ Figma `자료종합` 페이지(노드 `1264:12056`)의 최상위 16개 항목을
 - 원격 main의 `20d1ae1`·`aadfa9b`·`33f21a9`·`aa4b50b`를 받아 로컬 커밋을 그 위로 rebase했습니다. 파일 충돌은 없었습니다.
 - 원격 커밋이 `utils/plazaComments.ts`를 계정별 저장으로 바꾸면서 `readPlazaComments`가 `readThreadComments(personaId, threadId)`로 바뀌어, 홈 AI 맞춤 추천의 댓글 수가 빌드 오류를 냈습니다. 광장 `CaseFeedCard`와 같은 방식으로 현재 계정 기준 `readThreadComments(personaId, item.id)`를 쓰도록 맞췄습니다.
 - 합친 뒤 빌드 통과. 린트는 기존 결과 화면 두 곳의 `Date.now()` purity 오류 2건만 남아 있습니다(`CaseResultPage.tsx`, `ClosedCaseResultPage.tsx`).
+
+## 온보딩 2번째 영상 재생 구간 (2026-09-18)
+- 온보딩 2단계(배심원) 영상(`onboarding.mp4`, 전체 5.21초)을 2~5초 구간만 재생합니다. 파일은 그대로 두고 주소 끝에 미디어 프래그먼트 `#t=2,5`를 붙여, 브라우저가 2초부터 틀고 5초에서 멈춥니다. 구간 값은 `OnboardingPage.tsx`의 `ONBOARDING_VIDEO_START`·`ONBOARDING_VIDEO_END`입니다. 재생 속도는 사용자가 바꾼 0.8배 그대로라 3초 분량이 실제로 약 3.75초 동안 재생됩니다.
+- 브라우저에서 시작 위치 2초대, 5.01초에서 자동 정지를 확인했습니다. 구간이 확정되면 파일 자체를 잘라 교체할 수 있습니다(현재 PC에는 ffmpeg가 없음). 빌드·온보딩 폴더 린트 통과.
+- 후속 요청: 5초에서 뚝 멈추지 않도록 끝부분을 감속합니다. 끝나기 전 0.5초분(영상 기준 4.5~5초)에서 재생 속도를 0.8배에서 0.4배까지 부드러운 곡선(smoothstep)으로 줄입니다. 재생 중 매 프레임 남은 구간을 보고 속도를 정하며, 값은 `ONBOARDING_VIDEO_RATE`·`ONBOARDING_VIDEO_EASE_SECONDS`·`ONBOARDING_VIDEO_END_RATE`입니다. 처음 0.9초·0.3배로 넣었다가 사용자가 0.5초·0.4배로 조정했습니다. 마지막 0.5초분이 실제로는 약 0.9초 동안 재생됩니다. 감속 곡선이 영상 위치에 따라 속도를 줄이는 것을 확인했습니다. 빌드·온보딩 폴더 린트 통과.
