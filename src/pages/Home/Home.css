@@ -743,7 +743,7 @@
 .balance-section__refresh {
     position: absolute;
     z-index: 5;
-    top: 279px;
+    top: 311px;
     left: calc(50% - 22px);
     display: flex;
     align-items: center;
@@ -810,7 +810,12 @@
 .balance-board {
     position: relative;
     width: 354px;
-    height: 332px;
+    /*
+     * 깻잎과 민트초코가 같은 높이를 쓴다. 전에는 332 / 364로 달라서
+     * `다른 게임`으로 바꿀 때마다 섹션이 32px 늘었다 줄어 꿀렁였다.
+     * 접시가 더 긴 민트초코 쪽에 맞춘다. 깻잎 장면은 37px 내려 접시 바닥을 맞췄다.
+     */
+    height: 364px;
     margin-top: 2px;
 }
 
@@ -820,7 +825,12 @@
 
 .balance-board__draggable {
     position: absolute;
-    top: -13px;
+    /*
+     * 접시를 눌러서도 고를 수 있게 하려고, 대기 상태의 드래그 박스를 접시 위로 올렸다.
+     * 깻잎은 높이 133, 민트 스쿱은 117이고 접시 클릭 영역은 각각 124 / 108에서 시작한다.
+     * -9면 둘 다 접시와 한 픽셀도 겹치지 않는다. (놓는 중·결과 좌표는 그대로다)
+     */
+    top: -9px;
     left: calc(50% - 44.45px);
     width: 127px;
     height: 133px;
@@ -840,20 +850,24 @@
     height: 85px;
     object-fit: contain;
 }
+/*
+ * 접시 클릭 영역. 그림보다 크면 위쪽 드래그 박스와 겹쳐서 접시가 안 눌린다.
+ * 그래서 접시 그림(150x85, 왼쪽 top 124 / 오른쪽 top 128)에 맞춰 잡는다.
+ */
 .balance-board__plate-target {
     position: absolute;
     z-index: 0;
-    top: 77px;
-    width: 170px;
-    height: 106px;
+    top: 124px;
+    width: 150px;
+    height: 90px;
     padding: 0;
     border: 0;
     border-radius: 50%;
     background: transparent;
     cursor: pointer;
 }
-.balance-board__plate-target--left { left: 0; }
-.balance-board__plate-target--right { right: 0; }
+.balance-board__plate-target--left { left: 13px; }
+.balance-board__plate-target--right { right: 13px; }
 .balance-board__plate-target:disabled { pointer-events: none; }
 .balance-board__plate-target:focus-visible {
     outline: 2px solid var(--blue-700);
@@ -861,12 +875,12 @@
 }
 
 .balance-board__side--left .balance-board__plate {
-    top: 87px;
+    top: 124px;
     left: 13px;
 }
 
 .balance-board__side--right .balance-board__plate {
-    top: 91px;
+    top: 128px;
     left: 191px;
 }
 
@@ -884,7 +898,7 @@
 
 .balance-choice {
     position: absolute;
-    top: 172px;
+    top: 218px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -931,7 +945,7 @@
 
 .balance-board__guide {
     position: absolute;
-    top: 243px;
+    top: 287px;
     left: 50%;
     display: flex;
     align-items: flex-end;
@@ -1669,17 +1683,18 @@ img.ai-card__mascot {
 .balance-board__draggable::before {
     content: '';
     position: absolute;
-    inset: -30px -24px;
+    /* 아래(0)로는 넓히지 않는다. 넓히면 그만큼 접시 클릭 영역을 덮는다. */
+    inset: -21px -14px 0;
     pointer-events: auto;
 }
 
 /* 깻잎은 젓가락 끝이 아닌 잎 중심(드래그 기준점 35%)을 중심으로 잡히게 한다. */
 .balance-section:not(.balance-section--mint) .balance-board__draggable::before {
-    top: -30px;
-    bottom: -30px;
-    left: -42px;
+    top: -21px;
+    bottom: 0;
+    left: -26px;
     right: auto;
-    width: 172px;
+    width: 140px;
 }
 .balance-section:not(.balance-section--idle) .balance-board__draggable::before {
     pointer-events: none;
@@ -1763,12 +1778,12 @@ img.ai-card__mascot {
 
 .balance-section--left:not(.balance-section--idle) .balance-board__draggable {
     left: calc(24.85% - 44.45px);
-    top: 2px;
+    top: 39px;
 }
 
 .balance-section--right:not(.balance-section--idle) .balance-board__draggable {
     left: calc(75.15% - 44.45px);
-    top: 6px;
+    top: 43px;
 }
 
 .balance-section--growing .balance-board__draggable {
@@ -1883,18 +1898,18 @@ img.ai-card__mascot {
 .balance-section--result.balance-section--right .balance-board__draggable {
     opacity: 1;
     left: min(calc(74% - 44.45px), calc(100% - 127px));
-    top: -3px;
+    top: 34px;
     transform: scale(1);
 }
 
 .balance-board__pile {
     width: 300px;
     height: 225px;
-    top: 15px;
+    top: 52px;
 }
 
 .balance-section--result .balance-choice.is-selected {
-    top: 228px;
+    top: 260px;
 }
 
 /* 접시 확대 전에 잎을 중앙에 고정한다. 좌표 보간으로 옆에서 자라는 현상을 막는다. */
@@ -1950,7 +1965,7 @@ img.ai-card__mascot {
 .balance-section--result.balance-section--right .balance-board__side--right .balance-board__plate {
     left: calc(50% - 75px);
     right: auto;
-    top: 130px;
+    top: 167px;
     transform: scale(1.7);
     opacity: 0;
     transition: left 900ms cubic-bezier(.22, 1, .36, 1), top 900ms ease, transform 900ms ease, opacity 700ms ease;
@@ -1973,7 +1988,7 @@ img.ai-card__mascot {
 .balance-section--result.balance-section--right .balance-board__side--right .balance-board__plate {
     left: calc(50% - 75px);
     right: auto;
-    top: 130px;
+    top: 167px;
     transform: scale(1.74, 1.1);
     transition: left 900ms cubic-bezier(.22, 1, .36, 1), top 900ms cubic-bezier(.22, 1, .36, 1),
         transform 900ms cubic-bezier(.22, 1, .36, 1), opacity 550ms ease;
@@ -1990,7 +2005,7 @@ img.ai-card__mascot {
 }
 
 .balance-section--expanding .balance-choice.is-selected {
-    top: 228px;
+    top: 260px;
     left: 50%;
     right: auto;
     transform: translateX(-50%);
@@ -2662,7 +2677,7 @@ img.ai-card__mascot {
 .balance-section--placing .balance-choice.is-selected,
 .balance-section--expanding .balance-choice.is-selected,
 .balance-section--result .balance-choice.is-selected {
-    top: 228px;
+    top: 260px;
     left: 50%;
     right: auto;
     transform: translateX(-50%);
@@ -2675,13 +2690,13 @@ img.ai-card__mascot {
 
 /* 접시가 중앙으로 커지는 0.9초 동안, 선택 말풍선도 같은 궤적으로 함께 이동한다. */
 .balance-section--placing .balance-choice.is-selected {
-    top: 172px;
+    top: 218px;
     left: inherit;
     transform: translateX(-50%);
 }
 
 .balance-section--expanding .balance-choice.is-selected {
-    top: 228px;
+    top: 260px;
     left: 50%;
     right: auto;
     transform: translateX(-50%);
@@ -2693,13 +2708,13 @@ img.ai-card__mascot {
 }
 
 .balance-section--placing.balance-section--left .balance-choice.is-selected {
-    top: 172px;
+    top: 218px;
     left: 24.85%;
     right: auto;
 }
 
 .balance-section--placing.balance-section--right .balance-choice.is-selected {
-    top: 172px;
+    top: 218px;
     left: 75.15%;
     right: auto;
 }
