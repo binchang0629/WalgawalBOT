@@ -85,10 +85,12 @@ const ONBOARDING_VIDEO_END = 5
 const ONBOARDING_VIDEO_RATE = 0.8
 /*
  * 끝에서 뚝 멈추지 않도록, 끝나기 전 이만큼(영상 기준 초)은 속도를 서서히 줄인다.
- * 마지막 순간 속도는 ONBOARDING_VIDEO_END_RATE까지 내려간다.
+ * 이 영상은 마지막 프레임까지 계속 움직여서(스스로 멈추는 장면이 없다) 그냥 5초에서 끊으면
+ * 움직이던 도중에 얼어붙는다. 멈추는 순간 평소의 19%(0.15배)까지 떨어뜨려, 움직임이 거의
+ * 잦아든 뒤 멈추게 한다. 영상 기준 0.8초 구간이 실제로는 약 1.7초 동안 재생된다.
  */
-const ONBOARDING_VIDEO_EASE_SECONDS = 0.5
-const ONBOARDING_VIDEO_END_RATE = 0.4
+const ONBOARDING_VIDEO_EASE_SECONDS = 0.8
+const ONBOARDING_VIDEO_END_RATE = 0.15
 
 function SecondScene() {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -103,7 +105,11 @@ function SecondScene() {
       const remaining = ONBOARDING_VIDEO_END - video.currentTime
       if (remaining < ONBOARDING_VIDEO_EASE_SECONDS) {
         const t = Math.max(0, remaining) / ONBOARDING_VIDEO_EASE_SECONDS // 1 → 0
-        const eased = t * t * (3 - 2 * t) // 부드러운 감속 곡선
+        /*
+         * 사인 곡선: 감속 시작은 티 나지 않게 부드럽고, 끝으로 갈수록 곧장 가라앉는다.
+         * smoothstep은 끝에서 느린 속도로 오래 끌어 멈칫거리는 느낌이 나서 쓰지 않는다.
+         */
+        const eased = Math.sin((t * Math.PI) / 2)
         video.playbackRate = ONBOARDING_VIDEO_END_RATE + (ONBOARDING_VIDEO_RATE - ONBOARDING_VIDEO_END_RATE) * eased
       } else if (video.playbackRate !== ONBOARDING_VIDEO_RATE) {
         video.playbackRate = ONBOARDING_VIDEO_RATE
