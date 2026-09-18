@@ -1,80 +1,126 @@
 /*
  * MY > 내가 쓴 댓글.
  * 화면 틀(헤더·스크롤 영역·breadcrumb)은 MyCases.css의 .my-cases-page를 그대로 쓴다.
- * 여기에는 목록 카드만 둔다.
+ * 여기에는 목록 한 줄의 모양만 둔다.
+ *
+ * 한 줄은 세 단이다.
+ *   ① 내가 쓴 댓글       — 가장 굵고 크다. 이 화면의 주인공이다.
+ *   ② [사건|후일담] 제목  — 어디에 쓴 댓글인지. 타입은 색 알약으로 구분한다.
+ *   ③ 공감 · 반대 · 시각
+ *
+ * 카드와 그림자를 쓰지 않는다. 댓글이 길면 카드가 세로로 커져서 목록이 뚝뚝 끊겨 보인다.
+ * 옅은 구분선만으로 나누면 댓글 길이가 달라도 목록이 이어져 읽힌다.
  */
 
 .my-comments-page__count {
-    margin: -12px 0 14px;
+    margin: -12px 0 10px;
     color: var(--neutral-500);
     font-size: 12px;
     line-height: 1.3;
 }
 
 .my-comments-page__list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
-.my-comment-card {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 16px;
-    border: 1px solid var(--neutral-250);
-    border-radius: 12px;
-    background: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, .04);
+.my-comment-row {
+    display: block;
+    padding: 15px 0 16px;
+    border-bottom: 1px solid var(--neutral-100);
 }
 
-/* 어느 사건에 단 댓글인지가 먼저 읽혀야 해서 제목을 위에 둔다. */
-.my-comment-card__case {
+/* 첫 줄은 위 여백을 덜고, 마지막 줄은 구분선을 뺀다. */
+.my-comments-page__list > li:first-child .my-comment-row {
+    padding-top: 3px;
+}
+
+.my-comments-page__list > li:last-child .my-comment-row {
+    border-bottom: 0;
+}
+
+/* ① 내가 쓴 말. 줄 수를 제한하지 않는다 — 확인하러 오는 화면이라 잘리면 안 된다. */
+.my-comment-row__body {
+    margin: 0 0 9px;
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: -.01em;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+/* ② 어디에 쓴 댓글인지. */
+.my-comment-row__where {
     display: flex;
     align-items: center;
-    gap: 6px;
-    color: var(--blue-700);
+    gap: 7px;
+    margin: 0 0 8px;
     font-size: 12px;
-    font-weight: 700;
-    line-height: 1.3;
+    line-height: 1.4;
 }
 
-.my-comment-card__case > span {
+/* 사건은 파랑, 후일담은 주황. 목록을 훑을 때 색으로 먼저 갈린다. */
+.my-comment-row__kind {
+    flex: none;
+    padding: 2.5px 9px;
+    border-radius: var(--radius-pill);
+    background: var(--blue-050);
+    color: var(--blue-700);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.my-comment-row__kind.is-story {
+    background: var(--orange-100);
+    color: var(--orange-700);
+}
+
+/* 제목은 남는 폭을 전부 쓰고, 넘치면 `...`으로 잘린다. */
+.my-comment-row__title {
+    flex: 1 1 auto;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: var(--neutral-600);
 }
 
-.my-comment-card__case img {
-    flex: none;
-    width: 5.25px;
-    height: 9.33px;
-}
-
-/* 내가 쓴 말이 주인공이라 본문이 가장 크다. 길면 세 줄에서 자른다. */
-.my-comment-card__body {
+/* ③ 받은 공감·반대와 남긴 시각. */
+.my-comment-row__meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     margin: 0;
-    color: var(--ink);
-    font-size: 14px;
-    line-height: 1.45;
-    overflow-wrap: anywhere;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    overflow: hidden;
-}
-
-.my-comment-card__time {
     color: var(--neutral-500);
-    font-size: 11px;
+    font-size: 11.5px;
     line-height: 1.4;
 }
 
-.my-comment-card:focus-visible {
+.my-comment-row__meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.my-comment-row__meta img {
+    width: 13px;
+    height: 13px;
+    opacity: .6;
+}
+
+/* 반응 수와 시각을 나누는 점. */
+.my-comment-row__meta > i {
+    flex: none;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: var(--neutral-300);
+}
+
+.my-comment-row:focus-visible {
     outline: 2px solid var(--blue-700);
     outline-offset: 2px;
 }

@@ -9,9 +9,10 @@ import likeIcon from '../../assets/case/result/like.svg'
 import menuIcon from '../../assets/case/result/menu.svg'
 import submitIcon from '../../assets/case/result/submit.svg'
 import { commentStickerById, type CommentStickerId } from '../../data/common/commentStickers'
+import useFocusComment, { commentAnchorId } from '../../hooks/useFocusComment'
 import useLoginGate from '../../hooks/useLoginGate'
 import useSession from '../../hooks/useSession'
-import { addMyComment } from '../../utils/myComments'
+import { addMyComment, readMyCommentReactions, seedCommentReactions, setMyCommentReaction } from '../../utils/myComments'
 import useToast from '../../hooks/useToast'
 /*
  * 스티커 고르는 창은 사건 결과 화면에서 먼저 만들어 둔 것을 그대로 쓴다.
@@ -64,12 +65,14 @@ const badgeTone: Record<NonNullable<ThreadComment['voteId']>, 'blue' | 'orange' 
   neither: 'orange-solid',
 }
 
-function CommentRow({ comment, reaction, showReply, showVoteBadge, actionsInHeader, onReact, onEdit, onDelete }: {
+function CommentRow({ comment, reaction, showReply, showVoteBadge, actionsInHeader, isFocused, onReact, onEdit, onDelete }: {
   comment: ThreadComment
   reaction: CommentReaction
   showReply: boolean
   showVoteBadge: boolean
   actionsInHeader: boolean
+  /** MY > 내가 쓴 댓글에서 눌러 찾아온 댓글. 잠깐 배경을 밝혀 어느 것인지 알려준다. */
+  isFocused: boolean
   onReact: (reaction: Exclude<CommentReaction, null>) => void
   onEdit?: (body: string) => void
   onDelete?: () => void
@@ -119,7 +122,12 @@ function CommentRow({ comment, reaction, showReply, showVoteBadge, actionsInHead
   )
 
   return (
-    <article className={'result-comment' + (actionsInHeader ? ' result-comment--actions-in-head' : '')}>
+    <article
+      id={commentAnchorId(comment.id)}
+      className={'result-comment'
+        + (actionsInHeader ? ' result-comment--actions-in-head' : '')
+        + (isFocused ? ' is-focused' : '')}
+    >
       <div className="result-comment__head">
         <div className="result-comment__avatar" aria-hidden="true">
           <img src={comment.avatarUrl} alt="" />
@@ -232,7 +240,11 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
   const [currentPage, setCurrentPage] = useState(1)
   const [sortKey, setSortKey] = useState<SortKey>('latest')
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
-  const [reactions, setReactions] = useState<Record<string, CommentReaction>>({})
+  /*
+   * 내가 내 댓글에 눌러 둔 공감/반대는 MY 기록에 남아 있다.
+   * 화면을 다시 들어와도 눌린 상태가 유지되도록 그 값으로 시작한다.
+   */
+  const [reactions, setReactions] = useState<Record<string, CommentReaction>>(() => readMyCommentReactions(personaId))
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const sectionRef = useRef<HTMLElement>(null)
@@ -259,6 +271,11 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
     sortKey === 'latest' ? a.minutesAgo - b.minutesAgo : b.minutesAgo - a.minutesAgo
   ))
   const totalPages = Math.max(1, Math.ceil(sortedComments.length / perPage))
+  /*
+   * MY > 내가 쓴 댓글에서 눌러 들어온 경우, 그 댓글이 있는 페이지로 넘기고 그 자리로 스크롤한다.
+   * 정렬이 끝난 목록을 넘겨야 화면에 보이는 순서와 페이지 계산이 어긋나지 않는다.
+   */
+  const focusedCommentId = useFocusComment(sortedComments.map((comment) => comment.id), perPage, setCurrentPage)
   const safePage = Math.min(currentPage, totalPages)
   const visibleComments = sortedComments.slice((safePage - 1) * perPage, safePage * perPage)
 
@@ -268,9 +285,14 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
     const body = draft.trim()
     if (!body && !selectedStickerId) return
 
+    /*
+     * 댓글 화면과 MY가 같은 id를 쓴다. 공감/반대 수는 그 id에서 계산하므로
+     * 두 화면에 같은 숫자가 나온다.
+     */
+    const commentId = `new-comment-${Date.now()}-${nextCommentId.current++}`
     setAddedComments((current) => [
       {
-        id: `new-comment-${Date.now()}-${nextCommentId.current++}`,
+        id: commentId,
         nickname: currentUser?.nickname ?? '익명의 배심원',
         avatarUrl: currentUser?.anonymousAvatarUrl ?? comments[0].avatarUrl,
         minutesAgo: 0,
@@ -280,8 +302,7 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
         voteLabel: null,
         body,
         ...(selectedStickerId ? { stickerId: selectedStickerId } : {}),
-        likes: 0,
-        dislikes: 0,
+        ...seedCommentReactions(commentId),
       },
       ...current,
     ])
@@ -290,7 +311,7 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
      * (requestCommentLogin이 비로그인은 위에서 되돌린다).
      * 그래서 이 지점에서만 MY 기록에 남긴다. 스티커만 보낸 경우는 남길 글이 없어 건너뛴다.
      */
-    if (commentRecord && body) addMyComment(personaId, { ...commentRecord, body })
+    if (commentRecord && body) addMyComment(personaId, { ...commentRecord, body, id: commentId })
 
     setDraft('')
     setSelectedStickerId(null)
@@ -390,11 +411,14 @@ function CommentThread({ comments, perPage = 5, showReply = false, showVoteBadge
             showReply={showReply}
             showVoteBadge={showVoteBadge}
             actionsInHeader={actionsInHeader}
+            isFocused={focusedCommentId === comment.id}
             reaction={reactions[comment.id] ?? null}
-            onReact={(reaction) => setReactions((previous) => ({
-              ...previous,
-              [comment.id]: previous[comment.id] === reaction ? null : reaction,
-            }))}
+            onReact={(reaction) => {
+              const next = reactions[comment.id] === reaction ? null : reaction
+              // 내 댓글이면 MY 기록에도 남겨서 두 화면이 같은 상태를 보게 한다.
+              setMyCommentReaction(personaId, comment.id, next)
+              setReactions((previous) => ({ ...previous, [comment.id]: next }))
+            }}
             onEdit={comment.id.startsWith('new-comment-') ? (body) => {
               setAddedComments((current) => current.map((item) => (
                 item.id === comment.id ? { ...item, body, editedAtMs: Date.now() } : item

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import type { FormEvent, Ref } from 'react'
 import useLoginGate from '../../hooks/useLoginGate'
+import useDetailSlide from '../../hooks/useDetailSlide'
 import useSession from '../../hooks/useSession'
 import EmptyCaseState from '../../components/common/EmptyCaseState'
 import CaseFolderCard from '../../components/common/CaseFolderCard'
@@ -33,6 +34,7 @@ import clickTapIcon from '../../assets/afterstory/figma/icon-park-click-tap.svg'
 import searchIcon from '../../assets/plaza/search-field.svg'
 import './AfterStoryPage.css'
 import './AfterStoryDetailPage.css'
+import '../My/MyPageTransitions.css'
 
 const CONNECTED_CASE = {
   category: '친구 · 투표 종료',
@@ -171,6 +173,13 @@ type AfterStoryCategory = (typeof AFTER_STORY_CATEGORIES)[number]
  * 광장 목록도 4개 단위라 페이지 모양이 서로 맞는다. (PROJECT_SPEC.md §9-14)
  */
 const AFTER_STORIES_PER_PAGE = 4
+
+/*
+ * MY 안에서 들어온 경우에만 MY 상세 화면과 같은 좌우 슬라이드를 쓴다.
+ * 사건 결과 화면(CaseResultPage, ClosedCaseResultPage)과 같은 규칙이라,
+ * 내가 쓴 댓글에서 사건을 누르든 후일담을 누르든 들어오고 나가는 모습이 같다.
+ */
+const MY_DETAIL_PATHS: string[] = [PATHS.my, PATHS.myComments]
 
 interface AfterStoryLocationState {
   content?: string
@@ -555,6 +564,8 @@ export function AfterStoryDetailPage() {
   const { storyId } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
+  const fromMy = MY_DETAIL_PATHS.includes((location.state as AfterStoryLocationState | null)?.from ?? '')
+  const slide = useDetailSlide(fromMy)
   const variant = storyId ? AFTER_STORY_DETAILS[storyId as keyof typeof AFTER_STORY_DETAILS] : undefined
   const communityStory = storyId
     ? COMMUNITY_AFTER_STORIES.find((story) => `afterstory-${story.id}` === storyId)
@@ -611,10 +622,17 @@ export function AfterStoryDetailPage() {
       : undefined
 
   return (
-    <main className="afterstory-detail">
+    <main className={`afterstory-detail${slide.className ? ` ${slide.className}` : ''}`}>
       <AfterStoryHeader
         title="왈가왈후~"
-        onBack={() => navigate(backTo, { state: backState })}
+        /*
+         * MY에서 들어왔으면 나가는 모션을 재생한 뒤 이동한다.
+         * `slide.leave`가 되돌아가는 길이라는 표시도 같이 넘겨서,
+         * 도착한 MY 화면이 들어오는 슬라이드를 다시 재생하지 않는다.
+         */
+        onBack={fromMy
+          ? () => slide.leave(backTo, { state: backState })
+          : () => navigate(backTo, { state: backState })}
       />
       <div className="afterstory-detail__scroll">
         <section

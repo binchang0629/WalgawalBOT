@@ -3,7 +3,7 @@ import writerArtwork from '../../assets/case/result/panmung-scale-first-frame.pn
 import otherArtwork from '../../assets/case/result/panmung-scale-left-first-frame.png'
 import { weddingGiftCase, type WeddingGiftVoteId } from './caseDetailContent'
 import { latestPlazaCaseIds, plazaCaseAgeMinutes, plazaCases, type PlazaCase } from './plazaContent'
-import { findJihoonCommentSeed, jihoonCommentAuthor, jihoonCommentId, jihoonCommentMinutesAgo } from '../personas/jihoonComments'
+import { JIHOON_COMMENT_REACTIONS, findJihoonCommentSeed, jihoonCommentAuthor, jihoonCommentId, jihoonCommentMinutesAgo } from '../personas/jihoonComments'
 import type { ThreadComment } from '../../components/common/CommentThread'
 import { demoEventAt, formatDemoDateTime, formatElapsedMinutes } from './demoClock'
 
@@ -442,8 +442,7 @@ function withJihoonComment(caseId: string, list: ThreadComment[]): ThreadComment
     voteId: seed.voteId,
     voteLabel: voteLabels[seed.voteId],
     body: seed.body,
-    likes: 4,
-    dislikes: 0,
+    ...JIHOON_COMMENT_REACTIONS,
   }
   return next
 }

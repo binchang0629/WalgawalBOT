@@ -159,14 +159,21 @@ export function withJihoonAfterStoryComment(storyId: string | undefined, comment
     minutesAgo: seed.minutesAgo,
     body: seed.body,
     stickerId: undefined,
-    likes: 4,
-    dislikes: 0,
+    ...JIHOON_COMMENT_REACTIONS,
   }
   return next
 }
 
 /** 사건 댓글 목록과 MY 기록이 같은 댓글임을 알아볼 수 있게 id를 한곳에서 만든다. */
 export const jihoonCommentId = (caseId: string) => `${caseId}-jihoon-comment`
+
+/**
+ * 지훈의 댓글이 받은 공감/반대 수.
+ *
+ * 댓글 목록(광장 사건·후일담)과 MY > 내가 쓴 댓글 세 곳에 같은 숫자가 보여야 해서
+ * 여기 한 곳에 둔다.
+ */
+export const JIHOON_COMMENT_REACTIONS = { likes: 4, dislikes: 0 } as const
 
 /**
  * 지훈의 댓글이 그 사건 안에서 몇 분 전 글인지.

@@ -27,8 +27,10 @@ import type {
   JihoonSimilarComment,
   JihoonSimilarVoteId,
 } from '../../data/common/jihoonSimilarCaseContent'
+import useDetailSlide from '../../hooks/useDetailSlide'
+import useFocusComment, { commentAnchorId } from '../../hooks/useFocusComment'
 import useSession from '../../hooks/useSession'
-import { addMyComment } from '../../utils/myComments'
+import { addMyComment, readMyCommentReactions, seedCommentReactions, setMyCommentReaction } from '../../utils/myComments'
 import useToast from '../../hooks/useToast'
 import useLoginGate from '../../hooks/useLoginGate'
 import { PATHS, toAfterStoryDetail } from '../../routes/paths'
@@ -39,9 +41,25 @@ import VerdictReasonComparison from './components/VerdictReasonComparison'
 import ResultBreakdown from './components/ResultBreakdown'
 import './CaseResultPage.css'
 import './ClosedCaseResultPage.css'
+import '../My/MyPageTransitions.css'
 
 /** 이 사건(카페 홍보영상 잔금)의 후일담. `afterStoryList.ts`의 `video-payment`와 같은 글이다. */
 const JIHOON_AFTER_STORY_ID = 'afterstory-video-payment'
+
+/*
+ * 뒤로가기로 돌아갈 수 있는 화면.
+ *
+ * 넘겨받은 주소를 그대로 믿지 않고 이 목록 안의 것만 쓴다.
+ * MY > 내가 쓴 댓글도 여기 있어야, 그 목록에서 들어왔을 때 광장이 아니라 목록으로 돌아간다.
+ */
+const RETURNABLE_PATHS: string[] = [PATHS.myJury, PATHS.my, PATHS.myComments, PATHS.home]
+
+/*
+ * MY 안에서 들어온 경우에만 MY 상세 화면과 같은 좌우 슬라이드를 쓴다.
+ * 진행 중 사건 결과(CaseResultPage)와 같은 규칙이라, 내가 쓴 댓글에서 어떤 사건을 눌러도
+ * 들어오고 나가는 모습이 같다. 광장이나 홈에서 들어올 때는 원래대로 전환 없이 뜬다.
+ */
+const MY_DETAIL_PATHS: string[] = [PATHS.my, PATHS.myComments]
 
 const COMMENTS_PER_PAGE = 5
 const MAX_COMMENT_PAGES = 5
@@ -56,9 +74,11 @@ const voteDisplay: Record<JihoonSimilarVoteId, { tone: 'blue' | 'orange' | 'soli
 }
 
 
-function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
+function CommentItem({ comment, reaction, isFocused, onReact, onEdit, onDelete }: {
   comment: JihoonSimilarComment
   reaction: CommentReaction
+  /** MY > 내가 쓴 댓글에서 눌러 찾아온 댓글. 잠깐 배경을 밝혀 어느 것인지 알려준다. */
+  isFocused: boolean
   onReact: (reaction: Exclude<CommentReaction, null>) => void
   onEdit?: (body: string) => void
   onDelete?: () => void
@@ -86,7 +106,7 @@ function CommentItem({ comment, reaction, onReact, onEdit, onDelete }: {
   }
 
   return (
-    <article className="result-comment">
+    <article id={commentAnchorId(comment.id)} className={'result-comment' + (isFocused ? ' is-focused' : '')}>
       <div className="result-comment__head">
         <div className="result-comment__avatar" aria-hidden="true">
           <img src={comment.avatarUrl ?? jihoonSimilarResult.comments[0].avatarUrl} alt="" />
@@ -178,6 +198,8 @@ function ClosedCaseResultPage() {
   const location = useLocation()
   const navigate = useNavigate()
   const routeState = location.state as { fromPlaza?: boolean; returnTo?: string; homeCaseId?: string } | null
+  const fromMy = MY_DETAIL_PATHS.includes(routeState?.returnTo ?? '')
+  const slide = useDetailSlide(fromMy)
   const [draft, setDraft] = useState('')
   const [selectedStickerId, setSelectedStickerId] = useState<CommentStickerId | null>(null)
   const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false)
@@ -190,7 +212,8 @@ function ClosedCaseResultPage() {
    */
   const [sortKey, setSortKey] = useState<'latest' | 'registered'>('latest')
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
-  const [commentReactions, setCommentReactions] = useState<Record<string, CommentReaction>>({})
+  // 내 댓글에 눌러 둔 공감/반대는 MY 기록에 남아 있어서 화면을 다시 들어와도 살아난다.
+  const [commentReactions, setCommentReactions] = useState<Record<string, CommentReaction>>(() => readMyCommentReactions(personaId))
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const commentSectionRef = useRef<HTMLElement>(null)
   const nextCommentId = useRef(1)
@@ -219,6 +242,8 @@ function ClosedCaseResultPage() {
     Math.max(1, Math.ceil(allComments.length / COMMENTS_PER_PAGE)),
   )
   const visibleComments = orderedComments.slice((currentPage - 1) * COMMENTS_PER_PAGE, currentPage * COMMENTS_PER_PAGE)
+  /* MY에서 눌러 들어온 경우, 그 댓글이 있는 페이지로 넘기고 그 자리로 스크롤한다. */
+  const focusedCommentId = useFocusComment(orderedComments.map((comment) => comment.id), COMMENTS_PER_PAGE, setCurrentPage)
   const juryBreakdown = plazaStory
     ? getPlazaJuryBreakdown(plazaStory.id) ?? jihoonSimilarResult.breakdown
     : jihoonSimilarResult.breakdown
@@ -241,9 +266,11 @@ function ClosedCaseResultPage() {
     const body = draft.trim()
     if (!body && !selectedStickerId) return
 
+    /* 댓글 화면과 MY가 같은 id를 써야 공감/반대 수가 두 화면에서 같아진다. */
+    const commentId = `new-comment-${Date.now()}-${nextCommentId.current++}`
     setAddedComments((comments) => [
       {
-        id: 'new-comment-' + nextCommentId.current++,
+        id: commentId,
         nickname: currentUser?.nickname ?? '익명의 배심원',
         avatarUrl: currentUser?.anonymousAvatarUrl ?? jihoonSimilarResult.comments[0].avatarUrl,
         createdAt: '방금 전',
@@ -252,8 +279,7 @@ function ClosedCaseResultPage() {
         voteLabel: null,
         body,
         stickerId: selectedStickerId ?? undefined,
-        likes: 0,
-        dislikes: 0,
+        ...seedCommentReactions(commentId),
       },
       ...comments,
     ])
@@ -264,6 +290,7 @@ function ClosedCaseResultPage() {
      */
     if (body) {
       addMyComment(personaId, {
+        id: commentId,
         caseId: plazaStory?.id ?? jihoonSimilarCase.id,
         caseTitle: (plazaStory?.title ?? jihoonSimilarCase.resultTitle).replace(/\n/g, ' '),
         href: location.pathname,
@@ -298,9 +325,17 @@ function ClosedCaseResultPage() {
     setCurrentPage(1)
   }
 
+  const backTo = RETURNABLE_PATHS.find((path) => path === routeState?.returnTo)
+    ?? (plazaStory || routeState?.fromPlaza ? PATHS.plaza : undefined)
+
   return (
-    <main className="case-result case-result--closed">
-      <CaseHeader title="투표 결과" backTo={routeState?.returnTo === PATHS.myJury ? PATHS.myJury : routeState?.returnTo === PATHS.home ? PATHS.home : plazaStory || routeState?.fromPlaza ? PATHS.plaza : undefined} />
+    <main className={`case-result case-result--closed${slide.className ? ` ${slide.className}` : ''}`}>
+      <CaseHeader
+        title="투표 결과"
+        backTo={backTo}
+        // MY에서 들어왔을 때만 나가는 모션을 재생한 뒤 이동한다.
+        onBack={fromMy && backTo ? () => slide.leave(backTo) : undefined}
+      />
 
       <div className="case-result__body case-result__body--closed">
         <section className="result-overview" aria-labelledby="result-case-title">
@@ -405,11 +440,14 @@ function ClosedCaseResultPage() {
               <CommentItem
                 key={comment.id}
                 comment={comment}
+                isFocused={focusedCommentId === comment.id}
                 reaction={commentReactions[comment.id] ?? null}
-                onReact={(reaction) => setCommentReactions((previous) => ({
-                  ...previous,
-                  [comment.id]: previous[comment.id] === reaction ? null : reaction,
-                }))}
+                onReact={(reaction) => {
+                  const next = commentReactions[comment.id] === reaction ? null : reaction
+                  // 내 댓글이면 MY 기록에도 남겨서 두 화면이 같은 상태를 보게 한다.
+                  setMyCommentReaction(personaId, comment.id, next)
+                  setCommentReactions((previous) => ({ ...previous, [comment.id]: next }))
+                }}
                 onEdit={comment.id.startsWith('new-comment-') ? (body) => {
                   setAddedComments((comments) => comments.map((item) => (
                     item.id === comment.id ? { ...item, body, editedAtMs: Date.now() } : item
