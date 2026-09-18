@@ -18,6 +18,15 @@ import { balanceQuestions, mintBalanceQuestion, homeSectionTitles } from '../../
 
 type BalanceChoice = 'left' | 'right'
 
+/*
+ * 결과 뒤 다시하기 버튼 모양. 결과는 가리지 않고 말풍선 아래 같은 자리에 둔다.
+ * - 'circle': 흰 원 안에 새로고침 아이콘. 아이콘만으로는 배경에 묻혀 잘 안 보인다는 의견과,
+ *   이 섹션에 글자 버튼이 이미 많다는 의견을 함께 반영했다.
+ * - 'icon': 새로고침 아이콘만. (2026-09-18 이전 방식)
+ * 되돌리려면 이 값만 'icon'으로 바꾸면 된다.
+ */
+const RETRY_STYLE: 'circle' | 'icon' = 'circle'
+
 const playableQuestions = [balanceQuestions[0], mintBalanceQuestion] as const
 
 /** 두 문항이 드래그·버튼·다시하기 동작을 공유한다. 문항 전환 시 이전 타이머를 정리한다. */
@@ -180,7 +189,9 @@ function BalanceRound({ questionIndex, onNext }: { questionIndex: number; onNext
           </div>
         ))}
         {phase === 'result' && (
-          <button type="button" className="balance-section__refresh" aria-label={gameName + ' 게임 다시 하기'} onClick={handleReset}>
+          <button type="button"
+            className={'balance-section__refresh' + (RETRY_STYLE === 'circle' ? ' balance-section__refresh--circle' : '')}
+            aria-label={gameName + ' 게임 다시 하기'} onClick={handleReset}>
             <img src={homeIcons.refreshIcon} alt="" aria-hidden="true" />
           </button>
         )}

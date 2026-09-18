@@ -9,9 +9,19 @@ import kakaoP from '../../assets/my/plan/kakao-p.svg'
 import kakaoA from '../../assets/my/plan/kakao-a.svg'
 import kakaoY from '../../assets/my/plan/kakao-y.svg'
 import chevron from '../../assets/my/plan/chevron.svg'
+import { formatDemoMonthOffset } from '../../data/common/demoClock'
 import './WalbotPlanManagePage.css'
 
-const paymentHistory = ['2026.08.25', '2026.07.25'] as const
+/*
+ * 결제일은 사용자가 처음 접속한 날을 기준으로 한 달씩 반복된다.
+ * 첫 접속일이 이번 결제일이다. 다음 결제일 = 한 달 뒤, 결제 내역 = 이번 달(첫 접속일) · 지난달.
+ * (예: 9/18 접속 → 다음 10/18, 내역 9/18 · 8/18) 시연용 값이며 실제 결제 기록이 아니다.
+ * 시연 초기화로 첫 접속일이 바뀔 수 있어 렌더할 때 계산한다.
+ */
+const getPlanDates = () => ({
+  nextPaymentDate: formatDemoMonthOffset(1),
+  paymentHistory: [formatDemoMonthOffset(0), formatDemoMonthOffset(-1)],
+})
 
 function KakaoPayLogo() {
   return (
@@ -28,6 +38,7 @@ function KakaoPayLogo() {
 export default function WalbotPlanManagePage() {
   const handleBack = useWizardBack(PATHS.my)
   const { showToast } = useToast()
+  const { nextPaymentDate, paymentHistory } = getPlanDates()
 
   return (
     <main className="case-submit walbot-plan-manage my-detail-slide-enter">
@@ -50,7 +61,7 @@ export default function WalbotPlanManagePage() {
               </div>
               <dl className="walbot-plan-manage__billing">
                 <dt>다음 결제일</dt>
-                <dd>2026.09.25</dd>
+                <dd>{nextPaymentDate}</dd>
               </dl>
             </div>
           </section>

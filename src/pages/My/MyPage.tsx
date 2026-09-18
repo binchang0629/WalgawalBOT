@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import useSession from '../../hooks/useSession'
 import { PATHS } from '../../routes/paths'
 import { readMyComments } from '../../utils/myComments'
+import { formatDemoMonthOffset } from '../../data/common/demoClock'
 import profileImage from '../../assets/my/profile.png'
 import jihunProfileImage from '../../assets/my/account-jihun.png'
 import guestMascotImage from '../../assets/auth/loginPopUpMy.webp'
@@ -207,7 +208,8 @@ function MyPage() {
             <div className="plan-card__details">
               <p>광고 제거 · 재판 이용권 무제한 · AI 심층리포트 (판정별 해석)</p>
               <div>
-                <span>다음 결제일: 2026.09.25</span>
+                {/* 첫 접속일 한 달 뒤. 왈봇 플랜 관리 화면의 다음 결제일과 같은 값이다. */}
+                <span>다음 결제일: {formatDemoMonthOffset(1)}</span>
                 <span className="plan-card__manage-label">결제 수단 및 내역 관리 <img src={chevronBrownIcon} alt="" /></span>
               </div>
             </div>

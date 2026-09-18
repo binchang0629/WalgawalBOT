@@ -19,6 +19,7 @@ import DemoRelativeTime from '../../components/common/DemoRelativeTime'
 import Pagination from '../../components/common/Pagination'
 import { afterStoryAuthor, afterStoryComments, afterStoryLetter } from '../../data/common/afterStoryDetailContent'
 import { COMMUNITY_AFTER_STORIES } from '../../data/common/afterStoryList'
+import { categoryDotColor } from '../../data/common/plazaContent'
 import { getDemoFirstVisit } from '../../data/common/demoClock'
 import { withJihoonAfterStoryComment } from '../../data/personas/jihoonComments'
 import { afterStoryCardComments, parseElapsedMinutes, retimeComments } from '../../data/common/afterStoryCardComments'
@@ -36,7 +37,8 @@ import './AfterStoryDetailPage.css'
 import '../My/MyPageTransitions.css'
 
 const CONNECTED_CASE = {
-  category: '친구 · 투표 종료',
+  // 게시 확인·내가 올린 사건 카드와 같은 `판결 완료` 표기를 쓴다.
+  category: '친구 · 판결 완료',
   title: '조별 과제에서 친구를 공개적으로\n지적한 제가 너무 예민했던 걸까요?',
   storyTitle: '먼저 사과한 뒤,\n서로의 의견을 묻게 됐어요.',
   context: '조별 과제에서 친구를 공개적으로 지적한 사건',
@@ -445,7 +447,8 @@ export function AfterStoryHomePage() {
               >
                 <span className="afterstory-community-card__tape" aria-hidden="true" />
                 <header>
-                  <span className="afterstory-community-card__category">{story.category}</span>
+                  {/* 광장 사건 카드와 같은 분야별 색을 쓴다. (plazaContent.ts의 categoryDotColor) */}
+                  <span className="afterstory-community-card__category" style={{ color: categoryDotColor[story.category] }}>{story.category}</span>
                   <span><DemoRelativeTime label={story.updatedAt} /> · 공감 {story.reactions}</span>
                 </header>
                 <h3 title={story.title}>{story.title}</h3>

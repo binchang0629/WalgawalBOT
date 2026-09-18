@@ -1,8 +1,11 @@
+import type { CaseCategory } from '../../types'
+
 export type AfterStoryTone = 'friend' | 'company'
 
 export interface CommunityAfterStory {
   id: string
-  category: string
+  /** 광장과 같은 다섯 분야. 카드의 분야 색도 이 값으로 정한다. */
+  category: CaseCategory
   tone: AfterStoryTone
   /** `24분 전`, `3일 전`처럼 화면에 그대로 나오는 문구. */
   updatedAt: string

@@ -159,7 +159,7 @@ export const plazaCases: PlazaCase[] = [
   {
     id: 'case-invite-ex',
     category: '연인',
-    tag: '연애',
+    tag: '연인',
     title: '전 애인을 친구 모임에 초대해도\n괜찮을까요?',
     summary: '친구로 지내고 싶지만 현재 연인이 불편해해요',
     viewCount: 147,

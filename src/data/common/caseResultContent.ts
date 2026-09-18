@@ -52,7 +52,7 @@ export const weddingGiftResult = {
     {
       id: 'comment-1',
       avatarUrl: profileAvatars[0],
-      nickname: '현실주의토끼',
+      nickname: '은멍이',
       createdAt: '2분 전',
       voteId: 'writer',
       voteLabel: '투표 · 글쓴이 입장',
@@ -63,7 +63,7 @@ export const weddingGiftResult = {
     {
       id: 'comment-2',
       avatarUrl: profileAvatars[1],
-      nickname: '마음이먼저',
+      nickname: '삐뽀',
       createdAt: '4분 전',
       voteId: 'writer',
       voteLabel: '투표 · 글쓴이 입장',
@@ -75,7 +75,7 @@ export const weddingGiftResult = {
     {
       id: 'comment-3',
       avatarUrl: profileAvatars[2],
-      nickname: '선은지켜요',
+      nickname: '선지키미',
       createdAt: '7분 전',
       voteId: 'writer',
       voteLabel: '투표 · 글쓴이 입장',
@@ -86,7 +86,7 @@ export const weddingGiftResult = {
     {
       id: 'comment-4',
       avatarUrl: profileAvatars[3],
-      nickname: '경조사어려워',
+      nickname: '경조사초보',
       createdAt: '11분 전',
       voteId: 'other',
       voteLabel: '투표 · 상대방 입장',
@@ -97,7 +97,7 @@ export const weddingGiftResult = {
     {
       id: 'comment-5',
       avatarUrl: profileAvatars[4],
-      nickname: '한번더생각',
+      nickname: '말하기전에생각했나요',
       createdAt: '15분 전',
       voteId: 'both',
       voteLabel: '투표 · 양쪽 모두',

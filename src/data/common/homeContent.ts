@@ -1,4 +1,4 @@
-import type { CaseSummary } from '../../types'
+import type { CaseCategory, CaseSummary } from '../../types'
 import { weddingGiftCase } from './caseDetailContent'
 
 /**
@@ -51,6 +51,8 @@ export const todayCase = {
 
 /** 최근 본 사건 — 시안의 메모지 카드 2장 */
 export interface RecentCase extends CaseSummary {
+  /** 광장 카드와 같은 분야 색(점 + 글자)을 정한다. */
+  category: CaseCategory
   /** 카드 본문 한 줄 요약. 넘치면 말줄임 */
   summary: string
   /** 화면에 그대로 노출되는 상대 시각 */
@@ -61,17 +63,23 @@ export interface RecentCase extends CaseSummary {
 export const recentCases: RecentCase[] = [
   {
     id: 'case-always-paying',
-    tag: '친구 · 모임',
+    category: '친구',
+    tag: '친구',
     title: '친구 모임에서 항상\n저만 계산해요',
     summary: '제가 먼저 결제하면 나중에 보내준다고 하지만, 매번 입금을 요청하기도 지쳐요.',
     viewedAt: '어제',
     tone: 'blue',
   },
+  /*
+   * 예전 `생활 · 이웃`(세탁기 소음) 카드는 광장의 다섯 분야 어디에도 들지 않아,
+   * 광장에 있는 가족 사건으로 바꿨다. 분야 표기는 연인·친구·가족·직장·학업만 쓴다.
+   */
   {
-    id: 'case-laundry-noise',
-    tag: '생활 · 이웃',
-    title: '이웃의 늦은밤 세탁기 소음, 참아야 할까요?',
-    summary: '거의 매일 자정이 넘은 시간에 세탁기와 건조기를 돌려 잠들기 어려워요.',
+    id: 'case-family-care',
+    category: '가족',
+    tag: '가족',
+    title: '부모님 병원 동행을 저에게만\n부탁하는 형제자매',
+    summary: '각자 바쁘다는 이유로 돌봄 일정이 제게 몰리고 있어요.',
     viewedAt: '2일 전',
     tone: 'yellow',
   },
@@ -184,7 +192,7 @@ export const personalizedRecommendation = {
   },
   B: {
     displayName: '지훈',
-    topic: '일·관계 갈등 사건',
+    topic: '직장·관계 갈등 사건',
     caseIds: [
       'case-work-new-hire',
       'case-friend-group-chat',

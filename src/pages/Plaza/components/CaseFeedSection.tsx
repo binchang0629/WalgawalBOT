@@ -22,6 +22,9 @@ import chevronDown from '../../../assets/icons/chevron-down.svg'
 type CategoryFilter = CaseCategory | '전체'
 
 const CASES_PER_PAGE = 4
+
+/** `해결 사건` 보기에서 맨 위에 고정하는 사건. 지훈 시연 흐름의 지난 사건이다. */
+const PINNED_CLOSED_CASE_ID = 'case-company-874'
 function CaseFeedSection({ restoreState }: { restoreState?: PlazaReturnState | null }) {
   const [searchParams] = useSearchParams()
   const [category, setCategory] = useState<CategoryFilter>(restoreState?.category ?? '전체')
@@ -55,9 +58,15 @@ function CaseFeedSection({ restoreState }: { restoreState?: PlazaReturnState | n
       case 'voting':
         return latestPlazaCaseIds.map((id) => plazaCases.find((item) => item.id === id))
           .filter((item): item is (typeof plazaCases)[number] => Boolean(item && item.status === 'voting'))
-      case 'closed':
-        return latestPlazaCaseIds.map((id) => plazaCases.find((item) => item.id === id))
+      case 'closed': {
+        const closedCases = latestPlazaCaseIds.map((id) => plazaCases.find((item) => item.id === id))
           .filter((item): item is (typeof plazaCases)[number] => Boolean(item && item.status === 'closed'))
+        // 시연의 대표 지난 사건(수정 2회 · 잔금)을 맨 위에 둔다. 나머지는 최신순 그대로다.
+        return [
+          ...closedCases.filter((item) => item.id === PINNED_CLOSED_CASE_ID),
+          ...closedCases.filter((item) => item.id !== PINNED_CLOSED_CASE_ID),
+        ]
+      }
       case 'recommended':
         return latestPlazaCaseIds.map((id) => plazaCases.find((item) => item.id === id))
           .filter((item): item is (typeof plazaCases)[number] => Boolean(item && item.category === myCategory))

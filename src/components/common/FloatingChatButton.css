@@ -3,7 +3,8 @@
     /* 시안은 우측 16px이지만 머리 스프라이트 좌우에 투명 여백이 있어
        실제로는 더 안쪽으로 보인다. 6px 당겨 눈으로 맞춘 값이다. */
     right: 10px;
-    bottom: 16px;
+    /* 내비가 없는 화면. 맨 위로 버튼(하단 28px, 높이 40px) 위 6px에 쌓아 홈과 같은 모양으로 둔다. */
+    bottom: calc(74px + env(safe-area-inset-bottom, 0px));
     z-index: 30;
     display: grid;
     place-items: center;

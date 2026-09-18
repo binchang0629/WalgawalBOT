@@ -183,7 +183,9 @@
     gap: 8px;
 }
 
+/* 추가 질문 페이지는 라벨이 <p>라 브라우저 기본 여백(14px)이 붙는다. 다른 페이지와 같은 8px 간격을 위해 지운다. */
 .case-submit__label {
+    margin: 0;
     padding: 0;
     font-family: var(--font-body);
     font-size: 14px;

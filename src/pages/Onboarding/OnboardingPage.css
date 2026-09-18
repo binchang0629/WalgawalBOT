@@ -99,6 +99,49 @@
   overflow: hidden;
 }
 
+/*
+ * 한 단계의 문구 + 장면. main을 꽉 채우고, 단계를 넘길 때 두 패널이 겹쳐 좌우로 밀린다.
+ * 장면(.onboarding-page__scene)은 이 패널을 기준으로 절대 배치된다.
+ */
+.onboarding-page__panel {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #fff6dc;
+}
+
+/*
+ * 좌우 밀기. 이전 패널은 화면 밖으로 완전히 나가고 새 패널이 반대쪽에서 들어온다.
+ * 곡선은 모바일 화면 전환에서 흔히 쓰는 빠르게 출발해 부드럽게 멈추는 형태다.
+ * 길이는 OnboardingPage.tsx의 STEP_SLIDE_MS와 맞춘다.
+ */
+.onboarding-page__panel.is-entering-forward { animation: onboarding-slide-in-right 460ms cubic-bezier(.32, .72, 0, 1) both; }
+.onboarding-page__panel.is-leaving-forward { animation: onboarding-slide-out-left 460ms cubic-bezier(.32, .72, 0, 1) both; }
+.onboarding-page__panel.is-entering-backward { animation: onboarding-slide-in-left 460ms cubic-bezier(.32, .72, 0, 1) both; }
+.onboarding-page__panel.is-leaving-backward { animation: onboarding-slide-out-right 460ms cubic-bezier(.32, .72, 0, 1) both; }
+
+.onboarding-page__panel[class*='is-leaving'] { pointer-events: none; }
+
+@keyframes onboarding-slide-in-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes onboarding-slide-out-left { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+@keyframes onboarding-slide-in-left { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@keyframes onboarding-slide-out-right { from { transform: translateX(0); } to { transform: translateX(100%); } }
+
+/*
+ * 마지막 단계에서 홈으로 들어갈 때. 온보딩 전체가 살짝 앞으로 당겨지며 흐려진다.
+ * 이어서 홈은 AppViewport가 살짝 작은 상태에서 제자리로 커지며 나타난다.
+ * 길이는 OnboardingPage.tsx의 EXIT_MS와 맞춘다.
+ */
+.onboarding-intro.is-exiting {
+  animation: onboarding-exit 320ms cubic-bezier(.4, 0, 1, 1) both;
+  pointer-events: none;
+}
+
+@keyframes onboarding-exit {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(1.06); }
+}
+
 .onboarding-page__copy {
   position: relative;
   z-index: 3;
@@ -325,7 +368,7 @@
 }
 
 /* * 참고: 실제 기기에서 이 영상 아래에 검은 선이 한 줄 보일 때가 있다. * * 영상 파일 문제는 아니다. 125프레임 전부 맨 아랫줄이 크림색(253, 244, 217)이다. * 브라우저가 영상을 별도 레이어로 합성하면서 가장자리 한 줄이 투명(검정) 배경과 * 섞여 생기는 것으로 보인다. 화면을 움직이면 보였다 안 보였다 하고, 같은 자리에 * 캡처 이미지를 넣으면 안 보이는 것도 그래서다. * * 같은 색 띠로 경계를 덮어 봤지만 증상이 그대로여서 되돌렸다. 다시 손대야 한다면 * 이 방법은 이미 안 되는 것으로 확인됐으니 다른 쪽을 보는 편이 좋다. */
-.onboarding-page--step-2 .onboarding-page__copy {
+.onboarding-page__panel--step-2 .onboarding-page__copy {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -333,11 +376,11 @@
   text-align: right;
 }
 
-.onboarding-page--step-2 .onboarding-page__copy h1 {
+.onboarding-page__panel--step-2 .onboarding-page__copy h1 {
   font-size: 31px;
 }
 
-.onboarding-page--step-2 .onboarding-page__copy p {
+.onboarding-page__panel--step-2 .onboarding-page__copy p {
   width: 277px;
   font-size: 14px;
   font-weight: 600;
@@ -571,5 +614,12 @@
 
   .onboarding-page__scene--video {
     background: #fff6dc;
+  }
+}
+/* 모션 줄이기: 단계 밀기·홈 진입 전환 없이 바로 바꾼다. (JS도 같은 조건에서 전환을 건너뛴다) */
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-page__panel,
+  .onboarding-intro.is-exiting {
+    animation: none;
   }
 }

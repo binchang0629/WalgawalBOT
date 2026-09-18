@@ -59,6 +59,12 @@ function CaseDetailPage() {
 
   const isAuthenticated = sessionStatus === 'authenticated'
   const hasVoted = isAuthenticated && votedCaseIds.includes(caseContent.id)
+  /*
+   * 방금 투표해 `투표 완료!` 팝업이 떠 있는 동안에는 뒤 화면을 그대로 둔다.
+   * 투표는 이미 저장돼 hasVoted가 참이 되지만, 그때 `이미 투표한 사건이에요`로 바뀌면
+   * 팝업과 뒤 화면이 동시에 움직여 시선이 흩어진다. 재방문 때만 완료 안내를 보여준다.
+   */
+  const showVotedNotice = hasVoted && !confirmedVote
   const savedVote = juryVotes[caseContent.id]
   const savedChoice = caseContent.choices.find((choice) => choice.id === savedVote)
   const loginPath = `${PATHS.login}?from=${encodeURIComponent(location.pathname)}`
@@ -143,7 +149,7 @@ function CaseDetailPage() {
           <Link className="closed-case-result-link" to={toCaseResult(caseContent.id)} state={{ fromPlaza: entryState?.fromPlaza, returnTo: entryState?.returnTo, homeCaseId: entryState?.homeCaseId }}>
             투표 결과보기
           </Link>
-        ) : hasVoted ? (
+        ) : showVotedNotice ? (
           <section className="case-vote-complete" aria-labelledby="case-vote-complete-title">
             <span className="case-vote-complete__check" aria-hidden="true">✓</span>
             <div>
