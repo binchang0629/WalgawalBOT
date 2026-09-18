@@ -3,8 +3,11 @@
     /* 시안은 우측 16px이지만 머리 스프라이트 좌우에 투명 여백이 있어
        실제로는 더 안쪽으로 보인다. 6px 당겨 눈으로 맞춘 값이다. */
     right: 10px;
-    /* 내비가 없는 화면. 맨 위로 버튼(하단 28px, 높이 40px) 위 6px에 쌓아 홈과 같은 모양으로 둔다. */
-    bottom: calc(74px + env(safe-area-inset-bottom, 0px));
+    /* 내비가 없는 화면. 화면 아래를 기준으로 자리를 잡는다. (예전 맨 위로 버튼 자리)
+       맨 위로 버튼은 이 위 6px에 쌓인다.
+       화면에서 보니 두 버튼이 높게 떠 보여, 28px에서 16px 내린 값이다.
+       맨 위로 버튼도 같은 16px을 내려 둘 사이 간격은 그대로 6px이다. */
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     z-index: 30;
     display: grid;
     place-items: center;
@@ -22,12 +25,12 @@
 }
 
 /*
- * 내비 바로 위 오른쪽은 이제 `맨 위로` 버튼(ScrollTopButton) 자리다.
- * 챗봇 머리는 그 위로 올라가 두 버튼이 세로로 쌓인다.
- * 맨 위로 버튼의 하단 위치(36px) + 높이(40px)보다 6px 위에 둔다.
+ * 내비 바로 위 오른쪽은 이제 챗봇 버튼 자리다. (예전 맨 위로 버튼 자리)
+ * 맨 위로 버튼은 그 위로 올라가 두 버튼이 세로로 쌓인다.
+ * 36px에서 16px 내린 값이다. 내비 배경의 상단 돌출(19px) 위로 1px이 남는다.
  */
 .floating-chat-button--above-nav {
-    bottom: calc(var(--floating-nav-height) + 82px);
+    bottom: calc(var(--floating-nav-height) + 20px);
 }
 
 .floating-chat-button span {
