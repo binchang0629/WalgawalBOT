@@ -1,0 +1,684 @@
+.onboarding-intro {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #EAF6FF;
+}
+
+.onboarding-splash {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: #EAF6FF;
+  cursor: pointer;
+  transition: opacity 420ms ease;
+}
+
+.onboarding-splash.is-leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.onboarding-splash video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-splash {
+    transition: none;
+  }
+}
+
+.onboarding-page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  color: var(--ink);
+  background: #fff6dc;
+}
+
+.app-viewport:has(.onboarding-page)::before {
+  background: #fff6dc;
+}
+
+.app-viewport:has(.onboarding-splash)::before {
+  background: #EAF6FF;
+}
+
+.onboarding-page__header {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--neutral-100);
+}
+
+.onboarding-page__header button {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.onboarding-page__header button:first-child {
+  margin-left: -12px;
+}
+
+.onboarding-page__header img {
+  width: 24px;
+  height: 24px;
+}
+
+.onboarding-page__skip {
+  margin-right: -12px;
+  color: var(--orange);
+  font-family: var(--font-title);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.onboarding-page__main {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/*
+ * 한 단계의 문구 + 장면. main을 꽉 채우고, 단계를 넘길 때 두 패널이 겹쳐 좌우로 밀린다.
+ * 장면(.onboarding-page__scene)은 이 패널을 기준으로 절대 배치된다.
+ */
+.onboarding-page__panel {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #fff6dc;
+}
+
+/*
+ * 좌우 밀기. 이전 패널은 화면 밖으로 완전히 나가고 새 패널이 반대쪽에서 들어온다.
+ * 곡선은 모바일 화면 전환에서 흔히 쓰는 빠르게 출발해 부드럽게 멈추는 형태다.
+ * 길이는 OnboardingPage.tsx의 STEP_SLIDE_MS와 맞춘다.
+ */
+.onboarding-page__panel.is-entering-forward {
+  animation: onboarding-slide-in-right 460ms cubic-bezier(.32, .72, 0, 1) both;
+}
+
+.onboarding-page__panel.is-leaving-forward {
+  animation: onboarding-slide-out-left 460ms cubic-bezier(.32, .72, 0, 1) both;
+}
+
+.onboarding-page__panel.is-entering-backward {
+  animation: onboarding-slide-in-left 460ms cubic-bezier(.32, .72, 0, 1) both;
+}
+
+.onboarding-page__panel.is-leaving-backward {
+  animation: onboarding-slide-out-right 460ms cubic-bezier(.32, .72, 0, 1) both;
+}
+
+.onboarding-page__panel[class*='is-leaving'] {
+  pointer-events: none;
+}
+
+@keyframes onboarding-slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes onboarding-slide-out-left {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes onboarding-slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes onboarding-slide-out-right {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/*
+ * 마지막 단계에서 홈으로 들어갈 때. 온보딩 전체가 살짝 앞으로 당겨지며 흐려진다.
+ * 이어서 홈은 AppViewport가 살짝 작은 상태에서 제자리로 커지며 나타난다.
+ * 길이는 OnboardingPage.tsx의 EXIT_MS와 맞춘다.
+ */
+.onboarding-intro.is-exiting {
+  animation: onboarding-exit 320ms cubic-bezier(.4, 0, 1, 1) both;
+  pointer-events: none;
+}
+
+@keyframes onboarding-exit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+}
+
+.onboarding-page__copy {
+  position: relative;
+  z-index: 3;
+  padding: 38px 30px 0;
+}
+
+.onboarding-page__copy h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.64px;
+}
+
+.onboarding-page__copy em {
+  color: var(--orange-800);
+  font-style: normal;
+}
+
+.onboarding-page__copy em.is-blue {
+  color: var(--blue);
+}
+
+.onboarding-page__copy p {
+  margin: 12px 0 0;
+  color: var(--brown);
+  font-size: 16px;
+  line-height: 1.3;
+  letter-spacing: -0.32px;
+}
+
+.onboarding-page__scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.onboarding-page__scene--first {
+  z-index: 1;
+}
+
+.onboarding-page__wave {
+  position: absolute;
+  z-index: 0;
+  top: 170px;
+  left: 0;
+  width: 402px;
+  height: 314px;
+  max-width: none;
+}
+
+.onboarding-note {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  column-gap: 4px;
+  align-content: center;
+  width: 150px;
+  height: 100px;
+  padding: 8px 16px;
+  border-radius: 16px;
+  box-shadow: -4px 4px 12px rgb(37 37 37 / 0.12);
+  font-size: 16px;
+  font-style: normal;
+  transform-origin: center;
+}
+
+.onboarding-note strong {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+}
+
+/* * 아이콘 크기는 Figma 벡터 실제 치수를 그대로 쓴다. * 40px 칸에 꽉 채우면(width/height 40 + contain) 시안보다 커진다. * 세 아이콘은 가로세로 비율이 서로 달라서 한 값으로 묶을 수 없다. */
+.onboarding-note__icon img {
+  display: block;
+  max-width: none;
+  object-fit: contain;
+}
+
+.onboarding-note--fact .onboarding-note__icon img {
+  width: 26.7px;
+  height: 33.3px;
+}
+
+.onboarding-note--emotion .onboarding-note__icon img {
+  width: 33.3px;
+  height: 30.6px;
+}
+
+.onboarding-note--private .onboarding-note__icon img {
+  width: 30px;
+  height: 33.3px;
+}
+
+.onboarding-note b {
+  align-self: center;
+}
+
+.onboarding-note i {
+  grid-column: 1 / -1;
+  display: block;
+  width: 100%;
+  height: 8px;
+  margin-top: 5px;
+  border-radius: 2px;
+  background: rgb(97 77 40 / 14%);
+}
+
+.onboarding-note--fact i {
+  background: rgb(69 145 78 / 20%);
+}
+
+.onboarding-note--private i {
+  background: #c9d7ee;
+}
+
+.onboarding-note--fact i:first-of-type,
+.onboarding-note--emotion i:first-of-type {
+  width: 100px;
+}
+
+.onboarding-note--fact i:last-of-type,
+.onboarding-note--private i:last-of-type {
+  width: 100%;
+}
+
+.onboarding-note--emotion i:last-of-type,
+.onboarding-note--private i:first-of-type {
+  width: 80px;
+}
+
+/* * 메모 세 장의 자리는 Figma 온보딩페이지1(2568:10984)에서 그대로 옮겼다. * * Figma는 노드의 왼쪽 위를 중심으로 회전하고, CSS는 요소의 한가운데를 중심으로 돈다. * 그래서 Figma의 좌표를 top/left에 그냥 적으면 기울어진 만큼 어긋난다. * 아래 값은 회전 후 결과가 시안과 겹치도록 그 차이를 미리 반영한 것이다. * * 세 장 모두 150 × 100이고 좌표는 main(헤더 아래) 기준이다. * Figma 회전값은 반시계가 양수라 CSS에서는 부호가 뒤집힌다. */
+.onboarding-note--fact {
+  top: 188.6px;
+  left: 155.9px;
+  background: #efffd7;
+  /* 사실 카드: 0.1초 후 천천히 등장 */
+  animation: onboarding-note-fact-rise 750ms cubic-bezier(.2, .8, .2, 1) both;
+  animation-delay: 100ms;
+}
+
+.onboarding-note--emotion {
+  top: 234.1px;
+  left: 234.5px;
+  background: #fff6dc;
+  /* 감정 카드: 사실 카드보다 늦게 등장 */
+  animation: onboarding-note-emotion-rise 750ms cubic-bezier(.2, .8, .2, 1) both;
+  animation-delay: 500ms;
+}
+
+.onboarding-note--private {
+  top: 328.8px;
+  left: 245.9px;
+  background: #eaf6ff;
+  /* 나만 보기 카드: 가장 마지막에 등장 */
+  animation: onboarding-note-private-rise 750ms cubic-bezier(.2, .8, .2, 1) both;
+  animation-delay: 900ms;
+}
+
+/* * 온보딩 1페이지 카드 등장 애니메이션 * * 카드가 아래쪽에서 올라오면서 나타난다. * 각 카드의 기존 Figma 회전값도 함께 유지한다. */
+/* 사실 */
+@keyframes onboarding-note-fact-rise {
+  from {
+    opacity: 0;
+    transform: translateY(45px) rotate(-14deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(-14deg);
+  }
+}
+
+/* 감정 */
+@keyframes onboarding-note-emotion-rise {
+  from {
+    opacity: 0;
+    transform: translateY(45px) rotate(-1.2deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(-1.2deg);
+  }
+}
+
+/* 나만 보기 */
+@keyframes onboarding-note-private-rise {
+  from {
+    opacity: 0;
+    transform: translateY(45px) rotate(14.1deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(14.1deg);
+  }
+}
+
+.onboarding-page__sofa-bot {
+  position: absolute;
+  z-index: 2;
+  top: 300px;
+  left: -30px;
+  width: 283px;
+  height: auto;
+  max-width: none;
+}
+
+.onboarding-page__scene--video {
+  z-index: 1;
+  background: #fff6dc;
+}
+
+.onboarding-page__scene--video video {
+  position: absolute;
+  inset: -215px -7px auto;
+  width: calc(100% + 14px);
+  height: 912px;
+  object-fit: cover;
+}
+
+/* * 참고: 실제 기기에서 이 영상 아래에 검은 선이 한 줄 보일 때가 있다. * * 영상 파일 문제는 아니다. 125프레임 전부 맨 아랫줄이 크림색(253, 244, 217)이다. * 브라우저가 영상을 별도 레이어로 합성하면서 가장자리 한 줄이 투명(검정) 배경과 * 섞여 생기는 것으로 보인다. 화면을 움직이면 보였다 안 보였다 하고, 같은 자리에 * 캡처 이미지를 넣으면 안 보이는 것도 그래서다. * * 같은 색 띠로 경계를 덮어 봤지만 증상이 그대로여서 되돌렸다. 다시 손대야 한다면 * 이 방법은 이미 안 되는 것으로 확인됐으니 다른 쪽을 보는 편이 좋다. */
+.onboarding-page__panel--step-2 .onboarding-page__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding-top: 465px;
+  padding-right: 30px;
+  text-align: right;
+}
+
+.onboarding-page__panel--step-2 .onboarding-page__copy h1 {
+  font-size: 31px;
+}
+
+.onboarding-page__panel--step-2 .onboarding-page__copy p {
+  width: 277px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.onboarding-page__scene--third {
+  z-index: 1;
+}
+
+/* * 편지 봉투 묶음. Figma 'Featured / Envelope artwork' (x 78, y 336, 305.3 x 314). * main이 화면 y 126에서 시작하므로 장면 기준 top은 336 - 126 = 210이다. * 가운데 정렬이 아니다. 왼쪽 아래 판멍이 자리를 비우려고 오른쪽으로 치우쳐 있다. * (가운데였다면 x 48.5이고, 실제로 30px 왼쪽으로 밀려 있었다.) */
+.onboarding-page__envelope {
+  position: absolute;
+  top: 210px;
+  left: 78px;
+  width: 305px;
+  height: 314px;
+}
+
+/* * 편지지. * * Figma 'Letter / Paper'는 263 x 284.5 칸에 img2.png(1254 x 1254)를 CROP으로 넣는다. * 잘라 쓰는 영역이 가로 938.8 / 세로 1183.1이므로 배율이 가로 0.2801 · 세로 0.2405로 * 서로 다르다. 즉 원본을 세로로 살짝 눌러 넣은 그림이다. * 그래서 이미지 자체 크기는 1254 x 0.2801 = 351.3, 1254 x 0.2405 = 301.6이 된다. * * height: auto로 두면 원본이 정사각형이라 351 x 351이 되어 세로가 49px 길어지고, * 편지지 아래끝이 봉투 앞면(아래끝 314)을 뚫고 나왔다. 그래서 높이를 고정한다. */
+.onboarding-page__letter {
+  position: absolute;
+  z-index: 1;
+  top: -4.3px;
+  left: 50%;
+  width: 351.3px;
+  height: 301.6px;
+  max-width: none;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 -2px 10px rgb(65 66 95 / 0.14));
+  animation: onboarding-letter-rise 1100ms 1000ms cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.onboarding-page__letter-copy {
+  position: absolute;
+  z-index: 3;
+  top: 40px;
+  left: 50%;
+  width: 234px;
+  color: var(--dark-brown);
+  font-family: var(--font-serif);
+  text-align: center;
+  transform: translateX(-50%);
+  animation: onboarding-letter-copy-rise 700ms 1250ms cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.onboarding-page__letter-copy>span {
+  display: block;
+  color: var(--neutral-200);
+  font-family: var(--font-quote);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.onboarding-page__letter-copy p {
+  margin: 3px 0;
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.onboarding-page__letter-copy b {
+  display: block;
+  margin-top: 17px;
+  padding: 4px 0;
+  border-block: 1px solid var(--neutral-200);
+  color: var(--blue-300);
+  font-family: var(--font-body);
+  font-size: 13.8px;
+  line-height: 1.55;
+}
+
+@keyframes onboarding-letter-rise {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(22px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes onboarding-letter-copy-rise {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.onboarding-page__envelope-back,
+.onboarding-page__envelope-front {
+  position: absolute;
+  left: 50%;
+  max-width: none;
+  transform: translateX(-50%);
+}
+
+.onboarding-page__envelope-back {
+  z-index: 0;
+  top: 22px;
+  width: 296px;
+  height: 292px;
+  opacity: 0;
+  animation: onboarding-envelope-open 500ms 800ms ease forwards;
+}
+
+.onboarding-page__envelope-front {
+  z-index: 4;
+  top: 153px;
+  width: 295px;
+  height: 160px;
+}
+
+@keyframes onboarding-envelope-open {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.onboarding-page__envelope-closed {
+  position: absolute;
+  z-index: 6;
+  bottom: -10px;
+  left: 0px;
+  width: 340px;
+  height: 192px;
+  object-fit: contain;
+  animation: onboarding-envelope-close-hide 500ms 800ms ease forwards;
+}
+
+@keyframes onboarding-envelope-close-hide {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+/* * 두루마리를 든 판멍이. Figma 칸은 198 x 177, 장면 기준 top 415(화면 541). * * 쓰던 onboarding-map-mascot.png는 원본이 가로로 1.275배 늘어난 파일이었다. * (그림 영역이 946 x 675 = 1.401, 원본은 366 x 333 = 1.099) * 그래서 어떤 크기로 넣어도 판멍이가 눌린 것처럼 보였다. * 가로 눌림만 되돌려 594 x 531로 다시 저장했고, 이제 198 x 177과 비율이 같다. * (594 / 531 = 198 / 177 = 1.1186이라 object-fit이 필요 없다.) * * left가 0이 아닌 이유: Figma는 늘어난 그림의 좌우를 잘라 썼다. 그때 그림이 * 놓이던 자리에 맞추려면 2.9px 왼쪽에서 시작해야 한다. */
+.onboarding-page__letter-mascot {
+  position: absolute;
+  z-index: 7;
+  top: 415px;
+  left: -2.9px;
+  width: 200px;
+  height: 200px;
+}
+
+/* * 하단 컨트롤(순서 표시 · 다음 버튼). * * Figma(온보딩페이지 1·2·3 공통, 402 x 874 기준): * 컨테이너 y 749 ~ 823 (높이 74) * 순서 표시 x 28, y 787 ~ 811 (64 x 24) * 다음 버튼 x 322, y 761 ~ 811 (50 x 50) * * 둘 다 컨테이너 아래쪽에 맞춰져 있고(아래 여백 12px), 컨테이너 바닥에서 * 화면 바닥(874)까지 51px이 남는다. 그래서 가운데 정렬이 아니라 flex-end다. */
+.onboarding-page__footer {
+  position: relative;
+  z-index: 4;
+  bottom: 51px;
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 74px;
+  padding: 0 30px 12px 28px;
+}
+
+.onboarding-page__indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 24px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: var(--orange-400);
+}
+
+.onboarding-page__indicator button {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  opacity: .88;
+}
+
+.onboarding-page__indicator button.is-active {
+  background: var(--orange);
+  opacity: 1;
+}
+
+.onboarding-page__next {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--orange);
+}
+
+.onboarding-page__next img {
+  width: 14px;
+  height: 14px;
+}
+
+/* * 모션 줄이기 설정이 켜져 있는 사용자는 * 카드와 편지 애니메이션을 생략하고 최종 상태를 바로 보여준다. */
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-page__scene--first .onboarding-note {
+    animation: none;
+    opacity: 1;
+  }
+
+  .onboarding-page__scene--video video {
+    display: none;
+  }
+
+  .onboarding-page__letter,
+  .onboarding-page__letter-copy {
+    animation: none;
+  }
+
+  .onboarding-page__scene--video {
+    background: #fff6dc;
+  }
+}
+
+/* 모션 줄이기: 단계 밀기·홈 진입 전환 없이 바로 바꾼다. (JS도 같은 조건에서 전환을 건너뛴다) */
+@media (prefers-reduced-motion: reduce) {
+
+  .onboarding-page__panel,
+  .onboarding-intro.is-exiting {
+    animation: none;
+  }
+}

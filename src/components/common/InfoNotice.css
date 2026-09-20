@@ -1,0 +1,24 @@
+.info-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 13px;
+    border: 1px solid var(--orange-200);
+    border-radius: 12px;
+    background: var(--orange-050);
+}
+
+.info-notice img {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    transform: scaleY(-1);
+}
+
+.info-notice p {
+    margin: 0;
+    color: var(--brown);
+    font-size: 13px;
+    line-height: 1.3;
+}

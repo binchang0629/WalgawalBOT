@@ -1,0 +1,274 @@
+/*
+ * 회원가입 동의 시트. Figma `2264:13125` · `2264:13294`.
+ * 클래스 이름은 기호 없이 camelCase로 쓴다. (사용자 요청)
+ */
+
+.signUpAgreeOverlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    background: rgb(37 37 37 / 70%);
+    pointer-events: auto;
+    overscroll-behavior: contain;
+    animation: signUpAgreeDimIn 240ms ease-out both;
+}
+
+.signUpAgreeSheet {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-height: calc(100% - 16px);
+    padding: 12px 24px 46px;
+    border-radius: 20px 20px 0 0;
+    background: #fff;
+    color: var(--ink);
+    font-family: var(--font-body);
+    animation: signUpAgreeSheetIn 360ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.signUpAgreeSheet:focus { outline: none; }
+
+.showcase--mobile .signUpAgreeSheet {
+    padding-bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+}
+
+@keyframes signUpAgreeDimIn {
+    from { background-color: rgb(37 37 37 / 0%); }
+    to { background-color: rgb(37 37 37 / 70%); }
+}
+
+@keyframes signUpAgreeSheetIn {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .signUpAgreeOverlay,
+    .signUpAgreeSheet { animation: none; }
+}
+
+.signUpAgreeHandle {
+    flex: none;
+    width: 40px;
+    height: 4px;
+    margin: 0 auto 8px;
+    border-radius: 999px;
+    background: var(--neutral-400);
+}
+
+.signUpAgreeHeader {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0 30px;
+}
+
+.signUpAgreeHeader h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.signUpAgreeHeader button {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--neutral-100);
+    cursor: pointer;
+}
+
+.signUpAgreeHeader img { display: block; width: 24px; height: 24px; }
+
+/* ---------- 동의 항목 ---------- */
+
+.signUpAgreeList {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    flex-direction: column;
+    gap: 20px;
+    margin: 0;
+    padding: 0 2px 0 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    list-style: none;
+    scrollbar-width: none;
+}
+
+.signUpAgreeList::-webkit-scrollbar { width: 0; display: none; }
+
+.signUpAgreeRow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.signUpAgreeLabel {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    cursor: pointer;
+}
+
+/* 진짜 체크박스는 숨기고 키보드·스크린리더용으로만 남긴다. */
+.signUpAgreeLabel input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+}
+
+/*
+ * 시안의 라디오는 아이콘이 아니라 테두리 두께만 다른 원이다.
+ * 켜짐은 주황 6px, 꺼짐은 회색 2px.
+ */
+.signUpAgreeRadio {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--neutral-300);
+    border-radius: 10px;
+    transition: border-color 120ms ease, border-width 120ms ease;
+}
+
+.signUpAgreeLabel input:checked + .signUpAgreeRadio {
+    border: 6px solid var(--orange-700);
+}
+
+.signUpAgreeLabel input:focus-visible + .signUpAgreeRadio {
+    outline: 3px solid var(--blue-700);
+    outline-offset: 2px;
+}
+
+.signUpAgreeText {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--neutral-900);
+}
+
+/* 별표가 없는 줄도 같은 폭을 차지해 네 줄의 글자 시작점이 맞는다. */
+.signUpAgreeRequired {
+    display: inline-block;
+    width: 6px;
+    margin-right: 4px;
+    color: var(--blue-700);
+    font-weight: 400;
+}
+.signUpAgreeOptional { margin-left: 4px; color: var(--neutral-650); font-size: 14px; font-style: normal; }
+
+.signUpAgreeToggle {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.signUpAgreeToggle:disabled { cursor: default; }
+
+/*
+ * 원본 화살표는 위를 향한다. 접힘이 기본이라 180도 돌려 아래를 보게 한다.
+ * 색은 파일에 박혀 있으므로 mask로 얹어 CSS가 정하게 한다.
+ */
+.signUpAgreeChevron {
+    display: block;
+    width: 24px;
+    height: 24px;
+    background: currentcolor;
+    color: var(--neutral-650);
+    mask: url("../../../assets/auth/signUpChevronLarge.svg") center / 24px 24px no-repeat;
+    -webkit-mask: url("../../../assets/auth/signUpChevronLarge.svg") center / 24px 24px no-repeat;
+    transform: rotate(180deg);
+    transition: transform 180ms ease;
+}
+
+.signUpAgreeChevronOpen { transform: rotate(0deg); }
+
+/* 펼침 시안이 없어 열리지 않는 항목. 스타일가이드의 gray 400으로 비활성임을 보인다. */
+.signUpAgreeToggle:disabled .signUpAgreeChevron { color: var(--neutral-300); }
+
+/* ---------- 펼친 약관 ---------- */
+
+.signUpAgreeBody {
+    padding: 12px 0 20px 26px;
+    border-bottom: 1px solid var(--neutral-100);
+    color: var(--neutral-700);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.signUpAgreeBodyLead { margin: 0 0 8px; }
+
+.signUpAgreeBody ul {
+    margin: 0;
+    padding-left: 14px;
+    list-style: disc;
+}
+
+.signUpAgreeBody li { margin-bottom: 4px; }
+
+.signUpAgreeBodyMore {
+    margin: 16px 0 0;
+    color: var(--neutral-900);
+    font-weight: 700;
+}
+
+/* ---------- 안내와 버튼 ---------- */
+
+.signUpAgreeNotice {
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    margin: 24px 0 0;
+}
+
+.signUpAgreeNotice img {
+    margin-top: 0;
+}
+
+.signUpAgreeSubmit {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 100%;
+    height: 52px;
+    margin-top: 24px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--orange-700);
+    color: #fff;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+    cursor: pointer;
+}
+
+.signUpAgreeSubmit:disabled {
+    background: var(--neutral-100);
+    color: var(--neutral-400);
+    cursor: default;
+}
+
+.signUpAgreeSubmit:focus-visible,
+.signUpAgreeToggle:focus-visible,
+.signUpAgreeHeader button:focus-visible {
+    outline: 3px solid var(--blue-700);
+    outline-offset: 2px;
+}

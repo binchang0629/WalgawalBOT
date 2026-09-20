@@ -1,0 +1,13 @@
+.my-jury-page__count {
+    margin: -8px 0 18px;
+    color: var(--neutral-600);
+    font-size: 13px;
+    line-height: 1.3;
+}
+
+.my-jury-page .my-case-filters { margin-bottom: 20px; }
+.my-jury-page .case-list { padding-bottom: 8px; }
+.my-jury-page__pagination { margin: 24px 0 8px; }
+
+/* 상세에서 돌아온 목록은 기존 스크롤 위치의 카드가 즉시 보여야 한다. */
+.my-jury-page--restored .case-card { animation: none; }

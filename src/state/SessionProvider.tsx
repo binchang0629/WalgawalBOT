@@ -1,0 +1,463 @@
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
+import type { PersonaId, SessionStatus } from '../types'
+import type { WeddingGiftVoteId } from '../data/common/caseDetailContent'
+import { DEMO_ACCOUNTS, PERSONAS } from '../data/personas'
+import { JIHUN_JURY_CASE_IDS, JIHUN_JURY_VOTES } from '../data/personas/juryHistory'
+import { DEMO } from '../config/app'
+import { SessionContext } from './sessionContext'
+import type { SessionUser, SignupProfile } from './sessionContext'
+import { accountProfileAvatars } from '../data/common/profileAvatars'
+import { clearDemoDeadlines } from '../hooks/useCountdown'
+import { DEMO_FIRST_VISIT_KEY } from '../data/common/demoClock'
+import { clearLoginReward } from './loginRewardSignal'
+
+/**
+ * 시연 세션 상태를 한곳에서 관리한다.
+ *
+ * 저장·복원 로직은 이 파일 안에만 둔다.
+ * 인증 상태는 새 브라우저 세션마다 비로그인으로 시작하도록 sessionStorage에 두고,
+ * 계정별 활동 기록은 같은 시연 세션에서 새로고침해도 유지한다. (PROJECT_SPEC.md §7-8)
+ * 새 브라우저 세션에서는 이전 시연의 접수·투표 기록을 이어받지 않는다.
+ * 저장소를 못 쓰거나 값이 깨져 있어도 서아의 기본 데모 세션으로 시작한다.
+ *
+ * 복원은 첫 렌더의 초기값에서 동기로 끝낸다.
+ * effect 안에서 setState를 부르면 렌더가 연쇄로 일어나므로 그렇게 하지 않는다.
+ * effect는 반대 방향, 즉 상태를 저장소에 반영하는 용도로만 쓴다.
+ */
+
+const STORAGE_KEY = `${DEMO.storagePrefix}:session`
+const CUSTOM_ACTIVITY_KEY = `${DEMO.storagePrefix}:custom:activity:v1`
+// 서아 시안의 첫 배심 참여 1건/10pt를 재현하는 데모 보상이다.
+const DEMO_JURY_VOTE_POINTS = 10
+const MAX_SUBMITTED_CASES = 1
+
+interface ActivityRecord {
+  submittedCaseIds: string[]
+  submittedCaseAt: Record<string, number>
+  votedCaseIds: string[]
+  juryVotes: Partial<Record<string, WeddingGiftVoteId>>
+  /** 후일담을 게시한 사건 id. 게시 전에는 비어 있어서 `내가 쓴 후일담`이 빈 화면으로 나온다. */
+  publishedAfterStoryIds: string[]
+  publishedAfterStoryAt: Record<string, number>
+}
+
+type ActivityRecords = Record<PersonaId, ActivityRecord>
+
+// 이전 버전의 시연 기록이 첫 로그인에 1건씩 보이지 않도록 저장 키를 분리한다.
+const activityStorageKey = (personaId: PersonaId) => `${DEMO.storagePrefix}:${personaId}:activity:v3`
+
+function emptyActivity(): ActivityRecord {
+  return { submittedCaseIds: [], submittedCaseAt: {}, votedCaseIds: [], juryVotes: {}, publishedAfterStoryIds: [], publishedAfterStoryAt: {} }
+}
+
+function isIdList(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((id: unknown) => typeof id === 'string' && id.trim().length > 0)
+}
+
+function readActivity(personaId: PersonaId): ActivityRecord {
+  try {
+    const raw = window.localStorage.getItem(activityStorageKey(personaId))
+    return parseActivity(raw)
+  } catch {
+    return emptyActivity()
+  }
+}
+
+function parseActivity(raw: string | null): ActivityRecord {
+  try {
+    if (!raw) return emptyActivity()
+    const parsed: unknown = JSON.parse(raw)
+    if (typeof parsed !== 'object' || parsed === null) return emptyActivity()
+    const value = parsed as Partial<ActivityRecord>
+    if (!isIdList(value.submittedCaseIds) || !isIdList(value.votedCaseIds)) return emptyActivity()
+    const juryVotes = Object.fromEntries(
+      Object.entries(value.juryVotes ?? {}).filter(([caseId, voteId]) =>
+        value.votedCaseIds?.includes(caseId)
+        && (voteId === 'writer' || voteId === 'other' || voteId === 'both' || voteId === 'neither')),
+    ) as ActivityRecord['juryVotes']
+    return {
+      submittedCaseIds: [...new Set(value.submittedCaseIds)].slice(0, MAX_SUBMITTED_CASES),
+      submittedCaseAt: Object.fromEntries(Object.entries(value.submittedCaseAt ?? {})
+        .filter(([id, at]) => typeof id === 'string' && typeof at === 'number' && Number.isFinite(at) && at > 0)),
+      votedCaseIds: [...new Set(value.votedCaseIds)],
+      juryVotes,
+      /*
+       * 후일담 기록은 나중에 추가한 항목이다. 예전에 저장된 값에는 없으므로
+       * 없으면 빈 목록으로 본다. 이것 때문에 앞의 두 기록까지 버리지는 않는다.
+       */
+      publishedAfterStoryIds: isIdList(value.publishedAfterStoryIds)
+        ? [...new Set(value.publishedAfterStoryIds)]
+        : [],
+      publishedAfterStoryAt: Object.fromEntries(Object.entries(value.publishedAfterStoryAt ?? {})
+        .filter(([id, at]) => typeof id === 'string' && typeof at === 'number' && Number.isFinite(at) && at > 0)),
+    }
+  } catch {
+    return emptyActivity()
+  }
+}
+
+function readCustomActivity(): ActivityRecord {
+  const stored = readStored()
+  if (!stored?.isAuthenticated || !stored.signupProfile) return emptyActivity()
+  try {
+    return parseActivity(window.sessionStorage.getItem(CUSTOM_ACTIVITY_KEY))
+  } catch {
+    return emptyActivity()
+  }
+}
+
+function createInitialActivityRecords(): ActivityRecords {
+  // sessionStorage가 비어 있으면 새 시연이다. 이전 브라우저 세션의 활동은 복원하지 않는다.
+  if (!readStored()?.isAuthenticated) return { A: emptyActivity(), B: emptyActivity() }
+  return { A: readActivity('A'), B: readActivity('B') }
+}
+
+function clearStoredAppData() {
+  // 이 앱의 키만 지운다. 같은 출처의 다른 서비스 데이터는 건드리지 않는다.
+  const clearMatchingKeys = (storage: Storage) => {
+    const keys: string[] = []
+    for (let index = 0; index < storage.length; index += 1) {
+      const key = storage.key(index)
+      if (key && key !== DEMO_FIRST_VISIT_KEY && (key.startsWith('walgawalbot:')
+        || key.startsWith('wgwb:case-participant-count:v1:')
+        || key === 'wgwb:jihoon-recent-searches')) keys.push(key)
+    }
+    keys.forEach((key) => storage.removeItem(key))
+  }
+
+  try { clearMatchingKeys(window.localStorage) } catch { /* 저장소 접근이 막혀도 메모리 상태는 비운다. */ }
+  try { clearMatchingKeys(window.sessionStorage) } catch { /* 저장소 접근이 막혀도 메모리 상태는 비운다. */ }
+}
+
+function writeActivity(personaId: PersonaId, activity: ActivityRecord) {
+  try {
+    window.localStorage.setItem(activityStorageKey(personaId), JSON.stringify(activity))
+  } catch {
+    // 저장소를 사용할 수 없어도 현재 화면의 활동 기록은 메모리에서 유지한다.
+  }
+}
+
+interface StoredSession {
+  personaId: PersonaId
+  isAuthenticated: boolean
+  signupProfile?: SignupProfile | null
+}
+
+interface SessionState {
+  personaId: PersonaId
+  sessionStatus: SessionStatus
+  signupProfile: SignupProfile | null
+}
+
+function isSignupProfile(value: unknown): value is SignupProfile {
+  if (typeof value !== 'object' || value === null) return false
+  const profile = value as Partial<SignupProfile>
+  return typeof profile.nickname === 'string'
+    && profile.nickname.length >= 2
+    && profile.nickname.length <= 6
+    && typeof profile.email === 'string'
+    && profile.email.includes('@')
+}
+
+function readStored(): StoredSession | null {
+  try {
+    const raw = window.sessionStorage.getItem(STORAGE_KEY)
+    if (!raw) return null
+
+    const parsed: unknown = JSON.parse(raw)
+    if (typeof parsed !== 'object' || parsed === null) return null
+
+    const value = parsed as Partial<StoredSession>
+    if (value.personaId !== 'A' && value.personaId !== 'B') return null
+
+    return {
+      personaId: value.personaId,
+      isAuthenticated: value.isAuthenticated === true,
+      signupProfile: value.personaId === 'A' && value.isAuthenticated && isSignupProfile(value.signupProfile)
+        ? value.signupProfile
+        : null,
+    }
+  } catch {
+    // 저장소를 못 쓰거나 값이 깨진 경우. 안전한 초기 상태로 넘어간다.
+    return null
+  }
+}
+
+function writeStored(value: StoredSession) {
+  try {
+    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(value))
+  } catch {
+    // 저장에 실패해도 화면 동작은 계속된다.
+  }
+}
+
+/** 첫 렌더에서 저장된 값을 그대로 읽어 초기 상태로 쓴다. */
+function createInitialState(): SessionState {
+  const stored = readStored()
+
+  if (stored) {
+    return {
+      personaId: stored.personaId,
+      sessionStatus: stored.isAuthenticated ? 'authenticated' : 'anonymous',
+      signupProfile: stored.signupProfile ?? null,
+    }
+  }
+
+  // 처음 들어오면 서아의 시작 상태, 즉 비로그인이다.
+  return { personaId: 'A', sessionStatus: startStatusOf('A'), signupProfile: null }
+}
+
+/**
+ * 퍼소나마다 시연을 시작하는 로그인 상태가 다르다.
+ *
+ *   서아(신규) : 비로그인으로 시작한다. 투표하려다 로그인 안내를 만나고, 가입하고 돌아오는 흐름이다.
+ *   지훈(기존) : 이미 회원이라 로그인된 채로 시작한다. 가입 단계를 거치지 않는다.
+ */
+function startStatusOf(personaId: PersonaId): SessionStatus {
+  return PERSONAS[personaId].kind === 'new' ? 'anonymous' : 'authenticated'
+}
+
+function toUser(personaId: PersonaId, signupProfile: SignupProfile | null): SessionUser {
+  const account = DEMO_ACCOUNTS[personaId]
+  if (personaId === 'A' && signupProfile) {
+    return {
+      personaId,
+      name: signupProfile.nickname,
+      email: signupProfile.email,
+      nickname: signupProfile.nickname,
+      anonymousAvatarUrl: accountProfileAvatars.custom,
+      isCustomProfile: true,
+    }
+  }
+  return {
+    personaId,
+    name: account.name,
+    email: account.email,
+    nickname: account.nickname,
+    anonymousAvatarUrl: account.anonymousAvatarUrl,
+    isCustomProfile: false,
+  }
+}
+
+function SessionProvider({ children }: { children: ReactNode }) {
+  const [session, setSession] = useState<SessionState>(createInitialState)
+  const [rewardPointAdjustments, setRewardPointAdjustments] = useState<Partial<Record<PersonaId, number>>>({})
+  const [customRewardPointAdjustment, setCustomRewardPointAdjustment] = useState(0)
+  const [activityRecords, setActivityRecords] = useState<ActivityRecords>(createInitialActivityRecords)
+  const [customActivity, setCustomActivity] = useState<ActivityRecord>(readCustomActivity)
+
+  // 상태를 외부 시스템(localStorage)에 반영한다. effect의 본래 용도다.
+  useEffect(() => {
+    if (session.sessionStatus === 'anonymous') {
+      try { window.sessionStorage.removeItem(STORAGE_KEY) } catch { /* 저장소 접근 불가 */ }
+      return
+    }
+    writeStored({
+      personaId: session.personaId,
+      isAuthenticated: session.sessionStatus === 'authenticated',
+      signupProfile: session.sessionStatus === 'authenticated' ? session.signupProfile : null,
+    })
+  }, [session])
+
+  useEffect(() => {
+    if (session.sessionStatus !== 'authenticated') return
+    writeActivity('A', activityRecords.A)
+    writeActivity('B', activityRecords.B)
+  }, [activityRecords, session.sessionStatus])
+
+  useEffect(() => {
+    try {
+      if (session.sessionStatus === 'authenticated' && session.signupProfile) {
+        window.sessionStorage.setItem(CUSTOM_ACTIVITY_KEY, JSON.stringify(customActivity))
+      } else {
+        window.sessionStorage.removeItem(CUSTOM_ACTIVITY_KEY)
+      }
+    } catch {
+      // 저장소를 사용할 수 없어도 현재 화면의 활동 기록은 메모리에서 유지한다.
+    }
+  }, [session.sessionStatus, session.signupProfile, customActivity])
+
+  const signIn = useCallback((personaId: PersonaId, signupProfile?: SignupProfile) => {
+    if (signupProfile) {
+      // 직접 가입은 매번 새 시연 계정이다. 서아의 활동 기록은 그대로 둔다.
+      setCustomActivity(emptyActivity())
+      setCustomRewardPointAdjustment(0)
+    }
+    setSession({ personaId, sessionStatus: 'authenticated', signupProfile: personaId === 'A' ? signupProfile ?? null : null })
+  }, [])
+
+  const signOut = useCallback(() => {
+    clearStoredAppData()
+    clearDemoDeadlines()
+    clearLoginReward()
+    setActivityRecords({ A: emptyActivity(), B: emptyActivity() })
+    setCustomActivity(emptyActivity())
+    setRewardPointAdjustments({})
+    setCustomRewardPointAdjustment(0)
+    setSession({ personaId: 'A', sessionStatus: 'anonymous', signupProfile: null })
+  }, [])
+
+  /*
+   * 계정 전환은 그 퍼소나의 시연 시작 지점으로 되돌린다.
+   * 서아를 고르면 비로그인, 지훈을 고르면 로그인 상태다.
+   * 서아로 돌아왔는데 앞선 시연에서 로그인한 상태가 남아 있으면 가입 흐름을 다시 못 보여준다.
+   */
+  const switchPersona = useCallback((personaId: PersonaId, options?: { startSignedOut?: boolean }) => {
+    setSession({
+      personaId,
+      // 지훈의 로그인 화면부터 보여주려면 기존 사용자라도 비로그인에서 시작해야 한다.
+      sessionStatus: options?.startSignedOut ? 'anonymous' : startStatusOf(personaId),
+      signupProfile: null,
+    })
+  }, [])
+
+  const recordActivity = useCallback((field: 'submittedCaseIds' | 'publishedAfterStoryIds', id: string) => {
+    // 서버 연결 전 데모 집계. 로그인한 현재 계정에만 기록하고 같은 사건은 중복 집계하지 않는다.
+    if (session.sessionStatus !== 'authenticated' || !id.trim()) return
+    if (session.signupProfile) {
+      setCustomActivity((current) => {
+        if (current[field].includes(id)) return current
+        if (field === 'submittedCaseIds' && current.submittedCaseIds.length >= MAX_SUBMITTED_CASES) return current
+        return {
+          ...current, [field]: [...current[field], id],
+          ...(field === 'publishedAfterStoryIds' ? { publishedAfterStoryAt: { ...current.publishedAfterStoryAt, [id]: Date.now() } } : {}),
+          ...(field === 'submittedCaseIds' ? { submittedCaseAt: { ...current.submittedCaseAt, [id]: Date.now() } } : {}),
+        }
+      })
+      return
+    }
+    const personaId = session.personaId
+    setActivityRecords((current) => {
+      const activity = current[personaId]
+      if (activity[field].includes(id)) return current
+      if (field === 'submittedCaseIds' && activity.submittedCaseIds.length >= MAX_SUBMITTED_CASES) {
+        return current
+      }
+      return {
+        ...current,
+        [personaId]: {
+          ...activity, [field]: [...activity[field], id],
+          ...(field === 'publishedAfterStoryIds' ? { publishedAfterStoryAt: { ...activity.publishedAfterStoryAt, [id]: Date.now() } } : {}),
+          ...(field === 'submittedCaseIds' ? { submittedCaseAt: { ...activity.submittedCaseAt, [id]: Date.now() } } : {}),
+        },
+      }
+    })
+  }, [session.personaId, session.sessionStatus, session.signupProfile])
+
+  const recordCaseSubmission = useCallback((submissionId: string) => {
+    recordActivity('submittedCaseIds', submissionId)
+  }, [recordActivity])
+
+  const recordJuryVote = useCallback((caseId: string, voteId: WeddingGiftVoteId) => {
+    if (session.sessionStatus !== 'authenticated' || !caseId.trim()) return
+    if (!session.signupProfile && session.personaId === 'B' && JIHUN_JURY_CASE_IDS.includes(caseId)) return
+    const recordVote = (current: ActivityRecord): ActivityRecord => {
+      if (current.votedCaseIds.includes(caseId)) return current
+      return {
+        ...current,
+        votedCaseIds: [...current.votedCaseIds, caseId],
+        juryVotes: { ...current.juryVotes, [caseId]: voteId },
+      }
+    }
+    if (session.signupProfile) {
+      setCustomActivity(recordVote)
+    } else {
+      const personaId = session.personaId
+      setActivityRecords((current) => ({
+        ...current,
+        [personaId]: recordVote(current[personaId]),
+      }))
+    }
+  }, [session.personaId, session.sessionStatus, session.signupProfile])
+
+  const recordAfterStory = useCallback((storyId: string) => {
+    recordActivity('publishedAfterStoryIds', storyId)
+  }, [recordActivity])
+
+  const syncRewardPointTotal = useCallback((totalPoints: number) => {
+    if (!Number.isFinite(totalPoints) || totalPoints < 0) return
+    if (session.signupProfile) {
+      setCustomRewardPointAdjustment(totalPoints - customActivity.votedCaseIds.length * DEMO_JURY_VOTE_POINTS)
+      return
+    }
+    const personaId = session.personaId
+    const account = DEMO_ACCOUNTS[personaId]
+    const activity = activityRecords[personaId]
+    const earnedVotes = activity.votedCaseIds.filter((caseId) =>
+      personaId !== 'B' || !JIHUN_JURY_CASE_IDS.includes(caseId)).length
+    const earnedPoints = account.points + earnedVotes * DEMO_JURY_VOTE_POINTS
+
+    // 현재 합계와 목표 합계의 차이만 보관해 이후 배심 포인트도 계속 누적되게 한다.
+    setRewardPointAdjustments((current) => ({
+      ...current,
+      [personaId]: totalPoints - earnedPoints,
+    }))
+  }, [session.personaId, session.signupProfile, activityRecords, customActivity])
+
+  const activityStats = useMemo(() => {
+    if (session.signupProfile) {
+      return {
+        submittedCases: customActivity.submittedCaseIds.length,
+        juryParticipations: customActivity.votedCaseIds.length,
+        points: customActivity.votedCaseIds.length * DEMO_JURY_VOTE_POINTS + customRewardPointAdjustment,
+      }
+    }
+    const account = DEMO_ACCOUNTS[session.personaId]
+    const activity = activityRecords[session.personaId]
+    const submittedCases = activity.submittedCaseIds.length
+    const juryParticipations = activity.votedCaseIds.filter((caseId) =>
+      session.personaId !== 'B' || !JIHUN_JURY_CASE_IDS.includes(caseId)).length
+    return {
+      submittedCases: Math.min(
+        MAX_SUBMITTED_CASES,
+        account.submittedCases + submittedCases,
+      ),
+      juryParticipations: account.juryParticipations + juryParticipations,
+      points: account.points
+        + juryParticipations * DEMO_JURY_VOTE_POINTS
+        + (rewardPointAdjustments[session.personaId] ?? 0),
+    }
+  }, [session.personaId, session.signupProfile, activityRecords, customActivity, customRewardPointAdjustment, rewardPointAdjustments])
+
+  const value = useMemo(
+    () => ({
+      personaId: session.personaId,
+      sessionStatus: session.sessionStatus,
+      currentUser:
+        session.sessionStatus === 'authenticated' ? toUser(session.personaId, session.signupProfile) : null,
+      activityStats,
+      submittedCaseAt: session.signupProfile
+        ? customActivity.submittedCaseAt
+        : activityRecords[session.personaId].submittedCaseAt,
+      votedCaseIds: session.signupProfile
+        ? customActivity.votedCaseIds
+        : session.personaId === 'B'
+          ? [...new Set([...JIHUN_JURY_CASE_IDS, ...activityRecords.B.votedCaseIds])]
+          : activityRecords.A.votedCaseIds,
+      juryVotes: session.signupProfile
+        ? customActivity.juryVotes
+        : session.personaId === 'B'
+          ? { ...JIHUN_JURY_VOTES, ...activityRecords.B.juryVotes }
+          : activityRecords.A.juryVotes,
+      publishedAfterStoryIds: session.signupProfile
+        ? customActivity.publishedAfterStoryIds
+        : activityRecords[session.personaId].publishedAfterStoryIds,
+      publishedAfterStoryAt: session.signupProfile
+        ? customActivity.publishedAfterStoryAt
+        : activityRecords[session.personaId].publishedAfterStoryAt,
+      recordCaseSubmission,
+      recordJuryVote,
+      recordAfterStory,
+      syncRewardPointTotal,
+      signIn,
+      signOut,
+      switchPersona,
+    }),
+    [session, activityStats, activityRecords, customActivity, recordCaseSubmission, recordJuryVote, recordAfterStory, syncRewardPointTotal, signIn, signOut, switchPersona],
+  )
+
+  return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
+}
+
+export default SessionProvider

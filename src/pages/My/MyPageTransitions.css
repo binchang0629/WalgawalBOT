@@ -1,0 +1,37 @@
+/*
+ * MY 하위 상세 화면의 좌우 슬라이드 전환.
+ *
+ * 들어올 때 오른쪽 → 왼쪽, 돌아갈 때 왼쪽 → 오른쪽으로 짝을 맞춘다.
+ * 나가는 모션은 `hooks/useDetailSlide`가 이동을 미루는 동안 재생된다.
+ */
+
+.my-detail-slide-enter {
+    animation: my-detail-slide-in 340ms cubic-bezier(.22, 1, .36, 1) both;
+    will-change: transform;
+}
+
+/* 나가는 쪽은 되돌아가는 동작이라 들어올 때보다 조금 짧게 끊는다. */
+.my-detail-slide-exit {
+    animation: my-detail-slide-out 260ms cubic-bezier(.4, 0, 1, 1) both;
+    will-change: transform;
+    /* 빠져나가는 동안 눌리는 것을 막는다. 화면은 이미 이동 중이다. */
+    pointer-events: none;
+}
+
+@keyframes my-detail-slide-in {
+    from { transform: translate3d(100%, 0, 0); }
+    to { transform: none; }
+}
+
+@keyframes my-detail-slide-out {
+    from { transform: none; }
+    to { transform: translate3d(100%, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .my-detail-slide-enter,
+    .my-detail-slide-exit {
+        animation: none;
+        will-change: auto;
+    }
+}

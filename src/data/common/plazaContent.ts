@@ -1,0 +1,361 @@
+import type { CaseCategory, CaseSummary, JurorRank } from '../../types'
+import { jihoonSimilarCase, jihoonSimilarResult } from './jihoonSimilarCaseContent'
+import { parentsCase, parentsResult } from './parentsCaseContent'
+
+export const rankingTabs = [
+  { key: 'juror', label: '명판관 배심원' },
+  { key: 'voter', label: '최다 투표자' },
+] as const
+
+export const rankingPanel = {
+  title: '이달의 명판관 배심원',
+  description: '판결 포인트와 참여 기록을 반영했어요',
+} as const
+
+export const jurorRanking: JurorRank[] = [
+  { rank: 1, nickname: '정의의 다람쥐', point: 1045 },
+  { rank: 2, nickname: '판결 요정', point: 845 },
+  { rank: 3, nickname: '증거 수집가', point: 756 },
+]
+
+export const voterRankingPanel = {
+  title: '이달의 최다 투표자',
+  description: '가장 많은 사건에 소중한 한 표를 보냈어요',
+} as const
+
+export const voterRanking: JurorRank[] = [
+  { rank: 1, nickname: '오늘도 소신', point: 1428 },
+  { rank: 2, nickname: '한표의 용기', point: 1286 },
+  { rank: 3, nickname: '투표하는 토끼', point: 1137 },
+]
+
+export const caseCategories: (CaseCategory | '전체')[] = [
+  '전체',
+  '연인',
+  '친구',
+  '가족',
+  '직장',
+  '학업',
+]
+
+/**
+ * 전체 사건 목록의 보기 기준.
+ *
+ * 다섯 항목 모두 `어떤 사건을 보여줄까`에만 답한다. 고르면 목록이 줄거나 순서가 바뀔 뿐,
+ * 항목끼리 성격이 어긋나지 않는다. 글자 수와 끝말(`사건`)을 맞춰 한 덩어리로 읽힌다.
+ */
+export type PlazaViewKey = 'latest' | 'popular' | 'voting' | 'closed' | 'recommended'
+
+export const plazaViewOptions: { key: PlazaViewKey; label: string; description: string }[] = [
+  { key: 'latest', label: '최신 사건', description: '방금 올라온 순서' },
+  { key: 'popular', label: '인기 사건', description: '조회가 많은 순서' },
+  { key: 'voting', label: '진행 사건', description: '아직 투표 중' },
+  { key: 'closed', label: '해결 사건', description: '판결이 끝남' },
+  { key: 'recommended', label: '추천 사건', description: '내 사건과 같은 분야' },
+]
+
+/**
+ * 최신사건의 시연용 게시 순서. 조회·댓글 수와 무관하게 접수된 시각이 최근인 사건부터 보인다.
+ * 실제 서버 연결 시에는 이 목록 대신 게시 시각으로 정렬한다.
+ */
+export const latestPlazaCaseIds = [
+  'case-parents-interfere',
+  'case-school-lab-data',
+  'case-dating-travel-cost',
+  'case-work-new-hire',
+  'case-dating-phone',
+  'case-friend-group-chat',
+  'case-family-moving',
+  'case-invite-ex',
+  'case-work-after-hours',
+  'case-friend-loan',
+  'case-work-credit',
+  'case-secret-told',
+  'case-dating-anniversary',
+  'case-friend-trip-cancel',
+  'case-family-care',
+  'case-school-attendance',
+  'case-school-ai-report',
+  'case-family-living-expenses',
+  'case-company-874',
+  'case-group-project-credit',
+] as const
+
+/** 첫 방문 시점 기준 게시 나이. 해결 사건은 24시간 투표 뒤에 판결되며, 연결 후일담은 그 뒤에 올라온다. */
+export const plazaCaseAgeMinutes: Record<string, number> = {
+  'case-parents-interfere': 28,
+  'case-school-lab-data': 65,
+  'case-dating-travel-cost': 102,
+  'case-work-new-hire': 139,
+  'case-dating-phone': 176,
+  'case-friend-group-chat': 213,
+  'case-family-moving': 250,
+  'case-invite-ex': 287,
+  'case-work-after-hours': 324,
+  'case-friend-loan': 1500,
+  'case-work-credit': 1560,
+  'case-secret-told': 1620,
+  'case-dating-anniversary': 1740,
+  'case-friend-trip-cancel': 1920,
+  'case-family-care': 2220,
+  'case-school-attendance': 2460,
+  'case-school-ai-report': 2760,
+  'case-family-living-expenses': 3000,
+  'case-company-874': 3475,
+  'case-group-project-credit': 4380,
+  'case-friend-mistake': 1800,
+  'case-study-presentation': 4381,
+}
+
+export type PlazaCase = CaseSummary & {
+  category: CaseCategory
+  summary: string
+  viewCount: number
+  isVerdictAligned: boolean
+  /** 투표가 진행 중인지, 판결이 끝났는지. 시연용 고정값이다. */
+  status: 'voting' | 'closed'
+  /** 최신 광장 시안은 일치 여부와 독립적으로 배지 색을 지정한다. */
+  verdictTone?: 'blue' | 'orange'
+}
+
+/** 필터에서 선택할 수 있는 다섯 카테고리는 각각 네 건의 정적 시연 사례를 제공한다. */
+export const plazaCases: PlazaCase[] = [
+  {
+    id: 'case-company-874',
+    category: '직장',
+    tag: '직장',
+    title: jihoonSimilarCase.detailTitle,
+    summary: jihoonSimilarCase.cardSummary,
+    viewCount: 465,
+    commentCount: jihoonSimilarResult.commentCount,
+    // 상세 결과: AI는 글쓴이, 배심원 다수는 상대방 입장 → 의견 불일치.
+    isVerdictAligned: false,
+    status: 'closed',
+    verdictTone: 'orange',
+  },
+  {
+    id: 'case-secret-told',
+    category: '친구',
+    tag: '친구',
+    title: '친한 친구가 학교에서 저의 비밀을 다른 친구에게 말했어요',
+    summary: '믿고 털어놓은 비밀이 제 허락 없이 퍼졌어요',
+    viewCount: 245,
+    commentCount: 22,
+    isVerdictAligned: false,
+    status: 'closed',
+    verdictTone: 'blue',
+  },
+  {
+    id: 'case-parents-interfere',
+    category: '가족',
+    tag: '가족',
+    title: parentsCase.title,
+    summary: parentsCase.cardSummary,
+    viewCount: 125,
+    commentCount: parentsResult.commentCount,
+    isVerdictAligned: true,
+    status: 'voting',
+  },
+  {
+    id: 'case-invite-ex',
+    category: '연인',
+    tag: '연인',
+    title: '전 애인을 친구 모임에 초대해도\n괜찮을까요?',
+    summary: '친구로 지내고 싶지만 현재 연인이 불편해해요',
+    viewCount: 147,
+    commentCount: 47,
+    isVerdictAligned: false,
+    status: 'voting',
+  },
+  {
+    id: 'case-group-project-credit',
+    category: '학업',
+    tag: '학업',
+    title: '조별 과제에서 친구들을 공개적으로\n지적한 사건',
+    summary: '역할 분담이 지켜지지 않아 단체 대화방에서 문제를 꺼냈어요.',
+    viewCount: 318,
+    commentCount: 31,
+    isVerdictAligned: false,
+    status: 'closed',
+  },
+
+  {
+    id: 'case-dating-anniversary',
+    category: '연인',
+    tag: '연인',
+    title: '기념일 약속을 깜빡한 연인에게\n서운함을 말해도 될까요?',
+    summary: '바쁜 일정 때문이었다지만 매년 챙기던 날이라 마음이 남아요.',
+    viewCount: 214,
+    commentCount: 26,
+    isVerdictAligned: true,
+    status: 'closed',
+  },
+  {
+    id: 'case-dating-phone',
+    category: '연인',
+    tag: '연인',
+    title: '연인이 제 휴대폰 알림을 보는 건 관심일까요, 침해일까요?',
+    summary: '비밀번호를 공유하지 않았는데도 메시지 내용을 묻곤 해요.',
+    viewCount: 189,
+    commentCount: 18,
+    isVerdictAligned: false,
+    status: 'voting',
+  },
+  {
+    id: 'case-dating-travel-cost',
+    category: '연인',
+    tag: '연인',
+    title: '여행 경비를 더 낸 쪽이\n일정을 정해도 되는 걸까요?',
+    summary: '예약금과 숙소 비용을 제가 더 냈지만 함께 가는 여행이에요.',
+    viewCount: 166,
+    commentCount: 20,
+    isVerdictAligned: true,
+    status: 'voting',
+  },
+
+  {
+    id: 'case-friend-loan',
+    category: '친구',
+    tag: '친구',
+    title: '친구에게 빌려준 300만 원을\n6개월째 받지 못하고 있어요.',
+    summary: '약속한 상환일이 지나도 사정이 어렵다는 말만 반복돼요.',
+    viewCount: 352,
+    commentCount: 39,
+    isVerdictAligned: true,
+    status: 'closed',
+  },
+  {
+    id: 'case-friend-trip-cancel',
+    category: '친구',
+    tag: '친구',
+    title: '여행 직전 취소한 친구에게\n예약금을 모두 받아야 할까요?',
+    summary: '친구가 개인 사정으로 못 가게 됐는데 환불 불가 숙소였어요.',
+    viewCount: 231,
+    commentCount: 28,
+    isVerdictAligned: false,
+    status: 'closed',
+  },
+  {
+    id: 'case-friend-group-chat',
+    category: '친구',
+    tag: '친구',
+    title: '단체 대화방에서 저만 빼고 약속을 잡는 친구들, 제가 예민한걸까요?',
+    summary: '우연히 알게 된 뒤 서운함을 말했지만 예민하다는 반응을 들었어요.',
+    viewCount: 197,
+    commentCount: 24,
+    isVerdictAligned: false,
+    status: 'voting',
+  },
+
+  {
+    id: 'case-family-care',
+    category: '가족',
+    tag: '가족',
+    title: '부모님 병원 동행을 저에게만\n부탁하는 형제자매',
+    summary: '각자 바쁘다는 이유로 돌봄 일정이 제게 몰리고 있어요.',
+    viewCount: 286,
+    commentCount: 35,
+    isVerdictAligned: true,
+    status: 'closed',
+  },
+  {
+    id: 'case-family-living-expenses',
+    category: '가족',
+    tag: '가족',
+    title: '취업 후에도 생활비를 전부 내라는\n부모님 말씀',
+    summary: '독립 준비를 하고 있지만 가족의 기대도 이해하려고 해요.',
+    viewCount: 203,
+    commentCount: 19,
+    isVerdictAligned: false,
+    status: 'closed',
+  },
+  {
+    id: 'case-family-moving',
+    category: '가족',
+    tag: '가족',
+    title: '이사 날짜를 가족이 먼저 정한 뒤\n도움을 부탁했어요.',
+    summary: '이미 잡아둔 개인 일정이 있는데 거절하면 서운해할까 걱정돼요.',
+    viewCount: 164,
+    commentCount: 16,
+    isVerdictAligned: true,
+    status: 'voting',
+  },
+
+  {
+    id: 'case-work-credit',
+    category: '직장',
+    tag: '직장',
+    title: '상사가 제 아이디어를 자신의 공로로\n발표했어요.',
+    summary: '회의에서 제가 준비한 기획안을 팀장 이름으로 소개했어요.',
+    viewCount: 401,
+    commentCount: 52,
+    isVerdictAligned: false,
+    status: 'closed',
+  },
+  {
+    id: 'case-work-after-hours',
+    category: '직장',
+    tag: '직장',
+    title: '퇴근 뒤 단체 대화방 업무 지시에\n답하지 않았어요.',
+    summary: '다음 날 확인하겠다고 했지만 팀 분위기가 좋지 않아졌어요.',
+    viewCount: 257,
+    commentCount: 33,
+    isVerdictAligned: true,
+    status: 'voting',
+  },
+  {
+    id: 'case-work-new-hire',
+    category: '직장',
+    tag: '직장',
+    title: '신입 교육 자료를 저 혼자 다 만들라는 요청이 부담스러워요.',
+    summary: '공동 업무라고 들었지만 마감이 다가오며 제 몫으로 남았어요.',
+    viewCount: 178,
+    commentCount: 17,
+    isVerdictAligned: false,
+    status: 'voting',
+  },
+
+  {
+    id: 'case-school-attendance',
+    category: '학업',
+    tag: '학업',
+    title: '친구 대신 출석을 불러달라는 부탁을\n거절했더니 멀어졌어요.',
+    summary: '한 번만 도와달라는 말이었지만 규정을 어기는 일이라 망설였어요.',
+    viewCount: 221,
+    commentCount: 27,
+    isVerdictAligned: true,
+    status: 'closed',
+  },
+  {
+    id: 'case-school-ai-report',
+    category: '학업',
+    tag: '학업',
+    title: 'AI를 활용한 과제라서 표절이 아니라는\n조원의 주장',
+    summary: '보고서 작성 도구의 사용 범위를 두고 조원끼리 의견이 갈렸어요.',
+    viewCount: 265,
+    commentCount: 34,
+    isVerdictAligned: false,
+    status: 'closed',
+  },
+  {
+    id: 'case-school-lab-data',
+    category: '학업',
+    tag: '학업',
+    title: '실험 결과가 나오지 않아 데이터를 다시 정리하자고 했어요.',
+    summary: '마감은 다가오고, 조원은 지금 자료로 제출하자고 해요.',
+    viewCount: 149,
+    commentCount: 15,
+    isVerdictAligned: true,
+    status: 'voting',
+  },
+]
+
+export const categoryDotColor: Record<CaseCategory, string> = {
+  연인: 'var(--pink)',
+  친구: 'var(--blue-700)',
+  가족: 'var(--green)',
+  직장: 'var(--orange-700)',
+  학업: 'var(--blue-600)',
+}
+
+export const casePagination = { current: 1, total: 5 } as const

@@ -1,0 +1,79 @@
+/*
+ * 전역 초기화. 디자인 토큰은 styles/tokens.css에 있다.
+ * 화면별 스타일은 각 페이지·컴포넌트 CSS에 둔다. (PROJECT_SPEC.md §7-9)
+ */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    margin: 0;
+    padding: 0;
+    min-width: 320px;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+#root {
+    /* 100dvh 우선, 지원하지 않는 브라우저는 100vh로 되돌아간다. (PROJECT_SPEC.md §3) */
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+body {
+    background: #fff;
+    color: var(--ink);
+    font-family: var(--font-body);
+    -webkit-text-size-adjust: 100%;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+button {
+    font: inherit;
+    cursor: pointer;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+img {
+    max-width: 100%;
+}
+/* 홈·광장 검색창이 함께 쓰는 중앙 정렬 닫기 표시 */
+.search-close-mark {
+  position: relative;
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
+.search-close-mark::before,
+.search-close-mark::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 11px;
+  height: 1.5px;
+  border-radius: 999px;
+  background: var(--neutral-600);
+  content: '';
+}
+
+.search-close-mark::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.search-close-mark::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}

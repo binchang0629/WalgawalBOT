@@ -1,0 +1,167 @@
+.account-switch-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    background: rgb(0 0 0 / 45%);
+    pointer-events: auto;
+    overscroll-behavior: contain;
+    animation: account-switch-dim-in 240ms ease-out both;
+}
+
+.account-switch-sheet {
+    width: 100%;
+    max-height: calc(100% - 16px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 12px 20px 40px;
+    border-radius: 20px 20px 0 0;
+    background: #fff;
+    color: var(--ink);
+    font-family: var(--font-body);
+    scrollbar-width: none;
+    animation: account-switch-sheet-in 360ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes account-switch-dim-in {
+    from { background-color: rgb(0 0 0 / 0%); }
+    to { background-color: rgb(0 0 0 / 45%); }
+}
+
+@keyframes account-switch-sheet-in {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+@keyframes account-switch-confirm-in {
+    0% { opacity: 0; transform: scale(.88); }
+    68% { opacity: 1; transform: scale(1.025); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes account-switch-confirm-content-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes account-switch-confirm-avatar-in {
+    0% { opacity: 0; transform: scale(.78); }
+    65% { opacity: 1; transform: scale(1.08); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes account-switch-option-pop {
+    0% { transform: scale(.98); }
+    58% { transform: scale(1.015); }
+    100% { transform: scale(1); }
+}
+
+.profile-switch-confirm {
+    transform-origin: center 65%;
+    animation: account-switch-confirm-in 420ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.profile-switch-confirm__header,
+.profile-switch-confirm__profile > p,
+.profile-switch-confirm__profile > strong,
+.profile-switch-confirm__email,
+.profile-switch-confirm__actions {
+    animation: account-switch-confirm-content-in 360ms 90ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.profile-switch-confirm__profile .account-switch-sheet__avatar {
+    animation: account-switch-confirm-avatar-in 480ms 110ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .account-switch-overlay,
+    .account-switch-sheet,
+    .profile-switch-confirm,
+    .profile-switch-confirm__header,
+    .profile-switch-confirm__profile > p,
+    .profile-switch-confirm__profile .account-switch-sheet__avatar,
+    .profile-switch-confirm__profile > strong,
+    .profile-switch-confirm__email,
+    .profile-switch-confirm__actions,
+    .account-switch-sheet__option { animation: none; transition: none; }
+}
+
+.account-switch-sheet__handle {
+    width: 40px;
+    height: 4px;
+    margin: 0 auto 8px;
+    border-radius: 999px;
+    background: var(--neutral-400);
+}
+
+.account-switch-sheet__header { display: flex; align-items: center; justify-content: space-between; padding: 4px 0 16px; }
+.account-switch-sheet__header h2 { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.2; }
+.account-switch-sheet__header button { display: grid; place-items: center; width: 32px; height: 32px; border: 0; padding: 0; border-radius: 50%; background: var(--neutral-100); }
+.account-switch-sheet__header img { display: block; width: 24px; height: 24px; }
+.account-switch-sheet__body { display: flex; flex-direction: column; gap: 20px; padding-right: 2px; }
+.account-switch-sheet h3 { margin: 0 2px 6px; color: var(--neutral-600); font-size: 14px; font-weight: 500; line-height: 1.3; }
+.account-switch-sheet__account { display: flex; align-items: center; gap: 12px; min-height: 74px; padding: 16px 14px; border-radius: 12px; }
+.account-switch-sheet__avatar { position: relative; display: block; flex: none; width: 42px; height: 42px; overflow: hidden; border-radius: 50%; }
+.account-switch-sheet__avatar img { position: absolute; max-width: none; object-fit: contain; }
+.account-switch-sheet__avatar--A { background: var(--green); }
+.account-switch-sheet__avatar--A img { left: -6.85%; top: -.1%; width: 112.85%; height: 112.85%; }
+.account-switch-sheet__avatar--B { background: var(--pink); }
+.account-switch-sheet__avatar--B img { left: 3.41%; top: 7.03%; width: 93.18%; height: 93.18%; }
+.account-switch-sheet__avatar--custom { background: none; }
+.account-switch-sheet__avatar--custom img { left: 0; top: 0; width: 100%; height: 100%; }
+.account-switch-sheet__identity { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 2px; }
+.account-switch-sheet__identity strong { font-size: 16px; font-weight: 500; line-height: 1.3; }
+.account-switch-sheet__name-row { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; }
+.account-switch-sheet__name-row small { color: var(--neutral-650); font-size: 11px; font-weight: 400; line-height: 1.4; }
+.account-switch-sheet__email { color: var(--neutral-500); font-size: 13px; line-height: 1.3; overflow-wrap: anywhere; }
+.account-switch-sheet__current { flex: none; padding: 6px 12px; border-radius: 50px; color: var(--neutral-600); background: var(--neutral-100); font-size: 12px; font-weight: 500; line-height: 1; white-space: nowrap; }
+.account-switch-sheet__option {
+    cursor: pointer;
+    transform-origin: center;
+    transition: transform 120ms cubic-bezier(.2, .8, .2, 1);
+    will-change: transform;
+}
+.account-switch-sheet__option:active { transform: scale(.98); }
+.account-switch-sheet__option.is-selected {
+    box-shadow: inset 0 0 0 1px var(--orange-700);
+    animation: account-switch-option-pop 260ms cubic-bezier(.22, 1, .36, 1);
+}
+.account-switch-sheet__radio { position: relative; flex: none; display: grid; place-items: center; width: 24px; height: 24px; }
+.account-switch-sheet__radio input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; margin: 0; cursor: pointer; }
+.account-switch-sheet__radio-art { display: block; width: 15px; height: 15px; border: 1px solid var(--neutral-400); border-radius: 50%; pointer-events: none; }
+.account-switch-sheet__radio input:checked + .account-switch-sheet__radio-art { border: 0; }
+.account-switch-sheet__radio-art img { display: block; width: 15px; height: 15px; }
+.account-switch-sheet__radio input:focus-visible + .account-switch-sheet__radio-art { outline: 2px solid var(--orange-700); outline-offset: 3px; }
+.account-switch-sheet__footer { padding-top: 54px; }
+.account-switch-sheet__footer button { width: 100%; min-height: 52px; padding: 12px 16px; border: 0; border-radius: 12px; color: #fff; background: var(--orange-700); font-size: 16px; font-weight: 700; line-height: 1.3; }
+.account-switch-sheet__footer .account-switch-sheet__logout { min-height: 44px; margin-top: 8px; padding: 10px 16px; background: transparent; color: var(--neutral-600); font-size: 14px; font-weight: 500; }
+.account-switch-sheet :focus-visible { outline: 2px solid var(--blue-700); outline-offset: 3px; }
+.showcase--mobile .account-switch-sheet { padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+/* Keep the existing device indicator above the sheet instead of drawing a second one. */
+.device-frame__screen:has(.account-switch-overlay) .device-home-indicator { z-index: 50; }
+
+.account-switch-overlay--center { align-items: center; justify-content: center; padding: 16px 24px; }
+.profile-switch-confirm { width: 312px; max-width: 100%; max-height: 100%; overflow-y: auto; overscroll-behavior: contain; padding: 20px; border-radius: 12px; background: #fff; color: var(--ink); font-family: var(--font-body); scrollbar-width: none; }
+.profile-switch-confirm__header { display: flex; justify-content: space-between; align-items: center; }
+.profile-switch-confirm__header h2 { margin: 0; font-size: 18px; line-height: 1.2; }
+.profile-switch-confirm__header button { display: grid; place-items: center; width: 32px; height: 32px; margin: -6px; padding: 0; border: 0; border-radius: 50%; background: var(--neutral-100); }
+.profile-switch-confirm__profile { display: flex; flex-direction: column; align-items: center; margin: 20px 0 24px; text-align: center; }
+.profile-switch-confirm__profile p { margin: 0 0 20px; font-size: 16px; font-weight: 600; line-height: 1.3; }
+.profile-switch-confirm__profile .account-switch-sheet__avatar { width: 72px; height: 72px; }
+.profile-switch-confirm__profile strong { margin-top: 12px; font-size: 18px; line-height: 1.2; }
+.profile-switch-confirm__email { margin-top: 6px; color: var(--neutral-500); font-size: 12px; line-height: 1.3; overflow-wrap: anywhere; }
+.profile-switch-confirm__actions { display: flex; flex-direction: column; gap: 4px; }
+.profile-switch-confirm__submit { width: 100%; min-height: 44px; padding: 10px 16px; border: 0; border-radius: 10px; background: var(--orange-700); color: #fff; font-size: 14px; font-weight: 700; line-height: 1.3; }
+.profile-switch-confirm__logout { min-height: 36px; padding: 8px; border: 0; background: none; color: var(--neutral-500); font-size: 13px; font-weight: 500; line-height: 1.3; }
+.profile-switch-confirm :focus-visible { outline: 2px solid var(--orange-700); outline-offset: 3px; }
+
+/* 텍스트 확인 팝업: 공통 컨테이너·버튼을 쓰고 내용별 여백만 지정한다. */
+.profile-switch-confirm--message { padding: 32px 24px 24px; }
+.profile-switch-confirm--message .profile-switch-confirm__header { justify-content: center; text-align: center; }
+.profile-switch-confirm--message .profile-switch-confirm__actions { margin-top: 28px; gap: 8px; }
+.profile-switch-confirm--message .profile-switch-confirm__submit { min-height: 48px; }
+.profile-switch-confirm--message .profile-switch-confirm__logout { min-height: 44px; }
+
+@media (max-width: 370px) {
+    .account-switch-sheet__account { padding-inline: 8px; gap: 8px; }
+}

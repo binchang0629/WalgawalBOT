@@ -1,0 +1,266 @@
+/*
+ * 공개 후일담 상세 — 편지형.
+ *
+ * 기준 시안: Figma `AS06 / 공개 후일담 상세 · 편지형` (노드 `2778:15991`)
+ *   Header 402x64 · Content 402x1657 (히어로 648 + 댓글 + 페이지네이션)
+ *
+ * 댓글 영역은 공용 컴포넌트(components/common/CommentThread.css)를 그대로 쓰고,
+ * 이 화면에서만 다른 부분은 맨 아래에 `.afterstory-detail` 아래로 범위를 좁혀 둔다.
+ * 사건 결과 화면이 같은 CSS를 쓰기 때문에 공용 규칙은 여기서 건드리지 않는다.
+ */
+
+.afterstory-detail {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: var(--ink);
+  background: #fff;
+}
+
+.afterstory-detail__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  /* 히어로 배경이 화면 끝까지 닿아야 해서 좌우 여백은 각 영역에서 준다. */
+  /*
+   * 아래 여백 120px. 시안은 40px이지만 그러면 페이지 번호가 바닥에 붙고,
+   * 오른쪽 아래 판멍이 채팅 버튼(bottom 16px + 높이 80px = 96px)이 다음 화살표를 가린다.
+   * 96px을 넘겨 24px 더 준 값이다.
+   */
+  padding: 0 0 120px;
+  background: #fff;
+  scrollbar-width: none;
+}
+
+.afterstory-detail__scroll::-webkit-scrollbar { display: none; }
+
+
+/* ---------------- 히어로 (노드 2778:15994, 402x648) ---------------- */
+
+.afterstory-detail__hero {
+  /*
+   * 배경은 시안(`2778:15994`)에서 내보낸 PNG 한 장이다.
+   * 원본이 804x1296(402x648의 2배)이라 비율이 같아, 아래를 기준으로 채우면 시안과 겹친다.
+   */
+  padding: 32px 24px;
+  background: #fff center bottom / cover no-repeat;
+}
+
+.afterstory-detail__eyebrow {
+  margin: 0;
+  color: var(--neutral-600);
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.afterstory-detail__hero h1 {
+  margin: 12px 0 0;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.afterstory-detail__lead {
+  margin: 12px 0 0;
+  color: var(--neutral-600);
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.afterstory-detail__author {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: 46px;
+  margin-top: 22px;
+}
+
+.afterstory-detail__author img {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.afterstory-detail__author div {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  /* 닉네임이 길어도 오른쪽 버튼을 밀어내지 않고 이름 쪽이 줄어든다. */
+  min-width: 0;
+  overflow: hidden;
+}
+
+.afterstory-detail__author strong,
+.afterstory-detail__author > div > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.afterstory-detail__author strong {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.afterstory-detail__author span {
+  color: var(--neutral-600);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/*
+ * 원래 사건으로 건너가는 버튼. 작성자 줄 오른쪽 끝에 붙는다.
+ * 편지 본문을 덮지 않도록 테두리만 있는 가벼운 형태로 두고, 글자는 한 줄로 유지한다.
+ */
+.afterstory-detail__case-link {
+  display: inline-flex;
+  flex: none;
+  gap: 2px;
+  align-items: center;
+  margin-left: auto;
+  padding: 6px 10px;
+  border: 1px solid var(--blue-150);
+  border-radius: var(--radius-pill);
+  color: var(--blue);
+  background: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.afterstory-detail__case-link span {
+  color: inherit;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.afterstory-detail__case-link:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+
+/* ---------------- 편지지 (노드 2778:16008, 354x382) ---------------- */
+
+.afterstory-detail__letter {
+  position: relative;
+  /* Figma AS06 `편지지` 레이어: 354 × 382px. */
+  box-sizing: border-box;
+  --letter-paper-height: 382px;
+  height: var(--letter-paper-height);
+  min-height: var(--letter-paper-height);
+  margin-top: 14px;
+  padding: 0;
+}
+
+/* 홈의 두 후일담은 본문이 한 줄 더 길어 원본 편지지보다 한 칸만 늘린다. */
+.afterstory-detail__letter--long {
+  --letter-paper-height: 415px;
+}
+
+/*
+ * Figma AS06 `편지지`의 위치·크롭·그림자 값.
+ * 종이 아래는 히어로의 파란 배경에 바로 닿고, 그림자는 윗면에만 원본대로 남긴다.
+ */
+.afterstory-detail__letter-paper {
+  position: absolute;
+  top: -4px;
+  left: 0;
+  width: 100%;
+  height: var(--letter-paper-height);
+  overflow: hidden;
+  /* 투명한 편지지 윤곽을 따라가는 새 그림자라 사각 테두리가 생기지 않는다. */
+  filter: drop-shadow(2px 4px 8px rgb(65 66 95 / 14%));
+}
+
+.afterstory-detail__letter-paper img {
+  position: absolute;
+  top: -3.35%;
+  left: -16.79%;
+  width: 133.57%;
+  max-width: none;
+  height: 106.01%;
+}
+
+.afterstory-detail__letter h2 {
+  position: absolute;
+  z-index: 2;
+  top: 25px;
+  left: 24px;
+  margin: 0;
+  color: var(--orange-700);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/*
+ * 편지지의 줄. 한 칸은 글줄 15.6px + 위아래 여백 4px = 24px이고,
+ * 칸 사이가 9px 떨어져 시안의 33px 간격이 된다.
+ */
+.afterstory-detail__letter-lines {
+  position: absolute;
+  z-index: 2;
+  top: 77px;
+  right: 24px;
+  left: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.afterstory-detail__letter-lines p {
+  /* 한 칸 24px = 글줄 15px + 위아래 4px + 아래 선 1px. 시안의 33px 간격이 그대로 나온다. */
+  box-sizing: border-box;
+  height: 24px;
+  margin: 0;
+  padding: 4px 0;
+  overflow: hidden;
+  border-bottom: 1px solid var(--neutral-200);
+  color: var(--neutral-900);
+  font-family: var(--font-serif);
+  font-size: 13px;
+  line-height: 15px;
+  word-break: keep-all;
+}
+
+/* 홈 카드의 편지는 브라우저가 자연스럽게 줄바꿈하고, 종이의 줄만 반복한다. */
+.afterstory-detail__letter-lines--flow {
+  display: block;
+}
+
+.afterstory-detail__letter-lines--flow p {
+  height: auto;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: repeating-linear-gradient(to bottom, transparent 0 23px, var(--neutral-200) 23px 24px, transparent 24px 33px);
+  line-height: 33px;
+}
+
+
+/* ---------------- 댓글 (노드 2778:16027) ---------------- */
+
+.afterstory-detail__comments {
+  margin-top: 24px;
+  padding: 0 24px;
+}
+
+/* 시안은 마지막 댓글 구분선에서 페이지네이션까지 24px이다. 사건 결과 화면은 42px로 둔다. */
+.afterstory-detail .comment-pagination {
+  margin-top: 24px;
+}
+
+@media (max-width: 370px) {
+  .afterstory-detail__hero { padding-inline: 18px; }
+  .afterstory-detail__comments { padding-inline: 18px; }
+  .afterstory-detail__hero h1 { font-size: 24px; }
+  .afterstory-detail__letter { padding-inline: 18px; }
+  .afterstory-detail__letter-lines p { font-size: 12px; }
+}

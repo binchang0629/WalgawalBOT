@@ -1,0 +1,66 @@
+/* 서아 01~04 시안 차이만 적용. 지훈 화면의 기존 규격은 유지한다. */
+.case-submit--seoa {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.case-submit--seoa .case-submit__progress {
+  flex: none;
+  height: 56px;
+}
+
+.case-submit--seoa .case-submit__step-label {
+  line-height: 1.3;
+}
+
+.case-submit--seoa .case-submit__body {
+  padding-bottom: 16px;
+}
+
+.case-submit--seoa .case-submit__body > *,
+.case-submit--seoa .case-submit__complete-body > *,
+.case-submit--seoa .case-submit__complete-hero > * {
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.case-submit--seoa .case-submit__label {
+  line-height: 1.3;
+}
+
+.case-submit--seoa .case-submit__textarea-box {
+  height: 258px;
+  gap: 22px;
+}
+
+.case-submit--seoa .case-submit__textarea-box:focus-within,
+.case-submit--seoa .case-submit__textarea-box.has-content {
+  border-color: var(--orange);
+}
+
+.case-submit--seoa .case-submit__panmung p {
+  line-height: 1.3;
+}
+
+.case-submit--seoa .case-submit__footer {
+  box-shadow: none;
+}
+
+.case-submit--seoa .case-submit__ai-opinion-eyebrow {
+  line-height: 1.3;
+}
+
+.case-submit--seoa .case-submit__ai-opinion-reasons {
+  gap: 0;
+}
+
+.case-submit--seoa .case-submit__privacy-label,
+.case-submit--seoa .case-submit__receipt-visibility,
+.case-submit--seoa .case-submit__complete-reminder {
+  line-height: 1.3;
+}
+
+.case-submit--seoa button:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+}

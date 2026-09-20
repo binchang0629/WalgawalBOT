@@ -1,0 +1,7 @@
+/* 교체 전 광고의 CSS를 별도 이름으로 보관. 새 광고와 서로 영향을 주지 않는다. */
+.legacy-ad-banner { position: relative; overflow: hidden; height: 86px; background: var(--blue-300); }
+.legacy-ad-banner__copy { position: absolute; top: 19px; left: 40px; z-index: 1; }
+.legacy-ad-banner__lead { margin: 0 0 0 3px; font-size: 12px; font-weight: 500; line-height: 20px; color: var(--orange-250); }
+.legacy-ad-banner__title { display: block; font-family: var(--font-deco); font-size: 24px; font-weight: 400; line-height: 1.45; color: #fff; white-space: nowrap; }
+.legacy-ad-banner__art { position: absolute; top: -20px; left: 157px; width: 214px; height: 136px; object-fit: contain; }
+.legacy-ad-banner__label { position: absolute; top: 7px; left: 344px; z-index: 1; display: flex; align-items: center; height: 16px; padding: 0 8px 0 9px; border-radius: var(--radius-pill); background: var(--neutral-600); color: #fff; font-size: 12px; font-weight: 500; line-height: 20px; }

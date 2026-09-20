@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="76" height="76" viewBox="0 0 76 76" fill="none" role="img" aria-label="왈가왈BOT">
+  <title>왈가왈BOT — 판멍이 마크</title>
+  <g transform="translate(0 2)">
+    <ellipse cx="10" cy="36" rx="9" ry="17" fill="#374bff"/>
+    <ellipse cx="66" cy="36" rx="9" ry="17" fill="#374bff"/>
+    <rect x="12" y="12" width="52" height="48" rx="18" fill="#ffffff"/>
+    <rect x="18" y="18" width="40" height="36" rx="14" fill="#1e2638"/>
+    <path d="M26 34c1.6-3.4 6.4-3.4 8 0" stroke="#ffffff" stroke-width="3.4" stroke-linecap="round"/>
+    <path d="M42 34c1.6-3.4 6.4-3.4 8 0" stroke="#ffffff" stroke-width="3.4" stroke-linecap="round"/>
+    <ellipse cx="38" cy="41" rx="3.6" ry="3" fill="#ff9524"/>
+  </g>
+</svg>

@@ -1,0 +1,35 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# Claude 데스크톱 앱이 만드는 산출물 폴더
+Claude outputs/
+
+# TypeScript 빌드 정보 (tsconfig에서 node_modules/.tmp로 보내지만 안전장치)
+*.tsbuildinfo

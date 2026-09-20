@@ -1,0 +1,56 @@
+/*
+ * 맨 위로 버튼. 챗봇 머리(원형)와 구분되도록 납작한 알약 모양으로 둔다.
+ * 이제 챗봇 버튼 위에 쌓이는 자리라, 챗봇의 자리(내비 위 20px 또는 하단 12px)에
+ * 챗봇 높이(80px)와 간격(6px)을 더해 자리를 잡는다.
+ * 챗봇을 16px 내리면서 이 값도 같이 16px 내렸다. 둘의 간격은 그대로 6px이다.
+ */
+.scroll-top-button {
+    position: absolute;
+    right: 18px;
+    bottom: calc(var(--floating-nav-height) + 106px);
+    z-index: 30;
+    display: grid;
+    place-items: center;
+    width: 62px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid rgb(55 75 255 / 30%);
+    border-radius: 999px;
+    background: rgb(194 213 246 / 42%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    backdrop-filter: blur(12px) saturate(140%);
+    box-shadow: 0 6px 18px rgb(34 48 105 / 14%), inset 0 1px rgb(255 255 255 / 68%);
+    /* 아이콘은 currentColor를 따른다. */
+    color: var(--blue);
+    cursor: pointer;
+
+    /* 나타나기 전에는 클릭도 받지 않는다. */
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease;
+}
+
+/*
+ * 하단 내비게이션이 없는 화면(MY 하위 화면 등). 챗봇 버튼(하단 12px, 높이 80px) 위 6px에 쌓인다.
+ */
+.scroll-top-button--no-nav {
+    bottom: calc(98px + env(safe-area-inset-bottom, 0px));
+}
+
+.scroll-top-button.is-visible {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+}
+
+.scroll-top-button.is-visible:active { transform: translateY(0) scale(.96); }
+
+.scroll-top-button:focus-visible {
+    outline: 3px solid var(--orange-500);
+    outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .scroll-top-button { transition: none; }
+}

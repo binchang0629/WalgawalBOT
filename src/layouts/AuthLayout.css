@@ -1,0 +1,42 @@
+.auth-layout {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    overflow: hidden;
+}
+
+.auth-layout__scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+
+    /* 목업 안에 데스크톱 스크롤바가 보이지 않게 한다. 스크롤 자체는 유지된다. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.auth-layout__scroll::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+/* 회원가입은 헤더 아래 남은 화면에 고정하고 내부 페이지 스크롤을 만들지 않는다. */
+.auth-layout__scroll:has(.signUp) {
+    overflow-y: hidden;
+    padding-bottom: 0;
+}
+
+/*
+ * 로그인은 앱의 100dvh 화면에서 헤더를 제외한 나머지 높이를 그대로 쓴다.
+ * 본문에 다시 100vh를 주면 64px 헤더만큼 넘치므로 스크롤 컨테이너를 고정한다.
+ */
+.auth-layout__scroll:has(.login) {
+    overflow-y: hidden;
+    padding-bottom: 0;
+}
