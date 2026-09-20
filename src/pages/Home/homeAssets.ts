@@ -18,7 +18,6 @@ import pinOrange from '../../assets/home/figma/pin-orange.svg'
 // 밸런스 게임 다시하기 아이콘. 사용자 제공 두 화살표 아이콘(2026-09-18). 이전 아이콘은 refresh.svg로 남겨 두었다.
 // import refreshIcon from '../../assets/home/figma/balance-retry-arrows.svg'
 import refreshIcon1 from '../../assets/home/figma/IconArrow_1.svg'
-import refreshIcon2 from '../../assets/home/figma/IconArrow_2.svg'
 import dragHand from '../../assets/home/figma/drag-hand.svg'
 import balloonTailLeft from '../../assets/home/figma/balloon-tail-left.svg'
 import balloonTailRight from '../../assets/home/figma/balloon-tail-right.svg'
@@ -51,7 +50,6 @@ export const homeIcons = {
   pinOrange,
   // refreshIcon,
   refreshIcon1,
-  refreshIcon2,
   dragHand,
   balloonTailLeft,
   balloonTailRight,
