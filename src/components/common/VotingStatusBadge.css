@@ -11,20 +11,42 @@
     white-space: nowrap;
 }
 
+/*
+ * 지금 표가 들어오고 있다는 신호. 점이 한 번 뛰고, 그 자리에서 파동이 퍼져 나간다.
+ * 예전에는 밝기만 오르내려서 움직이는지 알아보기 어려웠다.
+ * 파동은 점의 자식이라 점의 확대가 함께 곱해진다. 그만큼 파동 배율은 작게 잡았다.
+ */
 .voting-status-badge__dot {
+    position: relative;
     width: 6px;
     height: 6px;
     flex: none;
     border-radius: 50%;
     background: var(--orange-800);
-    animation: voting-status-breathe 2.4s ease-in-out infinite;
+    animation: voting-status-beat 1.7s cubic-bezier(.4, 0, .3, 1) infinite;
 }
 
-@keyframes voting-status-breathe {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: .55; transform: scale(.82); }
+.voting-status-badge__dot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--orange-800);
+    animation: voting-status-ping 1.7s cubic-bezier(.16, .7, .3, 1) infinite;
+}
+
+@keyframes voting-status-beat {
+    0%, 60%, 100% { transform: scale(1); }
+    14% { transform: scale(1.24); }
+    34% { transform: scale(.92); }
+}
+
+@keyframes voting-status-ping {
+    0% { opacity: .5; transform: scale(1); }
+    72%, 100% { opacity: 0; transform: scale(2.9); }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .voting-status-badge__dot { animation: none; }
+    .voting-status-badge__dot::after { display: none; }
 }
