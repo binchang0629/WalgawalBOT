@@ -26,7 +26,11 @@ function CaseFeedCard({ item, index, onOpen, returnTo, fromPlaza = false }: Case
       <Link
         className="case-card__link"
         to={toCaseDetail(item.id)}
-        state={{ fromPlaza, returnTo }}
+        /*
+         * 목록에서 상세로 갈 때 화면이 툭 바뀌지 않고 오른쪽에서 덮고 들어온다.
+         * 홈의 오늘의 사건 카드가 쓰던 것과 같은 표시라 진입 경로가 달라도 전환이 같다.
+         */
+        state={{ fromPlaza, returnTo, entryMotion: 'slide-forward' }}
         aria-label={`${item.title.replace('\n', ' ')} 사건 상세 보기`}
         onClick={(event) => {
           if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return

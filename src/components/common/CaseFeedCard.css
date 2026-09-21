@@ -16,7 +16,18 @@
     border-radius: 12px;
     background: #fff;
     filter: drop-shadow(0 7px 9px rgba(31, 36, 128, .04));
-    animation: case-card-stagger-in 480ms cubic-bezier(.22, 1, .36, 1) both;
+    /*
+     * 등장 애니메이션은 `backwards`다. `both`로 두면 끝난 뒤에도 애니메이션이 transform을
+     * 붙잡고 있어서 아래 누름 반응이 먹지 않는다. 끝 장면이 원래 모습과 같아서 보이는 건 똑같다.
+     */
+    animation: case-card-stagger-in 480ms cubic-bezier(.22, 1, .36, 1) backwards;
+    /* 누르는 동안 카드가 살짝 눌린다. 화면이 바뀌기 전에 눌렸다는 것부터 손에 전해진다. */
+    transition: transform 160ms cubic-bezier(.22, 1, .36, 1), filter 160ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.case-card:active {
+    transform: scale(.985);
+    filter: drop-shadow(0 3px 5px rgba(31, 36, 128, .05));
 }
 
 @keyframes case-card-stagger-in {
@@ -123,8 +134,12 @@
 @media (prefers-reduced-motion: reduce) {
     .case-card {
         animation: none;
+        transition: none;
     }
 
+    .case-card:active {
+        transform: none;
+    }
 }
 
 

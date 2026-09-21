@@ -138,7 +138,7 @@ function RankingHeroSection() {
                   key={head.rank}
                   type="button"
                   className={`ranking-podium__head ranking-podium__head--${head.rank}`}
-                  style={toBox(head)}
+                  style={{ ...toBox(head), transformOrigin: `${head.pivotX}% 100%` }}
                   aria-label={`${head.rank}위 트로피 흔들기`}
                   onClick={() => handleTrophyPress(head.rank)}
                 >

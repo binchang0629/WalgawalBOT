@@ -231,6 +231,65 @@
     pointer-events: none;
 }
 
+/*
+ * 가만히 있어도 눌러보고 싶도록 아주 작게 출렁인다. 누를 때의 출렁임(JS)은 안쪽 img가 맡고
+ * 이 대기 모션은 바깥 버튼이 맡는다. 둘을 다른 요소에 두면 변형이 겹쳐 적용돼 서로를 끊지 않는다.
+ * 기준점은 버튼에 인라인으로 넣는 목 중심(TROPHY_HEADS.pivotX)이다.
+ * 속도 곡선은 누를 때와 같은 이유로 구간마다 건다. 전체에 걸면 중간의 눌림·늘어남이 뭉개진다.
+ */
+.ranking-podium__head {
+    animation: ranking-trophy-idle 2.9s infinite both;
+}
+
+.ranking-podium__head--2 {
+    animation-delay: 1.5s;
+}
+
+.ranking-podium__head--1 {
+    animation-delay: 1.9s;
+}
+
+.ranking-podium__head--3 {
+    animation-delay: 2.3s;
+}
+
+@keyframes ranking-trophy-idle {
+    0% {
+        transform: scale(1, 1);
+        animation-timing-function: cubic-bezier(.45, 0, .55, 1);
+    }
+
+    7% {
+        transform: scale(1.035, .965);
+        animation-timing-function: cubic-bezier(.45, 0, .55, 1);
+    }
+
+    18% {
+        transform: scale(.972, 1.032);
+        animation-timing-function: cubic-bezier(.45, 0, .55, 1);
+    }
+
+    28% {
+        transform: scale(1.02, .984);
+        animation-timing-function: cubic-bezier(.45, 0, .55, 1);
+    }
+
+    36% {
+        transform: scale(.992, 1.009);
+        animation-timing-function: cubic-bezier(.45, 0, .55, 1);
+    }
+
+    44% {
+        transform: scale(1.004, .996);
+        animation-timing-function: cubic-bezier(.45, 0, .55, 1);
+    }
+
+    52%,
+    100% {
+        transform: scale(1, 1);
+    }
+}
+
 .ranking-podium__head:focus-visible {
     outline: 2px solid var(--blue-700);
     outline-offset: 2px;
@@ -623,6 +682,7 @@
 
     .ranking-podium::before,
     .ranking-podium__image,
+    .ranking-podium__head,
     .ranking-item {
         animation: none;
     }
