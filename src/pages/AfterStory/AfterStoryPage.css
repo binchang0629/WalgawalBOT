@@ -46,7 +46,7 @@
 @media (max-width: 370px) { .afterstory-home__scroll { padding-inline: 18px; }.afterstory-entry-cards { gap: 14px; }.afterstory-entry-card { width: calc(50vw - 32px); }.afterstory-envelope { transform: scale(.94); transform-origin: top center; margin-bottom: -20px; }.afterstory-story-summary { margin-inline: -18px; }.afterstory-flow__body { --content-gutter: 18px; }.afterstory-flow__footer { padding-inline: 18px; } }
 
 /* 목록 화면은 마지막이 카드라 홈보다 조금 더 비운다. */
-.afterstory-mine .afterstory-home__scroll { padding-bottom: 148px; }
+.afterstory-mine .afterstory-home__scroll { padding-bottom: var(--main-content-end-padding); }
 .afterstory-mine--empty { height: 100%; display: flex; flex-direction: column; }
 .afterstory-mine--empty .afterstory-home__scroll { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bottom: 0; background: #fefff2; }
 /* 내 이야기 남기기 — 판결이 끝난 내 사건 목록. 왈가왈후 홈과 같은 배경을 쓴다. */
@@ -288,7 +288,7 @@
 }
 /* 다른 사람의 후일담: 문장 하나만 빠르게 읽는 여백형 목록 */
 .afterstory-community {
-  padding-bottom: 156px;
+  padding-bottom: var(--main-content-end-padding);
   background: #fffdf8;
 }
 
@@ -335,7 +335,7 @@
   isolation: isolate;
   overflow: hidden;
   margin: 34px -24px 0;
-  padding: 28px 24px 154px;
+  padding: 28px 24px var(--main-content-end-padding);
   background:
     radial-gradient(circle at 18% 12%, rgb(255 255 255 / 0.38) 0 1px, transparent 1.5px) 0 0 / 11px 11px,
     linear-gradient(135deg, rgb(255 255 255 / 0.38), transparent 48%),
@@ -542,7 +542,7 @@
 
 .afterstory-my-stories .afterstory-home__scroll {
   min-height: calc(100% - 64px);
-  padding-bottom: 154px;
+  padding-bottom: var(--main-content-end-padding);
   background-color: #fefff2;
   background-image: none !important;
 }

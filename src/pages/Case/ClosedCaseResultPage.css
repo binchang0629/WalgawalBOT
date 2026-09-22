@@ -6,7 +6,7 @@
 }
 
 .case-result--closed .case-result__body {
-  padding-bottom: 120px;
+  padding-bottom: var(--main-content-end-gap);
 }
 
 .case-result--closed .case-result__section-divider--closed {

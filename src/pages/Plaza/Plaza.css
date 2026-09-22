@@ -732,7 +732,7 @@
      * 그 값은 하단바에 가리지 않게 비워 두는 몫이라, 마지막 콘텐츠와
      * 하단바 사이 숨 쉴 공간은 여기서 준다.
      */
-    padding: 44px var(--content-gutter) 90px;
+    padding: 44px var(--content-gutter) var(--main-content-end-gap);
     display: flex;
     flex-direction: column;
     gap: 22px;

@@ -5,7 +5,7 @@
     color: var(--ink);
 }
 .case-result__body {
-    padding: 24px var(--content-gutter) 32px;
+    padding: 24px var(--content-gutter) var(--main-content-end-gap);
 }
 
 .case-result__section-divider {

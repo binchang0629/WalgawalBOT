@@ -106,5 +106,8 @@
     --device-status-bar: 62px;   /* Figma top_nav 상단 62px = 시스템 상태바 */
     --device-app-header: 64px;   /* 서비스 헤더. 왈가왈후·사건·MY·접수 헤더가 모두 64px이라 여기에 맞췄다 */
     --device-bottom-nav: 100px;  /* Figma down_nav (홈 인디케이터 포함) */
+    /* 하단 내비게이션 위에서 마지막 콘텐츠가 숨 쉴 공통 여백. */
+    --main-content-end-gap: 56px;
+    --main-content-end-padding: calc(var(--device-bottom-nav) + var(--main-content-end-gap));
     --content-gutter: 24px;
 }

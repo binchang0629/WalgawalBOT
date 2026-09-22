@@ -1,13 +1,12 @@
 /*
  * 맨 위로 버튼. 챗봇 머리(원형)와 구분되도록 납작한 알약 모양으로 둔다.
- * 이제 챗봇 버튼 위에 쌓이는 자리라, 챗봇의 자리(내비 위 20px 또는 하단 12px)에
- * 챗봇 높이(80px)와 간격(6px)을 더해 자리를 잡는다.
- * 챗봇을 16px 내리면서 이 값도 같이 16px 내렸다. 둘의 간격은 그대로 6px이다.
+ * 챗봇 버튼 위에 쌓이는 기준 위치다. 챗봇의 실제 클릭 영역은 가운데 64px이고,
+ * 버튼 자체를 위로 옮겨 위쪽 경계와 6px 간격을 맞춘다.
  */
 .scroll-top-button {
     position: absolute;
     right: 18px;
-    bottom: calc(var(--floating-nav-height) + 106px);
+    bottom: calc(var(--floating-nav-height) + 86px);
     z-index: 30;
     display: grid;
     place-items: center;
@@ -32,7 +31,7 @@
 }
 
 /*
- * 하단 내비게이션이 없는 화면(MY 하위 화면 등). 챗봇 버튼(하단 12px, 높이 80px) 위 6px에 쌓인다.
+ * 하단 내비게이션이 없는 화면(MY 하위 화면 등)도 챗봇의 실제 클릭 영역 위 6px에 쌓인다.
  */
 .scroll-top-button--no-nav {
     bottom: calc(98px + env(safe-area-inset-bottom, 0px));

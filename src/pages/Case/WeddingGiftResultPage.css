@@ -1,5 +1,5 @@
 .case-result--wedding .case-result__body {
-  padding-bottom: 120px;
+  padding-bottom: var(--main-content-end-gap);
 }
 
 .case-result--wedding .ai-verdict--wedding {

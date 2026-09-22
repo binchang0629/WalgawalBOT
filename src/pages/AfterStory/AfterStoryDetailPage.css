@@ -22,12 +22,8 @@
   min-height: 0;
   overflow-y: auto;
   /* 히어로 배경이 화면 끝까지 닿아야 해서 좌우 여백은 각 영역에서 준다. */
-  /*
-   * 아래 여백 120px. 시안은 40px이지만 그러면 페이지 번호가 바닥에 붙고,
-   * 오른쪽 아래 판멍이 채팅 버튼(bottom 16px + 높이 80px = 96px)이 다음 화살표를 가린다.
-   * 96px을 넘겨 24px 더 준 값이다.
-   */
-  padding: 0 0 120px;
+  /* 하단 내비게이션 위 콘텐츠 여백은 다른 주요 화면과 같은 기준을 쓴다. */
+  padding: 0 0 var(--main-content-end-padding);
   background: #fff;
   scrollbar-width: none;
 }

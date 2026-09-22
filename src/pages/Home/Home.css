@@ -832,6 +832,8 @@
  *
  * 결과가 나온 뒤에도 접시 이동(0.9초)과 `절대 안됨`의 젓가락 놓기(0.14초 지연 + 0.9초)가
  * 이어지므로, 그 연출이 모두 끝난 1.1초 뒤에 나타난다. 기다리는 동안은 보이지 않고 눌리지도 않는다.
+ * 원래는 원과 화살표를 1.4초 동안 여러 단계로 천천히 보이게 해 버튼이 버벅이는 듯 보였다.
+ * 이제 원은 짧게 자리 잡고, 안의 두 화살표만 한 번 매끈하게 회전한다.
  */
 .balance-section__refresh--circle {
     left: calc(50% - 32px);
@@ -843,40 +845,23 @@
     background: #fff;
     box-shadow: 0 4px 14px rgb(97 77 40 / 12%);
     cursor: pointer;
-    animation: balance-refresh-circle-enter 1400ms cubic-bezier(.2, .8, .2, 1) 1100ms both;
+    will-change: transform, opacity;
+    animation: balance-refresh-circle-enter 240ms cubic-bezier(.22, 1, .36, 1) 1100ms both;
 }
 
 .balance-section__refresh--circle img {
     width: 37.67px;
     height: 33.9px;
-    animation: balance-refresh-arrow-enter 1400ms cubic-bezier(.2, .8, .2, 1) 1100ms both;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    animation: balance-refresh-arrow-enter 560ms cubic-bezier(.2, .75, .3, 1) 1100ms both;
     transform-origin: center;
 }
 
 @keyframes balance-refresh-circle-enter {
     0% {
         opacity: 0;
-        transform: scale(.82);
-    }
-
-    20% {
-        opacity: .15;
-        transform: scale(.85);
-    }
-
-    40% {
-        opacity: .35;
-        transform: scale(.9);
-    }
-
-    60% {
-        opacity: .55;
-        transform: scale(.94);
-    }
-
-    80% {
-        opacity: .78;
-        transform: scale(.98);
+        transform: scale(.78);
     }
 
     100% {
@@ -888,37 +873,12 @@
 @keyframes balance-refresh-arrow-enter {
     0% {
         opacity: 0;
-        transform: rotate(0deg) scale(.82);
-    }
-
-    20% {
-        opacity: .15;
-        transform: rotate(-100deg) scale(.86);
-    }
-
-    40% {
-        opacity: .35;
-        transform: rotate(-220deg) scale(.9);
-    }
-
-    60% {
-        opacity: .55;
-        transform: rotate(-330deg) scale(.94);
-    }
-
-    78% {
-        opacity: .72;
-        transform: rotate(-430deg) scale(.97);
-    }
-
-    90% {
-        opacity: .9;
-        transform: rotate(-500deg) scale(.99);
+        transform: rotate(-360deg) scale(.9);
     }
 
     100% {
         opacity: 1;
-        transform: rotate(-540deg) scale(1);
+        transform: rotate(0deg) scale(1);
     }
 }
 
@@ -1377,7 +1337,7 @@
     flex-direction: column;
     align-items: center;
     gap: 24px;
-    padding: 60px var(--content-gutter);
+    padding: 60px var(--content-gutter) var(--main-content-end-gap);
 }
 
 .letter {

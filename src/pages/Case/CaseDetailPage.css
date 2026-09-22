@@ -23,7 +23,7 @@
 }
 
 .case-detail__body {
-    padding: 24px var(--content-gutter) 32px;
+    padding: 24px var(--content-gutter) var(--main-content-end-gap);
     display: flex;
     flex-direction: column;
     gap: 28px;
