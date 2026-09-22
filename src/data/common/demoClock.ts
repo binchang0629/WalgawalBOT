@@ -6,6 +6,21 @@ export const DEMO_FIRST_VISIT_KEY = 'walgawalbot:demo:first-visit:v1'
 const MINUTE = 60_000
 export const JURY_VOTE_DURATION_MINUTES = 24 * 60
 export const JURY_VOTE_DURATION = '24:00:00'
+
+/**
+ * 저장된 기준점을 그대로 믿는 기간.
+ *
+ * 기준점은 한 번의 시연 동안 사건과 댓글의 앞뒤 순서를 지키려고 브라우저에 남긴다.
+ * 그런데 이 값은 `시연 초기화`에도 일부러 지우지 않으므로(SessionProvider의
+ * `clearStoredAppData`), 어제 한 번 열어 본 브라우저로 오늘 다시 들어오면
+ * 경과 시간에 하루가 그대로 얹힌다. `2분 전`으로 적어 둔 댓글이 `1일 전`이 되는 식이다.
+ *
+ * 그래서 기준점이 이 기간을 넘기면 버리고 지금 시각으로 다시 잡는다.
+ * 한 번의 시연(길어야 몇 시간) 안에서는 여전히 같은 기준점을 쓰고,
+ * 전날 리허설한 브라우저로 발표해도 시각이 어긋나지 않는다.
+ */
+const FIRST_VISIT_MAX_AGE = 12 * 60 * MINUTE
+
 let firstVisit: number | undefined
 
 export function getDemoFirstVisit(): number {
@@ -14,8 +29,13 @@ export function getDemoFirstVisit(): number {
   const now = Date.now()
   try {
     const stored = Number(window.localStorage.getItem(DEMO_FIRST_VISIT_KEY))
-    firstVisit = Number.isFinite(stored) && stored > 0 && stored <= now ? stored : now
-    if (firstVisit === now) window.localStorage.setItem(DEMO_FIRST_VISIT_KEY, String(now))
+    const usable = Number.isFinite(stored)
+      && stored > 0
+      && stored <= now
+      && now - stored <= FIRST_VISIT_MAX_AGE
+    firstVisit = usable ? stored : now
+    // 저장된 값이 없거나 너무 오래됐을 때만 새로 적는다.
+    if (!usable) window.localStorage.setItem(DEMO_FIRST_VISIT_KEY, String(now))
   } catch {
     firstVisit = now
   }
