@@ -35,7 +35,7 @@ import useSession from '../../hooks/useSession'
 import { applyCommentEdits, deleteComment, editComment, isOwnComment, readCommentEdits } from '../../utils/commentEdits'
 import { readThreadComments, saveThreadComments } from '../../utils/plazaComments'
 import useToast from '../../hooks/useToast'
-import { PATHS, toAfterStoryDetail } from '../../routes/paths'
+import { PATHS, toAfterStoryDetail, toAuthEntry } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
 import CommentStickerPicker from './components/CommentStickerPicker'
 import ResultBreakdown from './components/ResultBreakdown'
@@ -314,7 +314,7 @@ function CaseResultPage() {
 
   if (caseId !== weddingGiftCase.id && !isParentsCase && !plazaStory) return <MissingCase />
 
-  const loginPath = `${PATHS.login}?from=${encodeURIComponent(location.pathname)}`
+  const loginPath = toAuthEntry(personaId, location.pathname)
   if (sessionStatus !== 'authenticated' && !isClosedPlazaCase) return <Navigate to={loginPath} replace />
 
   const routeState = location.state as ResultRouteState | null

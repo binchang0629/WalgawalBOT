@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react'
 import { DEMO_ACCOUNTS } from '../../data/personas'
 import { Link, useNavigate } from 'react-router-dom'
 import useSession from '../../hooks/useSession'
-import { PATHS } from '../../routes/paths'
+import { PATHS, toAuthEntry } from '../../routes/paths'
 import { readMyComments } from '../../utils/myComments'
 import { formatDemoMonthOffset } from '../../data/common/demoClock'
 import profileImage from '../../assets/my/profile.png'
@@ -121,7 +121,7 @@ function MyPage() {
             <h2 id="my-guest-title">로그인이 필요해요</h2>
             <p>로그인하고 내 사건과 배심 활동,<br />포인트를 한곳에서 확인해보세요.</p>
           </div>
-          <Link className="my-guest__login" to={`${PATHS.login}?from=${from}`}>
+          <Link className="my-guest__login" to={toAuthEntry(personaId, PATHS.my)}>
             로그인하기
           </Link>
           <p className="my-guest__signup">

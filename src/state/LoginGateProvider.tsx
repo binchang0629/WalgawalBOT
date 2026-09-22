@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import LoginPopUp from '../components/common/LoginPopUp'
 import useSession from '../hooks/useSession'
-import { PATHS } from '../routes/paths'
+import { PATHS, toAuthEntry } from '../routes/paths'
 import { LoginGateContext } from './loginGateContext'
 import type { LoginGateReason } from './loginGateContext'
 
@@ -24,7 +24,7 @@ interface GateState {
 }
 
 function LoginGateProvider({ children }: { children: ReactNode }) {
-  const { sessionStatus } = useSession()
+  const { personaId, sessionStatus } = useSession()
   const navigate = useNavigate()
   const location = useLocation()
   const [gate, setGate] = useState<GateState | null>(null)
@@ -52,9 +52,10 @@ function LoginGateProvider({ children }: { children: ReactNode }) {
   const handleLogin = useCallback(() => {
     if (!gate) return
     setGate(null)
-    // 로그인을 마치면 원래 가려던 화면으로 돌아간다. LoginPage가 `from`을 읽는다.
-    navigate(`${PATHS.login}?from=${encodeURIComponent(gate.destination)}`)
-  }, [gate, navigate])
+    // 두 시나리오 모두 로그인 화면을 보되, 화면 안의 활성 진입점은 퍼소나별로 다르다.
+    // 완료 뒤에는 `from`에 담아 둔 원래 위치로 돌아간다.
+    navigate(toAuthEntry(personaId, gate.destination))
+  }, [gate, navigate, personaId])
 
   const value = useMemo(() => ({ requireLogin }), [requireLogin])
 

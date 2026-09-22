@@ -27,7 +27,7 @@ const PROFILE_IMAGES = {
  */
 function PersonaSwitcher() {
   const navigate = useNavigate()
-  const { personaId, sessionStatus, currentUser, switchPersona, signIn, signOut } = useSession()
+  const { personaId, sessionStatus, currentUser, switchPersona, signIn } = useSession()
 
   if (sessionStatus === 'restoring') return null
 
@@ -46,6 +46,22 @@ function PersonaSwitcher() {
     navigate(PATHS.login)
   }
 
+  /**
+   * 바깥 패널의 로그인 상태도 현재 고른 퍼소나에 묶는다.
+   * 로그인 전으로 바꾸면서 항상 서아로 돌아가면 지훈 로그인 흐름이 끊기므로,
+   * 같은 퍼소나를 유지한 채 해당 시작 화면으로 이동한다.
+   */
+  const handleAuthState = (authenticated: boolean) => {
+    if (authenticated) {
+      signIn(personaId)
+      navigate(PATHS.home)
+      return
+    }
+
+    switchPersona(personaId, { startSignedOut: true })
+    navigate(personaId === 'A' ? PATHS.onboarding : PATHS.login)
+  }
+
   return (
     <section className="persona-switcher" aria-label="시연 계정 전환">
       <p className="persona-switcher__caption">시연 계정</p>
@@ -53,8 +69,9 @@ function PersonaSwitcher() {
       <div className="persona-switcher__list">
         {PERSONA_ORDER.map((id) => {
           const persona = PERSONAS[id]
-          // 직접 가입한 계정은 서아의 사건 흐름을 쓰지만 서아 시연 계정은 아니다.
-          const isCurrent = isAuthenticated && !currentUser?.isCustomProfile && id === personaId
+          // 로그인 여부와 무관하게 현재 시연 흐름을 표시한다.
+          // 그래야 `서아 · 로그인 전`처럼 두 상태가 함께 읽힌다.
+          const isCurrent = !currentUser?.isCustomProfile && id === personaId
 
           return (
             <button
@@ -93,7 +110,7 @@ function PersonaSwitcher() {
         <button
           type="button"
           className={isAuthenticated ? 'persona-switcher__auth-item' : 'persona-switcher__auth-item persona-switcher__auth-item--current'}
-          onClick={signOut}
+          onClick={() => handleAuthState(false)}
           aria-pressed={!isAuthenticated}
         >
           로그인 전
@@ -101,9 +118,7 @@ function PersonaSwitcher() {
         <button
           type="button"
           className={isAuthenticated ? 'persona-switcher__auth-item persona-switcher__auth-item--current' : 'persona-switcher__auth-item'}
-          onClick={() => {
-            if (!isAuthenticated) signIn(personaId)
-          }}
+          onClick={() => handleAuthState(true)}
           aria-pressed={isAuthenticated}
         >
           로그인 후
@@ -115,7 +130,7 @@ function PersonaSwitcher() {
           ? currentUser?.isCustomProfile
             ? `${currentUser.name} 계정으로 보는 중`
             : `${PERSONAS[personaId].name} 계정으로 보는 중`
-          : '아직 로그인하지 않은 상태'}
+          : `${PERSONAS[personaId].name} · 로그인 전`}
       </p>
 
       <button

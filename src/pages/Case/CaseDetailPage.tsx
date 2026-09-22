@@ -7,7 +7,7 @@ import { parentsCase } from '../../data/common/parentsCaseContent'
 import { getPlazaCaseStory } from '../../data/common/plazaCaseStories'
 import DemoRelativeTime from '../../components/common/DemoRelativeTime'
 import type { WeddingGiftVoteId } from '../../data/common/caseDetailContent'
-import { PATHS, toCaseResult } from '../../routes/paths'
+import { PATHS, toAuthEntry, toCaseResult } from '../../routes/paths'
 import CaseHeader from './components/CaseHeader'
 import CaseVoteSection from './components/CaseVoteSection'
 import AiSummary from './components/AiSummary'
@@ -68,7 +68,7 @@ function CaseDetailPage() {
   const showVotedNotice = hasVoted && !confirmedVote
   const savedVote = juryVotes[caseContent.id]
   const savedChoice = caseContent.choices.find((choice) => choice.id === savedVote)
-  const loginPath = `${PATHS.login}?from=${encodeURIComponent(location.pathname)}`
+  const loginPath = toAuthEntry(personaId, location.pathname)
   const entryState = location.state as { entryMotion?: string; returnTo?: string; fromPlaza?: boolean; homeCaseId?: string } | null
   const shouldSlideIn = entryState?.entryMotion === 'slide-forward'
   const overlayRoot = document.getElementById('app-overlay-root')

@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import useSession from '../../hooks/useSession'
 import { PATHS } from '../../routes/paths'
 import { requestLoginReward } from '../../state/loginRewardSignal'
-import { AUTH_DEMO_LOGINS, findDemoPersonaByEmail } from './authDemoAccount'
+import { AUTH_DEMO_LOGINS } from './authDemoAccount'
 import eyeOnIcon from '../../assets/auth/loginEyeOn.svg'
 import eyeOffIcon from '../../assets/auth/loginEyeOff.svg'
 import googleIcon from '../../assets/auth/loginSocialGoogle.png'
@@ -57,8 +57,10 @@ function LoginPage() {
   const from = rawFrom && rawFrom.startsWith('/') && !rawFrom.startsWith('//') ? rawFrom : PATHS.home
 
   const canSubmit = email.trim() !== '' && password !== ''
+  const isSeoaFlow = personaId === 'A'
 
   const handleDemoFill = () => {
+    if (isSeoaFlow) return
     setEmail(demoLogin.email)
     setPassword(demoLogin.password)
   }
@@ -67,12 +69,19 @@ function LoginPage() {
     event.preventDefault()
     if (!canSubmit) return
 
+    // 신규 사용자 서아는 기존 지훈 계정으로 들어갈 수 없다.
+    // 로그인 화면은 유지하고, 제출만 회원가입 흐름으로 이어준다.
+    if (isSeoaFlow) {
+      navigate(`${PATHS.signup}?from=${encodeURIComponent(from)}`, { replace: true })
+      return
+    }
+
     // 모바일 키보드·포커스가 남아 있으면 도착 화면의 하단 내비가 밀려 보일 수 있다.
     // 먼저 포커스를 해제하고 목적지 화면을 한 프레임 완성한 뒤 보상 팝업을 띄운다.
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
-    // 시연 계정 이메일을 직접 친 경우 그 계정으로 들어간다.
-    // 그래야 로그인 직후 인사 팝업이 `지훈님`처럼 실제 입력한 계정 이름으로 뜬다.
-    signIn(findDemoPersonaByEmail(email) ?? personaId)
+    // 지훈 플로우에서는 직접 입력해도 지훈 계정으로만 로그인한다.
+    // 다른 퍼소나의 값으로 흐름이 바뀌지 않게 시연 선택을 우선한다.
+    signIn(personaId)
     navigate(PATHS.home, { replace: true })
     window.requestAnimationFrame(() => {
       window.requestAnimationFrame(() => requestLoginReward('login'))
@@ -93,6 +102,8 @@ function LoginPage() {
             type="button"
             className={isDemoFilled ? 'login__demoFill login__demoFillOn' : 'login__demoFill'}
             onClick={handleDemoFill}
+            disabled={isSeoaFlow}
+            title={isSeoaFlow ? '서아 플로우에서는 회원가입으로 이어져요' : undefined}
           >
             {isDemoFilled ? `${demoLogin.shortName} 계정 로그인 중` : `${demoLogin.shortName} 계정 로그인`}
           </button>
@@ -156,12 +167,22 @@ function LoginPage() {
       </div>
 
       <p className="login__links">
-        <Link
-          className="login__signupLink"
-          to={`${PATHS.signup}?from=${encodeURIComponent(from)}`}
-        >
-          이메일로 회원가입
-        </Link>
+        {isSeoaFlow ? (
+          <Link
+            className="login__signupLink"
+            to={`${PATHS.signup}?from=${encodeURIComponent(from)}`}
+          >
+            이메일로 회원가입
+          </Link>
+        ) : (
+          <span
+            className="login__signupLink login__signupLink--disabled"
+            aria-disabled="true"
+            title="지훈 플로우에서는 기존 계정으로 로그인해요"
+          >
+            이메일로 회원가입
+          </span>
+        )}
         <span className="login__linkDivider" aria-hidden="true" />
         {/* 찾기 화면은 시안이 없어 연결하지 않는다. → PROJECT_SPEC.md §9 */}
         <span className="login__findLink">아이디 / 비밀번호 찾기</span>

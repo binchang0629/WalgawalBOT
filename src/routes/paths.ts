@@ -1,3 +1,5 @@
+import type { PersonaId } from '../types'
+
 /**
  * 앱 내부 경로를 한곳에서 관리한다.
  * 문자열 URL을 화면 코드에 직접 적지 않는다. (PROJECT_SPEC.md §7-3)
@@ -51,6 +53,14 @@ export const toCaseDetail = (caseId: string) => `/cases/${caseId}`
 export const toCaseResult = (caseId: string) => `/cases/${caseId}/result`
 export const toAfterStoryDetail = (storyId: string) => `/afterstory/${storyId}`
 export const toMyCaseResult = (caseId: string) => `/my/cases/${caseId}`
+
+/**
+ * 시연 퍼소나에 맞는 인증 진입점.
+ *
+ * 두 시나리오 모두 로그인 화면을 거친다. 화면 안에서 서아는 회원가입만,
+ * 지훈은 기존 계정 로그인만 활성화해 다음 행동을 하나로 좁힌다.
+ */
+export const toAuthEntry = (_personaId: PersonaId, from: string) => `${PATHS.login}?from=${encodeURIComponent(from)}`
 
 /**
  * 상세 화면에 외부에서 바로 들어온 경우 돌아갈 기본 경로.

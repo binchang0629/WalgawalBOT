@@ -110,6 +110,12 @@
     cursor: pointer;
 }
 
+/* 신규 사용자 서아 흐름에서는 기존 사용자 지훈의 빠른 로그인만 막는다. */
+.login__demoFill:disabled {
+    color: var(--neutral-400);
+    cursor: not-allowed;
+}
+
 .login__field {
     position: relative;
     display: flex;
@@ -265,6 +271,12 @@
     text-decoration-color: currentColor;
     text-underline-offset: 3px;
     text-decoration-thickness: 1px;
+}
+
+.login__signupLink--disabled {
+    color: var(--neutral-400);
+    cursor: not-allowed;
+    text-decoration: none;
 }
 
 .login__linkDivider {
