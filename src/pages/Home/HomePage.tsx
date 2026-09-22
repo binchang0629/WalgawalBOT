@@ -77,7 +77,8 @@ function HomePage() {
       />
       {isSearchOpen && <HomeSearchPanel isClosing={isSearchClosing} onClose={closeSearch} />}
       <PopularCaseSection />
-      {isAuthenticated && <RecentCasesSection />}
+      {/* 계정마다 열람 기록이 다르다. 전환해도 마운트가 유지되므로 key로 다시 읽게 한다. */}
+      {isAuthenticated && <RecentCasesSection key={personaId} />}
       <AdBanner />
       {!isAuthenticated && <CompactAiRecommendCard />}
       {isAuthenticated && <AiRecommendSection />}

@@ -44,7 +44,7 @@ const VARIANTS: Record<LoginGateReason, Variant> = {
       <>
         로그인을 하면 사건 작성부터
         <br />
-        <b>AI판결</b>까지 이어서 할 수 있어요
+        <b>AI 판결</b>까지 이어서 할 수 있어요
       </>
     ),
   },

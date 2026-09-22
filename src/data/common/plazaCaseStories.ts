@@ -469,6 +469,52 @@ export const recommendationOnlyCases: PlazaCase[] = [
 export const getRecommendationCase = (caseId: string) =>
   plazaCases.find((item) => item.id === caseId) ?? recommendationOnlyCases.find((item) => item.id === caseId)
 
+/**
+ * 투표가 진행 중인 사건을 조회수 높은 순으로.
+ *
+ * 활동 기록이 없는 계정의 첫 추천이 쓴다. 개인화할 근거가 없을 때 무엇으로 골랐는지
+ * 화면에서 바로 확인할 수 있어야 해서, 카드에 이미 찍혀 있는 조회수를 기준으로 삼았다.
+ * 계정별 관심 분야 목록(`personalizedRecommendation`)에서 뽑으면
+ * 개인화가 없다고 말하면서 개인화 목록을 쓰는 셈이 된다.
+ *
+ * 진행 중인 사건만 담는다. 첫 참여를 권하는 자리라 투표할 수 없는 사건은 소용이 없다.
+ */
+export const getPopularVotingCases = (): PlazaCase[] => plazaCases
+  .filter((item) => item.status === 'voting')
+  .sort((a, b) => b.viewCount - a.viewCount)
+
+/**
+ * 홈 `최근 본 사건` 메모지 한 장에 필요한 만큼만 추린 것.
+ *
+ * 축의금 사건은 광장 목록에 없고(홈 `오늘의 사건` 전용) 상세 데이터의 `summary`도
+ * AI 핵심요약 배열이라 카드 한 줄 요약으로 쓸 수 없다. 그래서 이 사건만 따로 적는다.
+ * 나머지는 광장 카드가 이미 같은 항목을 갖고 있어 그대로 쓴다.
+ */
+export interface RecentCaseCard {
+  id: string
+  category: CaseCategory
+  tag: string
+  /** 광장 카드의 `\n`이 섞여 있을 수 있다. 메모지는 카드 폭에 맞춰 흘리므로 쓰는 쪽에서 지운다. */
+  title: string
+  summary: string
+}
+
+const weddingGiftRecentCard: RecentCaseCard = {
+  id: weddingGiftCase.id,
+  category: weddingGiftCase.category,
+  tag: weddingGiftCase.category,
+  /* 상세의 원래 제목은 메모지에 담기에 길어 세 줄 안에 들어오도록 줄였다. */
+  title: '10년 지기 친구 결혼식에 축의금 10만 원을 냈어요',
+  summary: '오래된 사이인데 조금 더 생각할 줄 알았다는 말을 들었어요.',
+}
+
+export function getRecentCaseCard(caseId: string): RecentCaseCard | null {
+  if (caseId === weddingGiftCase.id) return weddingGiftRecentCard
+  const card = getRecommendationCase(caseId)
+  if (!card) return null
+  return { id: card.id, category: card.category, tag: card.tag, title: card.title, summary: card.summary }
+}
+
 export function getPlazaCaseStory(caseId: string | undefined) {
   if (!caseId) return null
   const narrative = narratives[caseId]

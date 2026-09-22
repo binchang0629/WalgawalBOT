@@ -177,7 +177,11 @@
     color: var(--neutral-700);
 }
 
-.loginPopUpBody b { font-weight: 700; }
+/* 안내 문구 안의 강조는 Primary blue다. 지금은 사건 접수 팝업의 `AI 판결` 한 곳에서 쓴다. */
+.loginPopUpBody b {
+    font-weight: 700;
+    color: var(--blue-700);
+}
 
 .loginPopUpPrimary,
 .loginPopUpSecondary {

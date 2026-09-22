@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import useSession from '../../hooks/useSession'
@@ -14,6 +14,7 @@ import AiSummary from './components/AiSummary'
 import useToast from '../../hooks/useToast'
 import useDemoCountdown from './components/useDemoCountdown'
 import { getRememberedCaseParticipantCount } from '../../utils/caseParticipantCount'
+import { recordCaseView } from '../../utils/recentViewedCases'
 import './CaseDetailPage.css'
 
 /**
@@ -45,7 +46,7 @@ function CaseDetailPage() {
   const { caseId } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
-  const { sessionStatus, votedCaseIds, juryVotes, recordJuryVote } = useSession()
+  const { personaId, sessionStatus, votedCaseIds, juryVotes, recordJuryVote } = useSession()
   const { showToast } = useToast()
   const [selectedVote, setSelectedVote] = useState<WeddingGiftVoteId | null>(null)
   const [confirmedVote, setConfirmedVote] = useState<WeddingGiftVoteId | null>(null)
@@ -71,6 +72,26 @@ function CaseDetailPage() {
   const entryState = location.state as { entryMotion?: string; returnTo?: string; fromPlaza?: boolean; homeCaseId?: string } | null
   const shouldSlideIn = entryState?.entryMotion === 'slide-forward'
   const overlayRoot = document.getElementById('app-overlay-root')
+  /** 이미 열람 기록을 남긴 사건. 계정 전환으로 효과가 다시 돌 때 중복 기록을 막는다. */
+  const recordedCaseRef = useRef<string | null>(null)
+  const isKnownCase = caseId === weddingGiftCase.id || caseId === parentsCase.id || Boolean(plazaStory)
+
+  /*
+   * 홈 `최근 본 사건`에 남길 열람 기록.
+   * 로그인 여부를 따지지 않는다 — 둘러보다 가입하는 서아의 흐름에서 가입 전에 본 사건도 본인이 본 것이다.
+   * 없는 사건 주소로 들어온 경우는 아래 `MissingCase`로 빠지므로 여기까지 오지 않는다.
+   */
+  useEffect(() => {
+    if (!isKnownCase) return
+    /*
+     * 한 사건은 한 번만 남긴다. 사건을 보는 도중 계정을 전환하면 이 효과가 다시 도는데,
+     * 그때 기록하면 서아가 보던 사건이 지훈 홈의 `최근 본 사건`에 올라온다.
+     * 사건 주소만 바뀌어 같은 화면이 다시 쓰이는 경우(`/cases/a` → `/cases/b`)는 id가 달라 기록된다.
+     */
+    if (recordedCaseRef.current === caseContent.id) return
+    recordedCaseRef.current = caseContent.id
+    recordCaseView(personaId, caseContent.id)
+  }, [isKnownCase, personaId, caseContent.id])
 
   useEffect(() => {
     if (!confirmedVote) return
@@ -87,7 +108,7 @@ function CaseDetailPage() {
     return () => window.clearTimeout(timer)
   }, [caseContent.id, confirmedVote, entryState?.homeCaseId, entryState?.returnTo, navigate])
 
-  if (caseId !== weddingGiftCase.id && caseId !== parentsCase.id && !plazaStory) return <MissingCase />
+  if (!isKnownCase) return <MissingCase />
 
   const handleVoteChoice = (choiceId: WeddingGiftVoteId) => {
     setSelectedVote(choiceId)

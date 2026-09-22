@@ -1,4 +1,3 @@
-import type { CaseCategory, CaseSummary } from '../../types'
 import { weddingGiftCase } from './caseDetailContent'
 
 /**
@@ -49,41 +48,12 @@ export const todayCase = {
   },
 } as const
 
-/** 최근 본 사건 — 시안의 메모지 카드 2장 */
-export interface RecentCase extends CaseSummary {
-  /** 광장 카드와 같은 분야 색(점 + 글자)을 정한다. */
-  category: CaseCategory
-  /** 카드 본문 한 줄 요약. 넘치면 말줄임 */
-  summary: string
-  /** 화면에 그대로 노출되는 상대 시각 */
-  viewedAt: string
-  tone: 'blue' | 'yellow'
-}
-
-export const recentCases: RecentCase[] = [
-  {
-    id: 'case-always-paying',
-    category: '친구',
-    tag: '친구',
-    title: '친구 모임에서 항상\n저만 계산해요',
-    summary: '제가 먼저 결제하면 나중에 보내준다고 하지만, 매번 입금을 요청하기도 지쳐요.',
-    viewedAt: '어제',
-    tone: 'blue',
-  },
-  /*
-   * 예전 `생활 · 이웃`(세탁기 소음) 카드는 광장의 다섯 분야 어디에도 들지 않아,
-   * 광장에 있는 가족 사건으로 바꿨다. 분야 표기는 연인·친구·가족·직장·학업만 쓴다.
-   */
-  {
-    id: 'case-family-care',
-    category: '가족',
-    tag: '가족',
-    title: '부모님 병원 동행을 저에게만\n부탁하는 형제자매',
-    summary: '각자 바쁘다는 이유로 돌봄 일정이 제게 몰리고 있어요.',
-    viewedAt: '2일 전',
-    tone: 'yellow',
-  },
-]
+/*
+ * 최근 본 사건은 더 이상 여기에 고정 데이터로 두지 않는다.
+ * 한 번도 연 적 없는 사건이 `최근 본`으로 뜨면 가입 직후 서아의 화면이 앞뒤가 맞지 않는다.
+ * 실제 열람 기록은 `utils/recentViewedCases.ts`가 계정별로 들고 있고,
+ * 카드에 쓸 사건 정보는 `getRecentCaseCard`(plazaCaseStories.ts)가 만든다.
+ */
 
 /** 광고 배너 — 실제 광고가 아니라 시안에 있는 자리 표시 */
 export const adBanner = {
@@ -173,6 +143,31 @@ export const aiRecommendation = {
   tail: '',
 } as const
 
+/**
+ * 추천 근거 문구. 계정이 아니라 **실제 활동 건수**로 고른다.
+ *
+ * 활동이 0건인데 `자주 참여했던 기록을 반영했어요`라고 하면 같은 계정의 MY(접수 0건·배심 참여 0건)와
+ * 화면에서 바로 어긋난다. 가입 직후 서아가 그 경우다. 그래서 기록이 없을 때는 무엇을 근거로 골랐는지
+ * 사실대로 말한다 — `getPopularVotingCases()`가 진행 사건을 조회수 높은 순으로 내놓고 앞의 세 건을 쓴다.
+ * 근거로 삼은 조회수가 카드에 그대로 찍혀 있어, 말한 기준과 화면을 바로 대조할 수 있다.
+ *
+ * 투표나 접수가 한 건이라도 쌓이면 `history` 쪽으로 저절로 넘어간다.
+ * 지훈은 배심 참여 기록을 갖고 시작하므로 처음부터 `history`다.
+ */
+export const recommendationCopy = {
+  history: {
+    description: '자주 참여했던 기록을 반영했어요.',
+    lead: '님에게 맞는',
+    tail: '을 찾았어요!',
+  },
+  coldStart: {
+    description: '아직 활동 기록이 없어 조회수가 높은 진행 사건을 골랐어요.',
+    lead: '님이 시작하기 좋은',
+    topic: '지금 많이 보는 사건',
+    tail: '이에요',
+  },
+} as const
+
 /** 로그인 후 추천 시안 1473:8571. 개인화 API 대신 데모 계정별 관심 분야를 구분한다. */
 export const personalizedRecommendation = {
   A: {
@@ -210,5 +205,6 @@ export const homeSectionTitles = {
   balance: { title: '밸런스 게임' },
   closeCall: { title: '막상막하', description: '한 표로 달라질 수 있는, 팽팽한 사건', action: '자세히 보기' },
   afterStory: { title: '왈가왈후~', description: '판정 이후, 이렇게 달라졌어요.', action: '더보기' },
-  aiRecommend: { title: 'AI 맞춤 추천', description: '자주 참여했던 기록을 반영했어요.' },
+  /* 부제는 활동 건수에 따라 달라져서 위 `recommendationCopy`가 갖고 있다. */
+  aiRecommend: { title: 'AI 맞춤 추천' },
 } as const
