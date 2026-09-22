@@ -1918,3 +1918,9 @@ Figma `자료종합` 페이지(노드 `1264:12056`)의 최상위 16개 항목을
 - **태그는 글자는 두고 불꽃 아이콘만 일렁이게 했다**(`swap-tag-flame`, 1.4초). 아래를 축으로 세로로 솟았다 기우는 정도라 `투표 중` 배지의 점 파동과 같은 크기의 신호다.
 - 둘 다 `prefers-reduced-motion: reduce`에서 멈춘다.
 - 검증: 모바일 뷰포트 브라우저에서 바의 `translateX`가 -5.8 ~ 5.0px 사이로 바뀌고, 불꽃이 세로 0.95 ~ 1.12배로 움직이는 것을 실측했다. `npm run typecheck`·`npm run build` 통과. 린트는 이번 수정과 무관한 `CaseResultPage.tsx`·`ClosedCaseResultPage.tsx`의 기존 `react-hooks/purity` 에러 2건이 남아 있다. 기존 500kB 청크 경고는 유지된다.
+
+## 최근 본 사건 1건일 때 첫째 자리 고정 (2026-09-21)
+
+- 최근 본 사건이 한 건뿐이면 카드가 섹션 가운데로 갔다. `.recent-section`이 `align-items: center`라 카드 묶음이 내용 폭만큼 줄어든 채 가운데 놓였기 때문이다.
+- `.recent-section__grid`에 카드 두 장 폭(`171px * 2 + 12px`)을 자리로 잡았다. 한 장이면 두 장일 때의 첫째 자리(왼쪽)에 선다. 폭을 화면에 맞춰 줄이지 않았다 — 줄이면 좁은 화면에서 두 장일 때 자리가 바뀐다.
+- 검증: 375px에서 한 장일 때 카드 left 10.5px, 두 장일 때 10.5px·193.5px로 수정 전 두 장 배치와 같은 것을 실측했다. `npm run typecheck`·`npm run build` 통과.
