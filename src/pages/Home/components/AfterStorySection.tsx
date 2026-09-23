@@ -45,7 +45,9 @@ function AfterStorySection() {
     if (isLeavingDetail) return
 
     const destination = toAfterStoryDetail(featuredAfterStory.id)
-    const state = { from: PATHS.home }
+    // 실제 뒤로가기는 홈으로, 하단 메뉴만 후일담으로 유지한다.
+    // 읽는 내용과 메뉴 상태는 맞추되 출발한 홈의 스크롤 위치는 잃지 않는다.
+    const state = { from: PATHS.home, navContext: PATHS.afterStory }
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       navigate(destination, { state })
       return
@@ -102,7 +104,7 @@ function AfterStorySection() {
           <Link
             className="letter__cta letter__cta--link"
             to={toAfterStoryDetail(featuredAfterStory.id)}
-            state={{ from: PATHS.home }}
+            state={{ from: PATHS.home, navContext: PATHS.afterStory }}
             aria-label="직속 사수와의 면담 후일담 자세히 보기"
             onClick={(event) => {
               if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
@@ -138,7 +140,7 @@ function AfterStorySection() {
             className="quote-card"
             key={story.id}
             to={toAfterStoryDetail(story.id)}
-            state={{ from: PATHS.home }}
+            state={{ from: PATHS.home, navContext: PATHS.afterStory }}
             aria-label={`${story.caseTitleLines.join(' ')} 후일담 읽기`}
           >
             <div className="quote-card__body">

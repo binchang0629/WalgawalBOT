@@ -54,7 +54,7 @@ const JIHOON_AFTER_STORY_ID = 'afterstory-video-payment'
  * 넘겨받은 주소를 그대로 믿지 않고 이 목록 안의 것만 쓴다.
  * MY > 내가 쓴 댓글도 여기 있어야, 그 목록에서 들어왔을 때 광장이 아니라 목록으로 돌아간다.
  */
-const RETURNABLE_PATHS: string[] = [PATHS.myJury, PATHS.my, PATHS.myComments, PATHS.home]
+const RETURNABLE_PATHS: string[] = [PATHS.myJury, PATHS.my, PATHS.myComments, PATHS.home, PATHS.afterStory]
 
 /*
  * MY 안에서 들어온 경우에만 MY 상세 화면과 같은 좌우 슬라이드를 쓴다.
@@ -199,7 +199,7 @@ function ClosedCaseResultPage() {
   const { requireLogin } = useLoginGate()
   const location = useLocation()
   const navigate = useNavigate()
-  const routeState = location.state as { fromPlaza?: boolean; returnTo?: string; homeCaseId?: string } | null
+  const routeState = location.state as { fromPlaza?: boolean; returnTo?: string; navContext?: string; homeCaseId?: string } | null
   const fromMy = MY_DETAIL_PATHS.includes(routeState?.returnTo ?? '')
   const slide = useDetailSlide(fromMy)
   const [draft, setDraft] = useState('')
@@ -241,7 +241,6 @@ function ClosedCaseResultPage() {
   const [commentReactions, setCommentReactions] = useState<Record<string, CommentReaction>>(() => readMyCommentReactions(personaId))
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const commentSectionRef = useRef<HTMLElement>(null)
-  const nextCommentId = useRef(1)
   const isAuthenticated = sessionStatus === 'authenticated'
 
   const requestCommentLogin = () => {
@@ -293,14 +292,13 @@ function ClosedCaseResultPage() {
     if (!body && !selectedStickerId) return
 
     /* 댓글 화면과 MY가 같은 id를 써야 공감/반대 수가 두 화면에서 같아진다. */
-    const commentId = `new-comment-${Date.now()}-${nextCommentId.current++}`
+    const commentId = `new-comment-${crypto.randomUUID()}`
     setAddedComments((comments) => [
       {
         id: commentId,
         nickname: currentUser?.nickname ?? '익명의 배심원',
         avatarUrl: currentUser?.anonymousAvatarUrl ?? jihoonSimilarResult.comments[0].avatarUrl,
         createdAt: '방금 전',
-        createdAtMs: Date.now(),
         voteId: null,
         voteLabel: null,
         body,

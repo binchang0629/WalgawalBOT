@@ -690,14 +690,18 @@ export function AfterStoryDetailPage() {
               광장 목록 밖으로 밀려난 예전 사건의 후일담은 갈 곳이 없어 버튼을 그리지 않는다.
             */}
             {communityStory?.caseId && (
-              <Link
+              <>
+                {/* 홈에서 연 후일담은 홈으로 돌아가고, 연결 사건을 읽는 동안만
+                    하단 메뉴를 왈가왈후~로 유지한다. */}
+                <Link
                 className="afterstory-detail__case-link"
                 to={toCaseDetail(communityStory.caseId)}
-                state={{ returnTo: PATHS.afterStory }}
+                state={{ from: backTo, returnTo: backTo, navContext: PATHS.afterStory }}
                 aria-label={`${communityStory.title} 사건 상세로 이동`}
-              >
-                그날의 사건 보기<span aria-hidden="true">›</span>
-              </Link>
+                >
+                  그날의 사건 보기<span aria-hidden="true">›</span>
+                </Link>
+              </>
             )}
           </div>
 

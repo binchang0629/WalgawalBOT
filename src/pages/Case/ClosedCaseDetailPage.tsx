@@ -12,12 +12,23 @@ function ClosedCaseDetailPage() {
   const location = useLocation()
   const plazaStory = getPlazaCaseStory(caseId)
   const caseContent = plazaStory ?? jihoonSimilarCase
-  const routeState = location.state as { fromPlaza?: boolean; returnTo?: string; homeCaseId?: string } | null
+  const routeState = location.state as { fromPlaza?: boolean; returnTo?: string; navContext?: string; homeCaseId?: string } | null
   const fromPlaza = routeState?.fromPlaza
 
   return (
     <main className="case-detail case-detail--closed">
-      <CaseHeader title="지난 사건" backTo={routeState?.returnTo === PATHS.myJury ? PATHS.myJury : routeState?.returnTo === PATHS.home ? PATHS.home : plazaStory ? PATHS.plaza : undefined} />
+      <CaseHeader
+        title="지난 사건"
+        backTo={routeState?.returnTo === PATHS.myJury
+          ? PATHS.myJury
+          : routeState?.returnTo === PATHS.home
+            ? PATHS.home
+            : routeState?.returnTo === PATHS.afterStory
+              ? PATHS.afterStory
+              : plazaStory
+                ? PATHS.plaza
+                : undefined}
+      />
 
       <div className="case-detail__body">
         <section className="case-overview case-overview--closed" aria-labelledby="case-title">
@@ -51,7 +62,7 @@ function ClosedCaseDetailPage() {
 
         <AiSummary items={caseContent.summary} />
 
-        <Link className="closed-case-result-link" to={toCaseResult(caseContent.id)} state={{ fromPlaza, returnTo: routeState?.returnTo, homeCaseId: routeState?.homeCaseId }}>
+        <Link className="closed-case-result-link" to={toCaseResult(caseContent.id)} state={{ fromPlaza, returnTo: routeState?.returnTo, navContext: routeState?.navContext, homeCaseId: routeState?.homeCaseId }}>
           투표 결과보기
         </Link>
       </div>

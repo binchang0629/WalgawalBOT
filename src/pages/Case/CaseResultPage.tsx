@@ -48,6 +48,7 @@ import './WeddingGiftResultPage.css'
 interface ResultRouteState {
   selectedVote?: WeddingGiftVoteId
   returnTo?: string
+  navContext?: string
   from?: string
   fromPlaza?: boolean
   homeCaseId?: string
@@ -60,7 +61,7 @@ interface ResultRouteState {
  * 넘겨받은 주소를 그대로 믿지 않고 이 목록 안의 것만 쓴다.
  * MY > 내가 쓴 댓글도 여기 있어야, 그 목록에서 들어왔을 때 광장이 아니라 목록으로 돌아간다.
  */
-const RETURNABLE_PATHS: string[] = [PATHS.myJury, PATHS.my, PATHS.myComments, PATHS.home]
+const RETURNABLE_PATHS: string[] = [PATHS.myJury, PATHS.my, PATHS.myComments, PATHS.home, PATHS.afterStory]
 
 /** 그중 MY 안쪽 화면. 여기서 들어왔을 때만 MY와 같은 좌우 슬라이드를 쓴다. */
 const MY_DETAIL_PATHS: string[] = [PATHS.my, PATHS.myComments]
@@ -250,7 +251,6 @@ function CaseResultPage() {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const commentSectionRef = useRef<HTMLElement>(null)
   const verdictVideoRef = useRef<HTMLVideoElement>(null)
-  const nextCommentId = useRef(1)
   const plazaStory = getPlazaCaseStory(caseId)
   const plazaResult = getPlazaCaseResultContent(caseId)
   const caseContent = caseId === parentsCase.id ? parentsCase : plazaStory ?? weddingGiftCase
@@ -338,14 +338,13 @@ function CaseResultPage() {
 
     const voteDisplay = voteDisplayById[selectedVote]
     /* 댓글 화면과 MY가 같은 id를 써야 공감/반대 수가 두 화면에서 같아진다. */
-    const commentId = `new-comment-${Date.now()}-${nextCommentId.current++}`
+    const commentId = `new-comment-${crypto.randomUUID()}`
     setAddedComments((comments) => [
       {
         id: commentId,
         avatarUrl: currentUser.anonymousAvatarUrl,
         nickname: currentUser.nickname,
         createdAt: '방금 전',
-        createdAtMs: Date.now(),
         voteId: selectedVote,
         voteLabel: voteDisplay.label,
         body,

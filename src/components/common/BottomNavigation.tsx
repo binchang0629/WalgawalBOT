@@ -93,12 +93,15 @@ function BottomNavigation() {
    * 3. 둘 다 없으면 현재 pathname을 사용
    */
   const routeState = location.state as {
+    /** 화면의 실제 출발점과 별개로 하단 메뉴만 유지할 때 쓴다. */
+    navContext?: string
     returnTo?: string
     from?: string
     fromPlaza?: boolean
   } | null
 
   const activePath =
+    routeState?.navContext ??
     routeState?.returnTo ??
     routeState?.from ??
     location.pathname

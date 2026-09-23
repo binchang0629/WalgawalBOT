@@ -69,7 +69,7 @@ function CaseDetailPage() {
   const savedVote = juryVotes[caseContent.id]
   const savedChoice = caseContent.choices.find((choice) => choice.id === savedVote)
   const loginPath = toAuthEntry(personaId, location.pathname)
-  const entryState = location.state as { entryMotion?: string; returnTo?: string; fromPlaza?: boolean; homeCaseId?: string } | null
+  const entryState = location.state as { entryMotion?: string; returnTo?: string; navContext?: string; fromPlaza?: boolean; homeCaseId?: string } | null
   const shouldSlideIn = entryState?.entryMotion === 'slide-forward'
   const overlayRoot = document.getElementById('app-overlay-root')
   /** 이미 열람 기록을 남긴 사건. 계정 전환으로 효과가 다시 돌 때 중복 기록을 막는다. */
@@ -99,6 +99,7 @@ function CaseDetailPage() {
       navigate(toCaseResult(caseContent.id), {
         state: {
           selectedVote: confirmedVote,
+          navContext: entryState?.navContext,
           fromPlaza: caseContent.id !== weddingGiftCase.id,
           returnTo: entryState?.returnTo,
           homeCaseId: entryState?.homeCaseId,
@@ -106,7 +107,7 @@ function CaseDetailPage() {
       })
     }, 1000)
     return () => window.clearTimeout(timer)
-  }, [caseContent.id, confirmedVote, entryState?.homeCaseId, entryState?.returnTo, navigate])
+  }, [caseContent.id, confirmedVote, entryState?.homeCaseId, entryState?.navContext, entryState?.returnTo, navigate])
 
   if (!isKnownCase) return <MissingCase />
 
@@ -129,7 +130,15 @@ function CaseDetailPage() {
     <main className={`case-detail${caseContent.id === parentsCase.id ? ' case-detail--family' : ''}${isClosed ? ' case-detail--closed' : ''}${shouldSlideIn ? ' case-detail--slide-forward' : ''}`}>
       <CaseHeader
         title={plazaStory ? (isClosed ? '지난 사건' : '사건 상세') : caseContent.id === parentsCase.id ? '사건 상세' : undefined}
-        backTo={entryState?.returnTo === PATHS.myJury ? PATHS.myJury : entryState?.returnTo === PATHS.home ? PATHS.home : plazaStory ? PATHS.plaza : undefined}
+        backTo={entryState?.returnTo === PATHS.myJury
+          ? PATHS.myJury
+          : entryState?.returnTo === PATHS.home
+            ? PATHS.home
+            : entryState?.returnTo === PATHS.afterStory
+              ? PATHS.afterStory
+              : plazaStory
+                ? PATHS.plaza
+                : undefined}
       />
 
       <div className="case-detail__body">
@@ -167,7 +176,7 @@ function CaseDetailPage() {
         <AiSummary items={caseContent.summary} />
 
         {isClosed ? (
-          <Link className="closed-case-result-link" to={toCaseResult(caseContent.id)} state={{ fromPlaza: entryState?.fromPlaza, returnTo: entryState?.returnTo, homeCaseId: entryState?.homeCaseId }}>
+          <Link className="closed-case-result-link" to={toCaseResult(caseContent.id)} state={{ fromPlaza: entryState?.fromPlaza, returnTo: entryState?.returnTo, navContext: entryState?.navContext, homeCaseId: entryState?.homeCaseId }}>
             투표 결과보기
           </Link>
         ) : showVotedNotice ? (
@@ -179,7 +188,7 @@ function CaseDetailPage() {
             </div>
             <Link
               to={toCaseResult(caseContent.id)}
-              state={{ selectedVote: savedVote, fromPlaza: entryState?.fromPlaza, returnTo: entryState?.returnTo, homeCaseId: entryState?.homeCaseId }}
+              state={{ selectedVote: savedVote, fromPlaza: entryState?.fromPlaza, returnTo: entryState?.returnTo, navContext: entryState?.navContext, homeCaseId: entryState?.homeCaseId }}
             >
               판결 다시 보기
             </Link>
